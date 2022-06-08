@@ -1,0 +1,124 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FlushMouse", "FlushMouse\FlushMouse.vcxproj", "{25CCB51D-E30E-4A21-BA9D-09CF79484FE9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3D3F632C-75BB-4830-AA8E-0871C6AA1A72} = {3D3F632C-75BB-4830-AA8E-0871C6AA1A72}
+		{701B5F8E-0E39-40C3-A692-B23A3836BEDE} = {701B5F8E-0E39-40C3-A692-B23A3836BEDE}
+		{CCAF431F-CE8E-4879-9B1F-3F1DF4AC2269} = {CCAF431F-CE8E-4879-9B1F-3F1DF4AC2269}
+		{DBEDAF04-FC3F-48DC-81AC-981A747F30A4} = {DBEDAF04-FC3F-48DC-81AC-981A747F30A4}
+		{FB5448F4-CEDD-4025-AF2A-F7540BDF9DDE} = {FB5448F4-CEDD-4025-AF2A-F7540BDF9DDE}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FlushMouseCursor", "FlushMouseCursor\FlushMouseCursor.vcxproj", "{FB5448F4-CEDD-4025-AF2A-F7540BDF9DDE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FlushMouse32", "FlushMouse32\FlushMouse32.vcxproj", "{DBEDAF04-FC3F-48DC-81AC-981A747F30A4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FlushMouseDLL32", "FlushMouseDLL32\FlushMouseDLL32.vcxproj", "{701B5F8E-0E39-40C3-A692-B23A3836BEDE}"
+EndProject
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "SetupProject", "SetupProject\SetupProject.wixproj", "{40614F11-A07B-42AB-822E-FAC73CC85CB0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{352B420D-E55A-4196-9597-D394D0DA2519}"
+	ProjectSection(SolutionItems) = preProject
+		Solution.props = Solution.props
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiscLIB", "MiscLIB\MiscLIB.vcxproj", "{CCAF431F-CE8E-4879-9B1F-3F1DF4AC2269}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiscLIB32", "MiscLIB32\MiscLIB32.vcxproj", "{3D3F632C-75BB-4830-AA8E-0871C6AA1A72}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ソリューション項目", "ソリューション項目", "{4DA8FAF2-6A3D-41B4-B811-0F39BFA7CAA5}"
+	ProjectSection(SolutionItems) = preProject
+		version.h = version.h
+		version.wxi = version.wxi
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Mixed Platform for FlushMouse = Debug|Mixed Platform for FlushMouse
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Mixed Platform for FlushMouse = Release|Mixed Platform for FlushMouse
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{25CCB51D-E30E-4A21-BA9D-09CF79484FE9}.Debug|Mixed Platform for FlushMouse.ActiveCfg = Debug|x64
+		{25CCB51D-E30E-4A21-BA9D-09CF79484FE9}.Debug|Mixed Platform for FlushMouse.Build.0 = Debug|x64
+		{25CCB51D-E30E-4A21-BA9D-09CF79484FE9}.Debug|x64.ActiveCfg = Debug|x64
+		{25CCB51D-E30E-4A21-BA9D-09CF79484FE9}.Debug|x64.Build.0 = Debug|x64
+		{25CCB51D-E30E-4A21-BA9D-09CF79484FE9}.Debug|x86.ActiveCfg = Debug|x64
+		{25CCB51D-E30E-4A21-BA9D-09CF79484FE9}.Release|Mixed Platform for FlushMouse.ActiveCfg = Release|x64
+		{25CCB51D-E30E-4A21-BA9D-09CF79484FE9}.Release|Mixed Platform for FlushMouse.Build.0 = Release|x64
+		{25CCB51D-E30E-4A21-BA9D-09CF79484FE9}.Release|x64.ActiveCfg = Release|x64
+		{25CCB51D-E30E-4A21-BA9D-09CF79484FE9}.Release|x64.Build.0 = Release|x64
+		{25CCB51D-E30E-4A21-BA9D-09CF79484FE9}.Release|x86.ActiveCfg = Release|x64
+		{FB5448F4-CEDD-4025-AF2A-F7540BDF9DDE}.Debug|Mixed Platform for FlushMouse.ActiveCfg = Debug|x64
+		{FB5448F4-CEDD-4025-AF2A-F7540BDF9DDE}.Debug|Mixed Platform for FlushMouse.Build.0 = Debug|x64
+		{FB5448F4-CEDD-4025-AF2A-F7540BDF9DDE}.Debug|x64.ActiveCfg = Debug|x64
+		{FB5448F4-CEDD-4025-AF2A-F7540BDF9DDE}.Debug|x64.Build.0 = Debug|x64
+		{FB5448F4-CEDD-4025-AF2A-F7540BDF9DDE}.Debug|x86.ActiveCfg = Debug|x64
+		{FB5448F4-CEDD-4025-AF2A-F7540BDF9DDE}.Release|Mixed Platform for FlushMouse.ActiveCfg = Release|x64
+		{FB5448F4-CEDD-4025-AF2A-F7540BDF9DDE}.Release|Mixed Platform for FlushMouse.Build.0 = Release|x64
+		{FB5448F4-CEDD-4025-AF2A-F7540BDF9DDE}.Release|x64.ActiveCfg = Release|x64
+		{FB5448F4-CEDD-4025-AF2A-F7540BDF9DDE}.Release|x64.Build.0 = Release|x64
+		{FB5448F4-CEDD-4025-AF2A-F7540BDF9DDE}.Release|x86.ActiveCfg = Release|x64
+		{DBEDAF04-FC3F-48DC-81AC-981A747F30A4}.Debug|Mixed Platform for FlushMouse.ActiveCfg = Debug|Win32
+		{DBEDAF04-FC3F-48DC-81AC-981A747F30A4}.Debug|Mixed Platform for FlushMouse.Build.0 = Debug|Win32
+		{DBEDAF04-FC3F-48DC-81AC-981A747F30A4}.Debug|x64.ActiveCfg = Debug|Win32
+		{DBEDAF04-FC3F-48DC-81AC-981A747F30A4}.Debug|x86.ActiveCfg = Debug|Win32
+		{DBEDAF04-FC3F-48DC-81AC-981A747F30A4}.Debug|x86.Build.0 = Debug|Win32
+		{DBEDAF04-FC3F-48DC-81AC-981A747F30A4}.Release|Mixed Platform for FlushMouse.ActiveCfg = Release|Win32
+		{DBEDAF04-FC3F-48DC-81AC-981A747F30A4}.Release|Mixed Platform for FlushMouse.Build.0 = Release|Win32
+		{DBEDAF04-FC3F-48DC-81AC-981A747F30A4}.Release|x64.ActiveCfg = Release|Win32
+		{DBEDAF04-FC3F-48DC-81AC-981A747F30A4}.Release|x86.ActiveCfg = Release|Win32
+		{DBEDAF04-FC3F-48DC-81AC-981A747F30A4}.Release|x86.Build.0 = Release|Win32
+		{701B5F8E-0E39-40C3-A692-B23A3836BEDE}.Debug|Mixed Platform for FlushMouse.ActiveCfg = Debug|Win32
+		{701B5F8E-0E39-40C3-A692-B23A3836BEDE}.Debug|Mixed Platform for FlushMouse.Build.0 = Debug|Win32
+		{701B5F8E-0E39-40C3-A692-B23A3836BEDE}.Debug|x64.ActiveCfg = Debug|Win32
+		{701B5F8E-0E39-40C3-A692-B23A3836BEDE}.Debug|x86.ActiveCfg = Debug|Win32
+		{701B5F8E-0E39-40C3-A692-B23A3836BEDE}.Debug|x86.Build.0 = Debug|Win32
+		{701B5F8E-0E39-40C3-A692-B23A3836BEDE}.Release|Mixed Platform for FlushMouse.ActiveCfg = Release|Win32
+		{701B5F8E-0E39-40C3-A692-B23A3836BEDE}.Release|Mixed Platform for FlushMouse.Build.0 = Release|Win32
+		{701B5F8E-0E39-40C3-A692-B23A3836BEDE}.Release|x64.ActiveCfg = Release|Win32
+		{701B5F8E-0E39-40C3-A692-B23A3836BEDE}.Release|x86.ActiveCfg = Release|Win32
+		{701B5F8E-0E39-40C3-A692-B23A3836BEDE}.Release|x86.Build.0 = Release|Win32
+		{40614F11-A07B-42AB-822E-FAC73CC85CB0}.Debug|Mixed Platform for FlushMouse.ActiveCfg = Debug|x64
+		{40614F11-A07B-42AB-822E-FAC73CC85CB0}.Debug|x64.ActiveCfg = Debug|x64
+		{40614F11-A07B-42AB-822E-FAC73CC85CB0}.Debug|x86.ActiveCfg = Debug|x64
+		{40614F11-A07B-42AB-822E-FAC73CC85CB0}.Release|Mixed Platform for FlushMouse.ActiveCfg = Release|x64
+		{40614F11-A07B-42AB-822E-FAC73CC85CB0}.Release|Mixed Platform for FlushMouse.Build.0 = Release|x64
+		{40614F11-A07B-42AB-822E-FAC73CC85CB0}.Release|x64.ActiveCfg = Release|x64
+		{40614F11-A07B-42AB-822E-FAC73CC85CB0}.Release|x64.Build.0 = Release|x64
+		{40614F11-A07B-42AB-822E-FAC73CC85CB0}.Release|x86.ActiveCfg = Release|x64
+		{CCAF431F-CE8E-4879-9B1F-3F1DF4AC2269}.Debug|Mixed Platform for FlushMouse.ActiveCfg = Debug|x64
+		{CCAF431F-CE8E-4879-9B1F-3F1DF4AC2269}.Debug|Mixed Platform for FlushMouse.Build.0 = Debug|x64
+		{CCAF431F-CE8E-4879-9B1F-3F1DF4AC2269}.Debug|x64.ActiveCfg = Debug|x64
+		{CCAF431F-CE8E-4879-9B1F-3F1DF4AC2269}.Debug|x64.Build.0 = Debug|x64
+		{CCAF431F-CE8E-4879-9B1F-3F1DF4AC2269}.Debug|x86.ActiveCfg = Debug|Win32
+		{CCAF431F-CE8E-4879-9B1F-3F1DF4AC2269}.Release|Mixed Platform for FlushMouse.ActiveCfg = Release|x64
+		{CCAF431F-CE8E-4879-9B1F-3F1DF4AC2269}.Release|Mixed Platform for FlushMouse.Build.0 = Release|x64
+		{CCAF431F-CE8E-4879-9B1F-3F1DF4AC2269}.Release|x64.ActiveCfg = Release|x64
+		{CCAF431F-CE8E-4879-9B1F-3F1DF4AC2269}.Release|x64.Build.0 = Release|x64
+		{CCAF431F-CE8E-4879-9B1F-3F1DF4AC2269}.Release|x86.ActiveCfg = Release|Win32
+		{3D3F632C-75BB-4830-AA8E-0871C6AA1A72}.Debug|Mixed Platform for FlushMouse.ActiveCfg = Debug|Win32
+		{3D3F632C-75BB-4830-AA8E-0871C6AA1A72}.Debug|Mixed Platform for FlushMouse.Build.0 = Debug|Win32
+		{3D3F632C-75BB-4830-AA8E-0871C6AA1A72}.Debug|x64.ActiveCfg = Debug|Win32
+		{3D3F632C-75BB-4830-AA8E-0871C6AA1A72}.Debug|x86.ActiveCfg = Debug|Win32
+		{3D3F632C-75BB-4830-AA8E-0871C6AA1A72}.Debug|x86.Build.0 = Debug|Win32
+		{3D3F632C-75BB-4830-AA8E-0871C6AA1A72}.Release|Mixed Platform for FlushMouse.ActiveCfg = Release|Win32
+		{3D3F632C-75BB-4830-AA8E-0871C6AA1A72}.Release|Mixed Platform for FlushMouse.Build.0 = Release|Win32
+		{3D3F632C-75BB-4830-AA8E-0871C6AA1A72}.Release|x64.ActiveCfg = Release|Win32
+		{3D3F632C-75BB-4830-AA8E-0871C6AA1A72}.Release|x64.Build.0 = Release|Win32
+		{3D3F632C-75BB-4830-AA8E-0871C6AA1A72}.Release|x86.ActiveCfg = Release|Win32
+		{3D3F632C-75BB-4830-AA8E-0871C6AA1A72}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0EBF6397-87D9-433F-AC10-2BA4AC953F45}
+	EndGlobalSection
+EndGlobal

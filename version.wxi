@@ -1,0 +1,5 @@
+<Include>
+	<!-- for wix Setup Project -->
+	<?define Version = "0.9.4.10" ?>
+</Include>
+
