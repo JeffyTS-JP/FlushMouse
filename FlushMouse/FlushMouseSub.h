@@ -10,6 +10,8 @@
 // Include
 //
 #pragma once
+#include <powrprof.h>
+#pragma comment(lib, "powrprof.lib")
 
 //
 // Define
@@ -54,6 +56,23 @@ private:
 
 private:
 	HWINEVENTHOOK	hEventHook;
+};
+
+//
+// class CPowerNotification
+//
+class CPowerNotification
+{
+public:
+	CPowerNotification();
+	~CPowerNotification();
+
+private:
+	static DEVICE_NOTIFY_CALLBACK_ROUTINE DeviceNotifyCallbackRoutine;
+
+private:
+	DEVICE_NOTIFY_SUBSCRIBE_PARAMETERS	Recipient;
+	HPOWERNOTIFY	RegistrationHandle;
 };
 
 //

@@ -35,6 +35,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ソリューション項目
 		version.wxi = version.wxi
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FlushMouseDLL", "FlushMouseDLL\FlushMouseDLL.vcxproj", "{EC908A5D-8859-4B02-9ACE-023FF407A3A3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platform for FlushMouse = Debug|Mixed Platform for FlushMouse
@@ -114,6 +116,18 @@ Global
 		{3D3F632C-75BB-4830-AA8E-0871C6AA1A72}.Release|x64.Build.0 = Release|Win32
 		{3D3F632C-75BB-4830-AA8E-0871C6AA1A72}.Release|x86.ActiveCfg = Release|Win32
 		{3D3F632C-75BB-4830-AA8E-0871C6AA1A72}.Release|x86.Build.0 = Release|Win32
+		{EC908A5D-8859-4B02-9ACE-023FF407A3A3}.Debug|Mixed Platform for FlushMouse.ActiveCfg = Debug|x64
+		{EC908A5D-8859-4B02-9ACE-023FF407A3A3}.Debug|Mixed Platform for FlushMouse.Build.0 = Debug|x64
+		{EC908A5D-8859-4B02-9ACE-023FF407A3A3}.Debug|x64.ActiveCfg = Debug|x64
+		{EC908A5D-8859-4B02-9ACE-023FF407A3A3}.Debug|x64.Build.0 = Debug|x64
+		{EC908A5D-8859-4B02-9ACE-023FF407A3A3}.Debug|x86.ActiveCfg = Debug|Win32
+		{EC908A5D-8859-4B02-9ACE-023FF407A3A3}.Debug|x86.Build.0 = Debug|Win32
+		{EC908A5D-8859-4B02-9ACE-023FF407A3A3}.Release|Mixed Platform for FlushMouse.ActiveCfg = Release|x64
+		{EC908A5D-8859-4B02-9ACE-023FF407A3A3}.Release|Mixed Platform for FlushMouse.Build.0 = Release|x64
+		{EC908A5D-8859-4B02-9ACE-023FF407A3A3}.Release|x64.ActiveCfg = Release|x64
+		{EC908A5D-8859-4B02-9ACE-023FF407A3A3}.Release|x64.Build.0 = Release|x64
+		{EC908A5D-8859-4B02-9ACE-023FF407A3A3}.Release|x86.ActiveCfg = Release|Win32
+		{EC908A5D-8859-4B02-9ACE-023FF407A3A3}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

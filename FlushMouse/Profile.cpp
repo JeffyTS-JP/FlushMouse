@@ -78,8 +78,8 @@ BOOL		CProfile::bGetProfileData()
 			if (CReg->bGetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("InThreadSleepTime"), (LPDWORD)&stAppRegData.dwInThreadSleepTime, 0)) {	// Thread内の待ち時間(IMECursorChangeThreadのみ)
 				if (CReg->bGetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("WaitWaveTime"), (LPDWORD)&stAppRegData.dwWaitWaveTime, 400)) {			// IME mode displayのwaveの待ち時間
 					if (CReg->bGetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayModeTime"), (LPDWORD)&stAppRegData.dwDisplayModeTime, 380)) {		// IME mode displayの表示時間
-						if (CReg->bGetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseColor"), (LPDWORD)&stAppRegData.dwNearDrawMouseColor, RGB(255, 192, 0))) {	// マウスカーソルへのIMEモード表示色
-							if (CReg->bGetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretColor"), (LPDWORD)&stAppRegData.dwNearDrawCaretColor, RGB(255, 192, 0))) {	// キャレットへのIMEモード表示色
+						if (CReg->bGetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseColor"), (LPDWORD)&stAppRegData.dwNearDrawMouseColor, aRGB(240, 254, 192, 0))) {	// マウスカーソルへのIMEモード表示色
+							if (CReg->bGetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretColor"), (LPDWORD)&stAppRegData.dwNearDrawCaretColor, aRGB(240, 254, 192, 0))) {	// キャレットへのIMEモード表示色
 								bRet = TRUE;
 							}
 						}
@@ -157,7 +157,7 @@ BOOL		CProfile::bSetProfileData()
 			if (CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("InThreadSleepTime"), stAppRegData.dwInThreadSleepTime)) {
 				if (CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("WaitWaveTime"), stAppRegData.dwWaitWaveTime)) {
 					if (CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayModeTime"), stAppRegData.dwDisplayModeTime)) {
-						if (CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("earDrawMouseColor"), stAppRegData.dwNearDrawMouseColor)) {
+						if (CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseColor"), stAppRegData.dwNearDrawMouseColor)) {
 							if (CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretColor"), stAppRegData.dwNearDrawCaretColor)) {
 								bRet = TRUE;
 							}

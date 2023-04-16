@@ -10,6 +10,8 @@
 // プリコンパイルするヘッダーをここに追加します
 #include "framework.h"
 #include "targetver.h"
-#include <Windows.h>
+#include <windows.h>
+#include <windowsx.h>
+#include <tchar.h>
 
 #endif //PCH_H

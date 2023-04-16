@@ -9,7 +9,7 @@
 #define VER_MAJOR		0
 #define VER_MINOR		9
 #define VER_BUILD_HI	4
-#define VER_BUILD_LO	10
+#define VER_BUILD_LO	11
 #define VER_FLAGS		VS_FF_PRERELEASE
 
 
@@ -20,5 +20,5 @@
 #define VER_STR(arg)	#arg
 
 // The String form of the version numbers
-#define VER_FILE_STRING VALUE		"FileVersion",		"0.9.4.10"
-#define VER_PRODUCT_STRING VALUE	"ProductVersion",	"0.9.4.10"
+#define VER_FILE_STRING VALUE		"FileVersion",		"0.9.4.11"
+#define VER_PRODUCT_STRING VALUE	"ProductVersion",	"0.9.4.11"

@@ -15,7 +15,7 @@
 #include "FlushMouseSub.h"
 #include "Profile.h"
 #include "Resource.h"
-
+#include "..\FlushMouseDLL\EventlogDll.h"
 #include "..\FlushMouseDLL32\FlushMouseDll32.h"
 #include "..\MiscLIB\CRegistry.h"
 
@@ -406,6 +406,52 @@ VOID			vGetSetProfileData()
 	bOffChangedFocus = Profile->stAppRegData.bOffChangedFocus;
 	bDrawNearCaret = Profile->stAppRegData.bDrawNearCaret;
 	bEnableEPHelper = Profile->stAppRegData.bEnableEPHelper;
+}
+//
+// class CPowerNotification
+// CPowerNotification()
+//
+CPowerNotification::CPowerNotification()
+{
+	Recipient.Callback = &DeviceNotifyCallbackRoutine;
+	Recipient.Context = &szWindowClass;
+	DWORD	dwErr = ERROR_SUCCESS;
+	if ((dwErr = PowerRegisterSuspendResumeNotification(DEVICE_NOTIFY_CALLBACK, &Recipient, &RegistrationHandle)) != ERROR_SUCCESS) {
+	}
+}
+
+//
+// ~CPowerNotification()
+//
+CPowerNotification::~CPowerNotification()
+{
+	DWORD	dwErr = ERROR_SUCCESS;
+	if ((dwErr = PowerUnregisterSuspendResumeNotification(RegistrationHandle)) != ERROR_SUCCESS) {
+	}
+}
+
+//
+// DeviceNotifyCallbackRoutine()
+//
+ULONG CPowerNotification::DeviceNotifyCallbackRoutine(LPVOID Context, ULONG Type, LPVOID Setting)
+{
+	UNREFERENCED_PARAMETER(Context);
+	UNREFERENCED_PARAMETER(Setting);
+
+	switch (Type) {
+	case PBT_APMPOWERSTATUSCHANGE:
+		break;
+	case PBT_APMRESUMEAUTOMATIC:
+		break;
+	case PBT_APMRESUMESUSPEND:
+		bReportEvent(MSG_PBT_APMRESUMESUSPEND, POWERNOTIFICATION_CATEGORY);
+		break;
+	case PBT_APMSUSPEND:
+		break;
+	case PBT_POWERSETTINGCHANGE:
+		break;
+	}
+	return (ULONG)ERROR_SUCCESS;
 }
 
 //

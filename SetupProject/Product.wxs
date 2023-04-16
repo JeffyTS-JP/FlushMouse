@@ -121,8 +121,10 @@
 		<InstallExecuteSequence>
 			<Custom Action="TaskKill" Before="FindRelatedProducts">Installed</Custom>
 			<Custom Action='UnregisterTaskScheduler' After='InstallInitialize'>Installed</Custom>
+			<Custom Action='UnregisterEventlog' After='InstallInitialize'>Installed</Custom>
 			<Custom Action='TaskKill_force' After='InstallInitialize'>Installed</Custom>
 			<Custom Action='RegisterTaskScheduler' Before='InstallFinalize'>NOT Installed</Custom>
+			<Custom Action='RegisterEventlog' Before='InstallFinalize'>NOT Installed</Custom>
 			<Custom Action='RemoveReg' After='RemoveExistingProducts'>WIXUI_VERIFYDIALOGOPTIONALCHECKBOX3 = 1 and Installed</Custom>
 		</InstallExecuteSequence>
 
@@ -143,6 +145,14 @@
 		<Binary Id="UNREGISTERTaskScheduler" SourceFile="C:\Windows\System32\schtasks.exe"> </Binary>
 		<CustomAction Id="UnregisterTaskScheduler" BinaryKey="UNREGISTERTaskScheduler" Execute="deferred" Return="asyncWait" Impersonate="no"
 								ExeCommand=" /Delete /F /TN &quot;$(var.ProductName)&quot;" />
+		<!-- Register EventLog -->
+		<Binary Id="REGISTEREventlog" SourceFile="C:\Windows\System32\reg.exe"> </Binary>
+		<CustomAction Id="RegisterEventlog" BinaryKey="REGISTEREventlog" Execute="deferred" Return="asyncWait" Impersonate="no"
+								ExeCommand=" IMPORT &quot;[INSTALLFOLDER]Register_Eventlog.reg&quot; /reg:64" />
+		<!-- Unegister EventLog -->
+		<Binary Id="UNREGISTEREventlog" SourceFile="C:\Windows\System32\reg.exe"> </Binary>
+		<CustomAction Id="UnregisterEventlog" BinaryKey="UNREGISTEREventlog" Execute="deferred" Return="asyncWait" Impersonate="no"
+								ExeCommand=" DELETE HKLM\System\CurrentControlSet\Services\Eventlog\Application\FlushMouse /f" />
 		<!-- Remove Registry in Uninstall -->
 		<Binary Id="REMOVEREG" SourceFile="C:\Windows\System32\reg.exe"> </Binary>
 		<CustomAction Id="RemoveReg" BinaryKey="REMOVEREG" Execute="immediate" Return="asyncNoWait" Impersonate="yes"
@@ -198,9 +208,9 @@
 			<Component Id="FlushMouse.exe" Guid="{25BEEEA7-583D-4C15-9566-FFA42716A1C9}">
 				<File Id="FlushMouse.exe" Name="FlushMouse.exe" Source="$(var.TargetDir01)FlushMouse.exe" />
 			</Component>
-			<!--Component Id="FlushMouseDLL.dll" Guid="{3C81EF6B-D231-4739-8361-496FE5BE93D3}"-->
-				<!--File Id="FlushMouseDLL.dll" Name="FlushMouseDLL.dll" Source="$(var.TargetDir01)FlushMouseDLL.dll" /-->
-			<!--/Component-->
+			<Component Id="FlushMouseDLL.dll" Guid="{3C81EF6B-D231-4739-8361-496FE5BE93D3}">
+				<File Id="FlushMouseDLL.dll" Name="FlushMouseDLL.dll" Source="$(var.TargetDir01)FlushMouseDLL.dll" />
+			</Component>
 			<Component Id="FlushMouse32.exe" Guid="{CB3543F9-1CA7-4773-9105-CB1BD98F49FD}">
 				<File Id="FlushMouse32.exe" Name="FlushMouse32.exe" Source="$(var.TargetDir02)FlushMouse32.exe" />
 			</Component>
@@ -216,20 +226,9 @@
 			<Component Id="Readme.txt" Guid="{061E1F61-3726-49AC-A504-2A4D115635F3}">
 				<File Id="Readme.txt" Name="Readme.txt" Source="$(var.TargetDir04)Readme.txt" />
 			</Component>
-			<Component Id="Register_FlushMouse.bat" Guid="{58D84ACB-D9C0-4E40-A485-3300E83F2660}">
-				<File Id="Register_FlushMouse.bat" Name="Register_FlushMouse.bat" Source="$(var.TargetDir04)Register_FlushMouse.bat" />
+			<Component Id="Register_Eventlog.reg" Guid="{FBC3FF68-EF97-43F1-BE86-5F5CFC3AE4F1}">
+				<File Id="Register_Eventlog.reg" Name="Register_Eventlog.reg" Source="$(var.TargetDir04)Register_Eventlog.reg" />
 			</Component>
-			<Component Id="Unregister_FlushMouse.bat" Guid="{C7B41729-230F-46C8-8E6F-724B98CD5B69}">
-				<File Id="Unregister_FlushMouse.bat" Name="Unregister_FlushMouse.bat" Source="$(var.TargetDir04)Unregister_FlushMouse.bat" />
-			</Component>
-			<!-- Registries -->
-			<!-- Auto start by user registry -->
-			<!--Component Id="AutoStartRegistry" Guid="{AE2203C7-DFFF-40AA-873F-39C206583E9C}"-->
-				<!--RegistryKey Root="HKCU" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Run" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="no"-->
-					<!--RegistryValue Type="string" Name="$(var.ProductName)" Value="[INSTALLFOLDER]$(var.MainExeFileName)" KeyPath="yes" /-->
-				<!--/RegistryKey-->
-			<!--/Component-->
-			<!-- App registries -->
 			<Component Id="Registries" Guid="{05B14589-18DE-4AE3-B6D8-EB65FA40B46D}">
 				<RegistryKey Root="HKLM" Key="$(var.AppRegKey)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="no">
 					<RegistryValue Type="string" Name="InstalledPath" Value="[INSTALLFOLDER]" KeyPath="yes" />

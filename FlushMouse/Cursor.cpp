@@ -180,7 +180,9 @@ BOOL			CCursor::bInitialize(HWND hWnd)
 	stIMECursorData.bDisplayIMEModeOnCursor = Profile->stAppRegData.bDisplayIMEModeOnCursor;
 	stIMECursorData.bForceHiragana = Profile->stAppRegData.bForceHiragana;
 	stIMECursorData.bDrawNearCaret = Profile->stAppRegData.bDrawNearCaret;
+	if (!(Profile->stAppRegData.dwNearDrawMouseColor & 0xff000000))	Profile->stAppRegData.dwNearDrawMouseColor = Profile->stAppRegData.dwNearDrawMouseColor | 0xff000000;
 	stIMECursorData.dwNearDrawMouseColor = Profile->stAppRegData.dwNearDrawMouseColor;
+	if (!(Profile->stAppRegData.dwNearDrawCaretColor & 0xff000000))	Profile->stAppRegData.dwNearDrawCaretColor = Profile->stAppRegData.dwNearDrawCaretColor | 0xff000000;
 	stIMECursorData.dwNearDrawCaretColor = Profile->stAppRegData.dwNearDrawCaretColor;
 
 	stIMECursorData.bDenyChangedByApp = Profile->stAppRegData.bDenyChangedByApp;
@@ -1041,7 +1043,7 @@ BOOL		CCursorWindow::Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 {
 	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(lpCreateStruct);
-	return SetLayeredWindowAttributes(hWnd, dwBackColor, (dwBackColor >> 24) & 0x000000ff, LWA_COLORKEY);
+	return SetLayeredWindowAttributes(hWnd, dwBackColor, (dwBackColor >> 24) & 0x000000ff, LWA_COLORKEY | LWA_ALPHA);
 }
 
 //

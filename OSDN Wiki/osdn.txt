@@ -5,13 +5,14 @@
 ||[[Thumb(FlushMouse.png, size=48x48)]]||'''[[ProjectDescription]](ƒ^ƒXƒNƒgƒŒƒC‚Éí’“‚µ‚ÄAƒ}ƒEƒXƒJ[ƒ\ƒ‹‚ÖIMEƒ‚[ƒh‚Ì•\Ž¦‚ð‚·‚éƒ†[ƒeƒBƒŠƒeƒB‚Å‚·)[[BR]]FlushMouse is a software developed by JeffyTS . It is a mouse gesture tool that allows you to perform various operations by drawing gestures with your mouse .  (by Bing ChatGPT)'''||
 
 [[BR]]
-2023/04/12[[BR]]
-@@@Version 0.9.4.10 ‚ðƒŠƒŠ[ƒX‚µ‚Ü‚µ‚½[[BR]]
+2023/04/16[[BR]]
+@@@Version 0.9.4.11 ‚ðƒŠƒŠ[ƒX‚µ‚Ü‚µ‚½[[BR]]
 [[BR]]
 (Žå‚È•ÏX“_)[[BR]]
- * IMEƒ‚[ƒh‚Ì•\Ž¦‚ÌFŽw’è‚ðƒŒƒWƒXƒgƒŠ‚É’Ç‰Á‚µ‚Ü‚µ‚½(‚Ü‚¾AÝ’è‰æ–Ê‚Íì¬‚µ‚Ä‚¢‚Ü‚¹‚ñBƒŒƒWƒXƒgƒŠ‚ð•ÒW‚Å‚«‚é•û‚ÍD‚Ý‚ÌF‚É‚µ‚Ä‚Ý‚Ä‚­‚¾‚³‚¢B‚½‚¾‚µAƒŒƒWƒXƒgƒŠ‚Ì•ÒW‚Í\•ª’ˆÓ‚µ‚Äs‚Á‚Ä‚­‚¾‚³‚¢)
-   * \HKEY_CURRENT_USER\Software\JeffyTS\FlushMouse ‚Ì NearDrawCaretColor ‚Æ NearDrawMouseColor ‚Å‚·BãˆÊƒoƒCƒg‚©‚çAƒ¿ B G R ‚Ì‡‚Å‚·‚ªAƒ¿ƒ`ƒƒƒlƒ‹‚Í–³Œø‚É‚µ‚Ä‚ ‚è‚Ü‚·
- * ExplorerPatcher ([https://github.com/valinet]) ‚ÌASimple Window Switcher‚ðŽg—p‚µ‚½‚Æ‚«AƒL[ƒ{[ƒh‚ªUS / ENG‚É‚È‚Á‚Ä‚µ‚Ü‚¤‚Ì‚ðŒyŒ¸‚³‚¹‚é‹@”\‚Ì“®ì‚ðŒ©’¼‚µ‚Ü‚µ‚½ __(‚±‚Ì‹@”\‚É‚ÍA§ŒÀŽ–€‚ª‚ ‚è‚Ü‚·‚Ì‚ÅA‰º‹L‚Ìà–¾‚ðŽQÆ‚µ‚Ä‚©‚çŽg—p‚µ‚Ä‚­‚¾‚³‚¢[[BR]]
+ * ƒoƒOC³‚ÆAƒCƒ“ƒXƒg[ƒ‰[‚ÌC³‚ðs‚¢‚Ü‚µ‚½[[BR]]
+ * IMEƒ‚[ƒh‚Ì•\Ž¦‚ÌFŽw’è‚Åƒ¿ƒ`ƒƒƒlƒ‹‚ª—LŒø‚É‚È‚é‚æ‚¤‚É•ÏX‚µ‚Ü‚µ‚½(Ý’è‰æ–Ê‚Íì¬‚µ‚Ä‚¢‚Ü‚¹‚ñBƒŒƒWƒXƒgƒŠ‚ð•ÒW‚Å‚«‚é•û‚ÍD‚Ý‚ÌF‚É‚µ‚Ä‚Ý‚Ä‚­‚¾‚³‚¢B‚½‚¾‚µAƒŒƒWƒXƒgƒŠ‚Ì•ÒW‚Í\•ª’ˆÓ‚µ‚Äs‚Á‚Ä‚­‚¾‚³‚¢)[[BR]]
+   * HKEY_CURRENT_USER\Software\JeffyTS\FlushMouse ‚Ì NearDrawCaretColor ‚Æ NearDrawMouseColor ‚Å‚·BãˆÊƒoƒCƒg‚©‚çAƒ¿ B G R ‚Ì‡‚Å‚·[[BR]]
+   * ƒ}ƒEƒXƒJ[ƒ\ƒ‹‰E‰º‚Ìƒ‚[ƒh•\Ž¦‚ÌF‚ÍAŒ»ó‚Å‚Í•ÏX‚Å‚«‚Ü‚¹‚ñB‚²—¹³‚­‚¾‚³‚¢[[BR]]
 [[BR]]
 (¡Œã‚É‚Â‚¢‚Ä)[[BR]]
  * OSDNã‚Å‚Í‚±‚±‚Ü‚Å‚Ì‹@”\‚ÅŠJ”­‚ÍI—¹‚Æ‚µ‚½‚¢‚Æl‚¦‚Ä‚¢‚Ü‚·(ƒoƒO‘Î‰ž‚Íœ‚­)[[BR]]
@@ -89,7 +90,7 @@ Windows 10 / 11‚Å‚Íƒ}ƒEƒXƒJ[ƒ\ƒ‹‚ÌŒ`ó‚â‘å‚«‚³‚ðŒˆ‚ß‚é•û–@‚ª•¡”‚ ‚é‚½‚ßA‰º‹L‚
  * š__•¨—“I‚É‰pŒê(101/102/104)ƒL[ƒ{[ƒh‚ðÚ‘±‚µ‚Ä‚¢‚éê‡‚Í“®‚«‚Ü‚¹‚ñB•K‚¸“ú–{Œê(106/109)ƒL[ƒ{[ƒh‚ÌŠÂ‹«‚ÅŽg—p‚µ‚Ä‚­‚¾‚³‚¢__ [[BR]]
 @@@(“ú–{ŒêƒL[ƒ{[ƒh‚ªŒ©‚Â‚©‚ç‚È‚¢‚Æ‚«‚É‚ÍA–{‹@”\‚ª“®ì‚µ‚È‚¢‚æ‚¤‚Éƒ`ƒFƒbƒN‚µ‚Ä‚¢‚Ü‚·)[[BR]]
  * šWindows‚É•t‘®‚³‚ê‚Ä‚¢‚éMicrosoft‚ÌIME‚Å‚µ‚©ŒŸØ‚µ‚Ä‚¢‚Ü‚¹‚ñ[[BR]]
- * ExplorerPatcher‚ÌuUS ENGv‚É‚È‚Á‚Ä‚¢‚é‚Æ‚«Aˆê•”‚ÌƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚Å‚ÍuŠ¿Žš(”¼Šp/‘SŠp)vƒL[‚ÅuUS ENGv‚©‚çØ‚è‘Ö‚í‚ç‚È‚¢‚±‚Æ‚ª‚ ‚è‚Ü‚·BŒ»Žž“_‚Å‚Í§ŒÀŽ–€‚Æ‚È‚è‚Ü‚·B‚²—¹³‚­‚¾‚³‚¢[[BR]]
+ * ˆê•”‚ÌƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚Å‚ÍuŠ¿Žš(”¼Šp/‘SŠp)v‚È‚Ç‚ÌIMEŠÖ˜AƒL[‚ÅuUS / ENGvuJA / ENGv‚©‚çØ‚è‘Ö‚í‚ç‚È‚¢‚±‚Æ‚ª‚ ‚è‚Ü‚·BŒ»Žž“_‚Å‚Í§ŒÀŽ–€‚Æ‚È‚è‚Ü‚·B‚²—¹³‚­‚¾‚³‚¢[[BR]]
  
 [[BR]]
  * IMEŠÖ˜AƒL[‚Ì“®ì‚Í‰º‹L‚Ì‚æ‚¤‚É‚È‚è‚Ü‚·(IME‚ÌÝ’è‚ÅƒL[ƒ}ƒbƒv‚ð•ÏX‚µ‚Ä‚¢‚éê‡‚ÍˆÙ‚È‚é‚±‚Æ‚ª‚ ‚è‚Ü‚·)[[BR]]
@@ -97,7 +98,7 @@ Windows 10 / 11‚Å‚Íƒ}ƒEƒXƒJ[ƒ\ƒ‹‚ÌŒ`ó‚â‘å‚«‚³‚ðŒˆ‚ß‚é•û–@‚ª•¡”‚ ‚é‚½‚ßA‰º‹L‚
 ||«‰Ÿ‰ºƒL[@@@IME‚Ìó‘Ô¨||@@JA / IME @@||@@JA / ENG @@||@@US / ENG @@||
 ||”¼Šp / ‘SŠp (Š¿Žš) @@@@||@@ ‚  / A@@@||(‘O‚ÌIME ONó‘Ô) ||(‘O‚ÌIME ONó‘Ô) ||
 ||–³•ÏŠ· @@@@@@@@@@||@@ IME OFF @@||@@ IME OFF @@||@@ IME OFF @@||
-||–³•ÏŠ· (IME ON‚Ìó‘Ô‚©‚ç)@||@‚  / ƒA / _¶ @||(‘O‚ÌIME ONó‘Ô) ||(‘O‚ÌIME ONó‘Ô) ||
+||–³•ÏŠ· (IME ON‚Ìó‘Ô‚©‚ç)@||@‚  / ƒA / _± @||(‘O‚ÌIME ONó‘Ô) ||(‘O‚ÌIME ONó‘Ô) ||
 ||•ÏŠ· @@@@@@@@@@@||(‘O‚ÌIME ONó‘Ô) ||(‘O‚ÌIME ONó‘Ô) ||(‘O‚ÌIME ONó‘Ô) ||
 ||‚Ð‚ç‚ª‚È @@@@@@@@@||@@@ ‚ @@@@||(‘O‚ÌIME ONó‘Ô) ||(‘O‚ÌIME ONó‘Ô) ||
 ||ƒJƒ^ƒJƒi (Shift + ‚Ð‚ç‚ª‚È)||@@@ ƒJ@@@@||(‘O‚ÌIME ONó‘Ô) ||(‘O‚ÌIME ONó‘Ô) ||

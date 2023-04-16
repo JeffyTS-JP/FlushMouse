@@ -17,6 +17,7 @@
 #include "Cursor.h"
 #include "Profile.h"
 #include "Resource.h"
+#include "..\FlushMouseDLL\EventlogDll.h"
 #include "..\FlushMouseDLL32\KeyboardHookDll32.h"
 #include "..\FlushMouseDLL32\MouseHookDll32.h"
 #include "..\MiscLIB\CThread.h"
@@ -81,6 +82,9 @@ static CFlushMouseHook* FlushMouseHook = NULL;
 
 // Event Handller for Focus
 static CFocusEvent* FocusEvent = NULL;
+
+// for PowerNotification
+static CPowerNotification* PowerNotification = NULL;
 
 // TaskTray
 static BOOL		bTaskTray = FALSE;
@@ -271,7 +275,8 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		return FALSE;
 	}
-	vGetSetProfileData();												// Profile dataを変数にセット
+
+	vGetSetProfileData();
 
 	// Register Re Create Task Tray Message
 	if ((uTaskbarCreatedMessage = RegisterWindowMessage(_T("TaskbarCreated"))) == 0) {
@@ -283,6 +288,14 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 	if ((bTaskTray = bCreateTaskTrayWindow(hWnd, IDI_FLUSHMOUSE)) == FALSE) {
 		vMessageBox(hWnd, IDS_NOTREGISTERTT, MessageBoxTYPE);
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+		return FALSE;
+	}
+
+	// for PowerNotification
+	PowerNotification = new CPowerNotification;
+	if (!PowerNotification) {
+		vMessageBox(hWnd, IDS_NOTRREGISTEVH, MessageBoxTYPE);			// Event Handllerを登録できなかったためエラーを表示
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);		// Quit
 		return FALSE;
 	}
 
@@ -317,6 +330,11 @@ static void Cls_OnDestroy(HWND hWnd)
 		if (bDestroyTaskTrayWindow(hWnd)) {
 			bTaskTray = FALSE;
 		}
+	}
+
+	if (PowerNotification != NULL) {
+		delete PowerNotification;
+		PowerNotification = NULL;
 	}
 
 	if (Resource != NULL) {

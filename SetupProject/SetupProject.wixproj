@@ -43,9 +43,7 @@
     <Content Include="dialog.bmp" />
     <Content Include="License.rtf" />
     <Content Include="Readme.txt" />
-    <Content Include="Register_FlushMouse.bat" />
     <Content Include="Register_TaskScheduler.xml" />
-    <Content Include="Unregister_FlushMouse.bat" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FlushMouse32\FlushMouse32.vcxproj">
