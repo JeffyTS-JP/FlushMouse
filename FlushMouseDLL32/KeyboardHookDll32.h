@@ -43,3 +43,4 @@ DLLEXPORT BOOL __stdcall bKeyboardHookLLUnset32(void);
 DLLEXPORT BOOL __stdcall bSetEnableEPHelperLL(BOOL bEPHelper);;
 
 
+/* EOF */

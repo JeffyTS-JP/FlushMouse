@@ -127,3 +127,5 @@ static BOOL	bMouseHookProcSub()
 	}
 	return TRUE;
 }
+
+/* EOF */

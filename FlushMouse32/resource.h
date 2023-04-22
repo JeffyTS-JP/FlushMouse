@@ -2,11 +2,7 @@
 // Microsoft Visual C++ で生成されたインクルード ファイル。
 // FlushMouse32.rc で使用
 //
-#define VER_MAJOR                       0
 #define IDC_MYICON                      2
-#define VER_BUILD_HI                    4
-#define VER_MINOR                       9
-#define VER_BUILD_LO                    10
 #define IDC_FLUSHMOUSE32                101
 #define IDI_FLUSHMOUSE32                110
 #define IDI_SMALL                       111

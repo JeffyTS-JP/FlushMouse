@@ -53,5 +53,4 @@ typedef struct tagMOUSE_SHAREDMEM {     // 共有メモリ用構造体
 DLLEXPORT BOOL __stdcall bMouseHookSet32(HWND hWnd);
 DLLEXPORT BOOL __stdcall bMouseHookUnset32(void);
 
-
-
+/* EOF */

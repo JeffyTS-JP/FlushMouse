@@ -157,3 +157,4 @@ static INT_PTR CALLBACK AboutDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 	return (INT_PTR)FALSE;
 }
 
+/* EOF */

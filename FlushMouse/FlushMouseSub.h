@@ -64,14 +64,13 @@ private:
 class CPowerNotification
 {
 public:
-	CPowerNotification();
+	CPowerNotification(HWND hWnd);
 	~CPowerNotification();
 
 private:
 	static DEVICE_NOTIFY_CALLBACK_ROUTINE DeviceNotifyCallbackRoutine;
 
 private:
-	DEVICE_NOTIFY_SUBSCRIBE_PARAMETERS	Recipient;
 	HPOWERNOTIFY	RegistrationHandle;
 };
 
@@ -91,7 +90,7 @@ private:
 	BOOL		bHook64DllUnload();
 	BOOL		bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name);
 	BOOL		bHook32DllStop();
-	static BOOL CALLBACK bEnumWindowsProc(HWND hWnd, LPARAM lParam);
+	static BOOL CALLBACK bEnumWindowsProcHookStop(HWND hWnd, LPARAM lParam);
 
 private:
 	HMODULE		hHook64Dll;
@@ -104,3 +103,4 @@ private:
 	LPPROCESS_INFORMATION	lpstProcessInfomation;
 };
 
+/* EOF */

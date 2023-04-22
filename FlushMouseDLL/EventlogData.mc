@@ -49,7 +49,7 @@ PowerNotification Events
 
 
 ;// Message definitions.
-MessageId=0x0100
+MessageId=0x0000
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_START_SUCCEED
@@ -61,7 +61,7 @@ Language=Japanese
 FlushMouseを起動しました。
 .
 
-MessageId=0x0101
+MessageId=0x0001
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_RESTART_EVENT
@@ -73,7 +73,31 @@ Language=Japanese
 FlushMouseを再起動します。
 .
 
-MessageId=0x0102
+MessageId=0x0002
+Severity=Informational
+Facility=Application
+SymbolicName=MSG_THREAD_HOOK_TIMER_STARTED
+Language=English
+Thread, Hook and Timer Started.
+.
+
+Language=Japanese
+Thread, Hook and Timer Started.
+.
+
+MessageId=0x0003
+Severity=Informational
+Facility=Application
+SymbolicName=MSG_THREAD_HOOK_TIMER_STOPPED
+Language=English
+Thread, Hook and Timer Stopped.
+.
+
+Language=Japanese
+Thread, Hook and Timer Stopped.
+.
+
+MessageId=0x0004
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_QUIT_FLUSHMOUSE
@@ -85,19 +109,19 @@ Language=Japanese
 FlushMouseを終了します。
 .
 
-MessageId=0x0103
+MessageId=0x0100
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_PBT_APMSUSPEND
 Language=English
-Entering to suspend (APM).
+Entering into suspend (APM).
 .
 
 Language=Japanese
-Entering to suspend (APM).
+Entering into suspend (APM).
 .
 
-MessageId=0x0104
+MessageId=0x0101
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_PBT_APMRESUMESUSPEND
@@ -109,7 +133,7 @@ Language=Japanese
 Resumeed from Susped (APM).
 .
 
-MessageId=0x0105
+MessageId=0x0102
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_PBT_APMPOWERSTATUSCHANGE
@@ -121,7 +145,7 @@ Language=Japanese
 Changed in the power status (APM).
 .
 
-MessageId=0x0106
+MessageId=0x0103
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_PBT_APMRESUMEAUTOMATIC
@@ -133,7 +157,7 @@ Language=Japanese
 Resuming from sleep or hibernation (APM).
 .
 
-MessageId=0x0107
+MessageId=0x0104
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_PBT_POWERSETTINGCHANGE

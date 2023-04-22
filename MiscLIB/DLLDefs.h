@@ -22,3 +22,5 @@
 
 #define DLLEXPORT extern "C" DLLAPI
 #define DLLEXPORT_CLS		 DLLAPI
+
+/* EOF */

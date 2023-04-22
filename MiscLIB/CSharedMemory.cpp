@@ -10,7 +10,7 @@
 // Include
 //
 #pragma once
-#include <Windows.h>
+#include "pch.h"
 #include "CSharedMemory.h"
 
 
@@ -33,7 +33,7 @@ BOOL		bSharedMemoryCreate(HANDLE handle, LPCTSTR szSharedMemoryName, DWORD dwDat
 {
 	UNREFERENCED_PARAMETER(handle);
 	SECURITY_ATTRIBUTES FileMappingAttributes{
-											sizeof(LPSECURITY_ATTRIBUTES),
+											sizeof(SECURITY_ATTRIBUTES),
 											NULL,
 											TRUE };
 	HANDLE hSharedMem = CreateFileMapping(INVALID_HANDLE_VALUE,	
@@ -59,7 +59,7 @@ BOOL		bSharedMemoryCreate(HANDLE handle, LPCTSTR szSharedMemoryName, DWORD dwDat
 //
 BOOL		bSharedMemoryDelete(LPCTSTR szSharedMemoryName)
 {
-	HANDLE hSharedMem = OpenFileMapping(FILE_MAP_READ, FALSE, szSharedMemoryName);
+	HANDLE hSharedMem = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, szSharedMemoryName);
 	if (hSharedMem != NULL) {
 		if (CloseHandle(hSharedMem))		return TRUE;	
 	}
@@ -149,3 +149,5 @@ BOOL		bSharedMemoryWrite(LPCTSTR lpszSharedMemoryName, LPBYTE lpbSharedData, DWO
 #endif // _WIN64
 	return FALSE;
 }
+
+/* EOF */

@@ -98,7 +98,7 @@ void		Cls_OnTaskTray(HWND hWnd, UINT id, UINT uMsg)
 	switch (uMsg) {
 		case WM_LBUTTONDOWN:
 			if (bOffChangedFocus) {
-				Cursor->vIMEOpenCloseForced(hWnd, IMECLOSE);
+				Cime->vIMEOpenCloseForced(hWnd, IMECLOSE);
 			}
 			[[fallthrough]];						// fallthrough is explicit
 			//break;
@@ -411,12 +411,9 @@ VOID			vGetSetProfileData()
 // class CPowerNotification
 // CPowerNotification()
 //
-CPowerNotification::CPowerNotification()
+CPowerNotification::CPowerNotification(HWND hWnd)
 {
-	Recipient.Callback = &DeviceNotifyCallbackRoutine;
-	Recipient.Context = &szWindowClass;
-	DWORD	dwErr = ERROR_SUCCESS;
-	if ((dwErr = PowerRegisterSuspendResumeNotification(DEVICE_NOTIFY_CALLBACK, &Recipient, &RegistrationHandle)) != ERROR_SUCCESS) {
+	if ((RegistrationHandle = RegisterSuspendResumeNotification(hWnd, DEVICE_NOTIFY_WINDOW_HANDLE)) == NULL) {
 	}
 }
 
@@ -425,33 +422,11 @@ CPowerNotification::CPowerNotification()
 //
 CPowerNotification::~CPowerNotification()
 {
-	DWORD	dwErr = ERROR_SUCCESS;
-	if ((dwErr = PowerUnregisterSuspendResumeNotification(RegistrationHandle)) != ERROR_SUCCESS) {
+	if (RegistrationHandle != NULL) {
+		if (UnregisterSuspendResumeNotification(RegistrationHandle) == 0) {
+		}
 	}
-}
-
-//
-// DeviceNotifyCallbackRoutine()
-//
-ULONG CPowerNotification::DeviceNotifyCallbackRoutine(LPVOID Context, ULONG Type, LPVOID Setting)
-{
-	UNREFERENCED_PARAMETER(Context);
-	UNREFERENCED_PARAMETER(Setting);
-
-	switch (Type) {
-	case PBT_APMPOWERSTATUSCHANGE:
-		break;
-	case PBT_APMRESUMEAUTOMATIC:
-		break;
-	case PBT_APMRESUMESUSPEND:
-		bReportEvent(MSG_PBT_APMRESUMESUSPEND, POWERNOTIFICATION_CATEGORY);
-		break;
-	case PBT_APMSUSPEND:
-		break;
-	case PBT_POWERSETTINGCHANGE:
-		break;
-	}
-	return (ULONG)ERROR_SUCCESS;
+	RegistrationHandle = NULL;
 }
 
 //
@@ -465,7 +440,9 @@ CFocusEvent::CFocusEvent()
 
 CFocusEvent::~CFocusEvent()
 {
-	bEventUnset();
+	if (bEventUnset()) {
+		hEventHook = NULL;
+	}
 }
 
 //
@@ -489,7 +466,7 @@ BOOL		CFocusEvent::bEventSet()
 //
 BOOL		CFocusEvent::bEventUnset()
 {
-	BOOL		bRet = FALSE;
+	BOOL	bRet = FALSE;
 	bRet = UnhookWinEvent(hEventHook);
 	return bRet;
 }
@@ -512,7 +489,7 @@ void CALLBACK CFocusEvent::vHandleEvent(HWINEVENTHOOK hook, DWORD dwEvent, HWND 
 		if (bCheckExistingJPIME() && bEnableEPHelper)	bForExplorerPatcherSWS(hWnd, FALSE, NULL, NULL);
 		if (hMainWnd != hWnd) {
 			if (bOffChangedFocus) {
-				Cursor->vIMEOpenCloseForced(hWnd, IMECLOSE);
+				Cime->vIMEOpenCloseForced(hWnd, IMECLOSE);
 				if (!Cursor->bStartIMECursorChangeThread(hWnd))		return;		// error
 			}
 			HWND	hWndObserved = NULL;
@@ -529,6 +506,7 @@ void CALLBACK CFocusEvent::vHandleEvent(HWINEVENTHOOK hook, DWORD dwEvent, HWND 
 					if (Shell_NotifyIconGetRect(&nii, &rc) != S_OK) {
 						return;
 					}
+					if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return; // error
 				}
 			}
 			if (!Cursor->bStartDrawIMEModeThread(hWndObserved))	return;			// error
@@ -653,41 +631,43 @@ BOOL 	CFlushMouseHook::bHook32DllStop()
 	if (!bHook32Dll)	return TRUE;
 	BOOL		bRet = FALSE;
 	if (lpstProcessInfomation->hProcess != NULL) {
-		if (!EnumWindows((WNDENUMPROC)&CFlushMouseHook::bEnumWindowsProc, (LPARAM)lpstProcessInfomation)) {
-			return FALSE;
-		}
-		DWORD dwRet = WaitForSingleObject(lpstProcessInfomation->hProcess, TIMEOUT);
-		switch (dwRet) {
-			case WAIT_OBJECT_0:
-				bRet = TRUE;
-				break;
-			case WAIT_FAILED:
-			case WAIT_ABANDONED:
-			case WAIT_TIMEOUT:
-			default:
-				if (TerminateProcess(lpstProcessInfomation->hProcess, 0)) {
+		if (!EnumWindows((WNDENUMPROC)&CFlushMouseHook::bEnumWindowsProcHookStop, (LPARAM)lpstProcessInfomation)) {
+			if (GetLastError() == ERROR_SUCCESS) {
+				DWORD dwRet = WaitForSingleObject(lpstProcessInfomation->hProcess, TIMEOUT);
+				switch (dwRet) {
+				case WAIT_OBJECT_0:
 					bRet = TRUE;
+					break;
+				case WAIT_FAILED:
+				case WAIT_ABANDONED:
+				case WAIT_TIMEOUT:
+				default:
+					if (TerminateProcess(lpstProcessInfomation->hProcess, 0) != 0) {
+						bRet = TRUE;
+					}
 				}
+				DWORD dwExitCode;
+				if (!GetExitCodeProcess(lpstProcessInfomation->hProcess, &dwExitCode)) {
+					bRet = FALSE;
+				}
+				if (lpstProcessInfomation->hProcess != NULL) {
+					CloseHandle(lpstProcessInfomation->hProcess);
+				}
+			}
+			if (lpstProcessInfomation->hThread != NULL) {
+				CloseHandle(lpstProcessInfomation->hThread);
+			}
 		}
-		DWORD dwExitCode;
-		if (!GetExitCodeProcess(lpstProcessInfomation->hProcess, &dwExitCode)) {
-			bRet = FALSE;
-		}
-		if (lpstProcessInfomation->hProcess != NULL) {
-			CloseHandle(lpstProcessInfomation->hProcess);
-		}
-	}
-	if (lpstProcessInfomation->hThread != NULL) {
-		CloseHandle(lpstProcessInfomation->hThread);
 	}
 	delete[] lpstProcessInfomation;
+	lpstProcessInfomation = NULL;
 	return bRet;
 }
 
 //
 // bEnumWindowsProc()
 //
-BOOL CALLBACK CFlushMouseHook::bEnumWindowsProc(HWND hWnd, LPARAM lParam)
+BOOL CALLBACK CFlushMouseHook::bEnumWindowsProcHookStop(HWND hWnd, LPARAM lParam)
 {
 	LPPROCESS_INFORMATION pi = (LPPROCESS_INFORMATION)lParam;
 
@@ -697,7 +677,10 @@ BOOL CALLBACK CFlushMouseHook::bEnumWindowsProc(HWND hWnd, LPARAM lParam)
 	if (pi->dwProcessId == lpdwProcessId)
 	{
 		PostMessage(hWnd, WM_CLOSE, 0, 0);
+		SetLastError(ERROR_SUCCESS);
+		return FALSE;
 	}
 	return TRUE;
 }
 
+/* EOF */

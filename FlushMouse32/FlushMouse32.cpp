@@ -87,7 +87,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		unsigned long long ll = 0;
 		if ((ll = _tstoll(lpCmdLine)) == 0) return (-1);
 		hParentWnd = (HWND)ll;
-		if (hParentWnd != FindWindow(_T("FlushMouse"), NULL)) {	// 渡された値をチェック
+		if (hParentWnd != FindWindow(_T("FLUSHMOUSE"), NULL)) {	// 渡された値をチェック
 			vMessageBox(NULL, IDS_NOTFORKBY64, MessageBoxTYPE);	// 不正起動のためメッセージを表示
 			return (-1);
 		}
@@ -267,3 +267,4 @@ static void vMessageBox(HWND hWnd, UINT uID, UINT uType)
 	}
 }
 
+/* EOF */

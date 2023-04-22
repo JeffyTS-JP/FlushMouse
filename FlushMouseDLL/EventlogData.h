@@ -78,7 +78,7 @@
 //
 // Started FlushMouse.
 //
-#define MSG_START_SUCCEED                ((DWORD)0x40000100L)
+#define MSG_START_SUCCEED                ((DWORD)0x40000000L)
 
 //
 // MessageId: MSG_RESTART_EVENT
@@ -87,7 +87,25 @@
 //
 // Restart FlushMouse.
 //
-#define MSG_RESTART_EVENT                ((DWORD)0x40000101L)
+#define MSG_RESTART_EVENT                ((DWORD)0x40000001L)
+
+//
+// MessageId: MSG_THREAD_HOOK_TIMER_STARTED
+//
+// MessageText:
+//
+// Thread, Hook and Timer Started.
+//
+#define MSG_THREAD_HOOK_TIMER_STARTED    ((DWORD)0x40000002L)
+
+//
+// MessageId: MSG_THREAD_HOOK_TIMER_STOPPED
+//
+// MessageText:
+//
+// Thread, Hook and Timer Stopped.
+//
+#define MSG_THREAD_HOOK_TIMER_STOPPED    ((DWORD)0x40000003L)
 
 //
 // MessageId: MSG_QUIT_FLUSHMOUSE
@@ -96,16 +114,16 @@
 //
 // Quit FlushMouse.
 //
-#define MSG_QUIT_FLUSHMOUSE              ((DWORD)0x40000102L)
+#define MSG_QUIT_FLUSHMOUSE              ((DWORD)0x40000004L)
 
 //
 // MessageId: MSG_PBT_APMSUSPEND
 //
 // MessageText:
 //
-// Entering to suspend (APM).
+// Entering into suspend (APM).
 //
-#define MSG_PBT_APMSUSPEND               ((DWORD)0x40000103L)
+#define MSG_PBT_APMSUSPEND               ((DWORD)0x40000100L)
 
 //
 // MessageId: MSG_PBT_APMRESUMESUSPEND
@@ -114,7 +132,7 @@
 //
 // Resumeed from Susped (APM).
 //
-#define MSG_PBT_APMRESUMESUSPEND         ((DWORD)0x40000104L)
+#define MSG_PBT_APMRESUMESUSPEND         ((DWORD)0x40000101L)
 
 //
 // MessageId: MSG_PBT_APMPOWERSTATUSCHANGE
@@ -123,7 +141,7 @@
 //
 // Changed in the power status (APM).
 //
-#define MSG_PBT_APMPOWERSTATUSCHANGE     ((DWORD)0x40000105L)
+#define MSG_PBT_APMPOWERSTATUSCHANGE     ((DWORD)0x40000102L)
 
 //
 // MessageId: MSG_PBT_APMRESUMEAUTOMATIC
@@ -132,7 +150,7 @@
 //
 // Resuming from sleep or hibernation (APM).
 //
-#define MSG_PBT_APMRESUMEAUTOMATIC       ((DWORD)0x40000106L)
+#define MSG_PBT_APMRESUMEAUTOMATIC       ((DWORD)0x40000103L)
 
 //
 // MessageId: MSG_PBT_POWERSETTINGCHANGE
@@ -141,5 +159,5 @@
 //
 // Power settings changed (APM).
 //
-#define MSG_PBT_POWERSETTINGCHANGE       ((DWORD)0x40000107L)
+#define MSG_PBT_POWERSETTINGCHANGE       ((DWORD)0x40000104L)
 

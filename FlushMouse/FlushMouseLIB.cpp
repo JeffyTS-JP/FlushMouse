@@ -53,10 +53,10 @@ TCHAR		szTitle[MAX_LOADSTRING]{};					// タイトル バーのテキスト
 TCHAR		szWindowClass[MAX_LOADSTRING]{};			// メイン ウィンドウ クラス名
 HWND		hMainWnd = NULL;
 
-CProfile	*Profile = NULL;							// Profile class
-CCursor		*Cursor = NULL;								// CCursor class
-
-CResource	*Resource = NULL;							// Resource
+CProfile	* Profile = NULL;							// Profile class
+CCursor		* Cursor = NULL;							// Cursor class
+CResource	* Resource = NULL;							// Resource class
+CIME		* Cime = NULL;								// IME class
 
 // Use in FlushMouse from Registry
 BOOL		bDisplayIMEModeOnCursor = TRUE;
@@ -115,12 +115,13 @@ static void		Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify);
 static void		Cls_OnLButtonDownEx(HWND hWnd, int x, int y, HWND hForeground);
 static void		Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground);
 static void		Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flags);
+static BOOL		Cls_OnPowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting);
 
 // Sub
 static VOID CALLBACK	vCheckFocusTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
 static LONG WINAPI		lExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo);
-static BOOL CALLBACK	bEnumChildProcActivateIME(HWND hWnd, LPARAM lParam);
 static BOOL CALLBACK	bEnumChildProcChangeHKL(HWND hWnd, LPARAM lParam);
+static BOOL		bSendInputSub(UINT cInputs, LPINPUT pInputs);
 static BOOL		bKBisEP();
 
 //
@@ -235,6 +236,8 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 {
 // void Cls_OnTaskTray(HWND hWnd, UINT id, UINT uMsg)
 #define HANDLE_WM_TASKTRAY(hWnd, wParam, lParam, fn) ((fn)((hWnd), (UINT)(wParam), (UINT)(lParam)), 0L)
+// BOOL Cls_OnPowerBroadcast(HWND hWnd, ULONG Type, LPPOWERBROADCAST_SETTING lpSetting)
+#define HANDLE_WM_POWERBROADCAST(hWnd, wParam, lParam, fn) ((fn)((hWnd), (ULONG)(wParam), (POWERBROADCAST_SETTING *)(lParam)), 0L)
 
 	switch (message) {
 		HANDLE_MSG(hWnd, WM_CREATE, Cls_OnCreate);
@@ -246,6 +249,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		HANDLE_MSG(hWnd, WM_LBUTTONUPEX, Cls_OnLButtonUpEx);
 		HANDLE_MSG(hWnd, WM_SYSKEYDOWNUPEX, Cls_OnSysKeyDownUpEx);
 		HANDLE_MSG(hWnd, WM_TASKTRAY, Cls_OnTaskTray);
+		HANDLE_MSG(hWnd, WM_POWERBROADCAST, Cls_OnPowerBroadcast);
 
 	default:
 		if (message == uTaskbarCreatedMessage) {
@@ -269,6 +273,8 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 {
 	UNREFERENCED_PARAMETER(lpCreateStruct);
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK)
+	Cime = new CIME;													// IME Class
+	
 	Profile = new CProfile;
 	if (!Profile->bGetProfileData()) {
 		vMessageBox(hWnd, IDS_CANTLOADREG, MessageBoxTYPE);
@@ -292,10 +298,10 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 	}
 
 	// for PowerNotification
-	PowerNotification = new CPowerNotification;
+	PowerNotification = new CPowerNotification(hWnd);
 	if (!PowerNotification) {
-		vMessageBox(hWnd, IDS_NOTRREGISTEVH, MessageBoxTYPE);			// Event Handllerを登録できなかったためエラーを表示
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);		// Quit
+		vMessageBox(hWnd, IDS_NOTRREGISTEVH, MessageBoxTYPE);
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		return FALSE;
 	}
 
@@ -324,6 +330,7 @@ static void Cls_OnDestroy(HWND hWnd)
 	if (Profile != NULL) {
 		Profile->bSetProfileData();
 		delete	Profile;
+		Profile = NULL;
 	}
 
 	if (bTaskTray) {
@@ -341,6 +348,11 @@ static void Cls_OnDestroy(HWND hWnd)
 		Resource->bUnload();
 		delete Resource;
 		Resource = NULL;
+	}
+
+	if (Cime != NULL) {
+		delete Cime;
+		Cime = NULL;
 	}
 
 	PostQuitMessage(0);
@@ -448,6 +460,35 @@ static void Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground)
 	}
 	return;
 }
+//
+// WM_POWERBROADCAST
+// Cls_OnPowerBroadcastEx()
+// https://www.intel.my/content/dam/www/public/ijkk/jp/ja/documents/developer/Application_Power_Management_J_i.pdf
+//
+static BOOL		Cls_OnPowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting)
+{
+	UNREFERENCED_PARAMETER(hWnd);
+	UNREFERENCED_PARAMETER(Type);
+	UNREFERENCED_PARAMETER(lpSetting);
+	switch (Type) {
+	case PBT_APMSUSPEND:
+		vStopThredHookTimer(hWnd);
+		break;
+	case PBT_APMRESUMEAUTOMATIC:
+		break;
+	case PBT_APMRESUMESUSPEND:
+		if (!bStartThredHookTimer(hWnd)) {
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+		}
+		bReportEvent(MSG_PBT_APMRESUMESUSPEND, POWERNOTIFICATION_CATEGORY);
+		break;
+	case PBT_POWERSETTINGCHANGE:
+		break;
+	case PBT_APMPOWERSTATUSCHANGE:
+		break;
+	}
+	return TRUE;
+}
 
 //
 // WM_SYSKEYDOWNEX
@@ -523,7 +564,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 			break;
 		case KEY_IME_ON:			// IME ON					(0x16)
 			if (bEnableEPHelper) {
-				Cursor->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
+				Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
 			}
 			break;
 		case KEY_KANJI:				// JP(IME/ENG) Alt + 漢字	(0x19)
@@ -543,7 +584,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 				SetFocus(hForeWnd);
 				if (bForExplorerPatcherSWS(hForeWnd, TRUE, &hNewHKL, &hPreviousHKL)) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
-						Cursor->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
+						Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
 					}
 				}
 			}
@@ -556,7 +597,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 							PostMessage(hWnd, WM_SYSKEYDOWNUPEX, KEY_OEM_PA1, (0x80000000));
 						}
 						else {
-							Cursor->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 						}
 					}
 				}
@@ -577,10 +618,10 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 			if (bEnableEPHelper) {
 				if (bForExplorerPatcherSWS(hForeWnd, TRUE, &hNewHKL, &hPreviousHKL)) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
-						Cursor->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+						Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 					}
 					else {		// KEY_OEM_PA1 is from US KB
-						Cursor->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+						Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 					}
 				}
 			}
@@ -589,7 +630,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 			if (bEnableEPHelper) {
 				if (bForExplorerPatcherSWS(hForeWnd, TRUE, &hNewHKL, &hPreviousHKL)) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
-						Cursor->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+						Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 					}
 				}
 			}
@@ -598,7 +639,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 			if (bEnableEPHelper) {
 				if (bForExplorerPatcherSWS(hForeWnd, TRUE, &hNewHKL, &hPreviousHKL)) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
-						Cursor->vIMEConvertModeChangeForced(hForeWnd, ZENKANA_IMEON);
+						Cime->vIMEConvertModeChangeForced(hForeWnd, ZENKANA_IMEON);
 					}
 				}
 			}
@@ -607,7 +648,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 			if (bEnableEPHelper) {
 				if (bForExplorerPatcherSWS(hForeWnd, TRUE, &hNewHKL, &hPreviousHKL)) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
-						Cursor->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
+						Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
 					}
 				}
 			}
@@ -616,10 +657,10 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 			if (bEnableEPHelper) {
 				if (bForExplorerPatcherSWS(hForeWnd, TRUE, &hNewHKL, &hPreviousHKL)) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
-						Cursor->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
+						Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
 					}
 					else {
-						Cursor->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
+						Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
 					}
 				}
 			}
@@ -628,10 +669,10 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 			if (bEnableEPHelper) {
 				if (bForExplorerPatcherSWS(hForeWnd, TRUE, &hNewHKL, &hPreviousHKL)) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
-						Cursor->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
+						Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
 					}
 					else {
-						Cursor->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+						Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 					}
 				}
 			}
@@ -642,10 +683,10 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 				SetFocus(hForeWnd);
 				if (bForExplorerPatcherSWS(hForeWnd, TRUE, &hNewHKL, &hPreviousHKL)) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
-						Cursor->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
+						Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
 					}
 					else {
-						Cursor->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+						Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 					}
 				}
 			}
@@ -712,7 +753,47 @@ BOOL		bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, LPHKL lpNewHKL, L
 			hkl = JP_IME;
 			if (ActivateKeyboardLayout(hkl, KLF_SETFORPROCESS) != 0) {
 				EnumChildWindows(hForeWnd, &bEnumChildProcChangeHKL, (LPARAM)hkl);
-				bRet = TRUE;
+				if ((hkl = GetKeyboardLayout(dwThreadID)) != NULL) {				// Re Check
+					if (((UINT64)hkl & KB_MASK) != KB_JP) {
+						int		iKBList = 0;
+						if ((iKBList = GetKeyboardLayoutList(0, NULL)) != 0) {
+							LPHKL	lpHKL = NULL;
+							if ((lpHKL = new HKL[sizeof(HKL) * iKBList]) != NULL) {
+								ZeroMemory(lpHKL, (sizeof(HKL) * iKBList));
+								if ((iKBList = GetKeyboardLayoutList(iKBList, lpHKL)) != 0) {
+									int	i = 0;
+									for (; i < iKBList; i++) {
+										if (lpHKL[i] == hkl) {
+											break;
+										}
+									}
+									int k = 1;
+									if (!(GetAsyncKeyState(VK_SHIFT) & 0x8000)) i = iKBList - i;
+									LPINPUT lpInputs = NULL;
+									if ((lpInputs = new INPUT[sizeof(INPUT) * (i * 2 + 2)]) != NULL) {
+										ZeroMemory(lpInputs, sizeof(INPUT) * (i * 2 + 2));
+										lpInputs[0].type = INPUT_KEYBOARD;	lpInputs[0].ki.wVk = VK_LWIN;
+										for (; k < ((i * 2)); k = k + 2) {
+											lpInputs[k].type = INPUT_KEYBOARD;	lpInputs[k].ki.wVk = VK_SPACE;
+											lpInputs[k + 1].type = INPUT_KEYBOARD;	lpInputs[k + 1].ki.wVk = VK_SPACE;	lpInputs[k + 1].ki.dwFlags = KEYEVENTF_KEYUP;
+										}
+										lpInputs[i * 2 + 1].type = INPUT_KEYBOARD;	lpInputs[i * 2 + 1].ki.wVk = VK_LWIN;	lpInputs[i * 2 + 1].ki.dwFlags = KEYEVENTF_KEYUP;
+										if (bSendInputSub((UINT)(i * 2 + 2), lpInputs)) {
+											hkl = lpHKL[0];
+											if (ActivateKeyboardLayout(hkl, KLF_SETFORPROCESS) != 0) {
+												EnumChildWindows(hForeWnd, &bEnumChildProcChangeHKL, (LPARAM)hkl);
+												bRet = TRUE;
+											}
+										}
+										delete[]	lpInputs;
+									}
+								}
+								delete[]	lpHKL;
+							}
+						}
+					}
+					else bRet = TRUE;
+				}
 			}
 		}
 		else {
@@ -720,10 +801,24 @@ BOOL		bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, LPHKL lpNewHKL, L
 			bRet = TRUE;
 		}
 	}
-	EnumChildWindows(hForeWnd, &bEnumChildProcActivateIME, NULL);
+	if (bRet)	Cime->vActivateIME(hForeWnd);
 	if (lpNewHKL != NULL)		*lpNewHKL = hkl;
 	if (lpPreviousHKL != NULL)	*lpPreviousHKL = hPreviousHKL;
 	return bRet;
+}
+
+//
+// bEnumChildProcChangeHKL()
+//
+BOOL CALLBACK bEnumChildProcChangeHKL(HWND hWnd, LPARAM lParam)
+{
+	HWND	hIMWnd = NULL;
+	if (ActivateKeyboardLayout((HKL)lParam, KLF_SETFORPROCESS) != 0) {
+		if ((hIMWnd = ImmGetDefaultIMEWnd(hWnd)) != NULL) {
+			SendMessage(hIMWnd, WM_INPUTLANGCHANGEREQUEST, (WPARAM)INPUTLANGCHANGE_SYSCHARSET, lParam);
+		}
+	}
+	return TRUE;
 }
 
 //
@@ -753,42 +848,16 @@ BOOL		bCheckExistingJPIME()
 	return bRet;
 }
 
-// 
-// bEnumChildProcActivateIME()
-// 
-BOOL CALLBACK bEnumChildProcActivateIME(HWND hWnd, LPARAM lParam)
-{
-	UNREFERENCED_PARAMETER(lParam);
-
-	HWND	hIMWnd = ImmGetDefaultIMEWnd(hWnd);
-	if (hIMWnd != NULL) {
-		SendMessage(hIMWnd, WM_ACTIVATE, (WPARAM)WA_ACTIVE, (LPARAM)NULL);
-		LPTSTR	lpszBuffer = new TCHAR[_MAX_PATH];
-		ZeroMemory(lpszBuffer, _MAX_PATH);
-		if (GetClassName(hIMWnd, lpszBuffer, _MAX_PATH) != 0) {
-			HWND	hIMEWnd = FindWindow(lpszBuffer, NULL);
-			if (hIMEWnd != NULL) {
-				SendMessage(hIMEWnd, WM_ACTIVATE, (WPARAM)WA_ACTIVE, (LPARAM)NULL);
-			}
-		}
-		if (lpszBuffer != NULL)	delete[] lpszBuffer;
-	}
-	return TRUE;
-}
-
-
 //
-// bEnumChildProcChangeHKL()
+// bSendInputSub()
 //
-BOOL CALLBACK bEnumChildProcChangeHKL(HWND hWnd, LPARAM lParam)
+static BOOL		bSendInputSub(UINT cInputs, LPINPUT pInputs)
 {
-	HWND	hIMWnd = NULL;
-	if (ActivateKeyboardLayout((HKL)lParam, KLF_SETFORPROCESS) != 0) {
-		if ((hIMWnd = ImmGetDefaultIMEWnd(hWnd)) != NULL) {
-			SendMessage(hIMWnd, WM_INPUTLANGCHANGEREQUEST, (WPARAM)INPUTLANGCHANGE_SYSCHARSET, lParam);
-		}
+	if (SendInput(cInputs, pInputs, sizeof(INPUT)) == cInputs) {
+		Sleep(10);
+		return TRUE;
 	}
-	return TRUE;
+	return FALSE;
 }
 
 //
@@ -809,31 +878,43 @@ static LONG WINAPI lExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo)
 BOOL		bStartThredHookTimer(HWND hWnd)
 {
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK)
-	Cursor = new CCursor;
-	if (!Cursor->bInitialize(hWnd)) {
-		vMessageBox(hWnd, IDS_CANTLOADCURSOR, MessageBoxTYPE);
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-		return FALSE;
+	// Load Cursor
+	if (Cursor == NULL) {
+		Cursor = new CCursor;
+		if (!Cursor->bInitialize(hWnd)) {
+			vMessageBox(hWnd, IDS_CANTLOADCURSOR, MessageBoxTYPE);
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			return FALSE;
+		}
 	}
 
-	FocusEvent = new CFocusEvent;
-	if (!FocusEvent->bEventSet()) {
-		vMessageBox(hWnd, IDS_NOTRREGISTEVH, MessageBoxTYPE);
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-		return FALSE;
+	// Register Hook
+	if (FlushMouseHook == NULL) {
+		FlushMouseHook = new CFlushMouseHook;
+		if (!FlushMouseHook->bHookSet(hWnd, szFlushMouse64, szFlushMouse32)) {
+			vMessageBox(hWnd, IDS_NOTREGISTERHOOK, MessageBoxTYPE);
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			return FALSE;
+		}
 	}
 
-	if ((bCheckFocusTimer = (BOOL)SetTimer(hWnd, nCheckFocusTimerID, nCheckFocusTimerTickValue, (TIMERPROC)&vCheckFocusTimerProc)) == 0) {
-		vMessageBox(hWnd, IDS_NOTIMERESOUCE, MessageBoxTYPE);
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-		return FALSE;
+	// Set Timer
+	if (bCheckFocusTimer == FALSE) {
+		if ((bCheckFocusTimer = (BOOL)SetTimer(hWnd, nCheckFocusTimerID, nCheckFocusTimerTickValue, (TIMERPROC)&vCheckFocusTimerProc)) == 0) {
+			vMessageBox(hWnd, IDS_NOTIMERESOUCE, MessageBoxTYPE);
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			return FALSE;
+		}
 	}
 
-	FlushMouseHook = new CFlushMouseHook;
-	if (!FlushMouseHook->bHookSet(hWnd, szFlushMouse64, szFlushMouse32)) {
-		vMessageBox(hWnd, IDS_NOTREGISTERHOOK, MessageBoxTYPE);
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-		return FALSE;
+	// Event Handller for Changed Focus
+	if (FocusEvent == NULL) {
+		FocusEvent = new CFocusEvent;
+		if (!FocusEvent->bEventSet()) {
+			vMessageBox(hWnd, IDS_NOTRREGISTEVH, MessageBoxTYPE);
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			return FALSE;
+		}
 	}
 	return TRUE;
 }
@@ -843,15 +924,15 @@ BOOL		bStartThredHookTimer(HWND hWnd)
 //
 VOID		vStopThredHookTimer(HWND hWnd)
 {
+	if (FocusEvent != NULL) {
+		delete FocusEvent;
+		FocusEvent = NULL;
+	}
+
 	if (bCheckFocusTimer) {
 		if (KillTimer(hWnd, nCheckFocusTimerID)) {
 			bCheckFocusTimer = FALSE;
 		}
-	}
-
-	if (FocusEvent != NULL) {
-		delete FocusEvent;
-		FocusEvent = NULL;
 	}
 
 	if (FlushMouseHook != NULL) {
@@ -944,3 +1025,4 @@ BOOL		CResource::bUnload()
 	return TRUE;
 }
 
+/* EOF */

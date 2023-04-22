@@ -24,24 +24,18 @@
 //
 // Define
 //
-#ifndef OCR_NORMAL
-#define OCR_NORMAL  32512		// IDC_ARROW	 (WinUser.h)
-#endif // !OCR_NORMAL
-#ifndef OCR_IBEAM
-#define OCR_IBEAM   32513		// IDC_IBEAM	 (WinUser.h)
-#endif // !OCR_IBEAM
-#ifndef OCR_HAND
-#define OCR_HAND    32649		// IDC_HAND (WinUser.h)
-#endif // !OCR_HAND
-#ifndef OCR_HELP
-#define	OCR_HELP	32651		// IDC_HELP (WinUser.h)
-#endif // !OCR_HELP
-#ifndef OCR_PIN
-#define OCR_PIN		32671		// IDC_PIN (WinUser.h)
-#endif // !OCR_PIN
-#ifndef OCR_PERSON
-#define	OCR_PERSON	32672		// IDC_PERSON (WinUser.h)	
-#endif // !OCR_PERSON
+#define FLUSHMOUSECURSORDIR	_T("\\JeffyTS\\FlushMouse\\")
+#define FLUSHMOUSECURSORDAT	_T("FlushMouseCursor.dat")
+
+// IME Cursor Change Thread
+#define IMECURSORCHANGETHREADID		1
+#define IMECURSORCHANGETHREADNAME	_T("IMECursorChangeThread")
+// Draw IME Mode near by Mouse cursor Thread
+#define	DRAWIMEMODETHREADID			2
+#define	DRAWIMEMODETHREADNAME		_T("DrawIMEModeThread")
+// Draw IME Mode near by Caret cursor Thread
+#define	DRAWIMEMODECARETTHREADID	3
+#define	DRAWIMEMODECARETTHREADNAME	_T("DrawIMEModeCaretThread")
 
 //
 // Struct Define
@@ -54,69 +48,168 @@
 // Local Data
 //
 
-#define FLUSHMOUSECURSORDIR	_T("\\JeffyTS\\FlushMouse\\")	// Cursor data dir
-#define FLUSHMOUSECURSORDAT	_T("FlushMouseCursor.dat")		// Cursor data Name
+//
+// Class CIME
+//
+CIME::CIME()
+{
 
-// IME Cursor Change Thread
-#define IMECURSORCHANGETHREAD	1							// IME Cursor Change THread ID
-static DWORD			dwIMECursorChangeThreadID = IMECURSORCHANGETHREAD;
-static TCHAR			szIMECursorChangeThreadName[] = _T("IMECursorChangeThread");
+}
+CIME::~CIME()
+{
 
-// Draw IME Mode near by Mouse cursor Thread
-#define	DRAWIMEMODETHREAD		2							// Draw IME Mode near by Mouse cursor Thead ID
-static DWORD			dwDrawIMEModeThreadID = DRAWIMEMODETHREAD;
-static TCHAR			szDrawIMEModeThreadName[] = _T("DrawIMEModeThread");
+}
 
-// Draw IME Mode near by Caret cursor Thread
-#define	DRAWIMEMODECARETTHREAD		3						// Draw IME Mode near by Caret cursor Thead ID
-static DWORD			dwDrawIMEModeCaretThreadID = DRAWIMEMODECARETTHREAD;
-static TCHAR			szDrawIMEModeCaretThreadName[] = _T("DrawIMEModeCaretThread");
+//
+// bIsIMEOpen()
+//
+BOOL		CIME::bIsIMEOpen(HWND hWndObserved)
+{
+	HWND    hIMWnd = NULL;
+	if ((hIMWnd = ImmGetDefaultIMEWnd(hWndObserved)) != NULL) {
+		if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETOPENSTATUS, (LPARAM)NULL) != 0) {
+			return TRUE;			// IME Open
+		}
+	}
+	return FALSE;					// IME Close
+}
 
-static MOUSECURSOR	stAllMouseCursor[] = {
-		{ OCR_APPSTARTING, 0, TRUE,  _T("AppStarting"), _T("") },
-		{ OCR_NORMAL,	   0, FALSE, _T("Arrow"),		_T("") },
-		{ OCR_CROSS,	   0, TRUE,  _T("Crosshair"),	_T("") },
-		{ OCR_HAND,		   0, FALSE, _T("Hand"),	    _T("") },
-		{ OCR_HELP,		   0, TRUE,  _T("Help"),	    _T("") },
-		{ OCR_IBEAM,	   0, FALSE, _T("IBeam"),		_T("") },
-		{ OCR_NO,		   0, TRUE,  _T("No"),			_T("") },
-	 // { OCR_NWPEN,	   0, TRUE,  _T("NWPen"),		_T("") },
-	 // { OCR_PEN,		   0, TRUE,  _T("Pen"),		    _T("") },
-		{ OCR_PERSON,	   0, TRUE,  _T("Person"),		_T("") },
-		{ OCR_PIN,		   0, TRUE,  _T("Pin"),		    _T("") },
-		{ OCR_SIZEALL,	   0, TRUE,  _T("SizeAll"),	    _T("") },
-		{ OCR_SIZENESW,	   0, TRUE,  _T("SizeNESW"),    _T("") },
-		{ OCR_SIZENS,	   0, TRUE,  _T("SizeNS"),		_T("") },
-		{ OCR_SIZENWSE,	   0, TRUE,  _T("SizeNWSE"),    _T("") },
-		{ OCR_SIZEWE,	   0, TRUE,  _T("SizeWE"),		_T("") },
-		{ OCR_UP,		   0, TRUE,  _T("UpArrow"),	    _T("") },
-		{ OCR_WAIT,		   0, TRUE,  _T("Wait"),	    _T("") },
-		{ (DWORD)(-1), 	   0, FALSE, _T(""),		    _T("") }		// Terminater
-};
+//
+// vIMEOpenCloseForced()
+//
+VOID		CIME::vIMEOpenCloseForced(HWND hWndObserved, DWORD dwIMEOpenClose)
+{
+	if (hWndObserved == NULL)	return;
+	LPARAM	lParam = (LPARAM)dwIMEOpenClose;
+	EnumChildWindows(hWndObserved, &bEnumChildProcIMEOpenClose, lParam);
+	return;
+}
 
-static FLUSHMOUSECURSOR	stFlushMouseCursor[] = {
-		{ IMEOFF,			_T("A"),	{OCR_NORMAL, IDC_IMEOFF_ARROW,		  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeOffArrow.cur")},
-										{OCR_HAND,   IDC_IMEOFF_HAND,		  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeOffHand.cur")},
-										{OCR_IBEAM,  IDC_IMEOFF_IBEAM,		  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeOffIbeam.cur")}},
-		{ ZENHIRA_IMEON,	_T("あ"),	{OCR_NORMAL, IDC_ZENHIRA_IMEON_ARROW, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenHiraOnArrow.cur")},
-										{OCR_HAND,   IDC_ZENHIRA_IMEON_HAND,  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenHiraOnHand.cur")},
-										{OCR_IBEAM,  IDC_ZENHIRA_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenHiraOnIbeam.cur")}},
-		{ HANEISU_IMEON,	_T("_A"),	{OCR_NORMAL, IDC_HANEISU_IMEON_ARROW, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHanEisuOnArrow.cur")},
-										{OCR_HAND,   IDC_HANEISU_IMEON_HAND,  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHanEisuOnHand.cur")},
-										{OCR_IBEAM,  IDC_HANEISU_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHanEisuOnIbeam.cur")}},
-		{ HANKANA_IMEON,	_T("_ｱ"),	{OCR_NORMAL, IDC_HANKANA_IMEON_ARROW, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHanKanaOnArrow.cur")},
-										{OCR_HAND,   IDC_HANKANA_IMEON_HAND,  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHanKanaOnHand.cur")},
-										{OCR_IBEAM,  IDC_HANKANA_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHanKanaOnIbeam.cur")}},
-		{ ZENEISU_IMEON,	_T("Ａ"),	{OCR_NORMAL, IDC_ZENEISU_IMEON_ARROW, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenEisuOnArrow.cur")},
-										{OCR_HAND,   IDC_ZENEISU_IMEON_HAND,  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenEisuOnHand.cur")},
-										{OCR_IBEAM,  IDC_ZENEISU_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenEisuOnIbeam.cur")}},
-		{ ZENKANA_IMEON,	_T("ア"),	{OCR_NORMAL, IDC_ZENKANA_IMEON_ARROW, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenKanaOnArrow.cur")},
-										{OCR_HAND,   IDC_ZENKANA_IMEON_HAND,  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenKanaOnHand.cur")},
-										{OCR_IBEAM,  IDC_ZENKANA_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenKanaOnIbeam.cur")}},
-		{ (UINT)(-1),		_T(""),		{0,			 0,						  FALSE, _T(""), _T("")},		// Terminater
-										{0,			 0,						  FALSE, _T(""), _T("")},		// Terminater
-										{0,			 0,						  FALSE, _T(""), _T("")} }		// Terminater
-};
+//
+// vIMEConvertModeChangeForced()
+//
+VOID		CIME::vIMEConvertModeChangeForced(HWND hWndObserved, DWORD dwConvertMode)
+{
+	if (hWndObserved == NULL)	return;
+	LPARAM	lParam = (LPARAM)dwConvertMode;
+	EnumChildWindows(hWndObserved, &bEnumChildProcIMECnvertMode, lParam);
+	return;
+}
+
+//
+// bEnumChildProcIMECnvertMode()
+//
+BOOL CALLBACK CIME::bEnumChildProcIMECnvertMode(HWND hWndObserved, LPARAM lParam)
+{
+	if (hWndObserved == NULL)	return FALSE;
+	HWND    hIMWnd = NULL;
+	if ((hIMWnd = ImmGetDefaultIMEWnd(hWndObserved)) != NULL) {
+		if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETOPENSTATUS, (LPARAM)TRUE) == 0) {	// lParam = FALSE to IME CLOSE / TRUE to IME OPEN
+			if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETCONVERSIONMODE, (LPARAM)lParam) == 0) {
+#ifdef _DEBUG
+				//DBvPrintf(_T("==hWndObserved = 0x%08x lParam = 0x%08x\n"), hWndObserved, lParam);
+#endif // _DEBUG
+			}
+		}
+	}
+	return TRUE;			// If error, but Continue all child Window
+}
+
+//
+// bEnumChildProcIMEOpenClose()
+//
+BOOL CALLBACK CIME::bEnumChildProcIMEOpenClose(HWND hWndObserved, LPARAM lParam)
+{
+	if (hWndObserved == NULL)	return FALSE;
+	HWND    hIMWnd = NULL;
+	if ((hIMWnd = ImmGetDefaultIMEWnd(hWndObserved)) != NULL) {
+		if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETOPENSTATUS, lParam) == 0) {	// lParam = FALSE to IME CLOSE / TRUE to IME OPEN
+#ifdef _DEBUG
+			//DBvPrintf(_T("==hWndObserved = 0x%08x lParam = 0x%08x\n"), hWndObserved, lParam);
+#endif // _DEBUG
+		}
+	}
+	return TRUE;			// If error, but Continue all child Window
+}
+
+//
+// dwIMECursorMode()
+//
+DWORD		CIME::dwIMECursorMode(HWND hWndObserved, BOOL bForceHiragana)
+{
+	if (hWndObserved != NULL) {
+		HWND    hIMWnd = NULL;
+		DWORD   dwConvertMode = 0;
+		if ((hIMWnd = ImmGetDefaultIMEWnd(hWndObserved)) != NULL) {
+			if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETOPENSTATUS, NULL) != 0) {
+				if ((dwConvertMode = (DWORD)SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETCONVERSIONMODE, NULL)) != 0) {
+					switch (dwConvertMode) {
+					case ZENHIRA_IMEON:
+					case (ZENHIRA_IMEON ^ IME_CMODE_ROMAN):
+						dwConvertMode = ZENHIRA_IMEON;
+						break;
+					case HANEISU_IMEON:
+					case (HANEISU_IMEON ^ IME_CMODE_ROMAN):
+						dwConvertMode = HANEISU_IMEON;
+						break;
+					case HANKANA_IMEON:
+					case (HANKANA_IMEON ^ IME_CMODE_ROMAN):
+						dwConvertMode = HANKANA_IMEON;
+						break;
+					case ZENEISU_IMEON:
+					case (ZENEISU_IMEON ^ IME_CMODE_ROMAN):
+						dwConvertMode = ZENEISU_IMEON;
+						break;
+					case ZENKANA_IMEON:
+					case (ZENKANA_IMEON ^ IME_CMODE_ROMAN):
+						dwConvertMode = ZENKANA_IMEON;
+						break;
+					default:
+						dwConvertMode = IMEOFF;
+					}
+					if ((bForceHiragana != FALSE) && (dwConvertMode != ZENHIRA_IMEON)) {
+						vIMEConvertModeChangeForced(hWndObserved, ZENHIRA_IMEON);
+						return ZENHIRA_IMEON;
+					}
+					return dwConvertMode;
+				}
+			}
+		}
+	}
+	return IMEOFF;
+}
+
+VOID		CIME::vActivateIME(HWND hWndObserved)
+{
+	EnumChildWindows(hWndObserved, &bEnumChildProcActivateIME, NULL);
+}
+
+// 
+// bEnumChildProcActivateIME()
+// 
+BOOL CALLBACK CIME::bEnumChildProcActivateIME(HWND hWnd, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+
+	BOOL	bRet = FALSE;
+	HWND	hIMWnd = ImmGetDefaultIMEWnd(hWnd);
+	if (hIMWnd != NULL) {
+		SendMessage(hIMWnd, WM_ACTIVATE, (WPARAM)WA_ACTIVE, (LPARAM)NULL);
+		LPTSTR	lpszBuffer = new TCHAR[_MAX_PATH];
+		ZeroMemory(lpszBuffer, _MAX_PATH);
+		if (GetClassName(hIMWnd, lpszBuffer, _MAX_PATH) != 0) {
+			HWND	hIMEWnd = FindWindow(lpszBuffer, NULL);
+			if (hIMEWnd != NULL) {
+				SendMessage(hIMEWnd, WM_ACTIVATE, (WPARAM)WA_ACTIVE, (LPARAM)NULL);
+
+				bRet = TRUE;
+			}
+		}
+		if (lpszBuffer != NULL)	delete[] lpszBuffer;
+	}
+	//return bRet;
+	return TRUE;
+}
 
 //
 // class CCursor
@@ -147,20 +240,28 @@ CCursor::~CCursor()
 {
 	if (DrawIMEModeCaretThread != NULL) {
 		delete	DrawIMEModeCaretThread;				// Draw IME Mode near by Caret cursor Threadの後始末
+		DrawIMEModeCaretThread = NULL;
 	}
 	if (CaretWindow != NULL) {
 		delete	CaretWindow;						// Draw Window near by Caret cursorの削除
+		CaretWindow = NULL;
 	}
 	if (DrawIMEModeThread != NULL) {
 		delete	DrawIMEModeThread;					// Draw IME Mode near by Mouse cursor Threadの後始末
+		DrawIMEModeThread = NULL;
 	}
 	if (CursorWindow != NULL) {
 		delete	CursorWindow;						// Draw Window near by Mouse cursorの削除
+		CursorWindow = NULL;
 	}
 	if (IMECursorChangeThread != NULL) {
 		delete	IMECursorChangeThread;				// IME Cursor Change Threadの後始末
+		IMECursorChangeThread = NULL;
 	}
-	if (stIMECursorData.lpszLoadDatName != NULL)	delete []	stIMECursorData.lpszLoadDatName;
+	if (stIMECursorData.lpszLoadDatName != NULL) {
+		delete[]	stIMECursorData.lpszLoadDatName;
+		stIMECursorData.lpszLoadDatName = NULL;
+	}
 }
 
 //
@@ -180,10 +281,8 @@ BOOL			CCursor::bInitialize(HWND hWnd)
 	stIMECursorData.bDisplayIMEModeOnCursor = Profile->stAppRegData.bDisplayIMEModeOnCursor;
 	stIMECursorData.bForceHiragana = Profile->stAppRegData.bForceHiragana;
 	stIMECursorData.bDrawNearCaret = Profile->stAppRegData.bDrawNearCaret;
-	if (!(Profile->stAppRegData.dwNearDrawMouseColor & 0xff000000))	Profile->stAppRegData.dwNearDrawMouseColor = Profile->stAppRegData.dwNearDrawMouseColor | 0xff000000;
-	stIMECursorData.dwNearDrawMouseColor = Profile->stAppRegData.dwNearDrawMouseColor;
-	if (!(Profile->stAppRegData.dwNearDrawCaretColor & 0xff000000))	Profile->stAppRegData.dwNearDrawCaretColor = Profile->stAppRegData.dwNearDrawCaretColor | 0xff000000;
-	stIMECursorData.dwNearDrawCaretColor = Profile->stAppRegData.dwNearDrawCaretColor;
+	stIMECursorData.dwNearDrawMouseColor = (~Profile->stAppRegData.dwNearDrawMouseColor & 0xff000000) | (Profile->stAppRegData.dwNearDrawMouseColor & 0x00ffffff);
+	stIMECursorData.dwNearDrawCaretColor = (~Profile->stAppRegData.dwNearDrawCaretColor & 0xff000000) | (Profile->stAppRegData.dwNearDrawCaretColor & 0x00ffffff);
 
 	stIMECursorData.bDenyChangedByApp = Profile->stAppRegData.bDenyChangedByApp;
 	stIMECursorData.bUseBigArrow = Profile->stAppRegData.bUseBigArrow;
@@ -197,16 +296,20 @@ BOOL			CCursor::bInitialize(HWND hWnd)
 	if (!bRegisterIMECursorChangeThread(hWnd)) return FALSE;
 	
 #define	WINDOWCLASS		_T("CursorWindow")
-	CursorWindow = new CCursorWindow;
-	if (!CursorWindow->bRegister((HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE), WINDOWCLASS, stIMECursorData.dwNearDrawMouseColor))		return FALSE;
-	CursorWindow->vSetModeString(stIMECursorData.lpstFlushMouseCursor[0].szMode);
-	DrawIMEModeThread = new CThread;
+	if (CursorWindow == NULL) {
+		CursorWindow = new CCursorWindow;
+		if (!CursorWindow->bRegister((HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE), WINDOWCLASS, stIMECursorData.dwNearDrawMouseColor))		return FALSE;
+		CursorWindow->vSetModeString(stIMECursorData.lpstFlushMouseCursor[0].szMode);
+		DrawIMEModeThread = new CThread;
+	}
 #undef WINDOWCLASS
 #define	WINDOWCLASS		_T("CaretWindow")
-	CaretWindow = new CCursorWindow;
-	if (!CaretWindow->bRegister((HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE), WINDOWCLASS, stIMECursorData.dwNearDrawCaretColor))	return FALSE;
-	CaretWindow->vSetModeString(stIMECursorData.lpstFlushMouseCursor[0].szMode);
-	DrawIMEModeCaretThread = new CThread;
+	if (CaretWindow == NULL) {
+		CaretWindow = new CCursorWindow;
+		if (!CaretWindow->bRegister((HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE), WINDOWCLASS, stIMECursorData.dwNearDrawCaretColor))	return FALSE;
+		CaretWindow->vSetModeString(stIMECursorData.lpstFlushMouseCursor[0].szMode);
+		DrawIMEModeCaretThread = new CThread;
+	}
 #undef WINDOWCLASS
 
 	if (!bRegisterDrawIMEModeThread(hWnd)) return FALSE;
@@ -262,80 +365,16 @@ LPTSTR		CCursor::lpszGetCursorDataName()
 }
 
 //
-// bIsIMEOpen()
-//
-BOOL			CCursor::bIsIMEOpen(HWND hWndObserved)
-{
-	HWND    hIMWnd = NULL;
-	if ((hIMWnd = ImmGetDefaultIMEWnd(hWndObserved)) != NULL) {
-		if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETOPENSTATUS, (LPARAM)NULL) != 0) {
-			return TRUE;			// IME Open
-		}
-	}
-	return FALSE;					// IME Close
-}
-
-//
-// vIMEOpenCloseForced()
-//
-VOID		CCursor::vIMEOpenCloseForced(HWND hWndObserved, DWORD dwIMEOpenClose)
-{
-	if (hWndObserved == NULL)	return;
-	LPARAM	lParam = (LPARAM)dwIMEOpenClose;
-	EnumChildWindows(hWndObserved, &bEnumChildProcIMEOpenClose, lParam);
-	return;
-}
-
-//
-// vIMEConvertModeChangeForced()
-//
-VOID		CCursor::vIMEConvertModeChangeForced(HWND hWndObserved, DWORD dwConvertMode)
-{
-	if (hWndObserved == NULL)	return;
-	LPARAM	lParam = (LPARAM)dwConvertMode;
-	EnumChildWindows(hWndObserved, &bEnumChildProcIMECnvertMode, lParam);
-	return;
-}
-
-//
-// bEnumChildProcIMEOpenClose()
-//
-BOOL CALLBACK CCursor::bEnumChildProcIMEOpenClose(HWND hWndObserved, LPARAM lParam)
-{
-	if (hWndObserved == NULL)	return FALSE;
-	HWND    hIMWnd = NULL;
-	if ((hIMWnd = ImmGetDefaultIMEWnd(hWndObserved)) != NULL) {
-		if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETOPENSTATUS, lParam) == 0) {	// lParam = FALSE to IME CLOSE / TRUE to IME OPEN
-		}
-	}
-	return TRUE;
-}
-
-//
-// bEnumChildProcIMECnvertMode()
-//
-BOOL CALLBACK CCursor::bEnumChildProcIMECnvertMode(HWND hWndObserved, LPARAM lParam)
-{
-	if (hWndObserved == NULL)	return FALSE;
-	HWND    hIMWnd = NULL;
-	if ((hIMWnd = ImmGetDefaultIMEWnd(hWndObserved)) != NULL) {
-		if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETOPENSTATUS, (LPARAM)TRUE) == 0) {	// lParam = FALSE to IME CLOSE / TRUE to IME OPEN
-			if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETCONVERSIONMODE, (LPARAM)lParam) == 0) {
-			}
-		}
-	}
-	return TRUE;
-}
-
-//
 // bStartIMECursorChangeThread()
 //
 BOOL		CCursor::bStartIMECursorChangeThread(HWND hWndObserved)
 {
+	if ((Cursor == NULL) || (IMECursorChangeThread == NULL))	return FALSE;
 	stIMECursorData.hWndObserved = hWndObserved;
 	if (!IMECursorChangeThread->bStart()) {
 		if (IMECursorChangeThread != NULL) {
 			delete	IMECursorChangeThread;
+			IMECursorChangeThread = NULL;
 		}
 		IMECursorChangeThread = new CThread;
 		if (!bRegisterIMECursorChangeThread(this->hMainWnd)) return FALSE;
@@ -348,12 +387,14 @@ BOOL		CCursor::bStartIMECursorChangeThread(HWND hWndObserved)
 //
 BOOL		CCursor::bStartDrawIMEModeThread(HWND hWndObserved)
 {
+	if ((Cursor == NULL) || (DrawIMEModeThread == NULL))	return FALSE;
 	stIMECursorData.hWndObserved = hWndObserved;
 	stIMECursorData.bDrawIMEModeWait = FALSE;
 	stIMECursorData.dwWaitWaveTime = Profile->stAppRegData.dwWaitWaveTime;
 	if (!DrawIMEModeThread->bStart()) {
 		if (DrawIMEModeThread != NULL) {
 			delete	DrawIMEModeThread;
+			DrawIMEModeThread = NULL;
 		}
 		DrawIMEModeThread = new CThread;
 		if (!bRegisterDrawIMEModeThread(this->hMainWnd)) return FALSE;
@@ -366,12 +407,14 @@ BOOL		CCursor::bStartDrawIMEModeThread(HWND hWndObserved)
 //
 BOOL		CCursor::bStartDrawIMEModeThreadWait(HWND hWndObserved)
 {
+	if ((Cursor == NULL) || (DrawIMEModeThread == NULL))	return FALSE;
 	stIMECursorData.hWndObserved = hWndObserved;
 	stIMECursorData.bDrawIMEModeWait = TRUE;
 	stIMECursorData.dwWaitWaveTime = Profile->stAppRegData.dwWaitWaveTime;
 	if (!DrawIMEModeThread->bStart()) {
 		if (DrawIMEModeThread != NULL) {
 			delete	DrawIMEModeThread;
+			DrawIMEModeThread = NULL;
 		}
 		DrawIMEModeThread = new CThread;
 		if (!bRegisterDrawIMEModeThread(this->hMainWnd)) return FALSE;
@@ -384,12 +427,14 @@ BOOL		CCursor::bStartDrawIMEModeThreadWait(HWND hWndObserved)
 //
 BOOL		CCursor::bStartDrawIMEModeThreadWaitDblClk(HWND hWndObserved)
 {
+	if ((Cursor == NULL) || (DrawIMEModeThread == NULL))	return FALSE;
 	stIMECursorData.hWndObserved = hWndObserved;
 	stIMECursorData.bDrawIMEModeWait = TRUE;
 	stIMECursorData.dwWaitWaveTime = GetDoubleClickTime();
 	if (!DrawIMEModeThread->bStart()) {
 		if (DrawIMEModeThread != NULL) {
 			delete	DrawIMEModeThread;
+			DrawIMEModeThread = NULL;
 		}
 		DrawIMEModeThread = new CThread;
 		if (!bRegisterDrawIMEModeThread(this->hMainWnd)) return FALSE;
@@ -451,7 +496,7 @@ BOOL		CCursor::bSystemCursorLoad()
 BOOL		CCursor::bRegisterIMECursorChangeThread(HWND hWndObserved)
 {
 	stIMECursorData.hWndObserved = hWndObserved;
-	if (!IMECursorChangeThread->bRegister(szIMECursorChangeThreadName, dwIMECursorChangeThreadID,
+	if (!IMECursorChangeThread->bRegister(IMECURSORCHANGETHREADNAME, IMECURSORCHANGETHREADID,
 							(LPTHREAD_START_ROUTINE)&bIMECursorChangeRoutine, &stIMECursorData, stIMECursorData.dwInThreadSleepTime)) {
 			return	FALSE;
 	}
@@ -487,7 +532,7 @@ BOOL		CCursor::bRegisterDrawIMEModeThread(HWND hWndObserved)
 {
 	// Register thread
 	stIMECursorData.hWndObserved = hWndObserved;
-	if (!DrawIMEModeThread->bRegister(szDrawIMEModeThreadName, dwDrawIMEModeThreadID,
+	if (!DrawIMEModeThread->bRegister(DRAWIMEMODETHREADNAME, DRAWIMEMODETHREADID,
 							(LPTHREAD_START_ROUTINE)&bDrawIMEModeRoutine, &stIMECursorData, 0)) {
 		return	FALSE;
 	}
@@ -515,57 +560,10 @@ BOOL		CCursor::bIsIMECursorChanged(LPIMECURSORDATA lpstCursorData)
 {
 	UINT		dwIMEState = (UINT)(-1);
 
-	dwIMEState = dwIMECursorMode(lpstCursorData->hWndObserved, lpstCursorData->bForceHiragana);
+	dwIMEState = Cime->dwIMECursorMode(lpstCursorData->hWndObserved, lpstCursorData->bForceHiragana);	// IMEのモードを取得
 	if (lpstCursorData->dwIMEState == dwIMEState) return FALSE;
 	lpstCursorData->dwIMEState = dwIMEState;
 	return TRUE;
-}
-
-//
-// dwIMECursorMode()
-//
-DWORD		CCursor::dwIMECursorMode(HWND hWndObserved, BOOL bForceHiragana)
-{
-	if (hWndObserved != NULL) {
-		HWND    hIMWnd = NULL;
-		DWORD   dwConvertMode = 0;
-		if ((hIMWnd = ImmGetDefaultIMEWnd(hWndObserved)) != NULL) {
-			if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETOPENSTATUS, NULL) != 0) {
-				if ((dwConvertMode = (DWORD)SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETCONVERSIONMODE, NULL)) != 0) {
-					switch (dwConvertMode) {
-					case ZENHIRA_IMEON:
-					case (ZENHIRA_IMEON ^ IME_CMODE_ROMAN):
-						dwConvertMode = ZENHIRA_IMEON;
-						break;
-					case HANEISU_IMEON:
-					case (HANEISU_IMEON ^ IME_CMODE_ROMAN):
-						dwConvertMode = HANEISU_IMEON;
-						break;
-					case HANKANA_IMEON:
-					case (HANKANA_IMEON ^ IME_CMODE_ROMAN):
-						dwConvertMode = HANKANA_IMEON;
-						break;
-					case ZENEISU_IMEON:
-					case (ZENEISU_IMEON ^ IME_CMODE_ROMAN):
-						dwConvertMode = ZENEISU_IMEON;
-						break;
-					case ZENKANA_IMEON:
-					case (ZENKANA_IMEON ^ IME_CMODE_ROMAN):
-						dwConvertMode = ZENKANA_IMEON;
-						break;
-					default:
-						dwConvertMode = IMEOFF;
-					}
-					if ((bForceHiragana != FALSE) && (dwConvertMode != ZENHIRA_IMEON)) {
-						vIMEConvertModeChangeForced(hWndObserved, ZENHIRA_IMEON);
-						return ZENHIRA_IMEON;
-					}
-					return dwConvertMode;
-				}
-			}
-		}
-	}
-	return IMEOFF;
 }
 
 //
@@ -712,7 +710,7 @@ BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData)
 	BOOL	bFoundCaret = FALSE;
 	RECT	rcCursor{}, rcCaret{};
 	int		iCursorSizeX = 0, iCursorSizeY = 0, iCaretSizeX = 0, iCaretSizeY = 0;
-	DWORD	dwIMEState = dwIMECursorMode(lpstCursorData->hWndObserved, lpstCursorData->bForceHiragana);
+	DWORD	dwIMEState = Cime->dwIMECursorMode(lpstCursorData->hWndObserved, lpstCursorData->bForceHiragana);
 	if (dwIMEState != IMEOFF) {
 		int		i = 0;
 		while (dwIMEState != lpstCursorData->lpstFlushMouseCursor[i].dwIMEMode) {
@@ -727,15 +725,15 @@ BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData)
 			if ((!lpstCursorData->bDisplayFocusWindowIME) || ((hWnd != NULL) && (hWnd == GetForegroundWindow()))) {
 				if (bCalcDispModeCaretRect(lpstCursorData->iModeSize, lpstCursorData->iModeSize, &rcCaret, &pt)) {
 					hWnd = WindowFromPoint(pt);
-					UINT	uIMEStateCaret = dwIMECursorMode(hWnd, lpstCursorData->bForceHiragana);
+					DWORD	dwIMEStateCaret = Cime->dwIMECursorMode(hWnd, lpstCursorData->bForceHiragana);
 					int		i = 0;
-					while (uIMEStateCaret != lpstCursorData->lpstFlushMouseCursor[i].dwIMEMode) {
+					while (dwIMEStateCaret != lpstCursorData->lpstFlushMouseCursor[i].dwIMEMode) {
 						++i;
 					}
 					if ((rcCaret.left != 0) || (rcCaret.top != 0) || (rcCaret.right != 0) || (rcCaret.bottom != 0)) {		// Determin Caret position
 						CaretWindow->vSetModeString(stIMECursorData.lpstFlushMouseCursor[i].szMode);
 						iCaretSizeX = rcCaret.right - rcCaret.left, iCaretSizeY = rcCaret.bottom - rcCaret.top;
-						if ((uIMEStateCaret == IMEOFF) || (uIMEStateCaret == HANEISU_IMEON) || (uIMEStateCaret == HANKANA_IMEON)) {
+						if ((dwIMEStateCaret == IMEOFF) || (dwIMEStateCaret == HANEISU_IMEON) || (dwIMEStateCaret == HANKANA_IMEON)) {
 							// Draw near by Caret cursor Left
 							iCaretSizeX = (iCaretSizeX * 2 + 2) / 3;	rcCaret.left = rcCaret.left + iCaretSizeX / 4;	rcCaret.right = rcCaret.left + iCaretSizeX;
 						}
@@ -887,8 +885,8 @@ CCursorWindow::CCursorWindow()
 	lpszWindowClass = NULL;
 	hCursorWindow = NULL;
 	lpszMode = NULL;
-	dwTextColor = aRGB(240, 254, 192, 0);
-	dwBackColor = aRGB(240, 254, 192, 0);
+	dwTextColor = aRGB(15, 254, 192, 0);
+	dwBackColor = aRGB(15, 254, 192, 0);
 }
 
 CCursorWindow::~CCursorWindow()
@@ -896,8 +894,12 @@ CCursorWindow::~CCursorWindow()
 	if (hCursorWindow != NULL)	 {
 		DestroyWindow(hCursorWindow);
 		UnregisterClass(lpszWindowClass, (HINSTANCE)GetWindowLongPtr(hCursorWindow, GWLP_HINSTANCE));
+		hCursorWindow = NULL;
 	}
-	if (lpszWindowClass != NULL)		delete []	lpszWindowClass;
+	if (lpszWindowClass != NULL) {
+		delete[]	lpszWindowClass;
+		lpszWindowClass = NULL;
+	}
 }
 
 //
@@ -1109,3 +1111,4 @@ void		CCursorWindow::Cls_OnPaint(HWND hWnd)
 	return;
 }
 
+/* EOF */

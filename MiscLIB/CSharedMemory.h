@@ -25,3 +25,4 @@ extern BOOL		bSharedMemoryClose(LPVOID lpvSharedMem);
 extern BOOL		bSharedMemoryRead(LPCTSTR szSharedMemoryName, LPBYTE lpbSharedData, DWORD dwSharedDataByteSize);
 extern BOOL		bSharedMemoryWrite(LPCTSTR szSharedMemoryName, LPBYTE lpbSharedData, DWORD dwSharedDataByteSize);
 
+/* EOF */

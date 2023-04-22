@@ -151,6 +151,8 @@
 								ExeCommand=" IMPORT &quot;[INSTALLFOLDER]Register_Eventlog.reg&quot; /reg:64" />
 		<!-- Unegister EventLog -->
 		<Binary Id="UNREGISTEREventlog" SourceFile="C:\Windows\System32\reg.exe"> </Binary>
+		<!--CustomAction Id="UnregisterEventlog" BinaryKey="UNREGISTEREventlog" Execute="deferred" Return="asyncWait" Impersonate="no"
+								ExeCommand=" DELETE HKLM\System\CurrentControlSet\Services\Eventlog\Application\&quot;$(var.ProductName)&quot; /f /va" /-->
 		<CustomAction Id="UnregisterEventlog" BinaryKey="UNREGISTEREventlog" Execute="deferred" Return="asyncWait" Impersonate="no"
 								ExeCommand=" DELETE HKLM\System\CurrentControlSet\Services\Eventlog\Application\FlushMouse /f" />
 		<!-- Remove Registry in Uninstall -->
@@ -229,6 +231,20 @@
 			<Component Id="Register_Eventlog.reg" Guid="{FBC3FF68-EF97-43F1-BE86-5F5CFC3AE4F1}">
 				<File Id="Register_Eventlog.reg" Name="Register_Eventlog.reg" Source="$(var.TargetDir04)Register_Eventlog.reg" />
 			</Component>
+			<!--Component Id="Register_FlushMouse.bat" Guid="{58D84ACB-D9C0-4E40-A485-3300E83F2660}">
+				<File Id="Register_FlushMouse.bat" Name="Register_FlushMouse.bat" Source="$(var.TargetDir04)Register_FlushMouse.bat" />
+			</Component>
+			<Component Id="Unregister_FlushMouse.bat" Guid="{C7B41729-230F-46C8-8E6F-724B98CD5B69}">
+				<File Id="Unregister_FlushMouse.bat" Name="Unregister_FlushMouse.bat" Source="$(var.TargetDir04)Unregister_FlushMouse.bat" />
+			</Component-->
+			<!-- Registries -->
+			<!-- Auto start by user registry -->
+			<!--Component Id="AutoStartRegistry" Guid="{AE2203C7-DFFF-40AA-873F-39C206583E9C}"-->
+				<!--RegistryKey Root="HKCU" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Run" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="no"-->
+					<!--RegistryValue Type="string" Name="$(var.ProductName)" Value="[INSTALLFOLDER]$(var.MainExeFileName)" KeyPath="yes" /-->
+				<!--/RegistryKey-->
+			<!--/Component-->
+			<!-- App registries -->
 			<Component Id="Registries" Guid="{05B14589-18DE-4AE3-B6D8-EB65FA40B46D}">
 				<RegistryKey Root="HKLM" Key="$(var.AppRegKey)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="no">
 					<RegistryValue Type="string" Name="InstalledPath" Value="[INSTALLFOLDER]" KeyPath="yes" />

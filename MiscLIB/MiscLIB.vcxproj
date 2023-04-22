@@ -156,11 +156,13 @@
     <ClInclude Include="CSharedMemory.h" />
     <ClInclude Include="CThread.h" />
     <ClInclude Include="DLLDefs.h" />
+    <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CRegistry.cpp" />
     <ClCompile Include="CSharedMemory.cpp" />
     <ClCompile Include="CThread.cpp" />
+    <ClCompile Include="pch.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

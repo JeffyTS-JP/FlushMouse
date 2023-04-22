@@ -10,7 +10,7 @@
 // Include
 //
 #pragma once
-#include <Windows.h>
+#include "pch.h"
 #include "CRegistry.h"
 
 //
@@ -148,3 +148,5 @@ BOOL		CRegistry::bSetRegValueString(HKEY hkey, LPCTSTR lpszSubKey, LPCTSTR szVal
 	}
 	return	bRet;
 }
+
+/* EOF */

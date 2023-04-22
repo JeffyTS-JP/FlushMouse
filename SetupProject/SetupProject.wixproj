@@ -43,6 +43,7 @@
     <Content Include="dialog.bmp" />
     <Content Include="License.rtf" />
     <Content Include="Readme.txt" />
+    <Content Include="Register_Eventlog.reg" />
     <Content Include="Register_TaskScheduler.xml" />
   </ItemGroup>
   <ItemGroup>

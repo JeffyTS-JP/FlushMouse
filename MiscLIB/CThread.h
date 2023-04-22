@@ -50,3 +50,4 @@ private:
 	LPTHREAD_DATA	lpstThreadData;
 };
 
+/* EOF */

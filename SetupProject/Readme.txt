@@ -19,3 +19,4 @@
         HKEY_CURRENT_USER\Software\JeffyTS\FlushMouse
         HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\EventLog\Application\FlushMouse
         
+/* EOF */
