@@ -95,10 +95,9 @@ static LRESULT CALLBACK lpMouseHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 				case WM_NCLBUTTONUP:
 				case WM_NCRBUTTONUP:
 					if (bMouseHookProcSub()) {
-						UINT  uCode = (UINT)(WM_USER + wParam);
 						MOUSEHOOKSTRUCT* mh = (MOUSEHOOKSTRUCT*)lParam;
 						DWORD pt = WORD2DWORD(mh->pt.x, mh->pt.y);
-						PostMessage(hWndMSParent, uCode, (WPARAM)mh->hwnd, (LPARAM)pt);
+						PostMessage(hWndMSParent, (UINT)(WM_USER + wParam), (WPARAM)mh->hwnd, (LPARAM)pt);
 					}
 					break;
 				default:
@@ -128,4 +127,4 @@ static BOOL	bMouseHookProcSub()
 	return TRUE;
 }
 
-/* EOF */
+/* = EOF = */

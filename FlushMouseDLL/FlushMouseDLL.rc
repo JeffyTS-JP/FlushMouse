@@ -52,8 +52,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION    VER_FILE
- PRODUCTVERSION VER_PRODUCT
+ FILEVERSION    FILE_VERSION
+ PRODUCTVERSION PRODUCT_VERSION
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -70,12 +70,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "JeffyTS"
             VALUE "FileDescription", "FlushMouseDLL.dll"
-            VER_FILE_STRING
+            FILE_VERSION_STRING
             VALUE "InternalName", "FlushMouseDLL.dll"
             VALUE "LegalCopyright", "Copyright (C) 2022 JeffyTS"
             VALUE "OriginalFilename", "FlushMouseDLL.dll"
             VALUE "ProductName", "FlushMouse"
-            VER_PRODUCT_STRING
+            PRODUCT_VERSION_STRING
         END
     END
     BLOCK "VarFileInfo"

@@ -13,9 +13,12 @@
 #include "pch.h"
 #include "FlushMouseLIB.h"
 #include "FlushMouseSub.h"
+#include "CommonDef.h"
 #include "Profile.h"
 #include "Resource.h"
+#include "..\FlushMouseDLL\GlobalHookDll.h"
 #include "..\FlushMouseDLL\EventlogDll.h"
+#include "..\FlushMouseDLL\EventlogData.h"
 #include "..\FlushMouseDLL32\FlushMouseDll32.h"
 #include "..\MiscLIB\CRegistry.h"
 
@@ -28,11 +31,13 @@
 //
 HWND		hAboutDlg = NULL;
 HWND		hSettingDlg = NULL;
+BOOL		bIMEInConverting = FALSE;
 
 //
 // Local Data
 //
-static BOOL		bOffChangedFocus = FALSE;
+static BOOL		bTaskTray = FALSE;
+static UINT		uTaskbarCreatedMessage = 0;
 
 //
 // Local Prototype Define
@@ -47,23 +52,70 @@ static DWORD	dwGetTrackbarPos(HWND hDlg, int iIDTrackbar);
 //
 // bCreateTaskTrayWindow()
 //
-BOOL		bCreateTaskTrayWindow(HWND hWnd, UINT uID)
+BOOL		bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitile)
 {
 	NOTIFYICONDATA   nIco{};
 	nIco.cbSize = sizeof(NOTIFYICONDATA);
 	nIco.hWnd = hWnd;
-	nIco.uID = uID;
-	nIco.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
-	nIco.uCallbackMessage = WM_TASKTRAY;
-	if ((nIco.hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(uID))) == NULL) {
+	nIco.uID = NOTIFYICONDATA_ID;
+	nIco.guidItem = GUID_NULL;
+	nIco.uFlags = NIF_INFO | NIF_MESSAGE | NIF_ICON | NIF_TIP;
+	nIco.uCallbackMessage = WM_TASKTRAYEX;
+	nIco.dwState = 0;
+	nIco.dwInfoFlags = NIIF_USER | NIIF_LARGE_ICON | NIIF_NOSOUND | NIIF_RESPECT_QUIET_TIME | NIIF_LARGE_ICON;
+	nIco.uVersion = NOTIFYICON_VERSION_4;
+	nIco.hIcon = hIcon;
+	if ((nIco.hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE))) == NULL) {
 		return FALSE;
 	}
-	_tcsncpy_s(nIco.szTip, ARRAYSIZE(nIco.szTip), szTitle, _TRUNCATE);
+	_tcsncpy_s(nIco.szTip, ARRAYSIZE(nIco.szTip), lpszTitile, _TRUNCATE);
 	if (Shell_NotifyIcon(NIM_ADD, &nIco) == FALSE) {			// Add TaskTray Icon
-		if (GetLastError() == ERROR_TIMEOUT) {
+		_Post_equals_last_error_ DWORD err = GetLastError();
+		if (err == ERROR_TIMEOUT) {
 			Sleep(1000);
 			if (Shell_NotifyIcon(NIM_ADD, &nIco) == FALSE) {	// Retry once
 				return FALSE;
+			}
+		}
+		else {
+			return FALSE;
+		}
+	}
+	if ((uTaskbarCreatedMessage = RegisterWindowMessage(_T("TaskbarCreated"))) == 0) {
+		bDestroyTaskTrayWindow(hWnd);
+		return FALSE;
+	}
+	bTaskTray = TRUE;
+	return TRUE;
+}
+
+//
+// bReCreateTaskTrayWindow()
+//
+BOOL		bReCreateTaskTrayWindow(HWND hWnd, UINT message)
+{
+	if (message == uTaskbarCreatedMessage) {
+		if (bDestroyTaskTrayWindow(hWnd)) {
+			bTaskTray = FALSE;
+		}
+		HICON	hIcon = NULL;
+		if ((hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE))) != NULL) {
+			if (bCreateTaskTrayWindow(hWnd, hIcon, szTitle) == FALSE) {
+				if (bDestroyTaskTrayWindow(hWnd)) {
+					bTaskTray = FALSE;
+				}
+				bReportEvent(MSG_RESTART_EVENT, APPLICATION_CATEGORY);
+				Sleep(100);
+				return TRUE;
+			}
+			else {
+				bTaskTray = TRUE;
+				vStopThredHookTimer(hWnd);
+				if (!bStartThredHookTimer(hWnd)) {
+					PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+				}
+				bReportEvent(MSG_THREAD_HOOK_TIMER_RESTARTED, APPLICATION_CATEGORY);
+				return TRUE;
 			}
 		}
 		else {
@@ -78,21 +130,48 @@ BOOL		bCreateTaskTrayWindow(HWND hWnd, UINT uID)
 // 
 BOOL		bDestroyTaskTrayWindow(HWND hWnd)
 {
-	NOTIFYICONDATA nIco{};
-	nIco.cbSize = sizeof(NOTIFYICONDATA);
-	nIco.hWnd = hWnd;
-	nIco.uID = IDI_FLUSHMOUSE;
-	nIco.uFlags = 0;
-	return Shell_NotifyIcon(NIM_DELETE, &nIco);
+	if (bTaskTray != FALSE) {
+		NOTIFYICONDATA nIco{};
+		nIco.cbSize = sizeof(NOTIFYICONDATA);
+		nIco.hWnd = hWnd;
+		nIco.uID = NOTIFYICONDATA_ID;
+		nIco.guidItem = GUID_NULL;
+		nIco.uFlags = 0;
+		if (Shell_NotifyIcon(NIM_DELETE, &nIco) != FALSE) {
+			bTaskTray = FALSE;
+			return TRUE;
+		}
+	}
+	return FALSE;
 }
 
 //
-// WM_TASKTRAY
-// Cls_OnTaskTray()
-//
-void		Cls_OnTaskTray(HWND hWnd, UINT id, UINT uMsg)
+// bGetTaskTrayWindowRect()
+// 
+BOOL		bGetTaskTrayWindowRect(HWND hWnd, LPRECT lpRect)
 {
-	if (id != IDI_FLUSHMOUSE) {
+	if (bTaskTray != FALSE) {
+		NOTIFYICONIDENTIFIER	nii{};
+		nii.cbSize = sizeof(NOTIFYICONIDENTIFIER);
+		nii.hWnd = hWnd;
+		nii.uID = NOTIFYICONDATA_ID;
+		nii.guidItem = GUID_NULL;
+		HRESULT	hResult = E_FAIL;
+		if ((hResult = Shell_NotifyIconGetRect(&nii, lpRect)) != S_OK) {
+			return FALSE;
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
+
+//
+// WM_TASKTRAYEX
+// Cls_OnTaskTrayEx()
+//
+void		Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg)
+{
+	if (id != NOTIFYICONDATA_ID) {
 		return;
 	}
 	switch (uMsg) {
@@ -311,7 +390,6 @@ static INT_PTR CALLBACK SettingDlg(HWND hDlg, UINT message, WPARAM wParam, LPARA
 					Profile->bSetProfileData();								// Set Registry data
 				}
 				vStopThredHookTimer(hMainWnd);
-				vGetSetProfileData();
 				if (!bStartThredHookTimer(hMainWnd)) {
 					PostMessage(hMainWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 					return (INT_PTR)FALSE;
@@ -399,6 +477,7 @@ static DWORD		dwGetTrackbarPos(HWND hDlg, int iIDTrackbar)
 VOID			vGetSetProfileData()
 {
 	bDisplayIMEModeOnCursor = Profile->stAppRegData.bDisplayIMEModeOnCursor;
+	bOffChangedFocus = Profile->stAppRegData.bOffChangedFocus;
 	bDisplayFocusWindowIME = Profile->stAppRegData.bDisplayFocusWindowIME;
 	bDoModeDispByIMEKeyDown = Profile->stAppRegData.bDoModeDispByIMEKeyDown;
 	bDoModeDispByMouseBttnUp = Profile->stAppRegData.bDoModeDispByMouseBttnUp;
@@ -406,14 +485,19 @@ VOID			vGetSetProfileData()
 	bOffChangedFocus = Profile->stAppRegData.bOffChangedFocus;
 	bDrawNearCaret = Profile->stAppRegData.bDrawNearCaret;
 	bEnableEPHelper = Profile->stAppRegData.bEnableEPHelper;
+	bMoveIMEToolbar = Profile->stAppRegData.bMoveIMEToolbar;
+	bIMEModeForced = Profile->stAppRegData.bIMEModeForced;
 }
+
 //
 // class CPowerNotification
 // CPowerNotification()
 //
 CPowerNotification::CPowerNotification(HWND hWnd)
 {
-	if ((RegistrationHandle = RegisterSuspendResumeNotification(hWnd, DEVICE_NOTIFY_WINDOW_HANDLE)) == NULL) {
+	if ((hSuspendResumeNotification = RegisterSuspendResumeNotification(hWnd, DEVICE_NOTIFY_WINDOW_HANDLE)) == NULL) {
+	}
+	if ((hPowerSettingNotification = RegisterPowerSettingNotification(hWnd, &guidPowerSettingNotification, DEVICE_NOTIFY_WINDOW_HANDLE)) == NULL) {
 	}
 }
 
@@ -422,33 +506,106 @@ CPowerNotification::CPowerNotification(HWND hWnd)
 //
 CPowerNotification::~CPowerNotification()
 {
-	if (RegistrationHandle != NULL) {
-		if (UnregisterSuspendResumeNotification(RegistrationHandle) == 0) {
+	if (hPowerSettingNotification != NULL) {
+		if (UnregisterPowerSettingNotification(hPowerSettingNotification) == 0) {
 		}
 	}
-	RegistrationHandle = NULL;
+	hPowerSettingNotification = NULL;
+	if (hSuspendResumeNotification != NULL) {
+		if (UnregisterSuspendResumeNotification(hSuspendResumeNotification) == 0) {
+		}
+	}
+	hSuspendResumeNotification = NULL;
+}
+
+//
+// PowerBroadcast()
+//
+BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting)
+{
+	UNREFERENCED_PARAMETER(hWnd);
+	UNREFERENCED_PARAMETER(Type);
+	UNREFERENCED_PARAMETER(lpSetting);
+	switch (Type) {
+	case PBT_APMSUSPEND:
+		vStopThredHookTimer(hWnd);
+		bReportEvent(MSG_PBT_APMSUSPEND, POWERNOTIFICATION_CATEGORY);
+		bReportEvent(MSG_THREAD_HOOK_TIMER_STOPPED, POWERNOTIFICATION_CATEGORY);
+		break;
+	case PBT_APMRESUMEAUTOMATIC:
+		bReportEvent(MSG_PBT_APMRESUMEAUTOMATIC, POWERNOTIFICATION_CATEGORY);
+		break;
+	case PBT_APMRESUMESUSPEND:
+		vGetSetProfileData();
+		if (!bStartThredHookTimer(hWnd)) {
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+		}
+		bReportEvent(MSG_THREAD_HOOK_TIMER_STARTED, POWERNOTIFICATION_CATEGORY);
+		bReportEvent(MSG_PBT_APMRESUMESUSPEND, POWERNOTIFICATION_CATEGORY);
+		break;
+	case PBT_POWERSETTINGCHANGE:
+		bReportEvent(MSG_PBT_POWERSETTINGCHANGE, POWERNOTIFICATION_CATEGORY);
+		break;
+	case PBT_APMPOWERSTATUSCHANGE:
+		bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE, POWERNOTIFICATION_CATEGORY);	
+		SYSTEM_POWER_STATUS	PoworStatus{};
+		if (GetSystemPowerStatus(&PoworStatus)) {
+			switch (PoworStatus.ACLineStatus) {
+			case 0:
+				bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_OFF, POWERNOTIFICATION_CATEGORY);
+				bDestroyTaskTrayWindow(hWnd);
+				bReportEvent(MSG_RESTART_EVENT, POWERNOTIFICATION_CATEGORY);
+				break;
+			case 1:
+				bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_ON, POWERNOTIFICATION_CATEGORY);
+				bReportEvent(MSG_RESTART_EVENT, POWERNOTIFICATION_CATEGORY);
+				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+				break;
+			default:
+				break;
+			}
+		}
+		if (lpSetting != NULL) {
+			PPOWERBROADCAST_SETTING	lpPwrSetting = (POWERBROADCAST_SETTING*)lpSetting;
+			if ((lpPwrSetting->PowerSetting == GUID_CONSOLE_DISPLAY_STATE)
+				|| (lpPwrSetting->PowerSetting == GUID_MONITOR_POWER_ON)
+				|| (lpPwrSetting->PowerSetting == GUID_SESSION_DISPLAY_STATUS)) {
+				if (lpPwrSetting->Data[0] == 0) {
+					bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_OFF, POWERNOTIFICATION_CATEGORY);
+				}
+				else {
+					bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_ON, POWERNOTIFICATION_CATEGORY);
+				}
+			}
+		}
+	}
+	return TRUE;
 }
 
 //
 // class CFocusEvent
 //
 //
-CFocusEvent::CFocusEvent()
+CEventHook::CEventHook()
 {
 	hEventHook = NULL;
+	hFormerWnd = NULL;
+	hEventHookIME = NULL;
 }
 
-CFocusEvent::~CFocusEvent()
+CEventHook::~CEventHook()
 {
 	if (bEventUnset()) {
 		hEventHook = NULL;
+		hFormerWnd = NULL;
+		hEventHookIME = NULL;
 	}
 }
 
 //
 // bEventSet()
 //
-BOOL		CFocusEvent::bEventSet()
+BOOL		CEventHook::bEventSet()
 {
 #define	EVENT_FLAGS		(WINEVENT_OUTOFCONTEXT)
 	hEventHook = SetWinEventHook(
@@ -458,23 +615,42 @@ BOOL		CFocusEvent::bEventSet()
 		0, 0,												// Process and thread IDs of interest (0 = all)
 		EVENT_FLAGS);										// Flags.
 	if (hEventHook == NULL)	return FALSE;
+
+	hEventHookIME = SetWinEventHook(
+		EVENT_OBJECT_TEXTSELECTIONCHANGED, EVENT_OBJECT_TEXTEDIT_CONVERSIONTARGETCHANGED,	// Range of events
+		NULL,												// Handle to DLL.
+		&vHandleEventIME,									// The callback.
+		0, 0,												// Process and thread IDs of interest (0 = all)
+		EVENT_FLAGS);										// Flags.
+	if (hEventHookIME == NULL)	return FALSE;
+
 	return TRUE;
 }
 
 //
 // bEventUnset()
 //
-BOOL		CFocusEvent::bEventUnset()
+BOOL		CEventHook::bEventUnset()
 {
-	BOOL	bRet = FALSE;
-	bRet = UnhookWinEvent(hEventHook);
-	return bRet;
+	if (hEventHookIME) {
+		if (UnhookWinEvent(hEventHookIME)) {
+			hEventHookIME = NULL;
+		}
+	}
+	if (hEventHook) {
+		if (UnhookWinEvent(hEventHook)) {
+			hEventHook = NULL;
+			//dwIMEEvent = 0;
+		}
+	}
+	if ((hEventHookIME == NULL) && (hEventHook == NULL))	return TRUE;
+	return FALSE;
 }
 
 //
 // vHandleEvent()
 //
-void CALLBACK CFocusEvent::vHandleEvent(HWINEVENTHOOK hook, DWORD dwEvent, HWND hWnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
+void CALLBACK CEventHook::vHandleEvent(HWINEVENTHOOK hook, DWORD dwEvent, HWND hWnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
 {
 	UNREFERENCED_PARAMETER(hook);
 	UNREFERENCED_PARAMETER(dwEvent);
@@ -486,31 +662,37 @@ void CALLBACK CFocusEvent::vHandleEvent(HWINEVENTHOOK hook, DWORD dwEvent, HWND 
 
 	if (hWnd == NULL)	return;
 	if (dwEvent == EVENT_SYSTEM_FOREGROUND) {
-		if (bCheckExistingJPIME() && bEnableEPHelper)	bForExplorerPatcherSWS(hWnd, FALSE, NULL, NULL);
-		if (hMainWnd != hWnd) {
-			if (bOffChangedFocus) {
-				Cime->vIMEOpenCloseForced(hWnd, IMECLOSE);
-				if (!Cursor->bStartIMECursorChangeThread(hWnd))		return;		// error
-			}
-			HWND	hWndObserved = NULL;
-			if (bDisplayFocusWindowIME) {
-				hWndObserved = hWnd;
-			}
-			else {
-				POINT	pt{};
-				if (GetCursorPos(&pt)) {
-					RECT	rc{};
-					NOTIFYICONIDENTIFIER	nii{};
-					nii.cbSize = sizeof(NOTIFYICONIDENTIFIER);
-					nii.hWnd = hMainWnd;	nii.uID = IDI_FLUSHMOUSE;	nii.guidItem = GUID_NULL;
-					if (Shell_NotifyIconGetRect(&nii, &rc) != S_OK) {
-						return;
-					}
-					if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return; // error
-				}
-			}
-			if (!Cursor->bStartDrawIMEModeThread(hWndObserved))	return;			// error
+		bIMEInConverting = FALSE;
+		HWND	hFindWnd = FindWindow(_T("FLUSHMOUSE"), NULL);
+		if (hFindWnd != NULL) {
+			PostMessage(hFindWnd, WM_EVENT_SYSTEM_FOREGROUNDEX, (WPARAM)dwEvent, (LPARAM)hWnd);
 		}
+	}
+}
+
+//
+// vHandleEventIME()
+//
+void CALLBACK CEventHook::vHandleEventIME(HWINEVENTHOOK hook, DWORD dwEvent, HWND hWnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
+{
+	UNREFERENCED_PARAMETER(hook);
+	UNREFERENCED_PARAMETER(hWnd);
+	UNREFERENCED_PARAMETER(idObject);
+	UNREFERENCED_PARAMETER(idChild);
+	UNREFERENCED_PARAMETER(dwEventThread);
+	UNREFERENCED_PARAMETER(dwmsEventTime);
+
+	switch (dwEvent) {
+	case EVENT_OBJECT_CLOAKED:
+		bIMEInConverting = FALSE;
+		break;
+	case EVENT_OBJECT_UNCLOAKED:
+	case EVENT_OBJECT_IME_SHOW:
+	case EVENT_OBJECT_IME_CHANGE:
+		bIMEInConverting = TRUE;
+		break;
+	default:
+		return;
 	}
 }
 
@@ -531,18 +713,19 @@ CFlushMouseHook::~CFlushMouseHook()
 {
 	bHookUnset();
 }
-
-#define		_KEYBOARDHOKK32
 //
 // bHookSet()
 //
 BOOL			CFlushMouseHook::bHookSet(HWND hWnd, LPCTSTR lpszDll64Name, LPCTSTR lpszExec32Name)
 {
-	UNREFERENCED_PARAMETER(lpszDll64Name);
-	if ((bHook32Dll = bHook32DllStart(hWnd, lpszExec32Name)) != FALSE) {
-		return TRUE;
+	if (bHook64DllLoad(lpszDll64Name) != FALSE) {
+		if ((bGlobalHook64 = bGlobalHookSet(hWnd)) != FALSE) {
+			if ((bHook32Dll = bHook32DllStart(hWnd, lpszExec32Name)) != FALSE) {
+				return TRUE;
+			}
+		}
 	}
-	bHook32DllStop();
+	bHookUnset();
 	return FALSE;
 }
 
@@ -551,7 +734,9 @@ BOOL			CFlushMouseHook::bHookSet(HWND hWnd, LPCTSTR lpszDll64Name, LPCTSTR lpszE
 //
 BOOL		CFlushMouseHook::bHookUnset()
 {
-	if (bHook32Dll)		bHook32DllStop();
+	if (bHook32Dll)			bHook32DllStop();
+	if (bGlobalHook64)		bGlobalHookUnset();
+	if (hHook64Dll != NULL)	bHook64DllUnload();
 	return TRUE;
 }
 
@@ -683,4 +868,4 @@ BOOL CALLBACK CFlushMouseHook::bEnumWindowsProcHookStop(HWND hWnd, LPARAM lParam
 	return TRUE;
 }
 
-/* EOF */
+/* = EOF = */

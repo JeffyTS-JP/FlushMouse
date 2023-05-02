@@ -6,21 +6,15 @@
 // #0000	2023/03/17  JeffyTS  	New edit.
 //
 
-#define VER_MAJOR		0
-#define VER_MINOR		9
-#define VER_BUILD_HI	4
-#define VER_BUILD_LO	12
-#define VER_FLAGS		VS_FF_PRERELEASE
+#define MAJOR_VERSION		0
+#define MINOR_VERSION		9
+#define BUILD_VERSION		4
+#define REVISON_VERSION		13
 
+#define FILE_VERSION_STRING		VALUE	"FileVersion",		"0.9.4.13"
+#define PRODUCT_VERSION_STRING	VALUE	"ProductVersion",	"0.9.4.13"
 
-// The Binary form of the version numbers
-#define VER_FILE		VER_MAJOR, VER_MINOR, VER_BUILD_HI, VER_BUILD_LO
-#define VER_PRODUCT		VER_MAJOR, VER_MINOR, VER_BUILD_HI, VER_BUILD_LO
+#define FILE_VERSION		MAJOR_VERSION, MINOR_VERSION, BUILD_VERSION, REVISON_VERSION
+#define PRODUCT_VERSION		MAJOR_VERSION, MINOR_VERSION, BUILD_VERSION, REVISON_VERSION
 
-#define VER_STR(arg)	#arg
-
-// The String form of the version numbers
-#define VER_FILE_STRING VALUE		"FileVersion",		"0.9.4.12"
-#define VER_PRODUCT_STRING VALUE	"ProductVersion",	"0.9.4.12"
-
-/* EOF */
+/* = EOF = */

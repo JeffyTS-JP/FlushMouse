@@ -13,18 +13,28 @@
 #include "pch.h"
 #include "FlushMouse32.h"
 #include "Resource.h"
+#include "..\FlushMouse\CommonDef.h"
+#include "..\FlushMouseDLL\EventlogData.h"
 #include "..\FlushMouseDLL32\FlushMouseDll32.h"
 #include "..\FlushMouseDLL32\MouseHookDll32.h"
 #include "..\FlushMouseDLL32\KeyboardHookDll32.h"
 
 #ifdef _DEBUG
+#define DEBUG_CLIENTBLOCK   new( _CLIENT_BLOCK, __FILE__, __LINE__)
 #include <crtdbg.h>
+#define new DEBUG_CLIENTBLOCK
 #endif // _DEBUG
 
 //
 // Define
 //
 #define MAX_LOADSTRING 100
+// Timer
+#define PROCINITTIMERVALUE		3000
+#define CHECKPROCTIMERID		2
+static UINT     nCheckProcTimerTickValue = PROCINITTIMERVALUE;		// Timer tick
+static UINT_PTR nCheckProcTimerID = CHECKPROCTIMERID;				// Timer ID
+static UINT_PTR	uCheckProcTimer = NULL;
 
 //
 // Struct Define
@@ -56,11 +66,11 @@ static LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 // Handler
 static BOOL				Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct);
 static void				Cls_OnDestroy(HWND hWnd);
-#define WM_SYSINUPUTLANGCHANGEEX	(WM_USER + WM_INPUTLANGCHANGE)
-#define	HANDLE_WM_SYSINUPUTLANGCHANGEEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (BOOL)(wParam)), 0L)
-static void				Cls_OnSysInputLangChangepEx(HWND hWnd, BOOL bEnableEPHelper);
+static void				Cls_OnCheckExistingJPIMEEx(HWND hWnd, BOOL bEPHelper);
 
 // Sub
+static VOID CALLBACK	vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
+static BOOL				bReportEvent(DWORD dwEventID, WORD wCategory);
 static LONG WINAPI		lExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo);
 static void				vMessageBox(HWND hWnd, UINT uID, UINT uType);
 
@@ -74,9 +84,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
 #ifdef _DEBUG
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif	
-	SetUnhandledExceptionFilter(&lExceptionFilter);				// 例外ハンドラの登録
+
+	SetUnhandledExceptionFilter(&lExceptionFilter);
 
 	if (*lpCmdLine == _T('\0')) {
 		hParentWnd = NULL;
@@ -192,7 +203,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 	switch (message) {
 		HANDLE_MSG(hWnd, WM_CREATE, Cls_OnCreate);
 		HANDLE_MSG(hWnd, WM_DESTROY, Cls_OnDestroy);
-		HANDLE_MSG(hWnd, WM_SYSINUPUTLANGCHANGEEX, Cls_OnSysInputLangChangepEx);
+		HANDLE_MSG(hWnd, WM_CHECKEXISTINGJPIMEEX, Cls_OnCheckExistingJPIMEEx);
 	default:
 			break;
 	}
@@ -207,12 +218,29 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 {
 	UNREFERENCED_PARAMETER(lpCreateStruct);
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK)						// MessageBox style
-	// Register Hook
 	if (!bMouseHookSet32(hParentWnd)) {	
 		vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE);
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		return FALSE;
 	}
+
+	BOOL	bBool = FALSE;
+	if (SetUserObjectInformation(GetCurrentProcess(), UOI_TIMERPROC_EXCEPTION_SUPPRESSION, &bBool, sizeof(BOOL)) != FALSE) {
+		// Set Timer for Proc
+		if (uCheckProcTimer == NULL) {
+			if ((uCheckProcTimer = SetTimer(hWnd, nCheckProcTimerID, nCheckProcTimerTickValue, (TIMERPROC)&vCheckProcTimerProc)) == 0) {
+				vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE);
+				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+				return FALSE;
+			}
+		}
+	}
+	else {
+		vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE);
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+		return FALSE;
+	}
+
 	if (!bKeyboardHookLLSet32(hParentWnd)) {
 		vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE);
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
@@ -227,22 +255,53 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 //
 static void Cls_OnDestroy(HWND hWnd)
 {
-	UNREFERENCED_PARAMETER(hWnd);
 	EXCEPTION_POINTERS ExceptionInfo{};
-	lExceptionFilter(&ExceptionInfo);								// Exceptionを呼んで終了処理させる
+	lExceptionFilter(&ExceptionInfo);
 
+	if (uCheckProcTimer != NULL) {
+		if (KillTimer(hWnd, nCheckProcTimerID)) {
+			uCheckProcTimer = NULL;
+		}
+	}
 	PostQuitMessage(0);
 }
 
 //
-// Cls_OnSysInputLangChangepEx()
+// WM_CHECKEXISTINGJPIMEEX
+// Cls_OnCheckExistingJPIMEEx()
 //
-static void		Cls_OnSysInputLangChangepEx(HWND hWnd, BOOL bEPHelper)
+static void		Cls_OnCheckExistingJPIMEEx(HWND hWnd, BOOL bEPHelper)
 {
 	UNREFERENCED_PARAMETER(hWnd);
-	if (!bSetEnableEPHelperLL(bEPHelper)) {
+	if (!bSetEnableEPHelperLL32(bEPHelper)) {
 		DestroyWindow(hWnd);
 	}
+}
+
+//
+// vCheckProcTimerProc()
+//
+static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime)
+{
+	UNREFERENCED_PARAMETER(hWnd);
+	UNREFERENCED_PARAMETER(uMsg);
+	UNREFERENCED_PARAMETER(dwTime);
+
+	if (uTimerID == nCheckProcTimerID) {
+		if (FindWindow(_T("FLUSHMOUSE"), NULL) == NULL) {
+			NOTIFYICONDATA nIco{};
+			nIco.cbSize = sizeof(NOTIFYICONDATA);
+			nIco.hWnd = hParentWnd;
+			nIco.uID = NOTIFYICONDATA_ID;
+			nIco.guidItem = GUID_NULL;
+			nIco.uFlags = 0;
+			if (Shell_NotifyIcon(NIM_DELETE, &nIco) == FALSE) {
+				bReportEvent(MSG_RESTART_EVENT, APPLICATION32_CATEGORY);
+				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			}
+		}
+	}
+	return;
 }
 
 //
@@ -257,6 +316,26 @@ static LONG WINAPI lExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo)
 }
 
 //
+// bReportEvent()
+//
+static BOOL	bReportEvent(DWORD dwEventID, WORD wCategory)
+{
+	BOOL	bRet = FALSE;
+	HANDLE	hEvent = RegisterEventSource(NULL, _T("FlushMouse"));
+	if (hEvent != NULL) {
+		if (ReportEvent(hEvent, (0x0000000c & (dwEventID >> 28)), wCategory, dwEventID, NULL, 0, 0, NULL, NULL) != 0) {
+			bRet = TRUE;
+		}
+		else {
+		}
+		if (DeregisterEventSource(hEvent) == 0) {
+			bRet = FALSE;
+		}
+	}
+	return bRet;
+}
+
+//
 // vMessageBox()
 //
 static void vMessageBox(HWND hWnd, UINT uID, UINT uType)
@@ -267,4 +346,4 @@ static void vMessageBox(HWND hWnd, UINT uID, UINT uType)
 	}
 }
 
-/* EOF */
+/* = EOF = */

@@ -150,4 +150,4 @@ BOOL		bSharedMemoryWrite(LPCTSTR lpszSharedMemoryName, LPBYTE lpbSharedData, DWO
 	return FALSE;
 }
 
-/* EOF */
+/* == EOF == */

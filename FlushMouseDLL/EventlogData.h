@@ -6,8 +6,8 @@
 // #0000	2023/04/13  JeffyTS  	New edit.
 //
 //
-// 
- // Categories of events.
+// Categories of events.
+//
 //
 //  Values are 32 bit values laid out as follows:
 //
@@ -59,7 +59,34 @@
 //
 // Application Events
 //
-#define APPLICATION_CATEGORY             ((DWORD)0x00000001L)
+#define APPLICATION_CATEGORY             ((DWORD)0x00000000L)
+
+//
+// MessageId: APPLICATION32_CATEGORY
+//
+// MessageText:
+//
+// Application32 Events
+//
+#define APPLICATION32_CATEGORY           ((DWORD)0x00000001L)
+
+//
+// MessageId: DLL_CATEGORY
+//
+// MessageText:
+//
+// DLL Events
+//
+#define DLL_CATEGORY                     ((DWORD)0x00000002L)
+
+//
+// MessageId: DLL32_CATEGORY
+//
+// MessageText:
+//
+// DLL32 Events
+//
+#define DLL32_CATEGORY                   ((DWORD)0x00000003L)
 
 //
 // MessageId: POWERNOTIFICATION_CATEGORY
@@ -68,9 +95,11 @@
 //
 // PowerNotification Events
 //
-#define POWERNOTIFICATION_CATEGORY       ((DWORD)0x00000002L)
+#define POWERNOTIFICATION_CATEGORY       ((DWORD)0x00000010L)
 
+//
 // Message definitions.
+//
 //
 // MessageId: MSG_START_SUCCEED
 //
@@ -108,13 +137,22 @@
 #define MSG_THREAD_HOOK_TIMER_STOPPED    ((DWORD)0x40000003L)
 
 //
+// MessageId: MSG_THREAD_HOOK_TIMER_RESTARTED
+//
+// MessageText:
+//
+// Thread, Hook and Timer Restarted.
+//
+#define MSG_THREAD_HOOK_TIMER_RESTARTED  ((DWORD)0x40000005L)
+
+//
 // MessageId: MSG_QUIT_FLUSHMOUSE
 //
 // MessageText:
 //
 // Quit FlushMouse.
 //
-#define MSG_QUIT_FLUSHMOUSE              ((DWORD)0x40000004L)
+#define MSG_QUIT_FLUSHMOUSE              ((DWORD)0x40000006L)
 
 //
 // MessageId: MSG_PBT_APMSUSPEND
@@ -126,31 +164,22 @@
 #define MSG_PBT_APMSUSPEND               ((DWORD)0x40000100L)
 
 //
-// MessageId: MSG_PBT_APMRESUMESUSPEND
-//
-// MessageText:
-//
-// Resumeed from Susped (APM).
-//
-#define MSG_PBT_APMRESUMESUSPEND         ((DWORD)0x40000101L)
-
-//
-// MessageId: MSG_PBT_APMPOWERSTATUSCHANGE
-//
-// MessageText:
-//
-// Changed in the power status (APM).
-//
-#define MSG_PBT_APMPOWERSTATUSCHANGE     ((DWORD)0x40000102L)
-
-//
 // MessageId: MSG_PBT_APMRESUMEAUTOMATIC
 //
 // MessageText:
 //
 // Resuming from sleep or hibernation (APM).
 //
-#define MSG_PBT_APMRESUMEAUTOMATIC       ((DWORD)0x40000103L)
+#define MSG_PBT_APMRESUMEAUTOMATIC       ((DWORD)0x40000101L)
+
+//
+// MessageId: MSG_PBT_APMRESUMESUSPEND
+//
+// MessageText:
+//
+// Resumeed from Susped (APM).
+//
+#define MSG_PBT_APMRESUMESUSPEND         ((DWORD)0x40000102L)
 
 //
 // MessageId: MSG_PBT_POWERSETTINGCHANGE
@@ -159,5 +188,51 @@
 //
 // Power settings changed (APM).
 //
-#define MSG_PBT_POWERSETTINGCHANGE       ((DWORD)0x40000104L)
+#define MSG_PBT_POWERSETTINGCHANGE       ((DWORD)0x40000103L)
 
+//
+// MessageId: MSG_PBT_APMPOWERSTATUSCHANGE
+//
+// MessageText:
+//
+// Changed the power status (APM).
+//
+#define MSG_PBT_APMPOWERSTATUSCHANGE     ((DWORD)0x40000104L)
+
+//
+// MessageId: MSG_PBT_APMPOWERSTATUSCHANGE_AC_ON
+//
+// MessageText:
+//
+// Changed the power status to AC Online (APM).
+//
+#define MSG_PBT_APMPOWERSTATUSCHANGE_AC_ON ((DWORD)0x40000105L)
+
+//
+// MessageId: MSG_PBT_APMPOWERSTATUSCHANGE_AC_OFF
+//
+// MessageText:
+//
+// Changed the power status to AC Offline (APM).
+//
+#define MSG_PBT_APMPOWERSTATUSCHANGE_AC_OFF ((DWORD)0x40000106L)
+
+//
+// MessageId: MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_ON
+//
+// MessageText:
+//
+// Changed the display state to ON (APM).
+//
+#define MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_ON ((DWORD)0x40000107L)
+
+//
+// MessageId: MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_OFF
+//
+// MessageText:
+//
+// Changed the display state to OFF (APM).
+//
+#define MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_OFF ((DWORD)0x40000108L)
+
+///* = EOF = */

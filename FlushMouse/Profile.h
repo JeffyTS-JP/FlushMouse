@@ -41,13 +41,14 @@ typedef struct tagAppRegData
 	BOOL		bDoModeDispByIMEKeyDown;
 	BOOL		bDoModeDispByMouseBttnUp;
 	BOOL		bDoModeDispByCtrlUp;
+	BOOL		bIMEModeForced;
+	BOOL		bMoveIMEToolbar;
 
 	// for FlushMouse & FlushMouseSub
+	BOOL		bOffChangedFocus;
 	BOOL		bDrawNearCaret;
 	BOOL		bEnableEPHelper;
 
-	// for FlushMouseSub
-	BOOL		bOffChangedFocus;
 } APPREGDATA, *PAPPREGDATA, *LPAPPREGDATA;
 
 //
@@ -74,4 +75,4 @@ public:
 };
 
 
-/* EOF */
+/* = EOF = */

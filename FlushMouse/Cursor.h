@@ -9,69 +9,62 @@
 // Include
 //
 #pragma once
+#include "CommonDef.h"
 #include "..\FlushMouseCursor\Resource.h"
 #include "..\MiscLIB\CThread.h"
 
 //
 // Define
 //
-#define MAX_LOADSTRING 100
-#define	MODECHAR		3
-
-// for IME
-#define IMECLOSE				0x0000
-#define IMEOPEN					0x0001
-#define IMC_GETCONVERSIONMODE   0x0001
-#define IMC_SETCONVERSIONMODE   0x0002
-#define IMC_GETSENTENCEMODE		0x0003
-#define IMC_SETSENTENCEMODE		0x0004
-#define IMC_GETOPENSTATUS		0x0005
-#define IMC_SETOPENSTATUS		0x0006
+#define	IMEMODECHAR		3
 
 // IME mode
+#define IMECLOSE		0x0000
+#define IMEOPEN			0x0001
 #define IMEOFF			(IME_CMODE_ALPHANUMERIC)														// 0x00 : A 英数(直接入力)
 #define HANEISU_IMEON	(IME_CMODE_ROMAN | IME_CMODE_ALPHANUMERIC)										// 0x10 :_A 半角英数 0001 0000
 #define HANKANA_IMEON	(IME_CMODE_ROMAN | IME_CMODE_KATAKANA | IME_CMODE_NATIVE)						// 0x13 :_ｶ 半角カナ 0001 0011
 #define ZENEISU_IMEON	(IME_CMODE_ROMAN | IME_CMODE_FULLSHAPE)											// 0x18 :Ａ 全角英数 0001 1000
 #define ZENHIRA_IMEON	(IME_CMODE_ROMAN | IME_CMODE_FULLSHAPE | IME_CMODE_NATIVE)						// 0x19 :あ 全角ひら 0001 1001（漢字変換モード)
 #define ZENKANA_IMEON	(IME_CMODE_ROMAN | IME_CMODE_FULLSHAPE | IME_CMODE_KATAKANA | IME_CMODE_NATIVE)	// 0x1B :カ 全角カナ 0001 1011
+#define IMEHIDE			(0x88)																			// 0x88 :■  Hide    1001 1000
 
 #ifndef OCR_NORMAL
-#define OCR_NORMAL  32512		// IDC_ARROW	 (WinUser.h)
+#define OCR_NORMAL			32512		// IDC_ARROW	 (WinUser.h)
 #endif // !OCR_NORMAL
 #ifndef OCR_IBEAM
-#define OCR_IBEAM   32513		// IDC_IBEAM	 (WinUser.h)
+#define OCR_IBEAM			32513		// IDC_IBEAM	 (WinUser.h)
 #endif // !OCR_IBEAM
 #define OCR_WAIT            32514
 #define OCR_CROSS           32515
 #define OCR_UP              32516
-#define OCR_SIZE            32640   /* OBSOLETE: use OCR_SIZEALL */
-#define OCR_ICON            32641   /* OBSOLETE: use OCR_NORMAL */
+#define OCR_SIZE            32640		/* OBSOLETE: use OCR_SIZEALL */
+#define OCR_ICON            32641		/* OBSOLETE: use OCR_NORMAL */
 #define OCR_SIZENWSE        32642
 #define OCR_SIZENESW        32643
 #define OCR_SIZEWE          32644
 #define OCR_SIZENS          32645
 #define OCR_SIZEALL         32646
-#define OCR_ICOCUR          32647   /* OBSOLETE: use OIC_WINLOGO */
+#define OCR_ICOCUR          32647		/* OBSOLETE: use OIC_WINLOGO */
 #define OCR_NO              32648
 #if(WINVER >= 0x0500)
 #ifndef OCR_HAND
-#define OCR_HAND    32649		// IDC_HAND (WinUser.h)
+#define OCR_HAND			32649		// IDC_HAND (WinUser.h)
 #endif // !OCR_HAND
 #endif /* WINVER >= 0x0500 */
 #ifndef OCR_HELP
 #if(WINVER >= 0x0400)
 #define OCR_APPSTARTING     32650
 #endif /* WINVER >= 0x0400 */
-#define	OCR_HELP	32651		// IDC_HELP (WinUser.h)
+#define	OCR_HELP			32651		// IDC_HELP (WinUser.h)
 #endif // !OCR_HELP
 #ifndef OCR_PIN
-#define OCR_PIN		32671		// IDC_PIN (WinUser.h)
+#define OCR_PIN				32671		// IDC_PIN (WinUser.h)
 #endif // !OCR_PIN
 #ifndef OCR_PERSON
-#define	OCR_PERSON	32672		// IDC_PERSON (WinUser.h)	
+#define	OCR_PERSON			32672		// IDC_PERSON (WinUser.h)	
 #endif // !OCR_PERSON
-
+#define	OCR_HIDE			32896		// Hide Cursor
 
 //
 // Struct Define
@@ -86,7 +79,7 @@ typedef struct tagMOUSECURSOR {
 
 typedef struct tagFLUSHMOUSECURSOR {
 	UINT		dwIMEMode;						// IME Mode ID
-	TCHAR		szMode[MODECHAR];				// Mode Display Char
+	TCHAR		szMode[IMEMODECHAR];			// Mode Display Char
 	MOUSECURSOR	stArrow;						// Arrow MOUSECURSOR
 	MOUSECURSOR	stHand;							// Hand MOUSECURSOR
 	MOUSECURSOR	stIbeam;						// Ibeam MOUSECURSOR
@@ -96,7 +89,7 @@ typedef struct tagIMECursorData
 {
 	// Use in Curosr
 	HWND		hWndObserved;
-	UINT		dwIMEState;
+	DWORD		dwIMEModeCursor;
 	BOOL		bDrawIMEModeWait;
 	LPCTSTR		lpszLoadDatName;
 	LPFLUSHMOUSECURSOR	lpstFlushMouseCursor;
@@ -118,13 +111,19 @@ typedef struct tagIMECursorData
 	BOOL		bDisplayFocusWindowIME;
 } IMECURSORDATA, * PIMECURSORDATA, * LPIMECURSORDATA;
 
+typedef struct tagVertialDesktop
+{
+	RECT	rcMonitorSize;
+	int		iNumOfMonitors;
+} VERTIALDESKTOP, * PVERTIALDESKTOP, * LPVERTIALDESKTOP;
+
 //
 // Class CCursorWindow
 //
 class CCursorWindow
 {
 public:
-	CCursorWindow();
+	CCursorWindow();	
 	~CCursorWindow();
 
 public:
@@ -165,14 +164,22 @@ public:
 	BOOL			bIsIMEOpen(HWND hWndObserved);
 	VOID			vIMEOpenCloseForced(HWND hWndObserved, DWORD dwIMEOpenClose);
 	VOID			vIMEConvertModeChangeForced(HWND hWndObserved, DWORD dwConvertMode);
-	DWORD			dwIMECursorMode(HWND hWndObserved, BOOL bForceHiragana);
+	DWORD			dwIMEMode(HWND hWndObserved, BOOL bForceHiragana);
 	VOID			vActivateIME(HWND hWndObserved);
+	BOOL			bMoveIMEToolbar();
+	BOOL			bGetVertialDesktopSize();
+	BOOL			bIsNewIME();
 
 private:
+	BOOL			bExsistIMEToolbar();
+	static BOOL 	bGetVertialDesktopSizeEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam);
+
 	static BOOL CALLBACK bEnumChildProcIMEOpenClose(HWND hWnd, LPARAM lParam);
 	static BOOL CALLBACK bEnumChildProcIMECnvertMode(HWND hWnd, LPARAM lParam);
 	static BOOL CALLBACK bEnumChildProcActivateIME(HWND hWnd, LPARAM lParam);
 
+private:
+	LPVERTIALDESKTOP	lpstVertialDesktop;
 };
 
 //
@@ -190,6 +197,8 @@ public:
 	BOOL			bStartDrawIMEModeThread(HWND hWndObserved);
 	BOOL			bStartDrawIMEModeThreadWait(HWND hWndObserved);
 	BOOL			bStartDrawIMEModeThreadWaitDblClk(HWND hWndObserved);
+	BOOL			bGetCaretPos(HWND hWnd, LPPOINT lpCaretPos);
+	BOOL			bShowHideCursor(HWND hWndObserved, BOOL bShow);
 
 private:
 	LPTSTR			lpszGetCursorDataName();
@@ -204,9 +213,9 @@ private:
 	BOOL			bRegisterDrawIMEModeThread(HWND hWndObserved);
 	BOOL			bDrawIMEModeOnDisplay(LPIMECURSORDATA lpstCursorData);
 	BOOL			bCalcDispModeRect(int iModeSizeX, int iModeSizeY, LPRECT lpRect);
-	BOOL			bCalcDispModeCaretRect(int iModeSizeX, int iModeSizeY, LPRECT lpRect, LPPOINT lpPt);
+	BOOL			bCalcDispModeCaretRect(HWND hWnd, int iModeSizeX, int iModeSizeY, LPRECT lpRect, LPPOINT lpPt);
 	BOOL			bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData);
-	static BOOL		bIconDrawEnumProc(HDC hDC, LPCRECT lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData);
+	static BOOL		bIconDrawEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam);
 	static BOOL WINAPI	bDrawIMEModeRoutine(LPVOID lpvParam);
 
 	BOOL			bGetMouseRegValue(LPCTSTR szValue, LPTSTR szFile);
@@ -222,11 +231,11 @@ private:
 	HMODULE			hModDll;
 	int				iCursorDataLoadCount;
 
-	CThread			*IMECursorChangeThread;
-	CCursorWindow	*CursorWindow;
-	CThread			*DrawIMEModeThread;
-	CCursorWindow	*CaretWindow;
-	CThread			*DrawIMEModeCaretThread;
+	CThread* IMECursorChangeThread;
+	CThread* DrawIMEModeThread;
+	CThread* DrawIMEModeCaretThread;
+	CCursorWindow* CursorWindow;
+	CCursorWindow* CaretWindow;
 
 	MOUSECURSOR	stAllMouseCursor[sizeof(MOUSECURSOR) * 19] = {
 	{ OCR_APPSTARTING, 0, TRUE,  _T("AppStarting"), _T("") },
@@ -247,6 +256,7 @@ private:
 	{ OCR_SIZEWE,	   0, TRUE,  _T("SizeWE"),		_T("") },
 	{ OCR_UP,		   0, TRUE,  _T("UpArrow"),	    _T("") },
 	{ OCR_WAIT,		   0, TRUE,  _T("Wait"),	    _T("") },
+	{ OCR_HIDE,		   0, TRUE,  _T("Hide"),	    _T("") },
 	{ (DWORD)(-1), 	   0, FALSE, _T(""),		    _T("") }		// Terminater
 	};
 
@@ -269,6 +279,9 @@ private:
 		{ ZENKANA_IMEON,	_T("ア"),	{OCR_NORMAL, IDC_ZENKANA_IMEON_ARROW, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenKanaOnArrow.cur")},
 										{OCR_HAND,   IDC_ZENKANA_IMEON_HAND,  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenKanaOnHand.cur")},
 										{OCR_IBEAM,  IDC_ZENKANA_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenKanaOnIbeam.cur")}},
+		{ IMEHIDE,			_T(""),		{OCR_NORMAL, IDC_HIDE_ARROW,          FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHideOnArrow.cur")},
+										{OCR_HAND,   IDC_HIDE_HAND,           FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHideOnHand.cur")},
+										{OCR_IBEAM,  IDC_HIDE_IBEAM,          FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHideOnIbeam.cur")}},
 		{ (UINT)(-1),		_T(""),		{0,			 0,						  FALSE, _T(""), _T("")},		// Terminater
 										{0,			 0,						  FALSE, _T(""), _T("")},		// Terminater
 										{0,			 0,						  FALSE, _T(""), _T("")} }		// Terminater
@@ -276,4 +289,4 @@ private:
 
 };
 
-/* EOF */
+/* = EOF = */

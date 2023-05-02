@@ -47,4 +47,4 @@ HINSTANCE hGetInstance()
 }
 
 
-/* EOF */
+/* = EOF = */

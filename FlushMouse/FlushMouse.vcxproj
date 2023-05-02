@@ -212,6 +212,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CommonDef.h" />
     <ClInclude Include="FlushMouse.h" />
     <ClInclude Include="Cursor.h" />
     <ClInclude Include="FlushMouseLIB.h" />

@@ -14,20 +14,8 @@
 #include "..\MiscLIB\CSharedMemory.h"
 
 //
-// Message Handler Define
-// 
-// void Cls_OnSysKeyDownEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flags)
-#define HANDLE_WM_SYSKEYDOWNUPEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (UINT)(wParam), (!(BOOL)(lParam & 0x80000000)), (int)(short)LOWORD(lParam), (UINT)HIWORD(lParam)), 0L)
-
-//
 // Define
 //
-#define VK_OEM_IME_OFF	0xf3
-#define VK_OEM_IME_ON	0xf4
-#define VK_ONLY_CTRLUP  0xe8
-#define WM_SYSKEYDOWNUPEX		(WM_USER + WM_SYSKEYDOWN)
-#define WM_SYSINUPUTLANGCHANGE	(WM_USER + WM_INUPUTLANGCHANGE)
-
 #define KEYBOARDHOOKLLMEM32 _T("KeyboardHookLLSharedMem32")
 typedef struct tagKEYBOARDLL_SHAREDMEM32 {
     HWND    hWnd; 
@@ -40,7 +28,7 @@ typedef struct tagKEYBOARDLL_SHAREDMEM32 {
 //
 DLLEXPORT BOOL __stdcall bKeyboardHookLLSet32(HWND);
 DLLEXPORT BOOL __stdcall bKeyboardHookLLUnset32(void);
-DLLEXPORT BOOL __stdcall bSetEnableEPHelperLL(BOOL bEPHelper);;
+DLLEXPORT BOOL __stdcall bSetEnableEPHelperLL32(BOOL bEPHelper);;
 
 
-/* EOF */
+/* = EOF = */

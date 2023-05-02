@@ -5,7 +5,6 @@
 ;// -------+-----------+-----------+-------------------------------------------- -
 ;// #0000	2023/04/13  JeffyTS  	New edit.
 ;//
-;//
 
 SeverityNames=(Success=0x0:STATUS_SEVERITY_SUCCESS
 Informational=0x1:STATUS_SEVERITY_INFORMATIONAL
@@ -24,10 +23,11 @@ LanguageNames=(Japanese=0x411:MSG00411)
 
 MessageIdTypedef=DWORD
 
-;// 
-; // Categories of events.
+;//
+;// Categories of events.
+;//
 
-MessageId=0x1
+MessageId=0x0
 SymbolicName=APPLICATION_CATEGORY
 Language=English
 Application Events
@@ -37,7 +37,37 @@ Language=Japanese
 Application Events
 .
 
+MessageId=0x1
+SymbolicName=APPLICATION32_CATEGORY
+Language=English
+Application32 Events
+.
+
+Language=Japanese
+Application32 Events
+.
+
 MessageId=0x2
+SymbolicName=DLL_CATEGORY
+Language=English
+DLL Events
+.
+
+Language=Japanese
+DLL Events
+.
+
+MessageId=0x3
+SymbolicName=DLL32_CATEGORY
+Language=English
+DLL32 Events
+.
+
+Language=Japanese
+DLL32 Events
+.
+
+MessageId=0x10
 SymbolicName=POWERNOTIFICATION_CATEGORY
 Language=English
 PowerNotification Events
@@ -48,7 +78,10 @@ PowerNotification Events
 .
 
 
+;//
 ;// Message definitions.
+;//
+
 MessageId=0x0000
 Severity=Informational
 Facility=Application
@@ -97,7 +130,19 @@ Language=Japanese
 Thread, Hook and Timer Stopped.
 .
 
-MessageId=0x0004
+MessageId=0x0005
+Severity=Informational
+Facility=Application
+SymbolicName=MSG_THREAD_HOOK_TIMER_RESTARTED
+Language=English
+Thread, Hook and Timer Restarted.
+.
+
+Language=Japanese
+Thread, Hook and Timer Restarted.
+.
+
+MessageId=0x0006
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_QUIT_FLUSHMOUSE
@@ -124,30 +169,6 @@ Entering into suspend (APM).
 MessageId=0x0101
 Severity=Informational
 Facility=Application
-SymbolicName=MSG_PBT_APMRESUMESUSPEND
-Language=English
-Resumeed from Susped (APM).
-.
-
-Language=Japanese
-Resumeed from Susped (APM).
-.
-
-MessageId=0x0102
-Severity=Informational
-Facility=Application
-SymbolicName=MSG_PBT_APMPOWERSTATUSCHANGE
-Language=English
-Changed in the power status (APM).
-.
-
-Language=Japanese
-Changed in the power status (APM).
-.
-
-MessageId=0x0103
-Severity=Informational
-Facility=Application
 SymbolicName=MSG_PBT_APMRESUMEAUTOMATIC
 Language=English
 Resuming from sleep or hibernation (APM).
@@ -157,7 +178,19 @@ Language=Japanese
 Resuming from sleep or hibernation (APM).
 .
 
-MessageId=0x0104
+MessageId=0x0102
+Severity=Informational
+Facility=Application
+SymbolicName=MSG_PBT_APMRESUMESUSPEND
+Language=English
+Resumeed from Susped (APM).
+.
+
+Language=Japanese
+Resumeed from Susped (APM).
+.
+
+MessageId=0x0103
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_PBT_POWERSETTINGCHANGE
@@ -169,4 +202,65 @@ Language=Japanese
 Power settings changed (APM).
 .
 
+MessageId=0x0104
+Severity=Informational
+Facility=Application
+SymbolicName=MSG_PBT_APMPOWERSTATUSCHANGE
+Language=English
+Changed the power status (APM).
+.
 
+Language=Japanese
+Changed the power status (APM).
+.
+
+MessageId=0x0105
+Severity=Informational
+Facility=Application
+SymbolicName=MSG_PBT_APMPOWERSTATUSCHANGE_AC_ON
+Language=English
+Changed the power status to AC Online (APM).
+.
+
+Language=Japanese
+Changed the power status to AC Online (APM).
+.
+
+MessageId=0x0106
+Severity=Informational
+Facility=Application
+SymbolicName=MSG_PBT_APMPOWERSTATUSCHANGE_AC_OFF
+Language=English
+Changed the power status to AC Offline (APM).
+.
+
+Language=Japanese
+Changed the power status to AC Offline (APM).
+.
+
+MessageId=0x0107
+Severity=Informational
+Facility=Application
+SymbolicName=MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_ON
+Language=English
+Changed the display state to ON (APM).
+.
+
+Language=Japanese
+Changed the display state to ON (APM).
+.
+
+MessageId=0x0108
+Severity=Informational
+Facility=Application
+SymbolicName=MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_OFF
+Language=English
+Changed the display state to OFF (APM).
+.
+
+Language=Japanese
+Changed the display state to OFF (APM).
+.
+
+
+;///* = EOF = */

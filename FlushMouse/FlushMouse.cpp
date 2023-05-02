@@ -23,7 +23,9 @@
 #include "Resource.h"
 
 #if defined _DEBUG
+#define DEBUG_CLIENTBLOCK   new( _CLIENT_BLOCK, __FILE__, __LINE__)
 #include <crtdbg.h>
+#define new DEBUG_CLIENTBLOCK
 #endif
 
 //
@@ -64,7 +66,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	UNREFERENCED_PARAMETER(nCmdShow);
 
 #if defined _DEBUG
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
 #define	RESOURCEFILE		_T("FlushMouse.exe")
@@ -135,7 +137,7 @@ static INT_PTR CALLBACK AboutDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 				SendMessage(hDlg, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);		// Iconの設定
 				LPTSTR	lpszVersion = new TCHAR[128];
 				ZeroMemory(lpszVersion, (sizeof(TCHAR) * 128));
-				_sntprintf_s(lpszVersion, 128, _TRUNCATE, _T("%d.%d.%d.%d"), VER_MAJOR, VER_MINOR, VER_BUILD_HI, VER_BUILD_LO);
+				_sntprintf_s(lpszVersion, 128, _TRUNCATE, _T("%d.%d.%d.%d"), MAJOR_VERSION, MINOR_VERSION, BUILD_VERSION, REVISON_VERSION);
 				SetDlgItemText(hDlg, IDC_VERSION, lpszVersion);					// Versionの設定
 				delete[]	lpszVersion;
 			}
@@ -157,4 +159,4 @@ static INT_PTR CALLBACK AboutDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 	return (INT_PTR)FALSE;
 }
 
-/* EOF */
+/* = EOF = */

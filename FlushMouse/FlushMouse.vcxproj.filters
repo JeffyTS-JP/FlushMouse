@@ -42,6 +42,9 @@
     <ClInclude Include="FlushMouseLIB.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="CommonDef.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FlushMouse.cpp">

@@ -13,5 +13,7 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <tchar.h>
+#include <shellapi.h>
+#include <cguid.h>
 
 #endif //PCH_H

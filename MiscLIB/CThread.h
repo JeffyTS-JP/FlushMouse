@@ -26,8 +26,9 @@ typedef struct tagTHREAD_DATA {
 	DWORD					dwSleepTime;
 	HANDLE					hEvent;
 	HANDLE					hThread;
-	BOOL						bThreadSentinel;
-} THREAD_DATA, *PTHREAD_DATA, *LPTHREAD_DATA;
+	BOOL					bThreadSentinel;
+	LPSECURITY_ATTRIBUTES	lpstSA;
+} THREAD_DATA, * PTHREAD_DATA, * LPTHREAD_DATA;
 
 //
 // Class Define
@@ -44,10 +45,10 @@ public:
 	VOID 	vUnregister();
 
 private:
-	static DWORD WINAPI	dwThreadProc(LPTHREAD_DATA lpstThreadData);
+	static unsigned __stdcall	uThreadProc(void* pArguments);
 
 private:
 	LPTHREAD_DATA	lpstThreadData;
 };
 
-/* EOF */
+/* == EOF == */

@@ -12,14 +12,10 @@
 #include "pch.h"
 #include "Profile.h"
 #include "Cursor.h"
+#include "CommonDef.h"
 #include "FlushMouseLIB.h"
 #include "..\FlushMouseCursor\Resource.h"
 #include "..\MiscLIB\CRegistry.h"
-
-//
-// Library
-//
-#pragma comment(lib, "Imm32.lib")
 
 //
 // Define
@@ -53,11 +49,15 @@
 //
 CIME::CIME()
 {
-
+	lpstVertialDesktop = new VERTIALDESKTOP[sizeof(VERTIALDESKTOP)];
+	ZeroMemory(lpstVertialDesktop, sizeof(VERTIALDESKTOP));
+	bGetVertialDesktopSize();
 }
+
 CIME::~CIME()
 {
-
+	if (lpstVertialDesktop != NULL)	delete[]	lpstVertialDesktop;
+	lpstVertialDesktop = NULL;
 }
 
 //
@@ -133,9 +133,9 @@ BOOL CALLBACK CIME::bEnumChildProcIMEOpenClose(HWND hWndObserved, LPARAM lParam)
 }
 
 //
-// dwIMECursorMode()
+// dwIMEMode()
 //
-DWORD		CIME::dwIMECursorMode(HWND hWndObserved, BOOL bForceHiragana)
+DWORD		CIME::dwIMEMode(HWND hWndObserved, BOOL bForceHiragana)
 {
 	if (hWndObserved != NULL) {
 		HWND    hIMWnd = NULL;
@@ -144,6 +144,9 @@ DWORD		CIME::dwIMECursorMode(HWND hWndObserved, BOOL bForceHiragana)
 			if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETOPENSTATUS, NULL) != 0) {
 				if ((dwConvertMode = (DWORD)SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETCONVERSIONMODE, NULL)) != 0) {
 					switch (dwConvertMode) {
+					case IME_CMODE_NATIVE:
+						dwConvertMode = IMEOFF;
+						break;
 					case ZENHIRA_IMEON:
 					case (ZENHIRA_IMEON ^ IME_CMODE_ROMAN):
 						dwConvertMode = ZENHIRA_IMEON;
@@ -179,6 +182,9 @@ DWORD		CIME::dwIMECursorMode(HWND hWndObserved, BOOL bForceHiragana)
 	return IMEOFF;
 }
 
+//
+// vActivateIME()
+//
 VOID		CIME::vActivateIME(HWND hWndObserved)
 {
 	EnumChildWindows(hWndObserved, &bEnumChildProcActivateIME, NULL);
@@ -212,6 +218,172 @@ BOOL CALLBACK CIME::bEnumChildProcActivateIME(HWND hWnd, LPARAM lParam)
 }
 
 //
+// bMoveIMEToolbar()
+//
+BOOL		CIME::bMoveIMEToolbar()
+{
+	if (bExsistIMEToolbar()) {
+		HWND	hIMEWnd = FindWindow(_T("ApplicationFrameWindow"), NULL);
+		if (hIMEWnd != NULL) {
+			POINT	pt{};
+			if (GetCursorPos(&pt)) {
+				RECT	rc{};
+				if (GetWindowRect(hIMEWnd, &rc)) {
+					VERTIALDESKTOP	stVertianDesktop{};
+					if (EnumDisplayMonitors(NULL, NULL, (MONITORENUMPROC)&bGetVertialDesktopSizeEnumProc, (LPARAM)&stVertianDesktop)) {
+						// Success
+					}
+					else {
+						_Post_equals_last_error_ DWORD	err = GetLastError();
+						if ((err == ERROR_INVALID_PARAMETER) || (err == ERROR_SUCCESS)) {
+						}
+						else if (err == ERROR_ACCESS_DENIED) {
+						}
+						else {
+							return FALSE;
+						}
+					}
+					LPINPUT lpInputs = NULL;
+					if ((lpInputs = new INPUT[sizeof(INPUT) * 4]) != NULL) {
+						ZeroMemory(lpInputs, sizeof(INPUT) * 4);
+						LONG	xCursor = 0, yCursor = 0, xToolbar = 0, yToolbar = 0;
+						if ((rc.right - rc.left) > (rc.bottom - rc.top)) {
+							rc.top = rc.top + 16;	rc.left = rc.left + 10;
+						}
+						else {
+							rc.top = rc.top + 10;	rc.left = rc.left + 16;
+						}
+						LONG	px0 = stVertianDesktop.rcMonitorSize.left;
+						LONG	py0 = stVertianDesktop.rcMonitorSize.top;
+						ULONG	cx = stVertianDesktop.rcMonitorSize.right - stVertianDesktop.rcMonitorSize.left;
+						ULONG	cy = stVertianDesktop.rcMonitorSize.bottom - stVertianDesktop.rcMonitorSize.top;
+						xCursor = ((((LONG)pt.x - px0) * 65536L) + cx - 1L) / cx;
+						yCursor = ((((LONG)pt.y - py0) * 65536L) + cy - 1L) / cy;
+						xToolbar = ((((LONG)rc.left - px0) * 65536L) + cx - 1L) / cx;
+						yToolbar = ((((LONG)rc.top - py0) * 65536L) + cy - 1L) / cy;
+						// #0
+						int	i = 0;
+						lpInputs[i].type = INPUT_MOUSE; lpInputs[i].mi.dx = (DWORD)xToolbar; lpInputs[i].mi.dy = (DWORD)yToolbar;
+						lpInputs[i].mi.mouseData = 0; lpInputs[i].mi.time = 0; lpInputs[i].mi.dwExtraInfo = 0;
+						lpInputs[i].mi.dwFlags = MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_VIRTUALDESK;
+						// #1
+						i = 1;
+						lpInputs[i].type = INPUT_MOUSE; lpInputs[i].mi.dx = (DWORD)xCursor; lpInputs[i].mi.dy = (DWORD)yCursor;
+						lpInputs[i].mi.mouseData = 0; lpInputs[i].mi.time = 0; lpInputs[i].mi.dwExtraInfo = 0;
+						lpInputs[i].mi.dwFlags = MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_VIRTUALDESK;
+						// #2
+						i = 2;
+						lpInputs[i].type = INPUT_MOUSE; lpInputs[i].mi.dx = (DWORD)xCursor; lpInputs[i].mi.dy = (DWORD)yCursor;
+						lpInputs[i].mi.mouseData = 0; lpInputs[i].mi.time = 0; lpInputs[i].mi.dwExtraInfo = 0;
+						lpInputs[i].mi.dwFlags = MOUSEEVENTF_LEFTUP;
+						UINT	cInputs = (UINT)(3);
+						if (SendInput(cInputs, &lpInputs[0], sizeof(INPUT)) == cInputs) {
+							Sleep(10);
+						}
+						delete[]	lpInputs;
+					}
+
+				}
+				else {
+					return FALSE;
+				}
+			}
+			else {
+				return FALSE;
+			}
+		}
+		else {
+			return FALSE;
+		}
+	}
+	return TRUE;
+}
+
+//
+// bGetVertialDesktopSize()
+//
+BOOL			CIME::bGetVertialDesktopSize()
+{
+	BOOL	bRet = FALSE;
+	if (lpstVertialDesktop != NULL) {
+		ZeroMemory(lpstVertialDesktop, sizeof(VERTIALDESKTOP));
+		if (EnumDisplayMonitors(NULL, NULL, (MONITORENUMPROC)&bGetVertialDesktopSizeEnumProc, (LPARAM)lpstVertialDesktop) != 0) {
+			bRet = TRUE;
+		}
+		else {
+			_Post_equals_last_error_ DWORD	err = GetLastError();
+			if ((err == ERROR_INVALID_PARAMETER) || (err == ERROR_SUCCESS)) {
+				bRet = TRUE;
+			}
+			else if (err == ERROR_ACCESS_DENIED) {
+				// error but be able to On Sleep
+				bRet = TRUE;
+			}
+			else {
+			}
+		}
+	}
+	return bRet;
+}
+
+//
+// bGetVertialDesktopSizeEnumProc()
+//
+BOOL		CIME::bGetVertialDesktopSizeEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(hDC);
+	UNREFERENCED_PARAMETER(lprcClip);
+	LPVERTIALDESKTOP	lpstVertialDesktop = (LPVERTIALDESKTOP)lParam;
+	//CIME* This = reinterpret_cast<CIME*>(lParam);
+	MONITORINFO	stMonInfo{};	stMonInfo.cbSize = sizeof(MONITORINFO);
+	if (GetMonitorInfo(hMonitor, &stMonInfo) != 0) {
+		if (stMonInfo.rcMonitor.left <= lpstVertialDesktop->rcMonitorSize.left)		lpstVertialDesktop->rcMonitorSize.left = stMonInfo.rcMonitor.left;
+		if (stMonInfo.rcMonitor.right >= lpstVertialDesktop->rcMonitorSize.right)	lpstVertialDesktop->rcMonitorSize.right = stMonInfo.rcMonitor.right;
+		if (stMonInfo.rcMonitor.top <= lpstVertialDesktop->rcMonitorSize.top)		lpstVertialDesktop->rcMonitorSize.top = stMonInfo.rcMonitor.top;
+		if (stMonInfo.rcMonitor.bottom >= lpstVertialDesktop->rcMonitorSize.bottom)	lpstVertialDesktop->rcMonitorSize.bottom = stMonInfo.rcMonitor.bottom;
+		++lpstVertialDesktop->iNumOfMonitors;
+		return TRUE;
+	}
+	return FALSE;
+}
+
+//
+// bExsistIMEToolbar
+//
+BOOL		CIME::bExsistIMEToolbar()
+{
+#define SUBKEY	_T("Software\\appdatalow\\software\\microsoft\\ime\\15.0\\IMEJP\\MSIME")
+#define VALUE	_T("ToolBarEnabled")
+	CRegistry* CReg = new CRegistry;
+	DWORD	dwToolBar = 0;
+	if (!CReg->bReadRegValueDWORD(HKEY_CURRENT_USER, SUBKEY, VALUE, &dwToolBar)) {
+	}
+	delete	CReg;
+	if ((bIsNewIME() == TRUE) && (dwToolBar != 0))	return TRUE;
+	else return FALSE;
+#undef SUBKEY
+#undef VALUE
+}
+
+//
+// bIsNewIME()
+//
+BOOL		CIME::bIsNewIME()
+{
+#define SUBKEY	_T("Software\\Microsoft\\CTF\\TIP\\{03B5835F-F03C-411B-9CE2-AA23E1171E36}")
+#define VALUE	_T("DummyValue")
+	CRegistry* CReg = new CRegistry;
+	DWORD	dwCTF = 0;
+	if (!CReg->bReadRegValueDWORD(HKEY_CURRENT_USER, SUBKEY, VALUE, &dwCTF)) {
+	}
+	delete	CReg;
+	if (dwCTF != 0)	return TRUE;
+	else			return FALSE;
+#undef SUBKEY
+#undef VALUE
+}
+
+//
 // class CCursor
 //
 CCursor::CCursor()
@@ -223,7 +395,7 @@ CCursor::CCursor()
 	iCursorDataLoadCount = 0;
 
 	stIMECursorData.hWndObserved = NULL;
-	stIMECursorData.dwIMEState = (UINT)(-1);			// IMEの状態(初期処理でチェックするように-1を入れる)
+	stIMECursorData.dwIMEModeCursor = (DWORD)(-1);
 	stIMECursorData.bDrawIMEModeWait = FALSE;
 	stIMECursorData.bDrawNearCaret = FALSE;
 	stIMECursorData.lpszLoadDatName = NULL;
@@ -312,7 +484,8 @@ BOOL			CCursor::bInitialize(HWND hWnd)
 	}
 #undef WINDOWCLASS
 
-	if (!bRegisterDrawIMEModeThread(hWnd)) return FALSE;
+	if (!bRegisterDrawIMEModeThread(hWnd))	return FALSE;
+	if (!bStartIMECursorChangeThread(hWnd))	return FALSE;
 
 	return TRUE;
 }
@@ -371,6 +544,7 @@ BOOL		CCursor::bStartIMECursorChangeThread(HWND hWndObserved)
 {
 	if ((Cursor == NULL) || (IMECursorChangeThread == NULL))	return FALSE;
 	stIMECursorData.hWndObserved = hWndObserved;
+	stIMECursorData.bDisplayFocusWindowIME = bDisplayFocusWindowIME;
 	if (!IMECursorChangeThread->bStart()) {
 		if (IMECursorChangeThread != NULL) {
 			delete	IMECursorChangeThread;
@@ -390,6 +564,7 @@ BOOL		CCursor::bStartDrawIMEModeThread(HWND hWndObserved)
 	if ((Cursor == NULL) || (DrawIMEModeThread == NULL))	return FALSE;
 	stIMECursorData.hWndObserved = hWndObserved;
 	stIMECursorData.bDrawIMEModeWait = FALSE;
+	stIMECursorData.bDisplayFocusWindowIME = bDisplayFocusWindowIME;
 	stIMECursorData.dwWaitWaveTime = Profile->stAppRegData.dwWaitWaveTime;
 	if (!DrawIMEModeThread->bStart()) {
 		if (DrawIMEModeThread != NULL) {
@@ -410,6 +585,7 @@ BOOL		CCursor::bStartDrawIMEModeThreadWait(HWND hWndObserved)
 	if ((Cursor == NULL) || (DrawIMEModeThread == NULL))	return FALSE;
 	stIMECursorData.hWndObserved = hWndObserved;
 	stIMECursorData.bDrawIMEModeWait = TRUE;
+	stIMECursorData.bDisplayFocusWindowIME = bDisplayFocusWindowIME;
 	stIMECursorData.dwWaitWaveTime = Profile->stAppRegData.dwWaitWaveTime;
 	if (!DrawIMEModeThread->bStart()) {
 		if (DrawIMEModeThread != NULL) {
@@ -430,6 +606,7 @@ BOOL		CCursor::bStartDrawIMEModeThreadWaitDblClk(HWND hWndObserved)
 	if ((Cursor == NULL) || (DrawIMEModeThread == NULL))	return FALSE;
 	stIMECursorData.hWndObserved = hWndObserved;
 	stIMECursorData.bDrawIMEModeWait = TRUE;
+	stIMECursorData.bDisplayFocusWindowIME = bDisplayFocusWindowIME;
 	stIMECursorData.dwWaitWaveTime = GetDoubleClickTime();
 	if (!DrawIMEModeThread->bStart()) {
 		if (DrawIMEModeThread != NULL) {
@@ -513,7 +690,7 @@ BOOL		CCursor::bIMECursorChangeRoutine(LPVOID lpvParam)
 	BOOL		bRet = TRUE;
 	if (lpstCursorData->bDisplayIMEModeOnCursor) {
 		This->bIsIMECursorChanged(lpstCursorData);
-		if (!This->bChangeFlushMouseCursor(lpstCursorData->dwIMEState, lpstCursorData)) {
+		if (!This->bChangeFlushMouseCursor(lpstCursorData->dwIMEModeCursor, lpstCursorData)) {
 			bRet = FALSE;
 		}
 	}
@@ -548,6 +725,10 @@ BOOL WINAPI	CCursor::bDrawIMEModeRoutine(LPVOID lpvParam)
 	CCursor* This = reinterpret_cast<CCursor*>(lpvParam);
 	This->bIsIMECursorChanged(lpstCursorData);
 	if (!This->bDrawIMEModeOnDisplay(lpstCursorData)) {
+		_Post_equals_last_error_ DWORD err = GetLastError();
+		if (err == ERROR_ACCESS_DENIED) {
+			return FALSE;
+		}
 		return FALSE;
 	}
 	return	TRUE;
@@ -558,11 +739,11 @@ BOOL WINAPI	CCursor::bDrawIMEModeRoutine(LPVOID lpvParam)
 //
 BOOL		CCursor::bIsIMECursorChanged(LPIMECURSORDATA lpstCursorData)
 {
-	UINT		dwIMEState = (UINT)(-1);
+	DWORD		dwIMEMode = (DWORD)(-1);
 
-	dwIMEState = Cime->dwIMECursorMode(lpstCursorData->hWndObserved, lpstCursorData->bForceHiragana);	// IMEのモードを取得
-	if (lpstCursorData->dwIMEState == dwIMEState) return FALSE;
-	lpstCursorData->dwIMEState = dwIMEState;
+	dwIMEMode = Cime->dwIMEMode(lpstCursorData->hWndObserved, lpstCursorData->bForceHiragana);
+	if (lpstCursorData->dwIMEModeCursor == dwIMEMode) return FALSE;
+	lpstCursorData->dwIMEModeCursor = dwIMEMode;
 	return TRUE;
 }
 
@@ -577,7 +758,7 @@ BOOL		CCursor::bDrawIMEModeOnDisplay(LPIMECURSORDATA lpstCursorData)
 		if (lpstCursorData->dwWaitWaveTime != 0)	Sleep(lpstCursorData->dwWaitWaveTime);
 	}
 	if (bCalcDispModeRect(lpstCursorData->iModeSize, lpstCursorData->iModeSize, &rc)) {
-		if (EnumDisplayMonitors(NULL, &rc, (MONITORENUMPROC)&bIconDrawEnumProc, (LPARAM)lpstCursorData)) {
+		if (EnumDisplayMonitors(NULL, &rc, (MONITORENUMPROC)&bIconDrawEnumProc, (LPARAM)lpstCursorData) != 0) {
 			bRet = TRUE;
 		}
 		else {
@@ -585,6 +766,15 @@ BOOL		CCursor::bDrawIMEModeOnDisplay(LPIMECURSORDATA lpstCursorData)
 			if ((err == ERROR_INVALID_PARAMETER) || (err == ERROR_SUCCESS)) {
 				bRet = TRUE;
 			}
+			else if (err == ERROR_ACCESS_DENIED) {
+				bRet = FALSE;
+			}
+		}
+	}
+	else {
+		_Post_equals_last_error_ DWORD err = GetLastError();
+		if (err == ERROR_ACCESS_DENIED) {
+			bRet = FALSE;
 		}
 	}
 	return bRet;
@@ -593,16 +783,14 @@ BOOL		CCursor::bDrawIMEModeOnDisplay(LPIMECURSORDATA lpstCursorData)
 //
 // bIconDrawEnumProc()
 //
-BOOL		CCursor::bIconDrawEnumProc(HDC hDC, LPCRECT lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData)
+BOOL		CCursor::bIconDrawEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(hMonitor);
 	UNREFERENCED_PARAMETER(hDC);
 	UNREFERENCED_PARAMETER(lprcClip);
-	UNREFERENCED_PARAMETER(lpfnEnum);
-	LPIMECURSORDATA	lpstCursorData = (LPIMECURSORDATA)dwData;
-	CCursor* This = reinterpret_cast<CCursor*>(dwData);
-	BOOL		bRet = FALSE;
-	bRet = This->bDrawIMEModeOnDisplaySub(lpstCursorData);
-	return bRet;
+	LPIMECURSORDATA	lpstCursorData = (LPIMECURSORDATA)lParam;
+	CCursor* This = reinterpret_cast<CCursor*>(lParam);
+	return This->bDrawIMEModeOnDisplaySub(lpstCursorData);
 }
 
 //
@@ -619,7 +807,7 @@ BOOL		CCursor::bCalcDispModeRect(int iModeSizeX, int iModeSizeY, LPRECT lpRect)
 			if ((GetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY)) == S_OK) {
 				int iIconSizeX = 0, iIconSizeY = 0;
 				iIconSizeX = iModeSizeX * (dpiX + USER_DEFAULT_SCREEN_DPI - 1) / USER_DEFAULT_SCREEN_DPI + 1;
-				iIconSizeY = iModeSizeY * (dpiX + USER_DEFAULT_SCREEN_DPI - 1) / USER_DEFAULT_SCREEN_DPI + 1;
+				iIconSizeY = iModeSizeY * (dpiY + USER_DEFAULT_SCREEN_DPI - 1) / USER_DEFAULT_SCREEN_DPI + 1;
 				// Draw near by Mouse cursor Left
 				lpRect->left = pt.x - ((iIconSizeX * 3 + 1) / 2);	lpRect->right = lpRect->left + iIconSizeX;
 				lpRect->top = pt.y - ((iIconSizeY + 1) / 2);		lpRect->bottom = lpRect->top + iIconSizeY;
@@ -627,19 +815,50 @@ BOOL		CCursor::bCalcDispModeRect(int iModeSizeX, int iModeSizeY, LPRECT lpRect)
 			}
 		}
 	}
+	else {
+		_Post_equals_last_error_ DWORD err = GetLastError();
+		if (err == ERROR_ACCESS_DENIED) {
+			SetLastError(err);
+			return FALSE;
+		}
+		return FALSE;
+	}
 	return FALSE;
+}
+
+//
+// bShowHideCursor()
+//
+BOOL		CCursor::bShowHideCursor(HWND hWndObserved, BOOL bShow)
+{
+	BOOL	bRet = FALSE;
+	if (bShow) {
+		bRet = bStartDrawIMEModeThread(hWndObserved);
+	}
+	else {
+		bRet = bChangeFlushMouseCursor(IMEHIDE, &stIMECursorData);
+	}
+	return bRet;
+}
+
+//
+// bGetCaretPos()
+//
+BOOL		CCursor::bGetCaretPos(HWND hWnd, LPPOINT lpCaretPos)
+{
+	RECT	rc{};
+	return bCalcDispModeCaretRect(hWnd, 0, 0, &rc, lpCaretPos);
 }
 
 //
 // bCalcDispModeCaretRect()
 //
-BOOL		CCursor::bCalcDispModeCaretRect(int iModeSizeX, int iModeSizeY, LPRECT lpRect, LPPOINT lpPt)
+BOOL		CCursor::bCalcDispModeCaretRect(HWND hForeWnd, int iModeSizeX, int iModeSizeY, LPRECT lpRect, LPPOINT lpPt)
 {
 	POINT	pt{};
 	RECT	rcFore{}, rcTop{};
-	HWND	hForeWnd = NULL;
 	DWORD	dwPID = 0, dwForeThreadID = 0;
-	if ((hForeWnd = GetForegroundWindow()) != NULL) {
+	if (hForeWnd != NULL) {
 		if (GetWindowRect(hForeWnd, &rcFore)) {
 			if ((dwForeThreadID = GetWindowThreadProcessId(hForeWnd, &dwPID)) != 0) {
 				GUITHREADINFO	GuiThredInfo{};	GuiThredInfo.cbSize = sizeof(GUITHREADINFO);
@@ -647,7 +866,6 @@ BOOL		CCursor::bCalcDispModeCaretRect(int iModeSizeX, int iModeSizeY, LPRECT lpR
 					if (GuiThredInfo.hwndCaret != NULL) {
 #define DESCENT		2
 						pt.x = GuiThredInfo.rcCaret.left;	pt.y = GuiThredInfo.rcCaret.top;
-#undef DESCEN
 						if (ClientToScreen(GuiThredInfo.hwndCaret, &pt)) {
 							lpPt->x = pt.x;	lpPt->y = pt.y;
 							pt.x = GuiThredInfo.rcCaret.right;	pt.y = GuiThredInfo.rcCaret.bottom;
@@ -699,9 +917,6 @@ BOOL		CCursor::bCalcDispModeCaretRect(int iModeSizeX, int iModeSizeY, LPRECT lpR
 	return FALSE;
 }
 
-//
-// bDrawIMEModeOnDisplaySub()
-//
 BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData)
 {
 #define	COUNT	20
@@ -710,62 +925,60 @@ BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData)
 	BOOL	bFoundCaret = FALSE;
 	RECT	rcCursor{}, rcCaret{};
 	int		iCursorSizeX = 0, iCursorSizeY = 0, iCaretSizeX = 0, iCaretSizeY = 0;
-	DWORD	dwIMEState = Cime->dwIMECursorMode(lpstCursorData->hWndObserved, lpstCursorData->bForceHiragana);
-	if (dwIMEState != IMEOFF) {
-		int		i = 0;
-		while (dwIMEState != lpstCursorData->lpstFlushMouseCursor[i].dwIMEMode) {
-			++i;
+	DWORD	dwIMEMode = Cime->dwIMEMode(lpstCursorData->hWndObserved, lpstCursorData->bForceHiragana);
+	int		iCursor = 0;
+	if (dwIMEMode != IMEOFF) {
+		while (dwIMEMode != lpstCursorData->lpstFlushMouseCursor[iCursor].dwIMEMode) {
+			++iCursor;
 		}
-		CursorWindow->vSetModeString(stIMECursorData.lpstFlushMouseCursor[i].szMode);
+		CursorWindow->vSetModeString(stIMECursorData.lpstFlushMouseCursor[iCursor].szMode);
 	}
 	if (lpstCursorData->bDrawNearCaret != FALSE) {
 		POINT	pt{};
-		if (GetCursorPos(&pt)) {
-			HWND	hWnd = WindowFromPoint(pt);
-			if ((!lpstCursorData->bDisplayFocusWindowIME) || ((hWnd != NULL) && (hWnd == GetForegroundWindow()))) {
-				if (bCalcDispModeCaretRect(lpstCursorData->iModeSize, lpstCursorData->iModeSize, &rcCaret, &pt)) {
-					hWnd = WindowFromPoint(pt);
-					DWORD	dwIMEStateCaret = Cime->dwIMECursorMode(hWnd, lpstCursorData->bForceHiragana);
-					int		i = 0;
-					while (dwIMEStateCaret != lpstCursorData->lpstFlushMouseCursor[i].dwIMEMode) {
-						++i;
-					}
-					if ((rcCaret.left != 0) || (rcCaret.top != 0) || (rcCaret.right != 0) || (rcCaret.bottom != 0)) {		// Determin Caret position
-						CaretWindow->vSetModeString(stIMECursorData.lpstFlushMouseCursor[i].szMode);
-						iCaretSizeX = rcCaret.right - rcCaret.left, iCaretSizeY = rcCaret.bottom - rcCaret.top;
-						if ((dwIMEStateCaret == IMEOFF) || (dwIMEStateCaret == HANEISU_IMEON) || (dwIMEStateCaret == HANKANA_IMEON)) {
-							// Draw near by Caret cursor Left
-							iCaretSizeX = (iCaretSizeX * 2 + 2) / 3;	rcCaret.left = rcCaret.left + iCaretSizeX / 4;	rcCaret.right = rcCaret.left + iCaretSizeX;
-						}
-						bFoundCaret = TRUE;
-					}
-					else {
-						bFoundCaret = FALSE;
-					}
+		HWND	hWnd = GetForegroundWindow();
+		if (bCalcDispModeCaretRect(hWnd, lpstCursorData->iModeSize, lpstCursorData->iModeSize, &rcCaret, &pt)) {
+			hWnd = WindowFromPoint(pt);
+			DWORD	dwIMEModeCaret = dwIMEMode;
+			int		iCaret = iCursor;
+			if (hWnd != lpstCursorData->hWndObserved) {
+				dwIMEModeCaret = Cime->dwIMEMode(hWnd, lpstCursorData->bForceHiragana);
+				while (dwIMEModeCaret != lpstCursorData->lpstFlushMouseCursor[iCaret].dwIMEMode) {
+					++iCaret;
 				}
+			}
+			if ((rcCaret.left != 0) || (rcCaret.top != 0) || (rcCaret.right != 0) || (rcCaret.bottom != 0)) {
+				CaretWindow->vSetModeString(stIMECursorData.lpstFlushMouseCursor[iCaret].szMode);
+				iCaretSizeX = rcCaret.right - rcCaret.left, iCaretSizeY = rcCaret.bottom - rcCaret.top;
+				if ((dwIMEModeCaret == IMEOFF) || (dwIMEModeCaret == HANEISU_IMEON) || (dwIMEModeCaret == HANKANA_IMEON)) {
+					// Draw near by Caret cursor Top
+					//iCaretSizeX = (iCaretSizeX * 2 + 2) / 3;	rcCaret.left = rcCaret.left + iCaretSizeX / 2;	rcCaret.right = rcCaret.left + iCaretSizeX;
+					// Draw near by Caret cursor Left
+					iCaretSizeX = (iCaretSizeX * 2 + 2) / 3;	rcCaret.left = rcCaret.left + iCaretSizeX / 4;	rcCaret.right = rcCaret.left + iCaretSizeX;
+				}
+				bFoundCaret = TRUE;
+			}
+			else {
+				bFoundCaret = FALSE;
 			}
 		}
 	}
-	//
 	int	iCount = 0;
 	if (lpstCursorData->dwDisplayModeTime != 0)	iCount = (lpstCursorData->dwDisplayModeTime + (COUNT - 1)) / COUNT;
-	else iCount = COUNT;															// default count
-	//
+	else iCount = COUNT;
 	if (bFoundCaret != FALSE) {
-		if (!CaretWindow->bSetWindowPos(HWND_TOPMOST, rcCaret.left, rcCaret.top, iCaretSizeX, iCaretSizeY, (SWP_SHOWWINDOW | SWP_NOACTIVATE))) {
+		if (!CaretWindow->bSetWindowPos(HWND_TOPMOST, rcCaret.left, rcCaret.top, iCaretSizeX, iCaretSizeY, (SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS))) {
 			bRet = FALSE;
 		}
 	}
-	//
 	for (; iCount >= 0; iCount--) {
-		if (bFoundCaret == FALSE) {
+		if (bFoundCaret == FALSE) {	//@@@
 			if (bCalcDispModeRect(lpstCursorData->iModeSize, lpstCursorData->iModeSize, &rcCursor)) {
 				iCursorSizeX = rcCursor.right - rcCursor.left; iCursorSizeY = rcCursor.bottom - rcCursor.top;
-				if ((dwIMEState == IMEOFF) || (dwIMEState == HANEISU_IMEON) || (dwIMEState == HANKANA_IMEON)) {
+				if ((dwIMEMode == IMEOFF) || (dwIMEMode == HANEISU_IMEON) || (dwIMEMode == HANKANA_IMEON)) {
 					iCursorSizeX = (iCursorSizeX * 2 + 2) / 3; rcCursor.left = rcCursor.right - iCursorSizeX;
 				}
-				if (dwIMEState != IMEOFF) {
-					if (!CursorWindow->bSetWindowPos(HWND_TOPMOST, rcCursor.left, rcCursor.top, iCursorSizeX, iCursorSizeY, (SWP_SHOWWINDOW | SWP_NOACTIVATE))) {
+				if (dwIMEMode != IMEOFF) {
+					if (!CursorWindow->bSetWindowPos(HWND_TOPMOST, rcCursor.left, rcCursor.top, iCursorSizeX, iCursorSizeY, (SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS))) {
 						bRet = FALSE;
 						break;
 					}
@@ -779,12 +992,12 @@ BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData)
 		Sleep(COUNT);
 		bRet = TRUE;
 	}
-	if (!CursorWindow->bSetWindowPos(HWND_BOTTOM, rcCursor.left, rcCursor.top, iCursorSizeX, iCursorSizeY, (SWP_HIDEWINDOW | SWP_NOACTIVATE))) {
+	if (!CursorWindow->bSetWindowPos(HWND_BOTTOM, rcCursor.left, rcCursor.top, iCursorSizeX, iCursorSizeY, (SWP_HIDEWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS))) {
 		bRet = FALSE;
 	}
 	CursorWindow->vSetModeString(stIMECursorData.lpstFlushMouseCursor[0].szMode);
 	if (bFoundCaret) {
-		if (!CaretWindow->bSetWindowPos(HWND_BOTTOM, rcCaret.left, rcCaret.top, iCaretSizeX, iCaretSizeY, (SWP_HIDEWINDOW | SWP_NOACTIVATE))) {
+		if (!CaretWindow->bSetWindowPos(HWND_BOTTOM, rcCaret.left, rcCaret.top, iCaretSizeX, iCaretSizeY, (SWP_HIDEWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS))) {
 			bRet = FALSE;
 		}
 		CaretWindow->vSetModeString(stIMECursorData.lpstFlushMouseCursor[0].szMode);
@@ -802,7 +1015,7 @@ BOOL		CCursor::bGetMouseRegValue(LPCTSTR szValue, LPTSTR szFile)
 #define MOUSE_SUBKEY	_T("Control Panel\\Cursors")
 	BOOL		bRet = FALSE;
 	CRegistry* CReg = new CRegistry;
-	if (CReg->bGetRegValueString(MOUSE_HKEY, MOUSE_SUBKEY, szValue, szFile, _MAX_PATH)) {
+	if (CReg->bReadRegValueString(MOUSE_HKEY, MOUSE_SUBKEY, szValue, szFile, _MAX_PATH)) {
 		bRet = TRUE;
 	}
 	else {
@@ -1111,4 +1324,4 @@ void		CCursorWindow::Cls_OnPaint(HWND hWnd)
 	return;
 }
 
-/* EOF */
+/* = EOF = */

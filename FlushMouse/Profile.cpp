@@ -48,13 +48,13 @@ CProfile::CProfile()
 	stAppRegData.bDoModeDispByIMEKeyDown = FALSE;	// IMEのモード変更のキーが押されたときにIMEモードを表示する
 	stAppRegData.bDoModeDispByMouseBttnUp = FALSE;	// Mouse L/Rボタンが離されたときにIMEモードを表示する
 	stAppRegData.bDoModeDispByCtrlUp = FALSE;		// Ctrlが離されたときにIMEモードを表示する
+	stAppRegData.bIMEModeForced = FALSE;			// Change IME Mode Forced
 
 	// for FlushMouse & FlushMouseSub
-	stAppRegData.bDrawNearCaret = FALSE;			// Caretの横にIMEモードを表示
-	stAppRegData.bEnableEPHelper = FALSE;			// for Explorer Patcher Simple Window Switcher Helper
-
-	// for FlushMouseSub
 	stAppRegData.bOffChangedFocus = FALSE;			// アプリケーションが切り替わったときIMEをOFFにする(bDisplayFocusWindowIMEとは排他的動作になる)
+	stAppRegData.bDrawNearCaret = FALSE;			// Caretの横にIMEモードを表示
+	stAppRegData.bMoveIMEToolbar = FALSE;			// New IMEのToolbarを移動する 
+	stAppRegData.bEnableEPHelper = FALSE;			// for Explorer Patcher Simple Window Switcher Helper
 }
 
 CProfile::~CProfile()
@@ -114,7 +114,11 @@ BOOL		CProfile::bGetProfileData()
 		if (CReg->bGetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByMouseBttnUp"), (LPBOOL) & (stAppRegData.bDoModeDispByMouseBttnUp), FALSE)) {	// Mouse L/Rボタンが離されたときにIMEモードを表示する
 			if (CReg->bGetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByIMEKeyDown"), (LPBOOL) & (stAppRegData.bDoModeDispByIMEKeyDown), FALSE)) {	// IMEのモード変更のキーが押されたときにIMEモードを表示する
 				if (CReg->bGetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByCtrlUp"), (LPBOOL) & (stAppRegData.bDoModeDispByCtrlUp), FALSE)) {		// Ctrlが離されたときにIMEモードを表示する
-					bRet = TRUE;
+					if (CReg->bGetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("IMEModeForced"), (LPBOOL) & (stAppRegData.bIMEModeForced), FALSE)) {			// Change IME Mode Forced
+						if (CReg->bGetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("MoveIMEToolbar"), (LPBOOL) & (stAppRegData.bMoveIMEToolbar), FALSE)) {			// Change IME Mode Forced
+							bRet = TRUE;
+						}
+					}
 				}
 			}
 		}
@@ -122,17 +126,12 @@ BOOL		CProfile::bGetProfileData()
 	// BOOL registry for FlushMouse & FlushMouseSub
 	if (bRet) {
 		bRet = FALSE;
-		if (CReg->bGetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DrawNearCaret"), (LPBOOL) & (stAppRegData.bDrawNearCaret), FALSE)) {			// Ctrlが離されたときにIMEモードを表示する
-			if (CReg->bGetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("EnableEPHelper"), (LPBOOL) & (stAppRegData.bEnableEPHelper), FALSE)) {		// Ctrlが離されたときにIMEモードを表示する
-				bRet = TRUE;
+		if (CReg->bGetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("OffChangedFocus"), (LPBOOL) & (stAppRegData.bOffChangedFocus), FALSE)) {						// アプリケーションが切り替わったときIMEをOFFにする
+			if (CReg->bGetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DrawNearCaret"), (LPBOOL) & (stAppRegData.bDrawNearCaret), FALSE)) {						// Ctrlが離されたときにIMEモードを表示する
+				if (CReg->bGetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("EnableEPHelper"), (LPBOOL) & (stAppRegData.bEnableEPHelper), FALSE)) {					// Ctrlが離されたときにIMEモードを表示する
+					bRet = TRUE;
+				}
 			}
-		}
-	}
-	// BOOL registry for FlushMouseSub
-	if (bRet) {
-		bRet = FALSE;
-		if (CReg->bGetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("OffChangedFocus"), (LPBOOL)&(stAppRegData.bOffChangedFocus), FALSE)) {	// アプリケーションが切り替わったときIMEをOFFにする
-			bRet = TRUE;
 		}
 	}
 	delete	CReg;
@@ -193,7 +192,11 @@ BOOL		CProfile::bSetProfileData()
 		if (CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByIMEKeyDown"), stAppRegData.bDoModeDispByIMEKeyDown)) {
 			if (CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByCtrlUp"), stAppRegData.bDoModeDispByCtrlUp)) {
 				if (CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByMouseBttnUp"), stAppRegData.bDoModeDispByMouseBttnUp)) {
-					bRet = TRUE;
+					if (CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("IMEModeForced"), stAppRegData.bIMEModeForced)) {
+						if (CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("MoveIMEToolbar"), stAppRegData.bMoveIMEToolbar)) {
+							bRet = TRUE;
+						}
+					}
 				}
 			}
 		}
@@ -201,23 +204,16 @@ BOOL		CProfile::bSetProfileData()
 	// BOOL registry in Use FlushMouse & FlushMouseSub
 	if (bRet) {
 		bRet = FALSE;
-		if (CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DrawNearCaret"), stAppRegData.bDrawNearCaret)) {
-			if (CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("EnableEPHelper"), stAppRegData.bEnableEPHelper)) {
-				bRet = TRUE;
-			}
-		}
-	}
-	// BOOL registry in Use FlushMouseSub
-	if (bRet) {
-		bRet = FALSE;
 		if (CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("OffChangedFocus"), stAppRegData.bOffChangedFocus)) {
-			bRet = TRUE;
+			if (CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DrawNearCaret"), stAppRegData.bDrawNearCaret)) {
+				if (CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("EnableEPHelper"), stAppRegData.bEnableEPHelper)) {
+					bRet = TRUE;
+				}
+			}
 		}
 	}
 	delete	CReg;
 	return bRet;
-#undef	PROFILE_HKEY
-#undef	PROFILE_SUBKEY
 }
 
-/* EOF */
+/* = EOF = */

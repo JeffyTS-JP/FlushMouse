@@ -46,4 +46,4 @@ HINSTANCE hGetDllInstance()
 	return hDLLInstance;
 }
 
-/* EOF */
+/* = EOF = */

@@ -149,8 +149,8 @@
       <AdditionalDependencies>..\$(Platform)\$(Configuration)\MiscLIB.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>move /Y $(OUTDIR)FlushMouseDLL.dll $(OUTDIR)_FlushMouseDLL.dll 
+copy /Y $(OUTDIR)_FlushMouseDLL.dll $(OUTDIR)FlushMouseDLL.dll</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>
@@ -180,8 +180,8 @@
       <AdditionalDependencies>..\$(Platform)\$(Configuration)\MiscLIB.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>move /Y $(OUTDIR)FlushMouseDLL.dll $(OUTDIR)_FlushMouseDLL.dll 
+copy /Y $(OUTDIR)_FlushMouseDLL.dll $(OUTDIR)FlushMouseDLL.dll</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>
@@ -189,10 +189,12 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\FlushMouse\CommonDef.h" />
     <ClInclude Include="EventlogDll.h" />
     <ClInclude Include="EventlogData.h" />
     <ClInclude Include="FlushMouseDll.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="GlobalHookDll.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="targetver.h" />
@@ -200,6 +202,7 @@
   <ItemGroup>
     <ClCompile Include="EventlogDll.cpp" />
     <ClCompile Include="FlushMouseDll.cpp" />
+    <ClCompile Include="GlobalHookDll.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

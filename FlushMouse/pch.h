@@ -20,5 +20,11 @@
 #include <VersionHelpers.h>
 #include <commctrl.h>
 #pragma comment(lib, "comctl32.lib")
+#include <imm.h>
+#include <ime_cmodes.h>
+#pragma comment(lib, "Imm32.lib")
+#include <dwmapi.h>
+#pragma comment(lib, "Dwmapi.lib")
+#include <Dbt.h>
 
 #endif //PCH_H

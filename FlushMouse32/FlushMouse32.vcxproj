@@ -193,6 +193,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\FlushMouse\CommonDef.h" />
     <ClInclude Include="FlushMouse32.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Resource.h" />

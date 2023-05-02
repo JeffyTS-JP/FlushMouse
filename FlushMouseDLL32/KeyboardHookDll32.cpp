@@ -11,6 +11,7 @@
 //
 #pragma once
 #include "pch.h"
+#include "..\FlushMouse\CommonDef.h"
 #include "KeyboardHookDll32.h"
 
 //
@@ -32,7 +33,8 @@ static BOOL		bOnlyCtrlLL = FALSE;
 static DWORD	dwPreviousVKLL = 0;
 static HWND		hWndKBParentLL = NULL;
 static LPKEYBOARDLL_SHAREDMEM32  lpDatKeyboardLL = NULL;
-static BOOL		bEnableEPHelper = FALSE;
+static BOOL		bEnableEPHelperLL = FALSE;
+static BOOL		bStartConversioningLL = FALSE;
 
 //
 // bKeyboardHookLLSet32()
@@ -47,7 +49,7 @@ DLLEXPORT BOOL  __stdcall bKeyboardHookLLSet32(HWND hWnd)
 		KEYBOARDLL_SHAREDMEM32   datKeyboardLL{};
 		if (bSharedMemoryCreate(hWnd, KEYBOARDHOOKLLMEM32, sizeof(KEYBOARDLL_SHAREDMEM32))) {
 			datKeyboardLL.hWnd = hWnd;    datKeyboardLL.hHook = hHook;	hWndKBParentLL = hWnd;
-			datKeyboardLL.bEnableEPHelper = bEnableEPHelper;
+			datKeyboardLL.bEnableEPHelper = bEnableEPHelperLL;
 			if (bSharedMemoryWrite(KEYBOARDHOOKLLMEM32, (LPBYTE)&datKeyboardLL, sizeof(KEYBOARDLL_SHAREDMEM32))) {
 				return TRUE;
 			}
@@ -77,9 +79,9 @@ DLLEXPORT BOOL __stdcall bKeyboardHookLLUnset32()
 }
 
 //
-// bSetEnableEPHelperLL()
+// bSetEnableEPHelperLL32()
 //
-DLLEXPORT BOOL __stdcall bSetEnableEPHelperLL(BOOL bEPHelper)
+DLLEXPORT BOOL __stdcall bSetEnableEPHelperLL32(BOOL bEPHelper)
 {
 	KEYBOARDLL_SHAREDMEM32   datKeyboardLL{};
 	if (bSharedMemoryRead(KEYBOARDHOOKLLMEM32, (LPBYTE)&datKeyboardLL, sizeof(KEYBOARDLL_SHAREDMEM32))) {
@@ -110,7 +112,7 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 			case VK_RCONTROL:		// Ctrl R (0xa3)
 				if (bOnlyCtrlLL) {
 					if (bKeyboardHookLLProcSub()) {
-						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (WM_USER + VK_ONLY_CTRLUP), (0x80000000 | (0xff000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24))));
+						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, KEY_ONLY_CTRLUP, (0x80000000 | (0xff000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24))));
 					}
 				}
 				bOnlyCtrlLL = FALSE;
@@ -143,6 +145,7 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 			case VK_F7:				// (0x76)
 			case VK_F8:				// (0x77)
 			case VK_F9:				// (0x78)``
+			case VK_F10:			// (0x79)
 				//case VK_NUMLOCK:		// Num Lock (0x90)
 			case VK_OEM_ATTN:		// OEM 英数/CapsLock (0xf0)
 			case VK_OEM_FINISH:		// OEM カタカナ (0xf1)
@@ -154,27 +157,27 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 			case VK_OEM_PA1:		// US(ENG) Non Convert (0xeb)
 				bOnlyCtrlLL = FALSE;
 				if (bKeyboardHookLLProcSub()) {
-					if (!bEnableEPHelper)	break;
+					if (!bEnableEPHelperLL)	break;
 					PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (WM_USER + lpstKBH->vkCode), ((0x80000000 | 0xff000000 & (static_cast<LPARAM>(lpstKBH->flags)) << 24)));
 				}
 				break;
 			case 0xff:				// US(ENG) Convert (0xff)
 				if (GetAsyncKeyState(VK_SHIFT) & 0x8000) {
 					if (bKeyboardHookLLProcSub()) {
-						if (!bEnableEPHelper)	break;
-						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (WM_USER + VK_OEM_FINISH), ((0x80000000 | 0xff000000 & (static_cast<LPARAM>(lpstKBH->flags)) << 24)));
+						if (!bEnableEPHelperLL)	break;
+						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, KEY_OEM_FINISH, ((0x80000000 | 0xff000000 & (static_cast<LPARAM>(lpstKBH->flags)) << 24)));
 					}
 				}
 				else if (lpstKBH->scanCode == 0x0070) {
 					if (bKeyboardHookLLProcSub()) {
-						if (!bEnableEPHelper)	break;
-						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (WM_USER + VK_OEM_COPY), ((0x80000000 | 0xff000000 & (static_cast<LPARAM>(lpstKBH->flags)) << 24)));
+						if (!bEnableEPHelperLL)	break;
+						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, KEY_OEM_COPY, ((0x80000000 | 0xff000000 & (static_cast<LPARAM>(lpstKBH->flags)) << 24)));
 					}
 				}
 				else if (lpstKBH->scanCode == 0x0079) {
 					if (bKeyboardHookLLProcSub()) {
-						if (!bEnableEPHelper)	break;
-						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (WM_USER + VK_CONVERT), ((0x80000000 | 0xff000000 & (static_cast<LPARAM>(lpstKBH->flags)) << 24)));
+						if (!bEnableEPHelperLL)	break;
+						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, KEY_CONVERT, ((0x80000000 | 0xff000000 & (static_cast<LPARAM>(lpstKBH->flags)) << 24)));
 					}
 				}
 				break;
@@ -193,37 +196,42 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 			case VK_LCONTROL:		// Ctrl L (0xa2)
 			case VK_RCONTROL:		// Ctrl R (0xa3)
 				bOnlyCtrlLL = TRUE;
+				bStartConversioningLL = FALSE;
 				break;
 			case VK_MENU:			// ALT    (0x12)
 			case VK_LMENU:			// ALT L  (0xa4)
 			case VK_RMENU:			// ALT R  (0xa5)
 				bOnlyCtrlLL = FALSE;
+				bStartConversioningLL = FALSE;
 				break;
 			case VK_CAPITAL:		// 英数/CapsLock (0x14)
 				bOnlyCtrlLL = FALSE;
+				bStartConversioningLL = FALSE;
 				if (bKBisNotJP() || bKBisEP()) {
 					dwPreviousVKLL = VK_OEM_ATTN;
 					if (bKeyboardHookLLProcSub()) {
-						if (!bEnableEPHelper)	break;
-						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (WM_USER + VK_OEM_ATTN), (0x7f000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24)));
+						if (!bEnableEPHelperLL)	break;
+						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, KEY_OEM_ATTN, (0x7f000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24)));
 					}
 					return 1;
 				}
 				break;
 			case VK_KANJI:			// JP(IME/ENG) Alt + 漢字	(0x19)
 				bOnlyCtrlLL = FALSE;
+				bStartConversioningLL = FALSE;
 				dwPreviousVKLL = VK_KANJI;
 				if (bKeyboardHookLLProcSub()) {
-					if (!bEnableEPHelper)	break;
-					PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (WM_USER + VK_KANJI), (0x7f000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24)));
+					if (!bEnableEPHelperLL)	break;
+					PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, KEY_KANJI, (0x7f000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24)));
 				}
 				break;
 			case VK_OEM_3:			// JP(IME/ENG) [@] / US(ENG) IME ON (0xc0) = ['] ALT + 半角/全角 or 漢字
 			case VK_OEM_8:			// JP(IME/ENG) [`] / UK(ENG) IME ON (0xdf) = ['] ALT + 半角/全角 or 漢字
 				bOnlyCtrlLL = FALSE;
+				bStartConversioningLL = FALSE;
 				if (bKBisNotJP() || bKBisEP()) {
 					if (bKeyboardHookLLProcSub()) {
-						if (!bEnableEPHelper)	break;
+						if (!bEnableEPHelperLL)	break;
 						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (WM_USER + lpstKBH->vkCode), (0x7f000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24)));
 					}
 					return 1;
@@ -233,13 +241,42 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 			case VK_OEM_FINISH:		// OEM カタカナ (0xf1)
 			case VK_OEM_COPY:		// OEM ひらがな (0xf2)
 				bOnlyCtrlLL = FALSE;
+				bStartConversioningLL = FALSE;
 				if (bKeyboardHookLLProcSub()) {
-					if (!bEnableEPHelper)	break;
+					if (!bEnableEPHelperLL)	break;
 					PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (WM_USER + lpstKBH->vkCode), (0x7f000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24)));
+				}
+				break;
+			case VK_RETURN:			// RETURN (0x0d)
+			case VK_ESCAPE:			// ESC (0x1b)
+			case VK_ACCEPT:			// IME 使用可能 (0x1e)
+			case VK_MODECHANGE:		// IME モード変更要求 (0x1f)
+			case VK_INSERT:			// INSERT (0x2d)
+			case VK_F1:				// (0x70)
+			case VK_F3:				// (0x72)
+			case VK_PROCESSKEY:		// IME PROCESS キー (0xe5)
+				bOnlyCtrlLL = FALSE;
+				bStartConversioningLL = FALSE;
+				if (bKeyboardHookLLProcSub()) {
+					PostMessage(hWndKBParentLL, WM_CHECKIMESTARTCONVEX, (WPARAM)bStartConversioningLL, (LPARAM)(DWORD)(WM_USER + lpstKBH->vkCode));
 				}
 				break;
 			default:
 				bOnlyCtrlLL = FALSE;
+				if (bStartConversioningLL == FALSE) {
+					if (((0x30 <= lpstKBH->vkCode) && (lpstKBH->vkCode <= 0x39))	// 「0」～「9」
+						|| ((0x41 <= lpstKBH->vkCode) && (lpstKBH->vkCode <= 0x5A))	// 「A」～「Z」
+						|| ((0x60 <= lpstKBH->vkCode) && (lpstKBH->vkCode <= 0x6f))	//  Ten Key
+						|| ((0xba <= lpstKBH->vkCode) && (lpstKBH->vkCode <= 0xc0))	// 「: *」「; +」「, <」「- =」「. >」「/ ?」「@ `」
+						|| ((0xdb <= lpstKBH->vkCode) && (lpstKBH->vkCode <= 0xdf))	// 「[ {」「\ |」「- =」「^ ~」
+						|| ((lpstKBH->vkCode == 0xe2))) {								// 「\ _」
+						bStartConversioningLL = TRUE;
+						if (bKeyboardHookLLProcSub()) {
+							PostMessage(hWndKBParentLL, WM_CHECKIMESTARTCONVEX, (WPARAM)bStartConversioningLL, (WM_USER + lpstKBH->vkCode));
+						}
+					}
+					else bStartConversioningLL = FALSE;
+				}
 				break;
 			}
 		}
@@ -290,9 +327,9 @@ static BOOL	bKeyboardHookLLProcSub()
 			return	FALSE;
 		}
 		hWndKBParentLL = lpDatKeyboardLL->hWnd;
-		bEnableEPHelper = lpDatKeyboardLL->bEnableEPHelper;
+		bEnableEPHelperLL = lpDatKeyboardLL->bEnableEPHelper;
 	}
 	return TRUE;
 }
 
-/* EOF */
+/* = EOF = */

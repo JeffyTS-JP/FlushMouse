@@ -211,6 +211,9 @@
     <None Include="ImeHanKanaOnArrow.cur" />
     <None Include="ImeHanKanaOnHand.cur" />
     <None Include="ImeHanKanaOnIbeam.cur" />
+    <None Include="ImeHideOnArrow.cur" />
+    <None Include="ImeHideOnHand.cur" />
+    <None Include="ImeHideOnIbeam.cur" />
     <None Include="ImeOffArrow.cur" />
     <None Include="ImeOffHand.cur" />
     <None Include="ImeOffIbeam.cur" />

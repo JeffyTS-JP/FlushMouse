@@ -23,22 +23,5 @@
 // Global Data
 //
 
-//
-// class CFocusEvent
-//
-class CFocusEvent
-{
-public:
-	CFocusEvent();
-	~CFocusEvent();
-	BOOL		bEventSet();
-	BOOL		bEventUnset();
 
-private:
-	static void CALLBACK vHandleEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime);
-
-private:
-	HWINEVENTHOOK	hEventHook;
-};
-
-/* EOF */
+/* = EOF = */

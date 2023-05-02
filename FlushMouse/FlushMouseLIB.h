@@ -46,7 +46,6 @@ private:
 //
 extern BOOL			bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance);
 extern BOOL			bStartThredHookTimer(HWND hWnd);
-extern VOID			vStartStopTimer(HWND hWnd, BOOL bStart);
 extern VOID			vStopThredHookTimer(HWND hWnd);
 extern BOOL			bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, LPHKL lpNewHKL, LPHKL lpPreviousHKL);
 extern BOOL			bCheckExistingJPIME();
@@ -60,8 +59,8 @@ extern TCHAR		szFlushMouse32[];
 extern TCHAR		szTitle[];
 extern TCHAR		szWindowClass[];
 extern HWND			hMainWnd;
-//extern HINSTANCE		hMainInst;
 
+extern BOOL			bOffChangedFocus;
 extern BOOL			bDoModeDispByIMEKeyDown;
 extern BOOL			bDoModeDispByCtrlUp;
 extern BOOL			bDisplayFocusWindowIME;
@@ -69,10 +68,12 @@ extern BOOL			bDisplayIMEModeOnCursor;
 extern BOOL			bDoModeDispByMouseBttnUp;
 extern BOOL			bDrawNearCaret;
 extern BOOL			bEnableEPHelper;
+extern BOOL			bMoveIMEToolbar;
+extern BOOL			bIMEModeForced;
 
 extern CProfile		*Profile;
 extern CCursor		*Cursor;
 extern CResource	*Resource;
 extern CIME			*Cime;
 
-/* EOF */
+/* = EOF = */

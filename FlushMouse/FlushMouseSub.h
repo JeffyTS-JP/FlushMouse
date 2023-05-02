@@ -16,8 +16,6 @@
 //
 // Define
 // 
-// Application-defined message identifiers.
-#define WM_TASKTRAY			(WM_APP + 1)
 
 //
 // Struct Define
@@ -28,34 +26,42 @@
 //
 extern HWND		hAboutDlg;
 extern HWND		hSettingDlg;
+extern BOOL		bIMEInConverting;
 
 //
 // Global Prototype Define
 //
-extern BOOL 	bCreateTaskTrayWindow(HWND hWnd, UINT uID);
+extern BOOL 	bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitile);
+extern BOOL		bReCreateTaskTrayWindow(HWND hWnd, UINT message);
 extern BOOL		bDestroyTaskTrayWindow(HWND hWnd);
-extern void		Cls_OnTaskTray(HWND hWnd, UINT id, UINT uMsg);
+extern BOOL		bGetTaskTrayWindowRect(HWND hWnd, LPRECT lpRect);
+extern void		Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg);
 extern void		vMessageBox(HWND hWnd, UINT uID, UINT uType);
 extern VOID		vAboutDialog(HWND hWnd);
 extern VOID		vSettingDialog(HWND hWnd);
 extern VOID		vGetSetProfileData();
 
 //
-// class CFocusEvent
+// class CEventHook
 //
-class CFocusEvent
+class CEventHook
 {
 public:
-	CFocusEvent();
-	~CFocusEvent();
+				CEventHook();
+				~CEventHook();
 	BOOL		bEventSet();
 	BOOL		bEventUnset();
 
 private:
 	static void CALLBACK vHandleEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime);
+	static void CALLBACK vHandleEventIME(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime);
+
+public:
+	HWND			hFormerWnd;
 
 private:
 	HWINEVENTHOOK	hEventHook;
+	HWINEVENTHOOK	hEventHookIME;
 };
 
 //
@@ -66,12 +72,15 @@ class CPowerNotification
 public:
 	CPowerNotification(HWND hWnd);
 	~CPowerNotification();
+	BOOL		PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting);
 
 private:
 	static DEVICE_NOTIFY_CALLBACK_ROUTINE DeviceNotifyCallbackRoutine;
 
 private:
-	HPOWERNOTIFY	RegistrationHandle;
+	HPOWERNOTIFY	hSuspendResumeNotification;
+	HPOWERNOTIFY	hPowerSettingNotification;
+	GUID			guidPowerSettingNotification;
 };
 
 //
@@ -103,4 +112,4 @@ private:
 	LPPROCESS_INFORMATION	lpstProcessInfomation;
 };
 
-/* EOF */
+/* = EOF = */

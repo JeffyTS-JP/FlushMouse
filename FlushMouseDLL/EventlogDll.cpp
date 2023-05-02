@@ -14,7 +14,7 @@
 #include "EventlogDll.h"
 
 //
-// 
+// bReportEvent()
 //
 DLLEXPORT BOOL  __stdcall 	bReportEvent(DWORD dwEventID, WORD wCategory)
 {

@@ -1,0 +1,132 @@
+﻿// CommonDef.h
+//		Copyright (C) 1993 JeffyTS
+//
+// No.      Date		    Name		    Reason & Document
+// -------+-----------+-----------+-------------------------------------------- -
+// #0001	2023/04/27  JeffyTS		New edit
+//
+
+//
+// Include
+//
+#pragma once
+#include "pch.h"
+#include "..\..\DEFS\types.h"
+
+//
+// Define
+//
+#define MAX_LOADSTRING 100
+
+// for IME
+#define IMC_GETCONVERSIONMODE   0x0001
+#define IMC_SETCONVERSIONMODE   0x0002
+#define IMC_GETSENTENCEMODE		0x0003
+#define IMC_SETSENTENCEMODE		0x0004
+#define IMC_GETOPENSTATUS		0x0005
+#define IMC_SETOPENSTATUS		0x0006
+
+// for Shell_NotifyIcon
+#define	NOTIFYICONDATA_ID		0x684B9604
+
+//
+// Message Handler Define
+// 
+
+#// void Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg);
+#define WM_TASKTRAYEX						(WM_USER + 0x0001)
+#define HANDLE_WM_TASKTRAYEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (UINT)(wParam), (UINT)(lParam)), 0L)
+
+// void Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd);
+#define WM_EVENT_SYSTEM_FOREGROUNDEX		(WM_USER + 0x0002)
+#define HANDLE_WM_EVENT_SYSTEM_FOREGROUNDEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (DWORD)(wParam), (HWND)(lParam)), 0L)
+
+// void	Cls_OnCheckExistingJPIMEEx(HWND hWnd, BOOL bEnableEPHelper);
+#define WM_CHECKEXISTINGJPIMEEX				(WM_USER + 0x0003)
+#define	HANDLE_WM_CHECKEXISTINGJPIMEEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (BOOL)(wParam)), 0L)
+
+// void	Cls_OnCheckIMEStartConversioningEx(HWND hWnd, BOOL bStartConversioning, DWORD vkCode);
+#define WM_CHECKIMESTARTCONVEX				(WM_USER + 0x0004)
+#define	HANDLE_WM_CHECKIMESTARTCONVEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (BOOL)(wParam), (DWORD)(lParam)), 0L)
+
+// void Cls_OnLButtonDownEx(HWND hWnd, int x, int y, HWND hForeground)
+#define WM_LBUTTONDOWNEX					(WM_USER + WM_LBUTTONDOWN)
+#define HANDLE_WM_LBUTTONDOWNEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), (HWND)(wParam)), 0L)
+
+// void Cls_OnRButtonDownEx(HWND hWnd, int x, int y, HWND hForeground)
+#define WM_RBUTTONDOWNEX					(WM_USER + WM_RBUTTONDOWN)
+#define HANDLE_WM_RBUTTONDOWNEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), (HWND)(wParam)), 0L)
+
+// void Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground)
+#define WM_LBUTTONUPEX						(WM_USER + WM_LBUTTONUP)
+#define HANDLE_WM_LBUTTONUPEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), (HWND)(wParam)), 0L)
+
+// void Cls_OnRButtonUpEx(HWND hWnd, int x, int y, HWND hForeground)
+#define WM_RBUTTONUPEX						(WM_USER + WM_RBUTTONUP)
+#define HANDLE_WM_RBUTTONUPEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), (HWND)(wParam)), 0L)
+
+// void Cls_OnLButtonDblClkEx(HWND hWnd, int x, int y, HWND hForeground)
+#define WM_LBUTTONDBLCLKEX					(WM_USER + WM_LBUTTONDBLCLK)
+#define HANDLE_WM_LBUTTONDBLCLKEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), (HWND)(wParam)), 0L)
+
+// void Cls_OnRButtonDblClkEx(HWND hWnd, int x, int y, HWND hForeground)
+#define WM_RBUTTONDBLCLKEX					(WM_USER + WM_RBUTTONDBLCLK)
+#define HANDLE_WM_RBUTTONDBLCLKEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), (HWND)(wParam)), 0L)
+
+// void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flags)
+#define WM_SYSKEYDOWNUPEX					(WM_USER + WM_SYSKEYDOWN)
+#define HANDLE_WM_SYSKEYDOWNUPEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (UINT)(wParam), (!(BOOL)(lParam & 0x80000000)), (int)(short)LOWORD(lParam), (UINT)HIWORD(lParam)), 0L)
+
+// void Cls_OnCreateEx(HWND hWnd, WPARAM wParam, LPCREATESTRUCT lParam)
+#define WM_CREATEEX							(WM_USER + WM_CREATE)
+#define HANDLE_WM_CREATEEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (WPARAM)(wParam), (LPCREATESTRUCT )(lParam)), 0L)
+
+// void Cls_OnInputLangChangeEx(HWND hWnd, UINT CodePage, HKL hkl);
+#define WM_INPUTLANGCHANGEEX				(WM_USER + WM_INPUTLANGCHANGE)
+#define HANDLE_WM_INPUTLANGCHANGEEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (UINT)(wParam), (HKL)(lParam)), 0L)
+
+// void Cls_OnTestEX(HWND hWnd, WPARAM wParam, LPARAM lParam);
+#define WM_TESTEX							(WM_USER + 0xff)	// for Test
+#define HANDLE_WM_TESTEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (WPARAM)(wParam), (LPARAM)(lParam)), 0L)
+
+
+#define KEY_CTRL			(WM_USER + VK_CONTROL)					// Ctrl   (0x11)
+#define KEY_LCTRL			(WM_USER + VK_LCONTROL)					// Ctrl L (0xa2)
+#define KEY_RCTRL			(WM_USER + VK_RCONTROL)					// Ctrl R (0xa3)
+#define	KEY_ALT				(WM_USER + VK_MENU)						// ALT    (0x12
+#define	KEY_LALT			(WM_USER + VK_LMENU)					// ALT L  (0xa4)
+#define	KEY_RALT			(WM_USER + VK_RMENU)					// ALT R  (0xa5)
+#define KEY_SHIFT			(WM_USER + VK_SHIFT)					// Shift  (0x10)
+#define KEY_LSHIFT			(WM_USER + VK_LSHIFT)					// Shift L(0xa0)
+#define KEY_RSHIFT			(WM_USER + VK_RSHIFT)					// Shift R(0xa1)
+#define KEY_LWIN			(WM_USER + VK_LWIN)						// L Win  (0x5b)
+#define KEY_RWIN			(WM_USER + VK_RWIN)						// R Win  (0x5c)
+#define KEY_CAPITAL			(WM_USER + VK_CAPITAL)					// Caps Lock (0x14)
+#define KEY_KANA			(WM_USER + VK_KANA)						// カナ   (0x15)
+#define KEY_IME_ON			(WM_USER + VK_IME_ON)					// IME ON (0x16)
+#define KEY_KANJI			(WM_USER + VK_KANJI)					// 漢字   (0x19)
+#define KEY_IME_OFF			(WM_USER + VK_IME_OFF)					// IME OFF(0x1a)
+#define KEY_CONVERT			(WM_USER + VK_CONVERT)					// IME convert    (0x1c)
+#define KEY_NONCONVERT		(WM_USER + VK_NONCONVERT)				// IME nonconvert (0x1d)
+#define KEY_F6				(WM_USER + VK_F6)						// F6  (0x75) 
+#define KEY_F7				(WM_USER + VK_F7)						// F7  (0x76)
+#define KEY_F8				(WM_USER + VK_F8)						// F8  (0x77)
+#define KEY_F9				(WM_USER + VK_F9)						// F9  (0x78)
+#define KEY_F10				(WM_USER + VK_F10)						// F10 (0x79)
+#define KEY_OEM_3			(WM_USER + VK_OEM_3)					// OEM US(ENG) IME ON (0xc0) [`] for US
+#define KEY_OEM_8			(WM_USER + VK_OEM_8)					// OEM UK(ENG) IME ON (0xc0) [`] for UK
+#define KEY_OEM_ATTN		(WM_USER + VK_OEM_ATTN)					// 英数/CapsLock (0xf0)
+#define KEY_OEM_FINISH		(WM_USER + VK_OEM_FINISH)				// OEM カタカナ (0xf1)
+#define KEY_OEM_COPY		(WM_USER + VK_OEM_COPY)					// OEM ひらがな (0xf2)
+#define VK_OEM_IME_OFF		0xf3									// Unassigned VK_CODE
+#define KEY_OEM_IME_OFF		(WM_USER + VK_OEM_IME_OFF)				// OEM IME OFF (0xf3) But It's IME ON when key up
+#define VK_OEM_IME_ON		0xf4									// Unassigned VK_CODE
+#define KEY_OEM_IME_ON		(WM_USER + VK_OEM_IME_ON)				// OEM IME ON  (0xf4) But It's IME OFF when key up
+#define KEY_OEM_BACKTAB		(WM_USER + VK_OEM_BACKTAB)				// OEM Alt+カタカナ/ひらがな (0xf5)
+#define VK_ONLY_CTRLUP		0xe8									// Unassigned VK_CODE
+#define KEY_ONLY_CTRLUP		(WM_USER + VK_ONLY_CTRLUP)				// Only Ctrl key up
+#define KEY_OEM_PA1			(WM_USER + VK_OEM_PA1)					// US(ENG) KB 無変換	 (0xeb)
+#define VK_FF				0xff									// Unassigned VK_CODE
+#define KEY_FF				(WM_USER + VK_FF)						// US(ENG) KB 変換/ひら/カタ	(0xff)
+
+/* = EOF = */
