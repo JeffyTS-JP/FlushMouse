@@ -18,6 +18,10 @@
 //
 #define MAX_LOADSTRING 100
 
+// Window Class
+#define	CLASS_FLUSHMOUSE		L"FlushMouse-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
+#define CLASS_FLUSHMOUSE32		L"FlushMouse32-{07C82AC3-DF75-469D-8443-91E6274A2422}"
+
 // for IME
 #define IMC_GETCONVERSIONMODE   0x0001
 #define IMC_SETCONVERSIONMODE   0x0002
@@ -28,6 +32,38 @@
 
 // for Shell_NotifyIcon
 #define	NOTIFYICONDATA_ID		0x684B9604
+
+typedef struct tagPOINTD
+{
+	double	x;
+	double	y;
+} POINTD, * PPOINTD, * LPPOINTD;
+
+typedef struct tagRECTF {
+	float    left;
+	float    top;
+	float    right;
+	float    bottom;
+} RECTF, * PRECTF, * LPRECTF;
+
+typedef struct tagRECTD {
+	double    left;
+	double    top;
+	double    right;
+	double    bottom;
+} RECTD, * PRECTD, * LPRECTD;
+
+typedef struct tagSIZEF
+{
+	float  cx;
+	float  cy;
+} SIZEF, * PSIZEF, * LPSIZEF;
+
+typedef struct tagSIZED
+{
+	double	cx;
+	double	cy;
+} SIZED, * PSIZED, * LPSIZED;
 
 //
 // Message Handler Define

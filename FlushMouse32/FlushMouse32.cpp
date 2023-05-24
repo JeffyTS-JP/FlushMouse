@@ -48,7 +48,7 @@ static UINT_PTR	uCheckProcTimer = NULL;
 // Local Data
 //
 static TCHAR		szTitle[MAX_LOADSTRING]{};			// タイトル バーのテキスト
-static TCHAR		szWindowClass[MAX_LOADSTRING]{};	// メイン ウィンドウ クラス名
+//static TCHAR		szWindowClass[]{ CLASS_FLUSHMOUSE32 };	// メイン ウィンドウ クラス名
 static HINSTANCE	hInst = NULL;						// 現在のインターフェイス
 static HWND			hParentWnd = NULL;					// 親のWindow Handle
 
@@ -98,28 +98,27 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		unsigned long long ll = 0;
 		if ((ll = _tstoll(lpCmdLine)) == 0) return (-1);
 		hParentWnd = (HWND)ll;
-		if (hParentWnd != FindWindow(_T("FLUSHMOUSE"), NULL)) {	// 渡された値をチェック
-			vMessageBox(NULL, IDS_NOTFORKBY64, MessageBoxTYPE);	// 不正起動のためメッセージを表示
+		if (hParentWnd != FindWindow(CLASS_FLUSHMOUSE, NULL)) {
+			vMessageBox(NULL, IDS_NOTFORKBY64, MessageBoxTYPE);
 			return (-1);
 		}
 	}
 
 	if (LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING) == 0) return (-1);
-	if (LoadString(hInstance, IDC_FLUSHMOUSE32, szWindowClass, MAX_LOADSTRING) == 0) return (-1);
 
-	if (!hPrevInstance) {						                // ほかのインスタンスが実行中か?
-		if (!MyRegisterClass(hInstance)) {		                // 共通の初期化処理
-			return (-1);										// 初期化に失敗した場合はエラー終了
+	if (!hPrevInstance) {
+		if (!MyRegisterClass(hInstance)) {
+			return (-1);
 		}
 	}
 
 	HWND	    hWnd = NULL;
-	if ((hWnd = FindWindow(szWindowClass, NULL)) != NULL) {
+	if ((hWnd = FindWindow(CLASS_FLUSHMOUSE32, NULL)) != NULL) {
 		SetFocus(GetLastActivePopup(hWnd));
 		PostMessage(hWnd, WM_DESTROY, NULL, NULL);
 		for (int i = 3; i > 0; i--) {
 			Sleep(500);
-			if (FindWindow(szWindowClass, NULL) != NULL) {
+			if (FindWindow(CLASS_FLUSHMOUSE32, NULL) != NULL) {
 				if (i == 1) {
 					vMessageBox(NULL, IDS_ALREADYRUN, MessageBoxTYPE);
 					return (-1);
@@ -163,7 +162,7 @@ static ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);								// マウスカーソルハンドル
 	wcex.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);               // ウィンドウ背景色
 	wcex.lpszMenuName = MAKEINTRESOURCE(IDC_FLUSHMOUSE32);                  // デフォルトメニュー名
-	wcex.lpszClassName = szWindowClass;                                     // このウインドウクラスにつける名前
+	wcex.lpszClassName = CLASS_FLUSHMOUSE32;								// このウインドウクラスにつける名前
 	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));    // 16×16の小さいサイズのアイコン
 
 	return RegisterClassEx(&wcex);
@@ -180,7 +179,7 @@ static BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	HWND	hWnd = NULL;						// メインウィンドウのハンドル
 	hWnd = CreateWindowEx(
 							WS_DISABLED,		// Disabled Window
-							szWindowClass,      // RegisterClass()呼び出しを参照
+							CLASS_FLUSHMOUSE32,	// RegisterClass()呼び出しを参照
 							szTitle,            // Title barのテキスト
 							WINDOWSTYLE,        // Window style
 							0, 0,               // 水平・垂直位置
@@ -288,7 +287,7 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 	UNREFERENCED_PARAMETER(dwTime);
 
 	if (uTimerID == nCheckProcTimerID) {
-		if (FindWindow(_T("FLUSHMOUSE"), NULL) == NULL) {
+		if (FindWindow(CLASS_FLUSHMOUSE, NULL) == NULL) {
 			NOTIFYICONDATA nIco{};
 			nIco.cbSize = sizeof(NOTIFYICONDATA);
 			nIco.hWnd = hParentWnd;

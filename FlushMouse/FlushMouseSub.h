@@ -10,8 +10,7 @@
 // Include
 //
 #pragma once
-#include <powrprof.h>
-#pragma comment(lib, "powrprof.lib")
+#include "pch.h"
 
 //
 // Define
@@ -73,9 +72,6 @@ public:
 	CPowerNotification(HWND hWnd);
 	~CPowerNotification();
 	BOOL		PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting);
-
-private:
-	static DEVICE_NOTIFY_CALLBACK_ROUTINE DeviceNotifyCallbackRoutine;
 
 private:
 	HPOWERNOTIFY	hSuspendResumeNotification;

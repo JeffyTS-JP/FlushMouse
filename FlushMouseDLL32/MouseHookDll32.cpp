@@ -26,28 +26,35 @@ static BOOL	bMouseHookProcSub();
 //
 // Local Data
 //
+#pragma comment( linker, "/SECTION:FLUSHMOUSEDLL_SEG32,RWS" )
+#pragma data_seg("FLUSHMOUSEDLL_SEG32")
 static HWND		hWndMSParent = NULL;
 static LPMOUSE_SHAREDMEM32  lpDatMouse = NULL;
+static CSharedMemory* CSharedMem = NULL;
+#pragma data_seg()
 
 //
 // bMouseHookSet()
 //
 DLLEXPORT BOOL  __stdcall bMouseHookSet32(HWND hWnd)
 {
-	HHOOK   hHook = NULL;
-	hHook = SetWindowsHookEx(WH_MOUSE,							// 種類はマウスフック
-							(HOOKPROC)lpMouseHookProc,			// マウスプロシージャをセット
-							hGetInstance(), 0);					// このDLLのインスタンスハンドルを指定
-	if (hHook) {
-		MOUSE_SHAREDMEM32   datMouse{};
-		if (bSharedMemoryCreate(hWnd, MOUSEHOOKMEM32, sizeof(MOUSE_SHAREDMEM32))) {
-			datMouse.hWnd = hWnd;    datMouse.hHook = hHook;		hWndMSParent = hWnd;
-			if (bSharedMemoryWrite(MOUSEHOOKMEM32, (LPBYTE)&datMouse, sizeof(MOUSE_SHAREDMEM32))) {
-				return TRUE;
+	hWndMSParent = hWnd;
+	if ((CSharedMem = new CSharedMemory(MOUSEHOOKMEM32, sizeof(MOUSEHOOKMEM32))) != NULL) {
+		if ((lpDatMouse = (LPMOUSE_SHAREDMEM32)CSharedMem->lpvSharedMemoryRead()) != NULL) {
+			lpDatMouse->hWnd = hWnd;
+			if (CSharedMem->bSharedMemoryWrite(lpDatMouse)) {
+				HHOOK	hHook = SetWindowsHookEx(WH_MOUSE, (HOOKPROC)lpMouseHookProc, hGetInstance(), 0);
+				if (hHook) {
+					lpDatMouse->hHook = hHook;
+					if (CSharedMem->bSharedMemoryWrite(lpDatMouse)) {
+						return TRUE;
+					}
+					UnhookWindowsHookEx(hHook);
+				}
 			}
-			bSharedMemoryDelete(MOUSEHOOKMEM32);
 		}
-		UnhookWindowsHookEx(hHook);
+		delete CSharedMem;
+		CSharedMem = NULL;
 	}
 	return FALSE;
 }
@@ -57,18 +64,19 @@ DLLEXPORT BOOL  __stdcall bMouseHookSet32(HWND hWnd)
 //
 DLLEXPORT BOOL __stdcall bMouseHookUnset32()
 {
-	MOUSE_SHAREDMEM32   datMouse{};
-	if (bSharedMemoryRead(MOUSEHOOKMEM32, (LPBYTE)&datMouse, sizeof(MOUSE_SHAREDMEM32))) {
-		if (datMouse.hHook) {
-			if (UnhookWindowsHookEx(datMouse.hHook)) {
-			// 共有メモリを削除
-				bSharedMemoryDelete(MOUSEHOOKMEM32);
-				return TRUE;
+	BOOL	bRet = FALSE;
+	if (CSharedMem != NULL) {
+		if ((lpDatMouse = (LPMOUSE_SHAREDMEM32)CSharedMem->lpvSharedMemoryRead()) != NULL) {
+			if (lpDatMouse->hHook) {
+				if (UnhookWindowsHookEx(lpDatMouse->hHook)) {
+					bRet = TRUE;
+				}
 			}
 		}
+		delete CSharedMem;
+		CSharedMem = NULL;
 	}
-	bSharedMemoryDelete(MOUSEHOOKMEM32);
-	return FALSE;
+	return bRet;
 }
 
 //
@@ -113,17 +121,12 @@ static LRESULT CALLBACK lpMouseHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 //
 static BOOL	bMouseHookProcSub()
 {
-	if ((hWndMSParent == NULL) || (lpDatMouse == NULL)) {
-		if (lpDatMouse == NULL) {
-			if ((lpDatMouse = (LPMOUSE_SHAREDMEM32)lpvSharedMemoryOpen(MOUSEHOOKMEM32, sizeof(MOUSE_SHAREDMEM32))) == NULL) {
-				return	FALSE;
-			}
+	if (lpDatMouse == NULL) {
+		if ((lpDatMouse = (LPMOUSE_SHAREDMEM32)CSharedMem->lpvSharedMemoryRead()) == NULL) {
+			return FALSE;
 		}
-		if (lpDatMouse->hWnd == NULL) {
-			return	FALSE;
-		}
-		hWndMSParent = lpDatMouse->hWnd;
 	}
+	hWndMSParent = lpDatMouse->hWnd;
 	return TRUE;
 }
 

@@ -10,6 +10,7 @@
 // Include
 //
 #pragma once
+#include "pch.h"
 
 //
 // Define
@@ -60,7 +61,7 @@ typedef struct tagAppRegData
 // Class Define
 //
 //
-// calss CProfile
+// Class CProfile
 //
 class CProfile
 {
@@ -71,7 +72,7 @@ public:
 	BOOL		bSetProfileData();
 
 public:
-	APPREGDATA	stAppRegData;
+	LPAPPREGDATA	lpstAppRegData;
 };
 
 

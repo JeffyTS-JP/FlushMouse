@@ -17,7 +17,7 @@
 //
 // Define
 //
-#define	DEFAULT_SHAREDMEMORYNAME	_T("DefaultSharedMemory")
+#define MAX_LOADSTRING 100
 #ifdef _WIN64
 typedef     ULONGLONG	QWORD;
 typedef     ULONGLONG	*LPQWORD;
@@ -27,53 +27,57 @@ typedef     ULONGLONG	*LPQWORD;
 #endif // _WIN64
 
 //
-// bSharedMemoryCreate()
+// Class CSharedMemory
 //
-BOOL		bSharedMemoryCreate(HANDLE handle, LPCTSTR szSharedMemoryName, DWORD dwDataByteSize)
+CSharedMemory::CSharedMemory(LPCTSTR szSharedMemoryName, DWORD dwDataSize)
 {
-	UNREFERENCED_PARAMETER(handle);
-	SECURITY_ATTRIBUTES FileMappingAttributes{
-											sizeof(SECURITY_ATTRIBUTES),
-											NULL,
-											TRUE };
-	HANDLE hSharedMem = CreateFileMapping(INVALID_HANDLE_VALUE,	
+
+	size_t	size = wcsnlen_s(szSharedMemoryName, MAX_LOADSTRING);
+	lpszSharedMemoryName = new TCHAR[size + 1];
+	ZeroMemory(lpszSharedMemoryName, sizeof(TCHAR) * (size + 1));
+	_tcsncpy_s(lpszSharedMemoryName, size + 1, szSharedMemoryName, _TRUNCATE);
+	dwDataByteSize = dwDataSize;
+
+	SECURITY_ATTRIBUTES FileMappingAttributes{sizeof( SECURITY_ATTRIBUTES), NULL, TRUE };
+
+	hSharedMem = CreateFileMapping(INVALID_HANDLE_VALUE,
 		&FileMappingAttributes,
 		PAGE_READWRITE,
 		0,
-		dwDataByteSize + GUARDBANDSIZE,
-		szSharedMemoryName);
+		dwDataByteSize,
+		lpszSharedMemoryName);
 	if (hSharedMem != NULL) {
-		LPBYTE lpSharedMem = (LPBYTE)MapViewOfFile(hSharedMem, FILE_MAP_ALL_ACCESS, 0, 0, dwDataByteSize + GUARDBANDSIZE);
+		LPBYTE lpSharedMem = (LPBYTE)MapViewOfFile(hSharedMem, FILE_MAP_ALL_ACCESS, 0, 0, dwDataByteSize);
 		if (lpSharedMem != NULL) {
-			ZeroMemory(lpSharedMem, dwDataByteSize + GUARDBANDSIZE);	
+			ZeroMemory(lpSharedMem, dwDataByteSize + GUARDBANDSIZE);
 			UnmapViewOfFile(lpSharedMem);
-			return TRUE;
+			return;
 		}
 		CloseHandle(hSharedMem);
 	}
-	return FALSE;
+	return;
 }
 
-//
-// bSharedMemoryDelete()
-//
-BOOL		bSharedMemoryDelete(LPCTSTR szSharedMemoryName)
+CSharedMemory::~CSharedMemory()
 {
-	HANDLE hSharedMem = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, szSharedMemoryName);
 	if (hSharedMem != NULL) {
-		if (CloseHandle(hSharedMem))		return TRUE;	
+		if (CloseHandle(hSharedMem)) {
+			hSharedMem = NULL;
+		}
 	}
-	return FALSE;
+	delete[]	lpszSharedMemoryName;
+	lpszSharedMemoryName = NULL;
+	dwDataByteSize = 0;
+	return;
 }
 
 //
-// lpvSharedMemoryOpen()
+// lpvSharedMemoryRead();
 //
-LPVOID	lpvSharedMemoryOpen(LPCTSTR szSharedMemoryName, DWORD dwDataByteSize)
+LPVOID	CSharedMemory::lpvSharedMemoryRead()
 {
-	HANDLE hSharedMem = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, szSharedMemoryName);	
 	if (hSharedMem != NULL) {
-		LPVOID lpvSharedMem = MapViewOfFile(hSharedMem, FILE_MAP_ALL_ACCESS, 0, 0, dwDataByteSize + GUARDBANDSIZE);
+		LPVOID lpvSharedMem = MapViewOfFile(hSharedMem, FILE_MAP_ALL_ACCESS, 0, 0, dwDataByteSize);
 		if (lpvSharedMem != NULL) {
 			return lpvSharedMem;
 		}
@@ -83,71 +87,44 @@ LPVOID	lpvSharedMemoryOpen(LPCTSTR szSharedMemoryName, DWORD dwDataByteSize)
 }
 
 //
-// bSharedMemoryClose()
+// bSharedMemoryWrite()
 //
-BOOL		bSharedMemoryClose(LPVOID lpvSharedMem)
+BOOL	CSharedMemory::bSharedMemoryWrite(LPVOID lpSharedData)
+{
+	if (hSharedMem != NULL) {
+		LPVOID lpvSharedMem = MapViewOfFile(hSharedMem, FILE_MAP_ALL_ACCESS, 0, 0, dwDataByteSize);
+		if (lpvSharedMem != NULL) {
+#ifdef _WIN64
+			LPQWORD lpqwSharedMem = (LPQWORD)lpvSharedMem;
+			LPQWORD	lpqwSharedData = (LPQWORD)lpSharedData;
+			for (DWORD index = 0; index < (dwDataByteSize / sizeof(QWORD)); index++) {
+				lpqwSharedMem[index] = lpqwSharedData[index];
+			}
+#else
+			LPDWORD lpqwSharedMem = (LPDWORD)lpvSharedMem;
+			LPDWORD	lpqwSharedData = (LPDWORD)lpSharedData;
+			for (DWORD index = 0; index < (dwDataByteSize / sizeof(DWORD)); index++) {
+				lpqwSharedMem[index] = lpqwSharedData[index];
+			}
+#endif // _WIN64
+			if (FlushViewOfFile(lpvSharedMem, dwDataByteSize)) {
+				return bSharedMemoryClose(lpqwSharedMem);
+			}
+		}
+		CloseHandle(hSharedMem);
+	}
+	return FALSE;
+}
+
+//
+// bSharedMemoryClose
+//
+BOOL		CSharedMemory::bSharedMemoryClose(LPVOID lpvSharedMem)
 {
 	if (!UnmapViewOfFile(lpvSharedMem)) {
 		return FALSE;
 	}
 	return TRUE;
-}
-
-//
-// bSharedMemoryRead()
-//
-BOOL		bSharedMemoryRead(LPCTSTR szSharedMemoryName, LPBYTE lpbSharedData, DWORD dwSharedDataByteSize)
-{
-#ifdef _WIN64
-	LPQWORD lpqwSharedMem = NULL;
-	LPQWORD	lpqwSharedData = (LPQWORD)lpbSharedData;
-	if ((lpqwSharedMem = (LPQWORD)lpvSharedMemoryOpen(szSharedMemoryName, dwSharedDataByteSize + GUARDBANDSIZE)) != NULL) {
-		for (DWORD index = 0; index < (dwSharedDataByteSize / sizeof(QWORD)); index++) {	
-			lpqwSharedData[index] = lpqwSharedMem[index];
-		}
-		return TRUE;
-	}
-#else
-	LPDWORD lpqwSharedMem = NULL;
-	LPDWORD	lpqwSharedData = (LPDWORD)lpbSharedData;
-
-	if ((lpqwSharedMem = (LPDWORD)lpvSharedMemoryOpen(szSharedMemoryName, dwSharedDataByteSize + GUARDBANDSIZE)) != NULL) {
-		for (DWORD index = 0; index < (dwSharedDataByteSize / sizeof(DWORD)); index++) {	
-			lpqwSharedData[index] = lpqwSharedMem[index];
-		}
-		return TRUE;
-	}
-#endif // _WIN64
-	return FALSE;
-}
-
-//
-// bSharedMemoryWrite()
-//
-BOOL		bSharedMemoryWrite(LPCTSTR lpszSharedMemoryName, LPBYTE lpbSharedData, DWORD dwSharedDataByteSize)
-{
-#ifdef _WIN64
-	LPQWORD lpqwSharedMem = NULL;
-	LPQWORD	lpqwSharedData = (LPQWORD)lpbSharedData;
-
-	if ((lpqwSharedMem = (LPQWORD)lpvSharedMemoryOpen(lpszSharedMemoryName, dwSharedDataByteSize)) != NULL) {
-		for (DWORD index = 0; index < (dwSharedDataByteSize / sizeof(QWORD)); index++) {	
-			lpqwSharedMem[index] = lpqwSharedData[index];
-		}
-		return bSharedMemoryClose(lpqwSharedMem);
-	}
-#else
-	LPDWORD lpqwSharedMem = NULL;
-	LPDWORD	lpqwSharedData = (LPDWORD)lpbSharedData;
-
-	if ((lpqwSharedMem = (LPDWORD)lpvSharedMemoryOpen(lpszSharedMemoryName, dwSharedDataByteSize)) != NULL) {
-		for (DWORD index = 0; index < (dwSharedDataByteSize / sizeof(DWORD)); index++) {	
-			lpqwSharedMem[index] = lpqwSharedData[index];
-		}
-		return bSharedMemoryClose(lpqwSharedMem);
-	}
-#endif // _WIN64
-	return FALSE;
 }
 
 /* == EOF == */

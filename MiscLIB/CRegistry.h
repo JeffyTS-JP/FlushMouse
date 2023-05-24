@@ -1,4 +1,4 @@
-﻿// CRegstry.h
+﻿// CRegistry.h
 //		Copyright (C) 2022 JeffyTS
 //
 // No.      Date		    Name		    Reason & Document
@@ -10,9 +10,10 @@
 // Include
 //
 #pragma once
+#include "pch.h"
 
 //
-// class CRegistry
+// Class CRegistry
 //
 class CRegistry
 {
@@ -21,16 +22,18 @@ public:
 	~CRegistry();
 
 public:
-	BOOL		bGetRegValueDWORD(HKEY hkey, LPCTSTR lpszSubKey, LPCTSTR szValue, LPDWORD lpdwData, DWORD dwInitialData);
-	BOOL		bSetRegValueDWORD(HKEY hkey, LPCTSTR lpszSubKey, LPCTSTR szValue, DWORD dwData);
-	BOOL		bGetRegValueDWORDasBOOL(HKEY hkey, LPCTSTR lpszSubKey, LPCTSTR szValue, LPBOOL lpbData, BOOL bInitialData);
-	BOOL		bSetRegValueDWORDasBOOL(HKEY hkey, LPCTSTR lpszSubKey, LPCTSTR szValue, BOOL bData);
-	BOOL		bGetRegValueString(HKEY hkey, LPCTSTR lpszSubKey, LPCTSTR szValue, LPTSTR szData, DWORD dwDataSize);
-	BOOL		bSetRegValueString(HKEY hkey, LPCTSTR lpszSubKey, LPCTSTR szValue, LPTSTR szData, DWORD dwDataSize);
+	BOOL		bGetSetRegValueDWORD(HKEY hKey, LPCTSTR lpszSubKey, LPCTSTR szValue, LPDWORD lpdwData, DWORD dwInitialData);
+	BOOL		bSetRegValueDWORD(HKEY hKey, LPCTSTR lpszSubKey, LPCTSTR szValue, DWORD dwData);
+	BOOL		bGetSetRegValueDWORDasBOOL(HKEY hKey, LPCTSTR lpszSubKey, LPCTSTR szValue, LPBOOL lpbData, BOOL bInitialData);
+	BOOL		bSetRegValueDWORDasBOOL(HKEY hKey, LPCTSTR lpszSubKey, LPCTSTR szValue, BOOL bData);
+	BOOL		bGetSetRegValueString(HKEY hKey, LPCTSTR lpszSubKey, LPCTSTR szValue, LPTSTR szData, DWORD dwDataSize);
+	BOOL		bSetRegValueString(HKEY hKey, LPCTSTR lpszSubKey, LPCTSTR szValue, LPTSTR szData, DWORD dwDataSize);
 
-	BOOL		bReadRegValueDWORD(HKEY hkey, LPCTSTR lpszSubKey, LPCTSTR szValue, LPDWORD lpdwData);
-	BOOL		bReadRegValueDWORDasBOOL(HKEY hkey, LPCTSTR lpszSubKey, LPCTSTR szValue, LPBOOL lpbData);
-	BOOL		bReadRegValueString(HKEY hkey, LPCTSTR lpszSubKey, LPCTSTR szValue, LPTSTR szData, DWORD dwDataSize);
+	BOOL		bReadRegValueDWORD(HKEY hKey, LPCTSTR lpszSubKey, LPCTSTR szValue, LPDWORD lpdwData);
+	BOOL		bReadRegValueDWORDasBOOL(HKEY hKey, LPCTSTR lpszSubKey, LPCTSTR szValue, LPBOOL lpbData);
+	BOOL		bReadRegValueString(HKEY hKey, LPCTSTR lpszSubKey, LPCTSTR szValue, LPTSTR szData, DWORD dwDataSize);
+
+	BOOL		bDeleteRegValue(HKEY hKey, LPCTSTR lpszSubKey, LPCTSTR szValue);
 
 private:
 
