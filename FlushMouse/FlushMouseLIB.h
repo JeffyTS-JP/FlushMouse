@@ -45,8 +45,8 @@ private:
 // Global Prototype Define
 //
 extern BOOL			bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance);
-extern BOOL			bStartThredHookTimer(HWND hWnd);
-extern VOID			vStopThredHookTimer(HWND hWnd);
+extern BOOL			bStartThreadHookTimer(HWND hWnd);
+extern VOID			vStopThreadHookTimer(HWND hWnd);
 extern BOOL			bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, LPHKL lpNewHKL, LPHKL lpPreviousHKL);
 extern BOOL			bCheckExistingJPIME();
 
@@ -57,7 +57,6 @@ extern TCHAR		szFlushMouse64[];
 extern TCHAR		szFlushMouse32[];
 
 extern TCHAR		szTitle[];
-extern TCHAR		szWindowClass[];
 extern HWND			hMainWnd;
 
 extern BOOL			bOffChangedFocus;

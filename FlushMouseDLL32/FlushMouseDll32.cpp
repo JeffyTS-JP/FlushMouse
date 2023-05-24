@@ -16,7 +16,10 @@
 //
 // Local Data
 //
+#pragma comment( linker, "/SECTION:FLUSHMOUSEDLL_SEG32,RWS" )
+#pragma data_seg("FLUSHMOUSEDLL_SEG32")
 static HINSTANCE    hDLLInstance = NULL;
+#pragma data_seg()
 
 //
 // DllMain()
@@ -27,6 +30,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 	switch (ul_reason_for_call) {
 	case DLL_PROCESS_ATTACH:
 		hDLLInstance = hModule;
+		DisableThreadLibraryCalls(hDLLInstance);
+
 		break;
 	case DLL_THREAD_ATTACH:
 		break;

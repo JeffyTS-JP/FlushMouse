@@ -52,7 +52,7 @@ static DWORD	dwGetTrackbarPos(HWND hDlg, int iIDTrackbar);
 //
 // bCreateTaskTrayWindow()
 //
-BOOL		bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitile)
+BOOL		bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle)
 {
 	NOTIFYICONDATA   nIco{};
 	nIco.cbSize = sizeof(NOTIFYICONDATA);
@@ -68,7 +68,7 @@ BOOL		bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitile)
 	if ((nIco.hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE))) == NULL) {
 		return FALSE;
 	}
-	_tcsncpy_s(nIco.szTip, ARRAYSIZE(nIco.szTip), lpszTitile, _TRUNCATE);
+	_tcsncpy_s(nIco.szTip, ARRAYSIZE(nIco.szTip), lpszTitle, _TRUNCATE);
 	if (Shell_NotifyIcon(NIM_ADD, &nIco) == FALSE) {			// Add TaskTray Icon
 		_Post_equals_last_error_ DWORD err = GetLastError();
 		if (err == ERROR_TIMEOUT) {
@@ -110,8 +110,8 @@ BOOL		bReCreateTaskTrayWindow(HWND hWnd, UINT message)
 			}
 			else {
 				bTaskTray = TRUE;
-				vStopThredHookTimer(hWnd);
-				if (!bStartThredHookTimer(hWnd)) {
+				vStopThreadHookTimer(hWnd);
+				if (!bStartThreadHookTimer(hWnd)) {
 					PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 				}
 				bReportEvent(MSG_THREAD_HOOK_TIMER_RESTARTED, APPLICATION_CATEGORY);
@@ -260,20 +260,20 @@ static INT_PTR CALLBACK SettingDlg(HWND hDlg, UINT message, WPARAM wParam, LPARA
 				SendDlgItemMessage(hDlg, IDC_COMBO1, CB_ADDSTRING, 0, (LPARAM)lpText);
 			}
 			{	// Check Box
-				bSetCheckDlgButton(hDlg, IDC_CHECK1, Profile->stAppRegData.bDisplayIMEModeOnCursor);
-				bSetCheckDlgButton(hDlg, IDC_CHECK2, Profile->stAppRegData.bOffChangedFocus);
-				bSetCheckDlgButton(hDlg, IDC_CHECK3, Profile->stAppRegData.bForceHiragana);
-				bSetCheckDlgButton(hDlg, IDC_CHECK4, Profile->stAppRegData.bDoModeDispByIMEKeyDown);
-				bSetCheckDlgButton(hDlg, IDC_CHECK5, Profile->stAppRegData.bDoModeDispByMouseBttnUp);
-				bSetCheckDlgButton(hDlg, IDC_CHECK6, Profile->stAppRegData.bDoModeDispByCtrlUp);
-				bSetCheckDlgButton(hDlg, IDC_CHECK7, Profile->stAppRegData.bDrawNearCaret);
-				bSetCheckDlgButton(hDlg, IDC_CHECK8, Profile->stAppRegData.bEnableEPHelper);
+				bSetCheckDlgButton(hDlg, IDC_CHECK1, Profile->lpstAppRegData->bDisplayIMEModeOnCursor);
+				bSetCheckDlgButton(hDlg, IDC_CHECK2, Profile->lpstAppRegData->bOffChangedFocus);
+				bSetCheckDlgButton(hDlg, IDC_CHECK3, Profile->lpstAppRegData->bForceHiragana);
+				bSetCheckDlgButton(hDlg, IDC_CHECK4, Profile->lpstAppRegData->bDoModeDispByIMEKeyDown);
+				bSetCheckDlgButton(hDlg, IDC_CHECK5, Profile->lpstAppRegData->bDoModeDispByMouseBttnUp);
+				bSetCheckDlgButton(hDlg, IDC_CHECK6, Profile->lpstAppRegData->bDoModeDispByCtrlUp);
+				bSetCheckDlgButton(hDlg, IDC_CHECK7, Profile->lpstAppRegData->bDrawNearCaret);
+				bSetCheckDlgButton(hDlg, IDC_CHECK8, Profile->lpstAppRegData->bEnableEPHelper);
 			}
 			{	// Track Bar
-				vSetTrackbar(hDlg, IDC_SLIDER1, 16, 64, 8, Profile->stAppRegData.iCursorSize, 8);
-				vSetTrackbar(hDlg, IDC_SLIDER2, 8, 64, 8, Profile->stAppRegData.iModeSize, 8);
-				vSetTrackbar(hDlg, IDC_SLIDER3, 100, 800, 70, Profile->stAppRegData.dwDisplayModeTime, 70);
-				vSetTrackbar(hDlg, IDC_SLIDER4, 0, 1000, 100, Profile->stAppRegData.dwWaitWaveTime, 100);
+				vSetTrackbar(hDlg, IDC_SLIDER1, 16, 64, 8, Profile->lpstAppRegData->iCursorSize, 8);
+				vSetTrackbar(hDlg, IDC_SLIDER2, 8, 64, 8, Profile->lpstAppRegData->iModeSize, 8);
+				vSetTrackbar(hDlg, IDC_SLIDER3, 100, 800, 70, Profile->lpstAppRegData->dwDisplayModeTime, 70);
+				vSetTrackbar(hDlg, IDC_SLIDER4, 0, 1000, 100, Profile->lpstAppRegData->dwWaitWaveTime, 100);
 				if (IsDlgButtonChecked(hDlg, IDC_CHECK3) == 0 && IsDlgButtonChecked(hDlg, IDC_CHECK4) == 0) {
 					EnableWindow(GetDlgItem(hDlg, IDC_SLIDER2), FALSE);	EnableWindow(GetDlgItem(hDlg, IDC_SLIDER3), FALSE);
 				}
@@ -284,7 +284,7 @@ static INT_PTR CALLBACK SettingDlg(HWND hDlg, UINT message, WPARAM wParam, LPARA
 				else EnableWindow(GetDlgItem(hDlg, IDC_SLIDER4), FALSE);
 			}
 			{	// 既定の動作
-				if (Profile->stAppRegData.bDisplayFocusWindowIME) {
+				if (Profile->lpstAppRegData->bDisplayFocusWindowIME) {
 					SendDlgItemMessage(hDlg, IDC_COMBO1, CB_SETCURSEL, 0, 0);
 					//EnableWindow(GetDlgItem(hDlg, IDC_CHECK2), TRUE);
 				}
@@ -364,24 +364,24 @@ static INT_PTR CALLBACK SettingDlg(HWND hDlg, UINT message, WPARAM wParam, LPARA
 				else EnableWindow(GetDlgItem(hDlg, IDC_SLIDER4), FALSE);
 				[[fallthrough]];						// fallthrough is explicit
 			case IDOK:
-				Profile->stAppRegData.bDisplayIMEModeOnCursor = bGetDlgButtonChecked(hDlg, IDC_CHECK1);
-				Profile->stAppRegData.bOffChangedFocus = bGetDlgButtonChecked(hDlg, IDC_CHECK2);
-				Profile->stAppRegData.bForceHiragana = bGetDlgButtonChecked(hDlg, IDC_CHECK3);
-				Profile->stAppRegData.bDoModeDispByIMEKeyDown = bGetDlgButtonChecked(hDlg, IDC_CHECK4);
-				Profile->stAppRegData.bDoModeDispByMouseBttnUp = bGetDlgButtonChecked(hDlg, IDC_CHECK5);
-				Profile->stAppRegData.bDoModeDispByCtrlUp = bGetDlgButtonChecked(hDlg, IDC_CHECK6);
-				Profile->stAppRegData.bDrawNearCaret = bGetDlgButtonChecked(hDlg, IDC_CHECK7);
-				Profile->stAppRegData.bEnableEPHelper = bGetDlgButtonChecked(hDlg, IDC_CHECK8);
-				Profile->stAppRegData.iCursorSize = (int)dwGetTrackbarPos(hDlg, IDC_SLIDER1);
-				Profile->stAppRegData.iModeSize = (int)dwGetTrackbarPos(hDlg, IDC_SLIDER2);
-				Profile->stAppRegData.dwDisplayModeTime = dwGetTrackbarPos(hDlg, IDC_SLIDER3);
-				Profile->stAppRegData.dwWaitWaveTime = dwGetTrackbarPos(hDlg, IDC_SLIDER4);
+				Profile->lpstAppRegData->bDisplayIMEModeOnCursor = bGetDlgButtonChecked(hDlg, IDC_CHECK1);
+				Profile->lpstAppRegData->bOffChangedFocus = bGetDlgButtonChecked(hDlg, IDC_CHECK2);
+				Profile->lpstAppRegData->bForceHiragana = bGetDlgButtonChecked(hDlg, IDC_CHECK3);
+				Profile->lpstAppRegData->bDoModeDispByIMEKeyDown = bGetDlgButtonChecked(hDlg, IDC_CHECK4);
+				Profile->lpstAppRegData->bDoModeDispByMouseBttnUp = bGetDlgButtonChecked(hDlg, IDC_CHECK5);
+				Profile->lpstAppRegData->bDoModeDispByCtrlUp = bGetDlgButtonChecked(hDlg, IDC_CHECK6);
+				Profile->lpstAppRegData->bDrawNearCaret = bGetDlgButtonChecked(hDlg, IDC_CHECK7);
+				Profile->lpstAppRegData->bEnableEPHelper = bGetDlgButtonChecked(hDlg, IDC_CHECK8);
+				Profile->lpstAppRegData->iCursorSize = (int)dwGetTrackbarPos(hDlg, IDC_SLIDER1);
+				Profile->lpstAppRegData->iModeSize = (int)dwGetTrackbarPos(hDlg, IDC_SLIDER2);
+				Profile->lpstAppRegData->dwDisplayModeTime = dwGetTrackbarPos(hDlg, IDC_SLIDER3);
+				Profile->lpstAppRegData->dwWaitWaveTime = dwGetTrackbarPos(hDlg, IDC_SLIDER4);
 				switch (SendDlgItemMessage(hDlg, IDC_COMBO1, CB_GETCURSEL, 0, 0)) {
 					case 0:
-						Profile->stAppRegData.bDisplayFocusWindowIME = TRUE;
+						Profile->lpstAppRegData->bDisplayFocusWindowIME = TRUE;
 						break;
 					case 1:
-						Profile->stAppRegData.bDisplayFocusWindowIME = FALSE;
+						Profile->lpstAppRegData->bDisplayFocusWindowIME = FALSE;
 						break;
 					default:
 						break;
@@ -389,8 +389,8 @@ static INT_PTR CALLBACK SettingDlg(HWND hDlg, UINT message, WPARAM wParam, LPARA
 				if (Profile != NULL) {
 					Profile->bSetProfileData();								// Set Registry data
 				}
-				vStopThredHookTimer(hMainWnd);
-				if (!bStartThredHookTimer(hMainWnd)) {
+				vStopThreadHookTimer(hMainWnd);
+				if (!bStartThreadHookTimer(hMainWnd)) {
 					PostMessage(hMainWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 					return (INT_PTR)FALSE;
 				}
@@ -476,17 +476,16 @@ static DWORD		dwGetTrackbarPos(HWND hDlg, int iIDTrackbar)
 //
 VOID			vGetSetProfileData()
 {
-	bDisplayIMEModeOnCursor = Profile->stAppRegData.bDisplayIMEModeOnCursor;
-	bOffChangedFocus = Profile->stAppRegData.bOffChangedFocus;
-	bDisplayFocusWindowIME = Profile->stAppRegData.bDisplayFocusWindowIME;
-	bDoModeDispByIMEKeyDown = Profile->stAppRegData.bDoModeDispByIMEKeyDown;
-	bDoModeDispByMouseBttnUp = Profile->stAppRegData.bDoModeDispByMouseBttnUp;
-	bDoModeDispByCtrlUp = Profile->stAppRegData.bDoModeDispByCtrlUp;
-	bOffChangedFocus = Profile->stAppRegData.bOffChangedFocus;
-	bDrawNearCaret = Profile->stAppRegData.bDrawNearCaret;
-	bEnableEPHelper = Profile->stAppRegData.bEnableEPHelper;
-	bMoveIMEToolbar = Profile->stAppRegData.bMoveIMEToolbar;
-	bIMEModeForced = Profile->stAppRegData.bIMEModeForced;
+	bDisplayIMEModeOnCursor = Profile->lpstAppRegData->bDisplayIMEModeOnCursor;
+	bOffChangedFocus = Profile->lpstAppRegData->bOffChangedFocus;
+	bDisplayFocusWindowIME = Profile->lpstAppRegData->bDisplayFocusWindowIME;
+	bDoModeDispByIMEKeyDown = Profile->lpstAppRegData->bDoModeDispByIMEKeyDown;
+	bDoModeDispByMouseBttnUp = Profile->lpstAppRegData->bDoModeDispByMouseBttnUp;
+	bDoModeDispByCtrlUp = Profile->lpstAppRegData->bDoModeDispByCtrlUp;
+	bDrawNearCaret = Profile->lpstAppRegData->bDrawNearCaret;
+	bEnableEPHelper = Profile->lpstAppRegData->bEnableEPHelper;
+	bMoveIMEToolbar = Profile->lpstAppRegData->bMoveIMEToolbar;
+	bIMEModeForced = Profile->lpstAppRegData->bIMEModeForced;
 }
 
 //
@@ -528,7 +527,7 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 	UNREFERENCED_PARAMETER(lpSetting);
 	switch (Type) {
 	case PBT_APMSUSPEND:
-		vStopThredHookTimer(hWnd);
+		vStopThreadHookTimer(hWnd);
 		bReportEvent(MSG_PBT_APMSUSPEND, POWERNOTIFICATION_CATEGORY);
 		bReportEvent(MSG_THREAD_HOOK_TIMER_STOPPED, POWERNOTIFICATION_CATEGORY);
 		break;
@@ -537,7 +536,7 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 		break;
 	case PBT_APMRESUMESUSPEND:
 		vGetSetProfileData();
-		if (!bStartThredHookTimer(hWnd)) {
+		if (!bStartThreadHookTimer(hWnd)) {
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		}
 		bReportEvent(MSG_THREAD_HOOK_TIMER_STARTED, POWERNOTIFICATION_CATEGORY);
@@ -548,9 +547,9 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 		break;
 	case PBT_APMPOWERSTATUSCHANGE:
 		bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE, POWERNOTIFICATION_CATEGORY);	
-		SYSTEM_POWER_STATUS	PoworStatus{};
-		if (GetSystemPowerStatus(&PoworStatus)) {
-			switch (PoworStatus.ACLineStatus) {
+		SYSTEM_POWER_STATUS	PowerStatus{};
+		if (GetSystemPowerStatus(&PowerStatus)) {
+			switch (PowerStatus.ACLineStatus) {
 			case 0:
 				bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_OFF, POWERNOTIFICATION_CATEGORY);
 				bDestroyTaskTrayWindow(hWnd);
@@ -663,7 +662,7 @@ void CALLBACK CEventHook::vHandleEvent(HWINEVENTHOOK hook, DWORD dwEvent, HWND h
 	if (hWnd == NULL)	return;
 	if (dwEvent == EVENT_SYSTEM_FOREGROUND) {
 		bIMEInConverting = FALSE;
-		HWND	hFindWnd = FindWindow(_T("FLUSHMOUSE"), NULL);
+		HWND	hFindWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
 		if (hFindWnd != NULL) {
 			PostMessage(hFindWnd, WM_EVENT_SYSTEM_FOREGROUNDEX, (WPARAM)dwEvent, (LPARAM)hWnd);
 		}
@@ -718,11 +717,10 @@ CFlushMouseHook::~CFlushMouseHook()
 //
 BOOL			CFlushMouseHook::bHookSet(HWND hWnd, LPCTSTR lpszDll64Name, LPCTSTR lpszExec32Name)
 {
-	if (bHook64DllLoad(lpszDll64Name) != FALSE) {
-		if ((bGlobalHook64 = bGlobalHookSet(hWnd)) != FALSE) {
-			if ((bHook32Dll = bHook32DllStart(hWnd, lpszExec32Name)) != FALSE) {
-				return TRUE;
-			}
+	UNREFERENCED_PARAMETER(lpszDll64Name);
+	if ((bGlobalHook64 = bGlobalHookSet(hWnd)) != FALSE) {
+		if ((bHook32Dll = bHook32DllStart(hWnd, lpszExec32Name)) != FALSE) {
+			return TRUE;
 		}
 	}
 	bHookUnset();
@@ -736,7 +734,6 @@ BOOL		CFlushMouseHook::bHookUnset()
 {
 	if (bHook32Dll)			bHook32DllStop();
 	if (bGlobalHook64)		bGlobalHookUnset();
-	if (hHook64Dll != NULL)	bHook64DllUnload();
 	return TRUE;
 }
 

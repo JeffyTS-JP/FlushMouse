@@ -48,7 +48,6 @@
 //
 // Hook
 TCHAR		szTitle[MAX_LOADSTRING]{};					// タイトル バーのテキスト
-TCHAR		szWindowClass[MAX_LOADSTRING]{};			// メイン ウィンドウ クラス名
 HWND		hMainWnd = NULL;
 
 CProfile	* Profile = NULL;							// Profile class
@@ -87,8 +86,7 @@ static UINT_PTR	uCheckProcTimer = NULL;
 // Hook
 static CFlushMouseHook* FlushMouseHook = NULL;
 
-// Event Handller for Focus
-// Event Handller
+// Event Handler
 static CEventHook* EventHook = NULL;
 
 // for PowerNotification
@@ -121,7 +119,7 @@ static void		Cls_OnLButtonDownEx(HWND hWnd, int x, int y, HWND hForeground);
 static void		Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground);
 static void		Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flags);
 static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd);
-static void		Cls_OnCheckIMEStartConversioningEx(HWND hWnd, BOOL bStartConversioning, DWORD vkCode);
+static void		Cls_OnCheckIMEStartConvertingEx(HWND hWnd, BOOL bStartConversioning, DWORD vkCode);
 
 // Sub
 static BOOL		bSendInputSub(UINT cInputs, LPINPUT pInputs);
@@ -139,7 +137,6 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance)
 	SetUnhandledExceptionFilter(&lExceptionFilter);
 
 	if (LoadString(Resource->hLoad(), IDS_APP_TITLE, szTitle, MAX_LOADSTRING) == 0) return FALSE;
-	if (LoadString(Resource->hLoad(), IDC_FLUSHMOUSE, szWindowClass, MAX_LOADSTRING) == 0) return FALSE;
 
 	// Set Thread DPI Awareness V2 for High DPI
 	SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
@@ -153,12 +150,12 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance)
 
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK)
 	HWND	    hWnd = NULL;
-	if ((hWnd = FindWindow(szWindowClass, NULL)) != NULL) {
+	if ((hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL)) != NULL) {
 		SetFocus(GetLastActivePopup(hWnd));
 		PostMessage(hWnd, WM_DESTROY, NULL, NULL);
 		for (int i = 3; i > 0; i--) {
 			Sleep(500);	
-			if (FindWindow(szWindowClass, NULL) != NULL) {
+			if (FindWindow(CLASS_FLUSHMOUSE, NULL) != NULL) {
 				if (i == 1) {
 					vMessageBox(NULL, IDS_ALREADYRUN, MessageBoxTYPE);
 					if (Resource != NULL) {
@@ -198,7 +195,7 @@ static ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);								// マウスカーソルハンドル
 	wcex.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);               // ウィンドウ背景色
 	wcex.lpszMenuName = MAKEINTRESOURCE(IDC_FLUSHMOUSE);                    // デフォルトメニュー名
-	wcex.lpszClassName = szWindowClass;                                     // このウインドウクラスにつける名前
+	wcex.lpszClassName = CLASS_FLUSHMOUSE;                                  // このウインドウクラスにつける名前
 	wcex.hIconSm = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_SMALL));	// 16×16の小さいサイズのアイコン
 
 	return RegisterClassEx(&wcex);
@@ -215,7 +212,7 @@ static HWND InitInstance(HINSTANCE hInstance, int nCmdShow)
 	HWND		hWnd = NULL;						// メインウィンドウのハンドル
 	hWnd = CreateWindowEx(
 					WS_EX_TOOLWINDOW,				// Tool Bar Window
-					szWindowClass,					// RegisterClass()呼び出しを参照
+					CLASS_FLUSHMOUSE,				// RegisterClass()呼び出しを参照
 					szTitle,						// Title barのテキスト
 					WINDOWSTYLE,					// Window style
 					0, 0,							// 水平・垂直位置
@@ -254,7 +251,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		HANDLE_MSG(hWnd, WM_TASKTRAYEX, Cls_OnTaskTrayEx);
 		HANDLE_MSG(hWnd, WM_POWERBROADCAST, Cls_OnPowerBroadcast);
 		HANDLE_MSG(hWnd, WM_EVENT_SYSTEM_FOREGROUNDEX, Cls_OnEventForegroundEx);
-		HANDLE_MSG(hWnd, WM_CHECKIMESTARTCONVEX, Cls_OnCheckIMEStartConversioningEx);
+		HANDLE_MSG(hWnd, WM_CHECKIMESTARTCONVEX, Cls_OnCheckIMEStartConvertingEx);
 
 	default:
 		if (!bReCreateTaskTrayWindow(hWnd, message)) {
@@ -309,7 +306,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		return FALSE;
 	}
 
-	if (!bStartThredHookTimer(hWnd)) {
+	if (!bStartThreadHookTimer(hWnd)) {
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		return FALSE;
 	}
@@ -326,7 +323,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 static void Cls_OnDestroy(HWND hWnd)
 {
 
-	vStopThredHookTimer(hWnd);
+	vStopThreadHookTimer(hWnd);
 
 	EXCEPTION_POINTERS ExceptionInfo{};
 	lExceptionFilter(&ExceptionInfo);
@@ -416,7 +413,7 @@ static void	Cls_OnDisplayChange(HWND hWnd, UINT bitsPerPixel, UINT cxScreen, UIN
 	UNREFERENCED_PARAMETER(bitsPerPixel);
 	UNREFERENCED_PARAMETER(cxScreen);
 	UNREFERENCED_PARAMETER(cyScreen);
-	if (!Cime->bGetVertialDesktopSize()) {
+	if (!Cime->bGetVirtualDesktopSize()) {
 	}
 }
 
@@ -434,7 +431,7 @@ static void Cls_OnLButtonDownEx(HWND hWnd, int x, int y, HWND hForeground)
 		POINT	pt{};
 		if (GetCursorPos(&pt)) {
 			RECT	rc{};
-			if (bGetTaskTrayWindowRect(hWnd, &rc) == FALSE)	return;	// error
+			if (bGetTaskTrayWindowRect(hWnd, &rc) == FALSE)	return;
 			if (((pt.x >= rc.left) && (pt.x <= rc.right)) || ((pt.y <= rc.top) && (pt.y >= rc.bottom)))	return;
 		}
 		bForExplorerPatcherSWS(hForeground, FALSE, NULL, NULL);
@@ -519,9 +516,9 @@ static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd)
 
 //
 // WM_CHECKIMESTARTCONVEX
-// Cls_OnCheckIMEStartConversioningEx()
+// Cls_OnCheckIMEStartConvertingEx()
 //
-static void		Cls_OnCheckIMEStartConversioningEx(HWND hWnd, BOOL bStartConversioning, DWORD vkCode)
+static void		Cls_OnCheckIMEStartConvertingEx(HWND hWnd, BOOL bStartConverting, DWORD vkCode)
 {
 	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(vkCode);
@@ -533,13 +530,13 @@ static void		Cls_OnCheckIMEStartConversioningEx(HWND hWnd, BOOL bStartConversion
 			hWndObserved = WindowFromPoint(pt);
 		}
 	}
-	if (Cime->dwIMEMode(hWndObserved, FALSE) != IMEOFF)	bIMEInConverting = bStartConversioning;
+	if (Cime->dwIMEMode(hWndObserved, FALSE) != IMEOFF)	bIMEInConverting = bStartConverting;
 	else												bIMEInConverting = FALSE;
 }
 
 //
 // WM_SYSKEYDOWNEX
-// Cls_OnSyskeDownUpEx()
+// Cls_OnSysKeyDownUpEx()
 //
 static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flags)
 {
@@ -763,13 +760,13 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 	else {
 		POINT	pt{};
 		if (GetCursorPos(&pt)) {
-			if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return; // error
+			if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return;
 		}
 	}
 	if (Cursor->bStartIMECursorChangeThread(hWndObserved)) {
 		if (bDoModeDispByIMEKeyDown) {
 			if (!bIMEInConverting) {
-				if (!Cursor->bStartDrawIMEModeThread(hWndObserved))	return;			// error
+				if (!Cursor->bStartDrawIMEModeThread(hWndObserved))	return;
 			}
 		}
 	}
@@ -893,7 +890,7 @@ BOOL		bCheckExistingJPIME()
 			delete[]	lpHKL;
 		}
 	}
-	HWND	hWnd = FindWindow(_T("FLUSHMOUSE32"), NULL);
+	HWND	hWnd = FindWindow(CLASS_FLUSHMOUSE32, NULL);
 	if (hWnd != NULL)	PostMessage(hWnd, WM_CHECKEXISTINGJPIMEEX, (WPARAM)bRet, (LPARAM)NULL);
 	return bRet;
 }
@@ -923,9 +920,9 @@ static LONG WINAPI lExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo)
 }
 
 //
-// bStartThredHookTimer()
+// bStartThreadHookTimer()
 //
-BOOL		bStartThredHookTimer(HWND hWnd)
+BOOL		bStartThreadHookTimer(HWND hWnd)
 {
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK)
 	
@@ -978,7 +975,7 @@ BOOL		bStartThredHookTimer(HWND hWnd)
 		return FALSE;
 	}
 
-	// Set Event Handller
+	// Set Event Handler
 	if (EventHook == NULL) {
 		EventHook = new CEventHook;
 		if (!EventHook->bEventSet()) {
@@ -987,13 +984,24 @@ BOOL		bStartThredHookTimer(HWND hWnd)
 			return FALSE;
 		}
 	}
+
+	HWND	hFindWnd = FindWindow(CLASS_FLUSHMOUSE32, NULL);
+	if (hFindWnd != NULL) {
+		if (bEnableEPHelper) {
+			PostMessage(hFindWnd, WM_CHECKEXISTINGJPIMEEX, (WPARAM)bEnableEPHelper, (LPARAM)NULL);
+		}
+		else {
+			PostMessage(hFindWnd, WM_CHECKEXISTINGJPIMEEX, (WPARAM)FALSE, (LPARAM)NULL);
+		}
+	}
+
 	return TRUE;
 }
 
 //
-// vStopThredHookTimer()
+// vStopThreadHookTimer()
 //
-VOID		vStopThredHookTimer(HWND hWnd)
+VOID		vStopThreadHookTimer(HWND hWnd)
 {
 	bDisplayIMEModeOnCursor = FALSE;
 	bDoModeDispByMouseBttnUp = FALSE;
@@ -1061,7 +1069,7 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 	UNREFERENCED_PARAMETER(dwTime);
 
 	if (uTimerID == nCheckProcTimerID) {
-		if (FindWindow(_T("FLUSHMOUSE32"), NULL) == NULL) {
+		if (FindWindow(CLASS_FLUSHMOUSE32, NULL) == NULL) {
 			bReportEvent(MSG_RESTART_EVENT, APPLICATION_CATEGORY);			// 再起動する
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);		// Quit
 		}

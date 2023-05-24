@@ -10,6 +10,7 @@
 // Include
 //
 #pragma once
+#include "pch.h"
 
 //
 // Define
@@ -33,7 +34,8 @@ typedef struct tagTHREAD_DATA {
 //
 // Class Define
 //
-// Thred
+// CThread
+//
 class CThread
 {
 public:

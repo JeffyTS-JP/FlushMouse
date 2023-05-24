@@ -73,7 +73,7 @@ typedef struct tagMOUSECURSOR {
 	DWORD		id;								// OCR_xxx
 	UINT		uResourceID;					// Resource ID
 	BOOL		bReadReg;						// TRUE = Read from Registry
-	TCHAR		szRegValue[MAX_LOADSTRING];		// Registory Value
+	TCHAR		szRegValue[MAX_LOADSTRING];		// Registry Value
 	TCHAR		szFile[_MAX_PATH];				// Cursor File Name
 } MOUSECURSOR, * PMOUSECURSOR, * LPMOUSECURSOR;
 
@@ -82,12 +82,12 @@ typedef struct tagFLUSHMOUSECURSOR {
 	TCHAR		szMode[IMEMODECHAR];			// Mode Display Char
 	MOUSECURSOR	stArrow;						// Arrow MOUSECURSOR
 	MOUSECURSOR	stHand;							// Hand MOUSECURSOR
-	MOUSECURSOR	stIbeam;						// Ibeam MOUSECURSOR
+	MOUSECURSOR	stIBeam;						// IBeam MOUSECURSOR
 } FLUSHMOUSECURSOR, * PFLUSHMOUSECURSOR, * LPFLUSHMOUSECURSOR;
 
 typedef struct tagIMECursorData
 {
-	// Use in Curosr
+	// Use in Cursor
 	HWND		hWndObserved;
 	DWORD		dwIMEModeCursor;
 	BOOL		bDrawIMEModeWait;
@@ -111,11 +111,11 @@ typedef struct tagIMECursorData
 	BOOL		bDisplayFocusWindowIME;
 } IMECURSORDATA, * PIMECURSORDATA, * LPIMECURSORDATA;
 
-typedef struct tagVertialDesktop
+typedef struct tagVirtualDesktop
 {
 	RECT	rcMonitorSize;
 	int		iNumOfMonitors;
-} VERTIALDESKTOP, * PVERTIALDESKTOP, * LPVERTIALDESKTOP;
+} VIRTUALDESKTOP, * PVIRTUALDESKTOP, * LPVIRTUALDESKTOP;
 
 //
 // Class CCursorWindow
@@ -167,19 +167,19 @@ public:
 	DWORD			dwIMEMode(HWND hWndObserved, BOOL bForceHiragana);
 	VOID			vActivateIME(HWND hWndObserved);
 	BOOL			bMoveIMEToolbar();
-	BOOL			bGetVertialDesktopSize();
+	BOOL			bGetVirtualDesktopSize();
 	BOOL			bIsNewIME();
 
 private:
-	BOOL			bExsistIMEToolbar();
-	static BOOL 	bGetVertialDesktopSizeEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam);
+	BOOL			bExistIMEToolbar();
+	static BOOL 	bGetVirtualDesktopSizeEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam);
 
 	static BOOL CALLBACK bEnumChildProcIMEOpenClose(HWND hWnd, LPARAM lParam);
-	static BOOL CALLBACK bEnumChildProcIMECnvertMode(HWND hWnd, LPARAM lParam);
+	static BOOL CALLBACK bEnumChildProcIMEConvertMode(HWND hWnd, LPARAM lParam);
 	static BOOL CALLBACK bEnumChildProcActivateIME(HWND hWnd, LPARAM lParam);
 
 private:
-	LPVERTIALDESKTOP	lpstVertialDesktop;
+	LPVIRTUALDESKTOP	lpstVirtualDesktop;
 };
 
 //
@@ -263,25 +263,25 @@ private:
 	FLUSHMOUSECURSOR	stFlushMouseCursor[sizeof(FLUSHMOUSECURSOR) * 7] = {
 		{ IMEOFF,			_T("A"),	{OCR_NORMAL, IDC_IMEOFF_ARROW,		  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeOffArrow.cur")},
 										{OCR_HAND,   IDC_IMEOFF_HAND,		  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeOffHand.cur")},
-										{OCR_IBEAM,  IDC_IMEOFF_IBEAM,		  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeOffIbeam.cur")}},
+										{OCR_IBEAM,  IDC_IMEOFF_IBEAM,		  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeOffIBeam.cur")}},
 		{ ZENHIRA_IMEON,	_T("あ"),	{OCR_NORMAL, IDC_ZENHIRA_IMEON_ARROW, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenHiraOnArrow.cur")},
 										{OCR_HAND,   IDC_ZENHIRA_IMEON_HAND,  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenHiraOnHand.cur")},
-										{OCR_IBEAM,  IDC_ZENHIRA_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenHiraOnIbeam.cur")}},
+										{OCR_IBEAM,  IDC_ZENHIRA_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenHiraOnIBeam.cur")}},
 		{ HANEISU_IMEON,	_T("_A"),	{OCR_NORMAL, IDC_HANEISU_IMEON_ARROW, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHanEisuOnArrow.cur")},
 										{OCR_HAND,   IDC_HANEISU_IMEON_HAND,  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHanEisuOnHand.cur")},
-										{OCR_IBEAM,  IDC_HANEISU_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHanEisuOnIbeam.cur")}},
+										{OCR_IBEAM,  IDC_HANEISU_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHanEisuOnIBeam.cur")}},
 		{ HANKANA_IMEON,	_T("_ｱ"),	{OCR_NORMAL, IDC_HANKANA_IMEON_ARROW, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHanKanaOnArrow.cur")},
 										{OCR_HAND,   IDC_HANKANA_IMEON_HAND,  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHanKanaOnHand.cur")},
-										{OCR_IBEAM,  IDC_HANKANA_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHanKanaOnIbeam.cur")}},
+										{OCR_IBEAM,  IDC_HANKANA_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHanKanaOnIBeam.cur")}},
 		{ ZENEISU_IMEON,	_T("Ａ"),	{OCR_NORMAL, IDC_ZENEISU_IMEON_ARROW, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenEisuOnArrow.cur")},
 										{OCR_HAND,   IDC_ZENEISU_IMEON_HAND,  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenEisuOnHand.cur")},
-										{OCR_IBEAM,  IDC_ZENEISU_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenEisuOnIbeam.cur")}},
+										{OCR_IBEAM,  IDC_ZENEISU_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenEisuOnIBeam.cur")}},
 		{ ZENKANA_IMEON,	_T("ア"),	{OCR_NORMAL, IDC_ZENKANA_IMEON_ARROW, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenKanaOnArrow.cur")},
 										{OCR_HAND,   IDC_ZENKANA_IMEON_HAND,  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenKanaOnHand.cur")},
-										{OCR_IBEAM,  IDC_ZENKANA_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenKanaOnIbeam.cur")}},
+										{OCR_IBEAM,  IDC_ZENKANA_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenKanaOnIBeam.cur")}},
 		{ IMEHIDE,			_T(""),		{OCR_NORMAL, IDC_HIDE_ARROW,          FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHideOnArrow.cur")},
 										{OCR_HAND,   IDC_HIDE_HAND,           FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHideOnHand.cur")},
-										{OCR_IBEAM,  IDC_HIDE_IBEAM,          FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHideOnIbeam.cur")}},
+										{OCR_IBEAM,  IDC_HIDE_IBEAM,          FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHideOnIBeam.cur")}},
 		{ (UINT)(-1),		_T(""),		{0,			 0,						  FALSE, _T(""), _T("")},		// Terminater
 										{0,			 0,						  FALSE, _T(""), _T("")},		// Terminater
 										{0,			 0,						  FALSE, _T(""), _T("")} }		// Terminater
