@@ -10,19 +10,32 @@
 // Include
 //
 #pragma once
+#include "pch.h"
 
 //
 // Define
 //
 
 //
-// Global Prototype Define
+// Class CSharedMemory
 //
-extern BOOL		bSharedMemoryCreate(HANDLE handle, LPCTSTR szSharedMemoryName, DWORD dwDataByteSize);
-extern BOOL		bSharedMemoryDelete(LPCTSTR szSharedMemoryName);
-extern LPVOID	lpvSharedMemoryOpen(LPCTSTR szSharedMemoryName, DWORD dwDataByteSize);
-extern BOOL		bSharedMemoryClose(LPVOID lpvSharedMem);
-extern BOOL		bSharedMemoryRead(LPCTSTR szSharedMemoryName, LPBYTE lpbSharedData, DWORD dwSharedDataByteSize);
-extern BOOL		bSharedMemoryWrite(LPCTSTR szSharedMemoryName, LPBYTE lpbSharedData, DWORD dwSharedDataByteSize);
+class CSharedMemory
+{
+public:
+	CSharedMemory(LPCTSTR szSharedMemoryName, DWORD dwDataSize);
+	~CSharedMemory();
+
+public:
+	LPVOID	lpvSharedMemoryRead();
+	BOOL	bSharedMemoryWrite(LPVOID lpSharedData);
+
+private:
+	BOOL		bSharedMemoryClose(LPVOID lpvSharedMem);
+
+private:
+	HANDLE	hSharedMem;
+	LPTSTR	lpszSharedMemoryName;
+	DWORD	dwDataByteSize;
+};
 
 /* EOF */

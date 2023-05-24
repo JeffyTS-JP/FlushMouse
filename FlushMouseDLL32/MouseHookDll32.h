@@ -20,7 +20,6 @@
 typedef struct tagMOUSE_SHAREDMEM32 {
 	HWND    hWnd;
 	HHOOK	hHook;
-	HWND    hForeground;
 } MOUSE_SHAREDMEM32, * PMOUSE_SHAREDMEM32, * LPMOUSE_SHAREDMEM32;
 
 //

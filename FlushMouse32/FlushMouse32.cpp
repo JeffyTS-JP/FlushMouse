@@ -48,7 +48,7 @@ static UINT_PTR	uCheckProcTimer = NULL;
 // Local Data
 //
 static TCHAR		szTitle[MAX_LOADSTRING]{};			// タイトル バーのテキスト
-static TCHAR		szWindowClass[MAX_LOADSTRING]{};	// メイン ウィンドウ クラス名
+static TCHAR		szWindowClass[]{ CLASS_FLUSHMOUSE32 };	// メイン ウィンドウ クラス名
 static HINSTANCE	hInst = NULL;						// 現在のインターフェイス
 static HWND			hParentWnd = NULL;					// 親のWindow Handle
 
@@ -98,14 +98,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		unsigned long long ll = 0;
 		if ((ll = _tstoll(lpCmdLine)) == 0) return (-1);
 		hParentWnd = (HWND)ll;
-		if (hParentWnd != FindWindow(_T("FLUSHMOUSE"), NULL)) {	// 渡された値をチェック
+		if (hParentWnd != FindWindow(CLASS_FLUSHMOUSE, NULL)) {	// 渡された値をチェック
 			vMessageBox(NULL, IDS_NOTFORKBY64, MessageBoxTYPE);	// 不正起動のためメッセージを表示
 			return (-1);
 		}
 	}
 
 	if (LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING) == 0) return (-1);
-	if (LoadString(hInstance, IDC_FLUSHMOUSE32, szWindowClass, MAX_LOADSTRING) == 0) return (-1);
 
 	if (!hPrevInstance) {						                // ほかのインスタンスが実行中か?
 		if (!MyRegisterClass(hInstance)) {		                // 共通の初期化処理
@@ -288,7 +287,7 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 	UNREFERENCED_PARAMETER(dwTime);
 
 	if (uTimerID == nCheckProcTimerID) {
-		if (FindWindow(_T("FLUSHMOUSE"), NULL) == NULL) {
+		if (FindWindow(CLASS_FLUSHMOUSE, NULL) == NULL) {
 			NOTIFYICONDATA nIco{};
 			nIco.cbSize = sizeof(NOTIFYICONDATA);
 			nIco.hWnd = hParentWnd;

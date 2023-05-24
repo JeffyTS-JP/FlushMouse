@@ -13,6 +13,11 @@
 #include "..\MISCLIB\DLLDefs.h"
 
 //
+// Global Data
+//
+extern UINT			WM_HOOKEX;
+
+//
 // Global Prototype Define
 //
 BOOL APIENTRY	DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved);
