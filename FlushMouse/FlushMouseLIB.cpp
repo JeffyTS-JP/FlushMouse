@@ -48,7 +48,6 @@
 //
 // Hook
 TCHAR		szTitle[MAX_LOADSTRING]{};					// タイトル バーのテキスト
-TCHAR		szWindowClass[]{ CLASS_FLUSHMOUSE };		// メイン ウィンドウ クラス名
 HWND		hMainWnd = NULL;
 
 CProfile	* Profile = NULL;							// Profile class
@@ -151,12 +150,12 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance)
 
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK)
 	HWND	    hWnd = NULL;
-	if ((hWnd = FindWindow(szWindowClass, NULL)) != NULL) {
+	if ((hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL)) != NULL) {
 		SetFocus(GetLastActivePopup(hWnd));
 		PostMessage(hWnd, WM_DESTROY, NULL, NULL);
 		for (int i = 3; i > 0; i--) {
 			Sleep(500);	
-			if (FindWindow(szWindowClass, NULL) != NULL) {
+			if (FindWindow(CLASS_FLUSHMOUSE, NULL) != NULL) {
 				if (i == 1) {
 					vMessageBox(NULL, IDS_ALREADYRUN, MessageBoxTYPE);
 					if (Resource != NULL) {
@@ -196,7 +195,7 @@ static ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);								// マウスカーソルハンドル
 	wcex.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);               // ウィンドウ背景色
 	wcex.lpszMenuName = MAKEINTRESOURCE(IDC_FLUSHMOUSE);                    // デフォルトメニュー名
-	wcex.lpszClassName = szWindowClass;                                     // このウインドウクラスにつける名前
+	wcex.lpszClassName = CLASS_FLUSHMOUSE;                                  // このウインドウクラスにつける名前
 	wcex.hIconSm = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_SMALL));	// 16×16の小さいサイズのアイコン
 
 	return RegisterClassEx(&wcex);
@@ -213,7 +212,7 @@ static HWND InitInstance(HINSTANCE hInstance, int nCmdShow)
 	HWND		hWnd = NULL;						// メインウィンドウのハンドル
 	hWnd = CreateWindowEx(
 					WS_EX_TOOLWINDOW,				// Tool Bar Window
-					szWindowClass,					// RegisterClass()呼び出しを参照
+					CLASS_FLUSHMOUSE,				// RegisterClass()呼び出しを参照
 					szTitle,						// Title barのテキスト
 					WINDOWSTYLE,					// Window style
 					0, 0,							// 水平・垂直位置

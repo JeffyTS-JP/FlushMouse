@@ -133,19 +133,8 @@ void CALLBACK CEventHookDll::vHandleEvent(HWINEVENTHOOK hook, DWORD dwEvent, HWN
 	UNREFERENCED_PARAMETER(dwEventThread);
 	UNREFERENCED_PARAMETER(dwmsEventTime);
 
-#ifdef _DEBUG
-	if ((dwEvent == EVENT_SYSTEM_FOREGROUND) || (dwEvent == EVENT_OBJECT_FOCUS)) {
-		//DBvPrintf(_T("vHandleEvent1 : event = 0x%08x hook = 0x%08x  idChild = 0x%08x\n"), dwEvent, hook, idChild);
-		//DBvPrintf(_T("vHandleEvent2 : hWnd = 0x%08x GetForegroundWindow = 0x%08x idObject = 0x%08x\n"), hWnd, GetForegroundWindow(), idObject);
-		//DBvPrintf(_T("vHandleEvent3 : dwEventThread = 0x%08x dwmsEventTime = 0x%08x\n"), dwEventThread, dwmsEventTime);
-	}
-#endif // _DEBUG
-
 	if (dwEvent == EVENT_SYSTEM_FOREGROUND) {
-		HWND	hFindWnd = FindWindow(_T("FLUSHMOUSE"), NULL);
-#ifdef _DEBUG
-		DBvPrintf(_T("vHandleEvent : event = 0x%08x hFindWnd = 0x%08x hWnd = 0x%08x GetForegroundWindow = 0x%08x\n"), dwEvent, hFindWnd, hWnd, GetForegroundWindow());
-#endif // _DEBUG
+		HWND	hFindWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
 		if (hFindWnd != NULL) {
 			PostMessage(hFindWnd, WM_EVENT_SYSTEM_FOREGROUND, (WPARAM)dwEvent, (LPARAM)hWnd);
 		}
@@ -164,12 +153,6 @@ void CALLBACK CEventHookDll::vHandleEventIME(HWINEVENTHOOK hook, DWORD dwEvent, 
 	UNREFERENCED_PARAMETER(dwEventThread);
 	UNREFERENCED_PARAMETER(dwmsEventTime);
 
-#ifdef _DEBUG
-	//DBvPrintf(_T("vHandleEventIME1 : event = 0x%08x hook = 0x%08x  idChild = 0x%08x\n"), dwEvent, hook, idChild);
-	//DBvPrintf(_T("vHandleEventIME2 : hWnd = 0x%08x GetForegroundWindow = 0x%08x idObject = 0x%08x\n"), hWnd, GetForegroundWindow(), idObject);
-	//DBvPrintf(_T("vHandleEventIME3 : dwEventThread = 0x%08x dwmsEventTime = 0x%08x\n"), dwEventThread, dwmsEventTime);
-#endif // _DEBUG
-
 	switch (dwEvent) {
 		case EVENT_OBJECT_CLOAKED:
 		case EVENT_OBJECT_IME_HIDE:
@@ -177,33 +160,13 @@ void CALLBACK CEventHookDll::vHandleEventIME(HWINEVENTHOOK hook, DWORD dwEvent, 
 			break;
 		case EVENT_OBJECT_UNCLOAKED:
 		case EVENT_OBJECT_IME_SHOW:
-		/*
-		{
-			HWND	hFindWnd = FindWindow(_T("FLUSHMOUSE"), NULL);
-			if (hFindWnd != NULL) {
-				PostMessage(hFindWnd, WM_EVENT_OBJECT_IME_INCONVERSION, (WPARAM)dwEvent, (LPARAM)0);
-			}
-		}
-		*/
 			bIMEInConversion = TRUE;
 			break;
 		case EVENT_OBJECT_IME_CHANGE:
-#ifdef _DEBUG
-			DBvPrintf(_T("EVENT_OBJECT_IME_CHANGE\n"));
-#endif // _DEBUG
-			break;
 		case EVENT_OBJECT_TEXTEDIT_CONVERSIONTARGETCHANGED:
-#ifdef _DEBUG
-			DBvPrintf(_T("EVENT_OBJECT_TEXTEDIT_CONVERSIONTARGETCHANGED\n"));
-#endif // _DEBUG
-			break;
 		case EVENT_OBJECT_TEXTSELECTIONCHANGED:
 		case EVENT_OBJECT_LIVEREGIONCHANGED:
-			break;
 		default:
-	#ifdef _DEBUG
-			DBvPrintf(_T("Unkown event = 0x%08x\n"), dwEvent);
-	#endif // _DEBUG
 			return;
 	}
 }

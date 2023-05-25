@@ -57,7 +57,6 @@ extern TCHAR		szFlushMouse64[];
 extern TCHAR		szFlushMouse32[];
 
 extern TCHAR		szTitle[];
-extern TCHAR		szWindowClass[];
 extern HWND			hMainWnd;
 
 extern BOOL			bOffChangedFocus;

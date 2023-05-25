@@ -119,13 +119,10 @@ BOOL CALLBACK CIME::bEnumChildProcIMEOpenClose(HWND hWndObserved, LPARAM lParam)
 	if (hWndObserved == NULL)	return FALSE;
 	HWND    hIMWnd = NULL;
 	if ((hIMWnd = ImmGetDefaultIMEWnd(hWndObserved)) != NULL) {
-		if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETOPENSTATUS, lParam) == 0) {	// lParam = FALSE to IME CLOSE / TRUE to IME OPEN
-#ifdef _DEBUG
-			//DBvPrintf(_T("==hWndObserved = 0x%08x lParam = 0x%08x\n"), hWndObserved, lParam);
-#endif // _DEBUG
+		if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETOPENSTATUS, lParam) == 0) {
 		}
 	}
-	return TRUE;			// If error, but Continue all child Window
+	return TRUE;
 }
 
 //
@@ -481,7 +478,7 @@ BOOL			CCursor::bInitialize(HWND hWnd)
 	if (!bChangeFlushMouseCursor(IMEOFF, &stIMECursorData)) return FALSE;
 	if (!bRegisterIMECursorChangeThread(hWnd)) return FALSE;
 	
-#define	WINDOWCLASS		_T("FlushMouseCursorWindow-{4D05403F-41D8-4FC4-8E4A-5211F6D96E97}")
+#define	WINDOWCLASS		_T("FlushMouseCursorWindow-{9395A3BE-4280-4AA1-9099-ADD712F982A1}")
 	if (CursorWindow == NULL) {
 		CursorWindow = new CCursorWindow;
 		if (!CursorWindow->bRegister((HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE), WINDOWCLASS, stIMECursorData.dwNearDrawMouseColor))		return FALSE;
@@ -489,7 +486,7 @@ BOOL			CCursor::bInitialize(HWND hWnd)
 		DrawIMEModeThread = new CThread;
 	}
 #undef WINDOWCLASS
-#define	WINDOWCLASS		_T("FlushMouseCaretWindow-{52CCC3C6-ABCE-4B31-AD5B-367F47C3BC67}")
+#define	WINDOWCLASS		_T("FlushMouseCaretWindow-{D40AF72E-E0D9-47DA-8A0E-7E29F6F763E4}")
 	if (CaretWindow == NULL) {
 		CaretWindow = new CCursorWindow;
 		if (!CaretWindow->bRegister((HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE), WINDOWCLASS, stIMECursorData.dwNearDrawCaretColor))	return FALSE;
