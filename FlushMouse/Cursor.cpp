@@ -486,6 +486,7 @@ BOOL			CCursor::bInitialize(HWND hWnd)
 		DrawIMEModeThread = new CThread;
 	}
 #undef WINDOWCLASS
+
 #define	WINDOWCLASS		_T("FlushMouseCaretWindow-{D40AF72E-E0D9-47DA-8A0E-7E29F6F763E4}")
 	if (CaretWindow == NULL) {
 		CaretWindow = new CCursorWindow;
