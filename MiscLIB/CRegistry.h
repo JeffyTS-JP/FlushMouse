@@ -30,6 +30,7 @@ public:
 	BOOL		bSetRegValueString(HKEY hKey, LPCTSTR lpszSubKey, LPCTSTR szValue, LPTSTR szData, DWORD dwDataSize);
 
 	BOOL		bReadRegValueDWORD(HKEY hKey, LPCTSTR lpszSubKey, LPCTSTR szValue, LPDWORD lpdwData);
+	BOOL		bReadSystemRegValueDWORD(HKEY hKey, LPCTSTR lpszSubKey, LPCTSTR szValue, LPDWORD lpdwData);
 	BOOL		bReadRegValueDWORDasBOOL(HKEY hKey, LPCTSTR lpszSubKey, LPCTSTR szValue, LPBOOL lpbData);
 	BOOL		bReadRegValueString(HKEY hKey, LPCTSTR lpszSubKey, LPCTSTR szValue, LPTSTR szData, DWORD dwDataSize);
 

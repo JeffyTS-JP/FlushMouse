@@ -9,6 +9,7 @@
             FlushMouseDLL32.dll
             Register_Eventlog.reg
             Register_TaskScheduler.xml
+            Register_TaskScheduler2.xml
             License.rtf
             Readme.txt
             

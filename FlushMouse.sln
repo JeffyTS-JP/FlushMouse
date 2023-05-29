@@ -20,17 +20,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FlushMouseDLL32", "FlushMou
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "SetupProject", "SetupProject\SetupProject.wixproj", "{40614F11-A07B-42AB-822E-FAC73CC85CB0}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{352B420D-E55A-4196-9597-D394D0DA2519}"
-	ProjectSection(SolutionItems) = preProject
-		Solution.props = Solution.props
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiscLIB", "MiscLIB\MiscLIB.vcxproj", "{CCAF431F-CE8E-4879-9B1F-3F1DF4AC2269}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiscLIB32", "MiscLIB32\MiscLIB32.vcxproj", "{3D3F632C-75BB-4830-AA8E-0871C6AA1A72}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ソリューション項目", "ソリューション項目", "{4DA8FAF2-6A3D-41B4-B811-0F39BFA7CAA5}"
 	ProjectSection(SolutionItems) = preProject
+		FlushMouse_x64.msi = FlushMouse_x64.msi
 		version.h = version.h
 		version.wxi = version.wxi
 	EndProjectSection

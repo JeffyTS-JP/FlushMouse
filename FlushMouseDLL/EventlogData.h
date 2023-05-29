@@ -6,6 +6,7 @@
 // #0000	2023/04/13  JeffyTS  	New edit.
 //
 //
+//
 // Categories of events.
 //
 //
@@ -98,6 +99,15 @@
 #define POWERNOTIFICATION_CATEGORY       ((DWORD)0x00000010L)
 
 //
+// MessageId: TASKSCHDULER_CATEGORY
+//
+// MessageText:
+//
+// TaskSheduler Events
+//
+#define TASKSCHDULER_CATEGORY            ((DWORD)0x00000011L)
+
+//
 // Message definitions.
 //
 //
@@ -143,7 +153,7 @@
 //
 // Thread, Hook and Timer Restarted.
 //
-#define MSG_THREAD_HOOK_TIMER_RESTARTED  ((DWORD)0x40000005L)
+#define MSG_THREAD_HOOK_TIMER_RESTARTED  ((DWORD)0x40000004L)
 
 //
 // MessageId: MSG_QUIT_FLUSHMOUSE
@@ -152,7 +162,25 @@
 //
 // Quit FlushMouse.
 //
-#define MSG_QUIT_FLUSHMOUSE              ((DWORD)0x40000006L)
+#define MSG_QUIT_FLUSHMOUSE              ((DWORD)0x40000005L)
+
+//
+// MessageId: MSG_RESTART_INSTALLER
+//
+// MessageText:
+//
+// Start FlushMouse(Installer).
+//
+#define MSG_RESTART_INSTALLER            ((DWORD)0x00000006L)
+
+//
+// MessageId: MSG_DONE_FLUSHMOUSE
+//
+// MessageText:
+//
+// Quit FlushMouse(Installer).
+//
+#define MSG_DONE_FLUSHMOUSE              ((DWORD)0x00000007L)
 
 //
 // MessageId: MSG_PBT_APMSUSPEND

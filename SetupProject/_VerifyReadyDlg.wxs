@@ -7,19 +7,22 @@
         <UI>
             <Dialog Id="_VerifyReadyDlg" Width="370" Height="270" Title="!(loc.VerifyReadyDlg_Title)" TrackDiskSpace="yes">
                 <!--@@@ start-->
-                <!-- Install -->
-				<Control Id="OptionalCheckBox1" Type="CheckBox" X="80" Y="150" Width="220" Height="20" Hidden="yes" Property="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX1" CheckBoxValue="1" Text="[WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT1]">
-					<Condition Action="show">WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT3 AND NOT Installed</Condition>
+				<!-- Install -->
+				<Control Id="OptionalCheckBox1" Type="CheckBox" X="80" Y="145" Width="220" Height="20" Hidden="yes" Property="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX1" CheckBoxValue="1" Text="[WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT1]">
+					<Condition Action="show">WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT1 AND NOT Installed</Condition>
 				</Control>
-				<Control Id="OptionalCheckBox2" Type="CheckBox" X="80" Y="170" Width="220" Height="20" Hidden="yes" Property="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX2" CheckBoxValue="1" Text="[WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT2]">
+				<Control Id="OptionalCheckBox2" Type="CheckBox" X="80" Y="160" Width="220" Height="20" Hidden="yes" Property="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX2" CheckBoxValue="1" Text="[WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT2]">
+					<Condition Action="show">WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT2 AND NOT Installed</Condition>
+				</Control>
+				<Control Id="OptionalCheckBox3" Type="CheckBox" X="80" Y="175" Width="220" Height="20" Hidden="yes" Property="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX3" CheckBoxValue="1" Text="[WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT3]">
 					<Condition Action="show">WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT3 AND NOT Installed</Condition>
 				</Control>
 				<Control Id="Comment1" Type="Text" X="80" Y="190" Width="220" Height="20" Hidden="yes" Property="WIXUI_VERIFYDIALOGOPTIONALCOMMENT1" Text="[WIXUI_VERIFYDIALOGOPTIONALCOMMENT1]">
-					<Condition Action="show">WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT3 AND NOT Installed</Condition>
+					<Condition Action="show">WIXUI_VERIFYDIALOGOPTIONALCOMMENT1 AND NOT Installed</Condition>
 				</Control>
 				<!-- Uninstall -->
-				<Control Id="OptionalCheckBox3" Type="CheckBox" X="80" Y="170" Width="220" Height="20" Hidden="yes" Property="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX3" CheckBoxValue="1" Text="[WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT3]">
-					<Condition Action="show">WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT3 AND Installed</Condition>
+				<Control Id="OptionalCheckBox4" Type="CheckBox" X="80" Y="175" Width="220" Height="20" Hidden="yes" Property="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX4" CheckBoxValue="1" Text="[WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT4]">
+					<Condition Action="show">WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT4 AND Installed</Condition>
 				</Control>
 				<!--@@@ end-->
 				<Control Id="Install" Type="PushButton" ElevationShield="yes" X="212" Y="243" Width="80" Height="17" Default="yes" Hidden="yes" Disabled="yes" Text="!(loc.VerifyReadyDlgInstall)">

@@ -2,22 +2,24 @@
 
 [[RepositoryInfo]]
 
-||[[Thumb(FlushMouse.png, size=48x48)]]||'''[[ProjectDescription]](タスクトレイに常駐して、マウスカーソルへIMEモードの表示をするユーティリティです)[[BR]]FlushMouse is a software developed by JeffyTS . It is a mouse gesture tool that allows you to perform various operations by drawing gestures with your mouse .  (by Bing ChatGPT)'''||
+||[[Thumb(FlushMouse.png, size=48x48)]]||'''[[ProjectDescription]](タスクトレイに常駐して、マウスカーソルへIMEモードの表示をするユーティリティです)[[BR]]FlushMouse is a software developed by JeffyTS . It is a mouse gesture tool that allows you to perform various operations by drawing gestures with your mouse .  (by Bing)'''||
 
 [[BR]]
-2023/05/25[[BR]]
-　　　Version 0.9.4.14 をリリースしました[[BR]]
+2023/06/13[[BR]]
+　　　'''Version 1.0.0.1 をリリースしました'''[[BR]]
 [[BR]]
 (主な変更点)[[BR]]
- * 処理のシェイプアップ及び軽微なバグ修正を行いました[[BR]]
+ * 処理のシェイプアップ及びバグ修正を行いました[[BR]]
  * IMEモードの表示の色指定でαチャネルが有効になるようにしてあります(設定画面は作成していません。レジストリを編集できる方は好みの色にしてみてください。ただし、レジストリの編集は十分注意して行ってください)[[BR]]
    * HKEY_CURRENT_USER\Software\JeffyTS\FlushMouse の NearDrawCaretColor と NearDrawMouseColor です。上位バイトから、α B G R の順です[[BR]]
    * αの値は、通常と違って、大きいほうが透明度が高くなります。これは従来と互換性を持たせるためですのでご了承ください。なお、レジストリを変更した方がいたら、お手数をおかけしますが修正をお願いします[[BR]]
    * マウスカーソル右下のモード表示の色は、現状では変更できません。ご了承ください[[BR]]
 [[BR]]
 (今後について)[[BR]]
- * OSDN上ではここまでの機能で開発は終了としたいと考えています(バグ対応は除く)[[BR]]
- * 今後は、プレゼンテーションモードの追加や、マウスカーソルの形状や、表示する内容などをカスタマイズする機能をつけて有償に移行しようと考えています[[BR]]
+ * ~~OSDN上ではここまでの機能で開発は終了としたいと考えています(バグ対応は除く)~~[[BR]]
+ * ~~今後は、プレゼンテーションモードの追加や、マウスカーソルの形状や、表示する内容などをカスタマイズする機能をつけて有償に移行しようと考えています~~[[BR]]
+ * と、上記のように考えていたのですが、この FlushMouse は Microsoft Storeに登録できないやり方を使って処理しているので無理なことが判明しました(フックを使用しいるとどうしてもだめなようです。ただ、SDKなどでだいぶ検証して直させてもらいました)[[BR]]
+ * '''ということで、今後も暇を見つけて、機能向上を目指していきますのでよろしくお願いします'''[[BR]]
 [[BR]]
 ||'''対応OS'''||
 Windows 10 / 11 64bit  (Latest Release Versionで検証しています)[[BR]]

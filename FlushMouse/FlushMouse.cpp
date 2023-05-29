@@ -21,6 +21,7 @@
 #include "..\version.h"
 #include "FlushMouseLIB.h"
 #include "Resource.h"
+#include "..\FlushMouseDLL\EventlogDll.h"
 
 #if defined _DEBUG
 #define DEBUG_CLIENTBLOCK   new( _CLIENT_BLOCK, __FILE__, __LINE__)
@@ -55,7 +56,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 //
 // Local Prototype Define
 //
-static INT_PTR CALLBACK AboutDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+static BOOL		bSetHeapInformation();
+static INT_PTR CALLBACK	AboutDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 //
 //  関数: wWinMain()
@@ -68,6 +70,43 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 #if defined _DEBUG
 	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
+	
+	HANDLE	hHandle = GetCurrentProcess();
+	if (!SetPriorityClass(hHandle, NORMAL_PRIORITY_CLASS)) {
+		return (-1);
+	}
+
+	if (!bSetHeapInformation())	return (-1);
+
+	if (*lpCmdLine == _T('\0')) {
+		// NOP
+	}
+	else {
+		int	iRet = 0;
+		if ((iRet = CompareStringOrdinal(lpCmdLine, -1, L"/quit", -1, TRUE)) != 0) {
+			if (iRet == CSTR_EQUAL) {
+				bReportEvent(MSG_DONE_FLUSHMOUSE, APPLICATION_CATEGORY);	// Eventlog
+				HWND	hWnd = NULL;
+				if ((hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL)) != NULL) {	// 先に起動されているウィンドウハンドルを探す
+					SetFocus(GetLastActivePopup(hWnd));					    // 先に起動されているウィンドウへフォーカスを与える
+					PostMessage(hWnd, WM_DESTROY, NULL, NULL);				// 先に起動されているウィンドウを終了させる
+					for (int i = 3; i > 0; i--) {
+						Sleep(500);											// 終了を3回待つ
+						if ((hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL)) != NULL) {
+							SetFocus(GetLastActivePopup(hWnd));				// 先に起動されているウィンドウへフォーカスを与える
+							PostMessage(hWnd, WM_DESTROY, NULL, NULL);		// 先に起動されているウィンドウを終了させる
+							if (i == 1) {
+								return (-1);								// 終了していない場合はエラー終了
+							}
+						}
+						else return 0;
+					}
+				}
+			}
+		}
+		if (hHandle != NULL)	CloseHandle(hHandle);
+		return 0;
+	}
 
 #define	RESOURCEFILE		_T("FlushMouse.exe")
 	// Load Resource
@@ -86,7 +125,27 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 			DispatchMessage(&msg);
 		}
 	}
+	if (Resource)	delete	Resource;
 	return (int)msg.wParam;
+}
+
+//
+// bSetHeapInformation()
+//
+BOOL	bSetHeapInformation()
+{
+	HANDLE	hHeap = NULL;
+	if ((hHeap = GetProcessHeap()) != NULL) {
+		ULONG	HeapInformation = 2;
+		if (!HeapSetInformation(hHeap, HeapCompatibilityInformation, &HeapInformation, sizeof(ULONG))) {
+			_Post_equals_last_error_ DWORD err = GetLastError();
+			if (err != ERROR_INVALID_PARAMETER) {	// 87 (0x57)
+				return FALSE;
+			}
+		}
+		return TRUE;
+	}
+	return FALSE;
 }
 
 // 
@@ -95,8 +154,24 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 void vMessageBox(HWND hWnd, UINT uID, UINT uType)
 {
 	TCHAR       lpText[MAX_LOADSTRING];
-	if (LoadString(Resource->hLoad(), uID, lpText, MAX_LOADSTRING) != 0) {
-		MessageBox(hWnd, lpText, szTitle, uType);
+	try {
+		throw LoadString(Resource->hLoad(), uID, lpText, MAX_LOADSTRING);
+	}
+	catch (int i) {
+		if (i != 0) {
+			try {
+				throw MessageBox(hWnd, lpText, szTitle, uType);
+			}
+			catch (int) {
+				return;
+			}
+			catch (...) {
+				return;					// error
+			}
+		}
+	}
+	catch (...) {
+		return;							// error
 	}
 }
 
@@ -135,11 +210,15 @@ static INT_PTR CALLBACK AboutDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 				HICON	hIcon = NULL;
 				hIcon = (HICON)LoadImage(Resource->hLoad(), MAKEINTRESOURCE(IDI_SMALL), IMAGE_ICON, 16, 16, 0);
 				SendMessage(hDlg, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);		// Iconの設定
-				LPTSTR	lpszVersion = new TCHAR[128];
-				ZeroMemory(lpszVersion, (sizeof(TCHAR) * 128));
-				_sntprintf_s(lpszVersion, 128, _TRUNCATE, _T("%d.%d.%d.%d"), MAJOR_VERSION, MINOR_VERSION, BUILD_VERSION, REVISON_VERSION);
-				SetDlgItemText(hDlg, IDC_VERSION, lpszVersion);					// Versionの設定
-				delete[]	lpszVersion;
+				LPTSTR	lpszVersion = new TCHAR[MAX_LOADSTRING];
+				ZeroMemory(lpszVersion, (sizeof(TCHAR) * MAX_LOADSTRING));
+				if (lpszVersion) {
+					ZeroMemory(lpszVersion, (sizeof(TCHAR) * MAX_LOADSTRING));
+					_sntprintf_s(lpszVersion, MAX_LOADSTRING, _TRUNCATE, _T("%d.%d.%d.%d"), MAJOR_VERSION, MINOR_VERSION, BUILD_VERSION, REVISON_VERSION);
+					SetDlgItemText(hDlg, IDC_VERSION, lpszVersion);					// Versionの設定
+					delete[]	lpszVersion;
+				}
+				else return (INT_PTR)FALSE;
 			}
 			return (INT_PTR)TRUE;
 		case WM_CTLCOLORDLG:

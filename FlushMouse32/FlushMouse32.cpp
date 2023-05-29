@@ -28,9 +28,8 @@
 //
 // Define
 //
-#define MAX_LOADSTRING 100
 // Timer
-#define PROCINITTIMERVALUE		3000
+#define PROCINITTIMERVALUE		1000
 #define CHECKPROCTIMERID		2
 static UINT     nCheckProcTimerTickValue = PROCINITTIMERVALUE;		// Timer tick
 static UINT_PTR nCheckProcTimerID = CHECKPROCTIMERID;				// Timer ID
@@ -71,7 +70,6 @@ static void				Cls_OnCheckExistingJPIMEEx(HWND hWnd, BOOL bEPHelper);
 // Sub
 static VOID CALLBACK	vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
 static BOOL				bReportEvent(DWORD dwEventID, WORD wCategory);
-static LONG WINAPI		lExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo);
 static void				vMessageBox(HWND hWnd, UINT uID, UINT uType);
 
 //
@@ -87,11 +85,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif	
 
-	SetUnhandledExceptionFilter(&lExceptionFilter);
+	HANDLE	hHandle = GetCurrentProcess();
+	if (!SetPriorityClass(hHandle, NORMAL_PRIORITY_CLASS)) {
+		return (-1);
+	}
 
 	if (*lpCmdLine == _T('\0')) {
 		hParentWnd = NULL;
-		vMessageBox(NULL, IDS_NOTFORKBY64, MessageBoxTYPE);		// 不正起動のためメッセージを表示
+		vMessageBox(NULL, IDS_NOTFORKBY64, MessageBoxTYPE);
 		return (-1);
 	}
 	else {
@@ -118,7 +119,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		PostMessage(hWnd, WM_DESTROY, NULL, NULL);
 		for (int i = 3; i > 0; i--) {
 			Sleep(500);
-			if (FindWindow(CLASS_FLUSHMOUSE32, NULL) != NULL) {
+			if ((hWnd = FindWindow(CLASS_FLUSHMOUSE32, NULL)) != NULL) {
+				SetFocus(GetLastActivePopup(hWnd));
+				PostMessage(hWnd, WM_DESTROY, NULL, NULL);
 				if (i == 1) {
 					vMessageBox(NULL, IDS_ALREADYRUN, MessageBoxTYPE);
 					return (-1);
@@ -128,7 +131,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		}
 	}
 
-	if (!InitInstance(hInstance, nCmdShow)) {                   // Window作成
+	if (!InitInstance(hInstance, nCmdShow)) {
 		return (-1);
 	}
 	
@@ -254,8 +257,8 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 //
 static void Cls_OnDestroy(HWND hWnd)
 {
-	EXCEPTION_POINTERS ExceptionInfo{};
-	lExceptionFilter(&ExceptionInfo);
+	bKeyboardHookLLUnset32();
+	bMouseHookUnset32();
 
 	if (uCheckProcTimer != NULL) {
 		if (KillTimer(hWnd, nCheckProcTimerID)) {
@@ -273,7 +276,7 @@ static void		Cls_OnCheckExistingJPIMEEx(HWND hWnd, BOOL bEPHelper)
 {
 	UNREFERENCED_PARAMETER(hWnd);
 	if (!bSetEnableEPHelperLL32(bEPHelper)) {
-		DestroyWindow(hWnd);
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
 	}
 }
 
@@ -294,24 +297,22 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 			nIco.uID = NOTIFYICONDATA_ID;
 			nIco.guidItem = GUID_NULL;
 			nIco.uFlags = 0;
-			if (Shell_NotifyIcon(NIM_DELETE, &nIco) == FALSE) {
-				bReportEvent(MSG_RESTART_EVENT, APPLICATION32_CATEGORY);
-				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			try {
+				throw Shell_NotifyIcon(NIM_DELETE, &nIco);					// Delete TaskTray Icon
 			}
+			catch (BOOL bRet) {
+				if (!bRet) {
+					return;
+				}
+			}
+			catch (...) {
+				return;
+			}
+			bReportEvent(MSG_RESTART_EVENT, APPLICATION32_CATEGORY);		// FlushMouseが動いていないため再起動する
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);		// Quit
 		}
 	}
 	return;
-}
-
-//
-// lExceptionFilter()
-//
-static LONG WINAPI lExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo)
-{
-	UNREFERENCED_PARAMETER(pExceptionInfo);
-	bKeyboardHookLLUnset32();										// Keyboard Hook LL の解除
-	bMouseHookUnset32();											// Mouse Hook の解除
-	return EXCEPTION_CONTINUE_SEARCH;
 }
 
 //

@@ -5,6 +5,7 @@
 ;// -------+-----------+-----------+-------------------------------------------- -
 ;// #0000	2023/04/13  JeffyTS  	New edit.
 ;//
+;//
 
 SeverityNames=(Success=0x0:STATUS_SEVERITY_SUCCESS
 Informational=0x1:STATUS_SEVERITY_INFORMATIONAL
@@ -77,6 +78,16 @@ Language=Japanese
 PowerNotification Events
 .
 
+MessageId=0x11
+SymbolicName=TASKSCHDULER_CATEGORY
+Language=English
+TaskSheduler Events
+.
+
+Language=Japanese
+TaskSheduler Events
+.
+
 
 ;//
 ;// Message definitions.
@@ -130,7 +141,7 @@ Language=Japanese
 Thread, Hook and Timer Stopped.
 .
 
-MessageId=0x0005
+MessageId=0x0004
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_THREAD_HOOK_TIMER_RESTARTED
@@ -142,7 +153,7 @@ Language=Japanese
 Thread, Hook and Timer Restarted.
 .
 
-MessageId=0x0006
+MessageId=0x0005
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_QUIT_FLUSHMOUSE
@@ -152,6 +163,30 @@ Quit FlushMouse.
 
 Language=Japanese
 FlushMouseを終了します。
+.
+
+MessageId=0x0006
+Severity=Success
+Facility=Application
+SymbolicName=MSG_RESTART_INSTALLER
+Language=English
+Start FlushMouse(Installer).
+.
+
+Language=Japanese
+FlushMouseを起動します(Installer)。
+.
+
+MessageId=0x0007
+Severity=Success
+Facility=Application
+SymbolicName=MSG_DONE_FLUSHMOUSE
+Language=English
+Quit FlushMouse(Installer).
+.
+
+Language=Japanese
+FlushMouseを終了します(Installer)。
 .
 
 MessageId=0x0100

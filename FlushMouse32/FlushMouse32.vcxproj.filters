@@ -55,4 +55,7 @@
       <Filter>リソース ファイル</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="FlushMouse32.exe.manifest" />
+  </ItemGroup>
 </Project>

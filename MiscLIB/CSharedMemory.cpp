@@ -33,7 +33,7 @@ CSharedMemory::CSharedMemory(LPCTSTR szSharedMemoryName, DWORD dwDataSize)
 {
 
 	size_t	size = wcsnlen_s(szSharedMemoryName, MAX_LOADSTRING);
-	lpszSharedMemoryName = new TCHAR[size + 1];
+	if ((lpszSharedMemoryName = new TCHAR[size + 1]) == NULL)	return;
 	ZeroMemory(lpszSharedMemoryName, sizeof(TCHAR) * (size + 1));
 	_tcsncpy_s(lpszSharedMemoryName, size + 1, szSharedMemoryName, _TRUNCATE);
 	dwDataByteSize = dwDataSize;
@@ -65,7 +65,7 @@ CSharedMemory::~CSharedMemory()
 			hSharedMem = NULL;
 		}
 	}
-	delete[]	lpszSharedMemoryName;
+	if (lpszSharedMemoryName != NULL)	delete[]	lpszSharedMemoryName;
 	lpszSharedMemoryName = NULL;
 	dwDataByteSize = 0;
 	return;

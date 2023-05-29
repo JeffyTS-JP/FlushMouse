@@ -169,6 +169,8 @@ public:
 	BOOL			bMoveIMEToolbar();
 	BOOL			bGetVirtualDesktopSize();
 	BOOL			bIsNewIME();
+	DWORD			dwGetInputLocale();
+	HKL				hklGetInputLocale(HWND hWndObserved);
 
 private:
 	BOOL			bExistIMEToolbar();
@@ -282,7 +284,7 @@ private:
 		{ IMEHIDE,			_T(""),		{OCR_NORMAL, IDC_HIDE_ARROW,          FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHideOnArrow.cur")},
 										{OCR_HAND,   IDC_HIDE_HAND,           FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHideOnHand.cur")},
 										{OCR_IBEAM,  IDC_HIDE_IBEAM,          FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHideOnIBeam.cur")}},
-		{ (UINT)(-1),		_T(""),		{0,			 0,						  FALSE, _T(""), _T("")},		// Terminater
+		{ (DWORD)(-1),		_T(""),		{0,			 0,						  FALSE, _T(""), _T("")},		// Terminater
 										{0,			 0,						  FALSE, _T(""), _T("")},		// Terminater
 										{0,			 0,						  FALSE, _T(""), _T("")} }		// Terminater
 	};

@@ -55,6 +55,8 @@ DLLEXPORT BOOL  __stdcall bMouseHookSet32(HWND hWnd)
 		}
 		delete CSharedMem;
 		CSharedMem = NULL;
+		hWndMSParent = NULL;
+		lpDatMouse = NULL;
 	}
 	return FALSE;
 }
@@ -75,6 +77,8 @@ DLLEXPORT BOOL __stdcall bMouseHookUnset32()
 		}
 		delete CSharedMem;
 		CSharedMem = NULL;
+		hWndMSParent = NULL;
+		lpDatMouse = NULL;
 	}
 	return bRet;
 }

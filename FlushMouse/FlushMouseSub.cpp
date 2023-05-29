@@ -18,7 +18,6 @@
 #include "Resource.h"
 #include "..\FlushMouseDLL\GlobalHookDll.h"
 #include "..\FlushMouseDLL\EventlogDll.h"
-#include "..\FlushMouseDLL\EventlogData.h"
 #include "..\FlushMouseDLL32\FlushMouseDll32.h"
 #include "..\MiscLIB\CRegistry.h"
 
@@ -61,26 +60,44 @@ BOOL		bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle)
 	nIco.guidItem = GUID_NULL;
 	nIco.uFlags = NIF_INFO | NIF_MESSAGE | NIF_ICON | NIF_TIP;
 	nIco.uCallbackMessage = WM_TASKTRAYEX;
-	nIco.dwState = 0;
-	nIco.dwInfoFlags = NIIF_USER | NIIF_LARGE_ICON | NIIF_NOSOUND | NIIF_RESPECT_QUIET_TIME | NIIF_LARGE_ICON;
+	nIco.dwState = NIS_HIDDEN | NIS_SHAREDICON;
+	nIco.dwInfoFlags = NIIF_USER | NIIF_LARGE_ICON | NIIF_NOSOUND;
 	nIco.uVersion = NOTIFYICON_VERSION_4;
 	nIco.hIcon = hIcon;
 	if ((nIco.hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE))) == NULL) {
 		return FALSE;
 	}
 	_tcsncpy_s(nIco.szTip, ARRAYSIZE(nIco.szTip), lpszTitle, _TRUNCATE);
-	if (Shell_NotifyIcon(NIM_ADD, &nIco) == FALSE) {			// Add TaskTray Icon
-		_Post_equals_last_error_ DWORD err = GetLastError();
-		if (err == ERROR_TIMEOUT) {
-			Sleep(1000);
-			if (Shell_NotifyIcon(NIM_ADD, &nIco) == FALSE) {	// Retry once
+	BOOL	bRet = FALSE;
+	try {
+		throw bRet = Shell_NotifyIcon(NIM_ADD, &nIco);
+	}
+	catch (BOOL) {
+		if (!bRet) {
+			_Post_equals_last_error_ DWORD err = GetLastError();
+			if (err == ERROR_TIMEOUT) {
+				Sleep(1000);
+				try {
+					throw bRet = Shell_NotifyIcon(NIM_ADD, &nIco);
+				}
+				catch (BOOL) {
+					if (!bRet) {
+						return FALSE;
+					}
+				}
+				catch (...) {
+					return FALSE;
+				}
+			}
+			else {
 				return FALSE;
 			}
 		}
-		else {
-			return FALSE;
-		}
 	}
+	catch (...) {
+		return FALSE;
+	}
+
 	if ((uTaskbarCreatedMessage = RegisterWindowMessage(_T("TaskbarCreated"))) == 0) {
 		bDestroyTaskTrayWindow(hWnd);
 		return FALSE;
@@ -137,9 +154,16 @@ BOOL		bDestroyTaskTrayWindow(HWND hWnd)
 		nIco.uID = NOTIFYICONDATA_ID;
 		nIco.guidItem = GUID_NULL;
 		nIco.uFlags = 0;
-		if (Shell_NotifyIcon(NIM_DELETE, &nIco) != FALSE) {
-			bTaskTray = FALSE;
-			return TRUE;
+		try {
+			throw Shell_NotifyIcon(NIM_DELETE, &nIco);
+		}
+		catch (BOOL bRet) {
+			if (bRet) {
+				bTaskTray = FALSE;
+				return TRUE;
+			}
+		}
+		catch (...) {
 		}
 	}
 	return FALSE;
@@ -156,11 +180,19 @@ BOOL		bGetTaskTrayWindowRect(HWND hWnd, LPRECT lpRect)
 		nii.hWnd = hWnd;
 		nii.uID = NOTIFYICONDATA_ID;
 		nii.guidItem = GUID_NULL;
-		HRESULT	hResult = E_FAIL;
-		if ((hResult = Shell_NotifyIconGetRect(&nii, lpRect)) != S_OK) {
+		try {
+			throw Shell_NotifyIconGetRect(&nii, lpRect);
+		}
+		catch (HRESULT	hResult) {
+			if (hResult != S_OK) {
+				return FALSE;
+			}
+			return TRUE;
+		}
+		catch (...) {
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			return FALSE;
 		}
-		return TRUE;
 	}
 	return FALSE;
 }
@@ -194,6 +226,7 @@ void		Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg)
 			SetForegroundWindow(hWnd);
 			APPBARDATA stAppBarData{};
 			stAppBarData.cbSize = sizeof(APPBARDATA);
+			stAppBarData.hWnd = hWnd;
 			SHAppBarMessage(ABM_GETTASKBARPOS, &stAppBarData);
 			UINT		uFlags = 0;
 			switch (stAppBarData.uEdge) {
@@ -221,8 +254,6 @@ void		Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg)
 				//EnableMenuItem(hSubMenu, IDR_TT_SETTING, MF_BYCOMMAND | MF_DISABLED);
 			}
 			TrackPopupMenu(hSubMenu, uFlags, pt.x, pt.y, 0, hWnd, NULL);
-			DestroyMenu(hMenu);
-			PostMessage(hWnd, WM_NULL, 0, 0);
 			break;
 	}
 }
@@ -705,12 +736,15 @@ CFlushMouseHook::CFlushMouseHook()
 	bKeyboardHook64 = FALSE;
 	bMouseHook64 = FALSE;
 	bHook32Dll = FALSE;
-	lpstProcessInfomation = NULL;
+	lpstProcessInfomation = new PROCESS_INFORMATION[sizeof(PROCESS_INFORMATION)];
+	if (lpstProcessInfomation)	ZeroMemory(lpstProcessInfomation, sizeof(PROCESS_INFORMATION));
 }
 
 CFlushMouseHook::~CFlushMouseHook()
 {
 	bHookUnset();
+	if (lpstProcessInfomation)	delete[]	lpstProcessInfomation;
+	lpstProcessInfomation = NULL;
 }
 //
 // bHookSet()
@@ -738,69 +772,37 @@ BOOL		CFlushMouseHook::bHookUnset()
 }
 
 //
-// bHook64DllLoad()
-//
-BOOL			CFlushMouseHook::bHook64DllLoad(LPCTSTR lpszDll64Name)
-{
-	DWORD	dwSize = 0;
-	dwSize = ExpandEnvironmentStrings(lpszDll64Name, NULL, 0);
-	LPTSTR	lpszBuffer = new TCHAR[dwSize];
-	ZeroMemory(lpszBuffer, dwSize);
-	dwSize = ExpandEnvironmentStrings(lpszDll64Name, lpszBuffer, dwSize);
-	BOOL		bRet = FALSE;
-	if (hHook64Dll == NULL) {
-		if ((hHook64Dll = LoadLibraryEx(lpszBuffer, NULL, 0)) != NULL) {
-			bRet = TRUE;
-		}
-	}
-	delete[]	lpszBuffer;
-	return bRet;
-}
-
-//
-// bHook64DllUnload()
-//
-BOOL			CFlushMouseHook::bHook64DllUnload()
-{
-	if (hHook64Dll != NULL) {
-		if (!FreeLibrary(hHook64Dll)) {
-			return FALSE;
-		}
-	}
-	hHook64Dll = NULL;
-	return TRUE;
-}
-
-//
 // bHook32DllStart()
 //
 BOOL	 	CFlushMouseHook::bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name)
 {
 #define	COMAMANDLINESIZE (sizeof(_T(" ")) * (sizeof(unsigned long long) + 1))
+	BOOL	bRet = FALSE;
 	DWORD	dwSize = 0;
 	dwSize = ExpandEnvironmentStrings(lpszExec32Name, NULL, 0);
 	LPTSTR	lpszBuffer = new TCHAR[dwSize];
-	ZeroMemory(lpszBuffer, dwSize);
-	dwSize = ExpandEnvironmentStrings(lpszExec32Name, lpszBuffer, dwSize);
+	if (lpszBuffer) {
+		ZeroMemory(lpszBuffer, dwSize);
+		dwSize = ExpandEnvironmentStrings(lpszExec32Name, lpszBuffer, dwSize);
 
-	LPTSTR	lpszCommandLine = NULL;
-	lpszCommandLine = new TCHAR[dwSize + COMAMANDLINESIZE];
-	ZeroMemory(lpszCommandLine, (dwSize + sizeof(COMAMANDLINESIZE)));
-	_sntprintf_s(lpszCommandLine, (dwSize + COMAMANDLINESIZE), _TRUNCATE, _T("%s %llu"), lpszBuffer, (unsigned long long)hWnd);
-	if (lpszBuffer != NULL)	delete[]		lpszBuffer;
-
-	lpstProcessInfomation = new PROCESS_INFORMATION[sizeof(PROCESS_INFORMATION)];
-	ZeroMemory(lpstProcessInfomation, sizeof(PROCESS_INFORMATION));
-	STARTUPINFO	stStartupInfo{};		stStartupInfo.cb = sizeof(STARTUPINFO);
-	BOOL		bRet = FALSE;
-	if ((bRet = CreateProcess(NULL, lpszCommandLine, NULL, NULL, TRUE,
-		NORMAL_PRIORITY_CLASS, NULL, NULL, &stStartupInfo, lpstProcessInfomation)) == FALSE) {
-			delete[] lpstProcessInfomation;
+		LPTSTR	lpszCommandLine = NULL;
+		lpszCommandLine = new TCHAR[dwSize + COMAMANDLINESIZE];
+		if (lpszCommandLine) {
+			ZeroMemory(lpszCommandLine, (dwSize + sizeof(COMAMANDLINESIZE)));
+			_sntprintf_s(lpszCommandLine, (dwSize + COMAMANDLINESIZE), _TRUNCATE, _T("%s %llu"), lpszBuffer, (unsigned long long)hWnd);
+			if (lpstProcessInfomation) {
+				STARTUPINFO	stStartupInfo{};		stStartupInfo.cb = sizeof(STARTUPINFO);
+				if ((bRet = CreateProcess(NULL, lpszCommandLine, NULL, NULL, TRUE,
+					NORMAL_PRIORITY_CLASS, NULL, NULL, &stStartupInfo, lpstProcessInfomation)) == FALSE) {
+				}
+				else {
+					bHook32Dll = TRUE;
+				}
+			}
+			delete[]	lpszCommandLine;
+		}
+		delete[]		lpszBuffer;
 	}
-	else {
-		bHook32Dll = TRUE;
-	}
-	if (lpszCommandLine != NULL)		delete[]	lpszCommandLine;
 	return bRet;
 }
 
@@ -812,37 +814,38 @@ BOOL 	CFlushMouseHook::bHook32DllStop()
 #define	TIMEOUT	1000 
 	if (!bHook32Dll)	return TRUE;
 	BOOL		bRet = FALSE;
-	if (lpstProcessInfomation->hProcess != NULL) {
-		if (!EnumWindows((WNDENUMPROC)&CFlushMouseHook::bEnumWindowsProcHookStop, (LPARAM)lpstProcessInfomation)) {
-			if (GetLastError() == ERROR_SUCCESS) {
-				DWORD dwRet = WaitForSingleObject(lpstProcessInfomation->hProcess, TIMEOUT);
-				switch (dwRet) {
-				case WAIT_OBJECT_0:
-					bRet = TRUE;
-					break;
-				case WAIT_FAILED:
-				case WAIT_ABANDONED:
-				case WAIT_TIMEOUT:
-				default:
-					if (TerminateProcess(lpstProcessInfomation->hProcess, 0) != 0) {
+	if (lpstProcessInfomation != NULL) {
+		if (lpstProcessInfomation->hProcess != NULL) {
+			if (!EnumWindows((WNDENUMPROC)&CFlushMouseHook::bEnumWindowsProcHookStop, (LPARAM)lpstProcessInfomation)) {
+				if (GetLastError() == ERROR_SUCCESS) {
+					DWORD dwRet = WaitForSingleObject(lpstProcessInfomation->hProcess, TIMEOUT);
+					switch (dwRet) {
+					case WAIT_OBJECT_0:
+						bRet = TRUE;
+						break;
+					case WAIT_FAILED:
+					case WAIT_ABANDONED:
+					case WAIT_TIMEOUT:
+					default:
+						if (TerminateProcess(lpstProcessInfomation->hProcess, 0)) {
+							bRet = TRUE;
+						}
 						bRet = TRUE;
 					}
+					DWORD dwExitCode;
+					if (!GetExitCodeProcess(lpstProcessInfomation->hProcess, &dwExitCode)) {
+						bRet = FALSE;
+					}
+					if (lpstProcessInfomation->hProcess != NULL) {
+						CloseHandle(lpstProcessInfomation->hProcess);
+					}
 				}
-				DWORD dwExitCode;
-				if (!GetExitCodeProcess(lpstProcessInfomation->hProcess, &dwExitCode)) {
-					bRet = FALSE;
+				if (lpstProcessInfomation->hThread != NULL) {
+					CloseHandle(lpstProcessInfomation->hThread);
 				}
-				if (lpstProcessInfomation->hProcess != NULL) {
-					CloseHandle(lpstProcessInfomation->hProcess);
-				}
-			}
-			if (lpstProcessInfomation->hThread != NULL) {
-				CloseHandle(lpstProcessInfomation->hThread);
 			}
 		}
 	}
-	delete[] lpstProcessInfomation;
-	lpstProcessInfomation = NULL;
 	return bRet;
 }
 

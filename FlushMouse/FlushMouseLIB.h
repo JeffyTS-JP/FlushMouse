@@ -47,7 +47,7 @@ private:
 extern BOOL			bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance);
 extern BOOL			bStartThreadHookTimer(HWND hWnd);
 extern VOID			vStopThreadHookTimer(HWND hWnd);
-extern BOOL			bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, LPHKL lpNewHKL, LPHKL lpPreviousHKL);
+extern BOOL			bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, BOOL bIMEModeForcedChange, LPHKL lpNewHKL, LPHKL lpPreviousHKL);
 extern BOOL			bCheckExistingJPIME();
 
 //

@@ -246,6 +246,9 @@
       <Project>{ccaf431f-ce8e-4879-9b1f-3f1df4ac2269}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="FlushMouse.exe.manifest" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>

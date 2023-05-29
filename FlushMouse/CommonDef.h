@@ -11,7 +11,6 @@
 //
 #pragma once
 #include "pch.h"
-#include "..\..\DEFS\types.h"
 
 //
 // Define
@@ -20,7 +19,7 @@
 
 // Window Class
 #define	CLASS_FLUSHMOUSE		L"FlushMouse-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
-#define CLASS_FLUSHMOUSE32		L"FlushMouse32-{07C82AC3-DF75-469D-8443-91E6274A2422}"
+#define CLASS_FLUSHMOUSE32		L"FlushMouse32-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
 
 // for IME
 #define IMC_GETCONVERSIONMODE   0x0001
@@ -29,6 +28,18 @@
 #define IMC_SETSENTENCEMODE		0x0004
 #define IMC_GETOPENSTATUS		0x0005
 #define IMC_SETOPENSTATUS		0x0006
+
+// for KB
+#define	KB_MASK		0xffff0000
+#define	KB_JP		0x04110000
+#define	KB_US		0x04090000
+#define	LANG_MASK	0x0000ffff
+#define LANG_IME	0x00000411
+#define	LANG_ENG	0x00000409
+#define JP_IME		(HKL)(KB_JP | LANG_IME)
+#define JP_ENG		(HKL)(KB_JP | LANG_ENG)
+#define US_IME		(HKL)(KB_US | LANG_IME)
+#define US_ENG		(HKL)(KB_US | LANG_ENG)
 
 // for Shell_NotifyIcon
 #define	NOTIFYICONDATA_ID		0x684B9604

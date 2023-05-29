@@ -62,6 +62,12 @@ DLLEXPORT BOOL  __stdcall bGlobalHookSet(HWND hWnd)
 		}
 		delete CSharedMem;
 		CSharedMem = NULL;
+		hGLInstance = NULL;
+		hWndGLParent = NULL;
+		hHookGL = NULL;
+		lpDatGlobal = NULL;
+		hPrevWnd = NULL;
+		bSubclassed = FALSE;
 	}
 	return FALSE;
 }
@@ -86,6 +92,12 @@ DLLEXPORT BOOL __stdcall bGlobalHookUnset()
 		}
 		delete CSharedMem;
 		CSharedMem = NULL;
+		hGLInstance = NULL;
+		hWndGLParent = NULL;
+		hHookGL = NULL;
+		lpDatGlobal = NULL;
+		hPrevWnd = NULL;
+		bSubclassed = FALSE;
 	}
 	return bRet;
 }
@@ -119,18 +131,20 @@ static LRESULT CALLBACK lpGlobalHookProc(int nCode, WPARAM wParam, LPARAM lParam
 			if (lpCW->message == WM_HOOKEX) {
 				if (bGlobalHookProcSub()) {
 					if (lpCW->lParam) {
-						if (UnhookWindowsHookEx(hHookGL) != FALSE) {
-							if (!bSubclassed) {
+						if (!bSubclassed) {
+							if (hHookGL == NULL)	break;
+							if (UnhookWindowsHookEx(hHookGL) != FALSE) {
 #define	DLLNAME		_T("FlushMouseDLL.dll")
 								if (LoadLibraryEx(DLLNAME, NULL, 0)) {
 									bSubclassed = TRUE;
 								}
+								hHookGL = NULL;
 							}
 						}
 					}
 					else {
-						if (UnhookWindowsHookEx(hHookGL) != FALSE) {
-							FreeLibrary(hGLInstance);
+						if (bSubclassed) {
+							if (hHookGL == NULL)	break;
 							bSubclassed = FALSE;
 						}
 					}

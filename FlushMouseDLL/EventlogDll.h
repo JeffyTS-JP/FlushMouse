@@ -12,6 +12,7 @@
 #pragma once
 #include "pch.h"
 #include "FlushMouseDll.h"
+#include "EventlogData.h"
 
 //
 // Global Prototype Define

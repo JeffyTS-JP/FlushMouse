@@ -12,14 +12,12 @@
 #include "CThread.h"
 
 //
-// CThred::
+// CThread::
 //
 CThread::CThread()
 {
-	lpstThreadData = new THREAD_DATA[sizeof(THREAD_DATA)];
-	ZeroMemory(lpstThreadData, sizeof(THREAD_DATA));
-	lpstThreadData->lpstSA = new SECURITY_ATTRIBUTES[sizeof(SECURITY_ATTRIBUTES)];
-	ZeroMemory(lpstThreadData->lpstSA, sizeof(SECURITY_ATTRIBUTES));
+	if ((lpstThreadData = new THREAD_DATA[sizeof(THREAD_DATA)]) != NULL)	ZeroMemory(lpstThreadData, sizeof(THREAD_DATA));
+	if ((lpstThreadData->lpstSA = new SECURITY_ATTRIBUTES[sizeof(SECURITY_ATTRIBUTES)]) != NULL)	ZeroMemory(lpstThreadData->lpstSA, sizeof(SECURITY_ATTRIBUTES));
 
 	lpstThreadData->lpstSA->nLength = sizeof(SECURITY_ATTRIBUTES);
 	lpstThreadData->lpstSA->lpSecurityDescriptor = NULL;
@@ -39,7 +37,7 @@ CThread::~CThread()
 //
 BOOL 	CThread::bRegister(LPCTSTR lpszThreadName, DWORD dwThreadID, LPTHREAD_START_ROUTINE lpbCallbackRoutine, LPVOID lParamOption, DWORD dwSleepTime)
 {
-	if (lpstThreadData == NULL)	return FALSE;
+	if ((lpstThreadData == NULL) || (lpstThreadData->lpstSA == NULL))	return FALSE;
 	lpstThreadData->lpszThreadName = lpszThreadName;				lpstThreadData->dwThreadID = dwThreadID;
 	lpstThreadData->lpbCallbackRoutine = lpbCallbackRoutine;		lpstThreadData->lParamOption = lParamOption;
 	lpstThreadData->dwSleepTime = dwSleepTime;						lpstThreadData->bThreadSentinel = TRUE;
@@ -57,9 +55,7 @@ BOOL 	CThread::bRegister(LPCTSTR lpszThreadName, DWORD dwThreadID, LPTHREAD_STAR
 //
 BOOL 	CThread::bStart()
 {
-	if ((lpstThreadData == NULL) || (lpstThreadData->hThread == NULL)) {
-		return FALSE;
-	}
+	if ((lpstThreadData == NULL) || (lpstThreadData->lpstSA == NULL) || (lpstThreadData->hThread == NULL))	return FALSE;
 	lpstThreadData->bThreadSentinel = TRUE;
 	DWORD	dwExitCode = 0;
 	if (GetExitCodeThread((HANDLE)lpstThreadData->hThread, &dwExitCode)) {
@@ -89,29 +85,27 @@ BOOL 	CThread::bStart()
 VOID 	CThread::vUnregister()
 {
 #define	TIMEOUT	1000 
-	if ((lpstThreadData == NULL) || (lpstThreadData->hThread == NULL))	return;
+	if ((lpstThreadData == NULL) || (lpstThreadData->lpstSA == NULL) || (lpstThreadData->hEvent == NULL) || (lpstThreadData->hThread == NULL))	return;
 	lpstThreadData->bThreadSentinel = FALSE;
 	DWORD	dwExitCode = 0;
 	if (GetExitCodeThread((HANDLE)lpstThreadData->hThread, &dwExitCode)) {
 		if (dwExitCode == STILL_ACTIVE) {
 			if (ResumeThread(lpstThreadData->hThread) != -1) {
-				if (lpstThreadData->hEvent != NULL) {
-					if (SetEvent(lpstThreadData->hEvent)) {
-						DWORD	dwRet = WaitForSingleObject((HANDLE)lpstThreadData->hThread, TIMEOUT);
-						switch (dwRet) {
-						case WAIT_OBJECT_0:
-							break;
-						case WAIT_ABANDONED:
-						case WAIT_TIMEOUT:
-						case WAIT_FAILED:
-						default:
+				if (SetEvent(lpstThreadData->hEvent)) {
+					DWORD	dwRet = WaitForSingleObject((HANDLE)lpstThreadData->hThread, TIMEOUT);
+					switch (dwRet) {
+					case WAIT_OBJECT_0:
+						break;
+					case WAIT_ABANDONED:
+					case WAIT_TIMEOUT:
+					case WAIT_FAILED:
+					default:
 #pragma warning(push)
 #pragma warning(disable : 6258)
 						if (!TerminateThread(lpstThreadData->hThread, 2)) {
 						}
 #pragma warning(pop)
 						break;
-						}
 					}
 				}
 			}
@@ -129,7 +123,7 @@ unsigned __stdcall	CThread::uThreadProc(void* pArguments)
 {
 	LPTHREAD_DATA lpstThreadData = (LPTHREAD_DATA)pArguments;
 	do {
-		if ((lpstThreadData != NULL) && (lpstThreadData->hEvent != NULL) && (lpstThreadData->hThread != NULL)) {
+		if ((lpstThreadData != NULL) && (lpstThreadData->lpstSA != NULL) && (lpstThreadData->hEvent != NULL) && (lpstThreadData->hThread != NULL)) {
 			DWORD	dwRet = WaitForSingleObject(lpstThreadData->hEvent, INFINITE);
 			switch (dwRet) {
 			case WAIT_OBJECT_0:	

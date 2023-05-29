@@ -190,23 +190,21 @@ BOOL CALLBACK CIME::bEnumChildProcActivateIME(HWND hWnd, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
-	BOOL	bRet = FALSE;
 	HWND	hIMWnd = ImmGetDefaultIMEWnd(hWnd);
 	if (hIMWnd != NULL) {
 		SendMessage(hIMWnd, WM_ACTIVATE, (WPARAM)WA_ACTIVE, (LPARAM)NULL);
 		LPTSTR	lpszBuffer = new TCHAR[_MAX_PATH];
-		ZeroMemory(lpszBuffer, _MAX_PATH);
+		ZeroMemory(lpszBuffer, (sizeof(TCHAR) * _MAX_PATH));
 		if (GetClassName(hIMWnd, lpszBuffer, _MAX_PATH) != 0) {
 			HWND	hIMEWnd = FindWindow(lpszBuffer, NULL);
 			if (hIMEWnd != NULL) {
 				SendMessage(hIMEWnd, WM_ACTIVATE, (WPARAM)WA_ACTIVE, (LPARAM)NULL);
-
-				bRet = TRUE;
+				if (lpszBuffer != NULL)	delete[] lpszBuffer;
+				return TRUE;
 			}
 		}
 		if (lpszBuffer != NULL)	delete[] lpszBuffer;
 	}
-	//return bRet;
 	return TRUE;
 }
 
@@ -335,7 +333,6 @@ BOOL			CIME::bGetVirtualDesktopSize()
 	return bRet;
 }
 
-
 //
 // bGetVirtualDesktopSizeEnumProc()
 //
@@ -395,6 +392,48 @@ BOOL		CIME::bIsNewIME()
 }
 
 //
+// dGetInputLocale()
+//
+DWORD		CIME::dwGetInputLocale()
+{
+#define SUBKEY	_T("SOFTWARE\\Microsoft\\Input\\Locales")
+#define VALUE	_T("InputLocale")
+	DWORD	dwInputLocale = 0;
+	CRegistry* CReg = new CRegistry;
+	if (CReg) {
+		if (!CReg->bReadSystemRegValueDWORD(HKEY_LOCAL_MACHINE, SUBKEY, VALUE, &dwInputLocale)) {
+		}
+		delete	CReg;
+	}
+	return (dwInputLocale & 0x0000ffff);
+#undef SUBKEY
+#undef VALUE
+}
+
+//
+// hklGetInputLocale()
+//
+HKL		CIME::hklGetInputLocale(HWND hWndObserved)
+{
+
+	DWORD	dwProcessID = 0;
+	DWORD	dwThreadID = 0;
+	HKL		hkl = NULL;
+	DWORD	dwInputLocale = 0;
+	if ((dwThreadID = GetWindowThreadProcessId(hWndObserved, &dwProcessID)) != 0) {
+		if ((hkl = GetKeyboardLayout(dwThreadID)) != NULL) {
+			int	iKeyboardType = GetKeyboardType(1);
+			if ((iKeyboardType != 2) || (hkl != JP_IME))	hkl = US_ENG;
+			hkl = (HKL)(((UINT64)hkl & KB_MASK) | (dwInputLocale & LANG_MASK));
+			return hkl;
+		}
+	}
+	return (HKL)0;
+#undef SUBKEY
+#undef VALUE
+}
+
+//S
 // class CCursor
 //
 CCursor::CCursor()
@@ -939,23 +978,27 @@ BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData)
 	int		iCursorSizeX = 0, iCursorSizeY = 0, iCaretSizeX = 0, iCaretSizeY = 0;
 	DWORD	dwIMEMode = Cime->dwIMEMode(lpstCursorData->hWndObserved, lpstCursorData->bForceHiragana);
 	int		iCursor = 0;
-	if (dwIMEMode != IMEOFF) {
-		while (dwIMEMode != lpstCursorData->lpstFlushMouseCursor[iCursor].dwIMEMode) {
-			++iCursor;
+	while (dwIMEMode != lpstCursorData->lpstFlushMouseCursor[iCursor].dwIMEMode) {
+		++iCursor;
+		if (lpstCursorData->lpstFlushMouseCursor[iCursor].dwIMEMode == (DWORD)(-1)) {
+			iCursor = 0;	dwIMEMode = IMEOFF;
+			break;
 		}
-		CursorWindow->vSetModeString(stIMECursorData.lpstFlushMouseCursor[iCursor].szMode);
 	}
+	CursorWindow->vSetModeString(stIMECursorData.lpstFlushMouseCursor[iCursor].szMode);
 	if (lpstCursorData->bDrawNearCaret != FALSE) {
 		POINT	pt{};
 		HWND	hWnd = GetForegroundWindow();
 		if (bCalcDispModeCaretRect(hWnd, lpstCursorData->iModeSize, lpstCursorData->iModeSize, &rcCaret, &pt)) {
 			hWnd = WindowFromPoint(pt);
 			DWORD	dwIMEModeCaret = dwIMEMode;
-			int		iCaret = iCursor;
-			if (hWnd != lpstCursorData->hWndObserved) {
-				dwIMEModeCaret = Cime->dwIMEMode(hWnd, lpstCursorData->bForceHiragana);
-				while (dwIMEModeCaret != lpstCursorData->lpstFlushMouseCursor[iCaret].dwIMEMode) {
-					++iCaret;
+			int		iCaret = 0;
+			dwIMEModeCaret = Cime->dwIMEMode(hWnd, lpstCursorData->bForceHiragana);
+			while (dwIMEModeCaret != lpstCursorData->lpstFlushMouseCursor[iCaret].dwIMEMode) {
+				++iCaret;
+				if (lpstCursorData->lpstFlushMouseCursor[iCaret].dwIMEMode == (DWORD)(-1)) {
+					iCaret = 0;	dwIMEModeCaret = IMEOFF;
+					break;
 				}
 			}
 			if ((rcCaret.left != 0) || (rcCaret.top != 0) || (rcCaret.right != 0) || (rcCaret.bottom != 0)) {
