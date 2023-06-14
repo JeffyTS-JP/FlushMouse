@@ -17,6 +17,7 @@
 #include "Profile.h"
 #include "Resource.h"
 #include "..\FlushMouseDLL\GlobalHookDll.h"
+#include "..\FlushMouseDLL\KeyboardHookDll.h"
 #include "..\FlushMouseDLL\EventlogDll.h"
 #include "..\FlushMouseDLL32\FlushMouseDll32.h"
 #include "..\MiscLIB\CRegistry.h"
@@ -733,7 +734,7 @@ CFlushMouseHook::CFlushMouseHook()
 {
 	hHook64Dll = NULL;
 	bGlobalHook64 = FALSE;
-	bKeyboardHook64 = FALSE;
+	bKeyboardHookLL64 = FALSE;
 	bMouseHook64 = FALSE;
 	bHook32Dll = FALSE;
 	lpstProcessInfomation = new PROCESS_INFORMATION[sizeof(PROCESS_INFORMATION)];
@@ -753,8 +754,10 @@ BOOL			CFlushMouseHook::bHookSet(HWND hWnd, LPCTSTR lpszDll64Name, LPCTSTR lpszE
 {
 	UNREFERENCED_PARAMETER(lpszDll64Name);
 	if ((bGlobalHook64 = bGlobalHookSet(hWnd)) != FALSE) {
-		if ((bHook32Dll = bHook32DllStart(hWnd, lpszExec32Name)) != FALSE) {
-			return TRUE;
+		if ((bKeyboardHookLL64 = bKeyboardHookLLSet(hWnd)) != FALSE) {
+			if ((bHook32Dll = bHook32DllStart(hWnd, lpszExec32Name)) != FALSE) {
+				return TRUE;
+			}
 		}
 	}
 	bHookUnset();
@@ -767,6 +770,7 @@ BOOL			CFlushMouseHook::bHookSet(HWND hWnd, LPCTSTR lpszDll64Name, LPCTSTR lpszE
 BOOL		CFlushMouseHook::bHookUnset()
 {
 	if (bHook32Dll)			bHook32DllStop();
+	if (bKeyboardHookLL64)	bKeyboardHookLLUnset();
 	if (bGlobalHook64)		bGlobalHookUnset();
 	return TRUE;
 }

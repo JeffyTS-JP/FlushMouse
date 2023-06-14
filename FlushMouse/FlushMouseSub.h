@@ -91,8 +91,6 @@ public:
 	BOOL		bHookUnset();
 
 private:
-	BOOL		bHook64DllLoad(LPCTSTR lpszDll64Name);
-	BOOL		bHook64DllUnload();
 	BOOL		bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name);
 	BOOL		bHook32DllStop();
 	static BOOL CALLBACK bEnumWindowsProcHookStop(HWND hWnd, LPARAM lParam);
@@ -100,7 +98,7 @@ private:
 private:
 	HMODULE		hHook64Dll;
 	BOOL		bGlobalHook64;
-	BOOL		bKeyboardHook64;
+	BOOL		bKeyboardHookLL64;
 	BOOL		bMouseHook64;
 	BOOL		bHook32Dll;
 

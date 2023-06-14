@@ -17,7 +17,6 @@
 #include "..\FlushMouseDLL\EventlogData.h"
 #include "..\FlushMouseDLL32\FlushMouseDll32.h"
 #include "..\FlushMouseDLL32\MouseHookDll32.h"
-#include "..\FlushMouseDLL32\KeyboardHookDll32.h"
 
 #ifdef _DEBUG
 #define DEBUG_CLIENTBLOCK   new( _CLIENT_BLOCK, __FILE__, __LINE__)
@@ -65,7 +64,6 @@ static LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 // Handler
 static BOOL				Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct);
 static void				Cls_OnDestroy(HWND hWnd);
-static void				Cls_OnCheckExistingJPIMEEx(HWND hWnd, BOOL bEPHelper);
 
 // Sub
 static VOID CALLBACK	vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
@@ -205,7 +203,6 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 	switch (message) {
 		HANDLE_MSG(hWnd, WM_CREATE, Cls_OnCreate);
 		HANDLE_MSG(hWnd, WM_DESTROY, Cls_OnDestroy);
-		HANDLE_MSG(hWnd, WM_CHECKEXISTINGJPIMEEX, Cls_OnCheckExistingJPIMEEx);
 	default:
 			break;
 	}
@@ -243,11 +240,6 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		return FALSE;
 	}
 
-	if (!bKeyboardHookLLSet32(hParentWnd)) {
-		vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE);
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-		return FALSE;
-	}
 	return TRUE;
 }
 
@@ -257,7 +249,6 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 //
 static void Cls_OnDestroy(HWND hWnd)
 {
-	bKeyboardHookLLUnset32();
 	bMouseHookUnset32();
 
 	if (uCheckProcTimer != NULL) {
@@ -266,18 +257,6 @@ static void Cls_OnDestroy(HWND hWnd)
 		}
 	}
 	PostQuitMessage(0);
-}
-
-//
-// WM_CHECKEXISTINGJPIMEEX
-// Cls_OnCheckExistingJPIMEEx()
-//
-static void		Cls_OnCheckExistingJPIMEEx(HWND hWnd, BOOL bEPHelper)
-{
-	UNREFERENCED_PARAMETER(hWnd);
-	if (!bSetEnableEPHelperLL32(bEPHelper)) {
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
-	}
 }
 
 //

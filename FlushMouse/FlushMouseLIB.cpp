@@ -19,7 +19,7 @@
 #include "CommonDef.h"
 #include "..\FlushMouseDLL\EventlogDll.h"
 #include "..\FlushMouseDLL\GlobalHookDll.h"
-#include "..\FlushMouseDLL32\KeyboardHookDll32.h"
+#include "..\FlushMouseDLL\KeyboardHookDll.h"
 #include "..\FlushMouseDLL32\MouseHookDll32.h"
 #include "..\MiscLIB\CThread.h"
 #include "..\MiscLIB\CRegistry.h"
@@ -587,7 +587,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 			}
 			break;
 		case KEY_IME_OFF:			// IME OFF					(0x1a)
-			bIMEInConverting = FALSE;
+			if (bIMEInConverting)	return;
 			if (bEnableEPHelper || bIMEModeForced) {
 				if ((bIMEModeForced != FALSE) && (!Cime->bIsNewIME())) {
 					Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
@@ -632,9 +632,16 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 			break;
 		case KEY_OEM_3:				// JP(IME/ENG) [@] / US(ENG) IME ON (0xc0) = ['] ALT + ”¼Šp/‘SŠp or Š¿Žš
 		case KEY_OEM_8:				// JP(IME/ENG) [`] / UK(ENG) IME ON (0xdf) = ['] ALT + ”¼Šp/‘SŠp or Š¿Žš
+			if (!bKBisEP())	return;
+			if (bIMEInConverting)	return;
 			if (bEnableEPHelper || bIMEModeForced) {
 				if (bForExplorerPatcherSWS(hForeWnd, TRUE, bIMEModeForced, &hNewHKL, &hPreviousHKL)) {
-					Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
+					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
+						Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
+					}
+					else {
+						return;
+					}
 				}
 			}
 			break;
@@ -648,7 +655,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 			}
 			break;
 		case KEY_OEM_ATTN:			// JP(IME/ENG) ‰p”/CapsLock(0xf0)
-			bIMEInConverting = FALSE;
+			if (bIMEInConverting)	return;
 			if (bEnableEPHelper || bIMEModeForced) {
 				if (bForExplorerPatcherSWS(hForeWnd, TRUE, bIMEModeForced, &hNewHKL, &hPreviousHKL)) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
@@ -663,7 +670,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 			}
 			break;
 		case KEY_OEM_FINISH:		// JP(IME/ENG) OEM ƒJƒ^ƒJƒi	(0xf1)
-			bIMEInConverting = FALSE;
+			if (bIMEInConverting)	return;
 			if (bEnableEPHelper || bIMEModeForced) {
 				if (bForExplorerPatcherSWS(hForeWnd, bIMEModeForced, TRUE, &hNewHKL, &hPreviousHKL)) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
@@ -678,7 +685,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 			}
 			break;
 		case KEY_OEM_COPY:			// JP(IME/ENG) OEM ‚Ð‚ç‚ª‚È	(0xf2)
-			bIMEInConverting = FALSE;
+			if (bIMEInConverting)	return;
 			if (bEnableEPHelper || bIMEModeForced) {
 				if (bForExplorerPatcherSWS(hForeWnd, bIMEModeForced, TRUE, &hNewHKL, &hPreviousHKL)) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
@@ -785,6 +792,46 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 		}
 	}
 	return;
+}
+
+//
+// bKBisEP()
+//
+static BOOL		bKBisEP()
+{
+	if (GetKeyboardType(1) == 0) {		// EP Keyboard
+		_Post_equals_last_error_ DWORD err = GetLastError();
+		if (err != 0) {
+		}
+		else {
+			return TRUE;
+		}
+	}
+
+	// 2nd Check
+	DWORD	dProcessID = 0;
+	DWORD	dThreadID = GetWindowThreadProcessId(GetForegroundWindow(), &dProcessID);
+	if (dThreadID != 0) {
+		HKL	hkl = GetKeyboardLayout(dThreadID);
+		if (hkl == US_ENG) {			// EP Keyboard
+			return TRUE;
+		}
+	}
+
+	// 3rd Check
+#define SUBKEY	_T("SOFTWARE\\Microsoft\\Input\\Locales")
+#define VALUE	_T("InputLocale")
+	DWORD	dwInputLocale = 0;
+	CRegistry* CReg = new CRegistry;
+	if (CReg) {
+		if (!CReg->bReadSystemRegValueDWORD(HKEY_LOCAL_MACHINE, SUBKEY, VALUE, &dwInputLocale)) {
+		}
+		delete	CReg;
+	}
+	if ((dwInputLocale & 0x0000ffff) == LANG_IME)	return FALSE;
+	return TRUE;
+#undef SUBKEY
+#undef VALUE
 }
 
 // 

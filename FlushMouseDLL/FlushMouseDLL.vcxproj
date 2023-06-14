@@ -195,6 +195,7 @@ copy /Y $(OUTDIR)_FlushMouseDLL.dll $(OUTDIR)FlushMouseDLL.dll</Command>
     <ClInclude Include="FlushMouseDll.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GlobalHookDll.h" />
+    <ClInclude Include="KeyboardHookDll.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="targetver.h" />
@@ -203,6 +204,7 @@ copy /Y $(OUTDIR)_FlushMouseDLL.dll $(OUTDIR)FlushMouseDLL.dll</Command>
     <ClCompile Include="EventlogDll.cpp" />
     <ClCompile Include="FlushMouseDll.cpp" />
     <ClCompile Include="GlobalHookDll.cpp" />
+    <ClCompile Include="KeyboardHookDll.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
