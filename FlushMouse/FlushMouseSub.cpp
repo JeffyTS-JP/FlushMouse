@@ -119,20 +119,21 @@ BOOL		bReCreateTaskTrayWindow(HWND hWnd, UINT message)
 		HICON	hIcon = NULL;
 		if ((hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE))) != NULL) {
 			if (bCreateTaskTrayWindow(hWnd, hIcon, szTitle) == FALSE) {
-				if (bDestroyTaskTrayWindow(hWnd)) {
-					bTaskTray = FALSE;
-				}
-				bReportEvent(MSG_RESTART_EVENT, APPLICATION_CATEGORY);
-				Sleep(100);
-				return TRUE;
-			}
-			else {
 				bTaskTray = TRUE;
 				vStopThreadHookTimer(hWnd);
 				if (!bStartThreadHookTimer(hWnd)) {
+					bReportEvent(MSG_THREAD_HOOK_TIMER_RESTART_FAILED, APPLICATION_CATEGORY);// Eventlog
 					PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 				}
 				bReportEvent(MSG_THREAD_HOOK_TIMER_RESTARTED, APPLICATION_CATEGORY);
+				return TRUE;
+			}
+			else {
+				if (bDestroyTaskTrayWindow(hWnd)) {
+					bTaskTray = FALSE;
+				}
+				bReportEvent(MSG_TASKTRAY_REGISTER_FAILD, APPLICATION_CATEGORY);// Eventlog
+				bReportEvent(MSG_RESTART_EVENT, APPLICATION_CATEGORY);
 				return TRUE;
 			}
 		}
@@ -163,11 +164,15 @@ BOOL		bDestroyTaskTrayWindow(HWND hWnd)
 				bTaskTray = FALSE;
 				return TRUE;
 			}
+			else {
+				return FALSE;
+			}
 		}
 		catch (...) {
+			return FALSE;
 		}
 	}
-	return FALSE;
+	return TRUE;
 }
 
 //
@@ -559,19 +564,12 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 	UNREFERENCED_PARAMETER(lpSetting);
 	switch (Type) {
 	case PBT_APMSUSPEND:
-		vStopThreadHookTimer(hWnd);
 		bReportEvent(MSG_PBT_APMSUSPEND, POWERNOTIFICATION_CATEGORY);
-		bReportEvent(MSG_THREAD_HOOK_TIMER_STOPPED, POWERNOTIFICATION_CATEGORY);
 		break;
 	case PBT_APMRESUMEAUTOMATIC:
 		bReportEvent(MSG_PBT_APMRESUMEAUTOMATIC, POWERNOTIFICATION_CATEGORY);
 		break;
 	case PBT_APMRESUMESUSPEND:
-		vGetSetProfileData();
-		if (!bStartThreadHookTimer(hWnd)) {
-			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-		}
-		bReportEvent(MSG_THREAD_HOOK_TIMER_STARTED, POWERNOTIFICATION_CATEGORY);
 		bReportEvent(MSG_PBT_APMRESUMESUSPEND, POWERNOTIFICATION_CATEGORY);
 		break;
 	case PBT_POWERSETTINGCHANGE:
@@ -584,13 +582,12 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 			switch (PowerStatus.ACLineStatus) {
 			case 0:
 				bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_OFF, POWERNOTIFICATION_CATEGORY);
-				bDestroyTaskTrayWindow(hWnd);
+				Sleep(3000);
 				bReportEvent(MSG_RESTART_EVENT, POWERNOTIFICATION_CATEGORY);
+				bDestroyTaskTrayWindow(hWnd);
 				break;
 			case 1:
 				bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_ON, POWERNOTIFICATION_CATEGORY);
-				bReportEvent(MSG_RESTART_EVENT, POWERNOTIFICATION_CATEGORY);
-				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 				break;
 			default:
 				break;

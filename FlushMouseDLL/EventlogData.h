@@ -90,6 +90,15 @@
 #define DLL32_CATEGORY                   ((DWORD)0x00000003L)
 
 //
+// MessageId: Installer_CATEGORY
+//
+// MessageText:
+//
+// Installer Events
+//
+#define Installer_CATEGORY               ((DWORD)0x00000004L)
+
+//
 // MessageId: POWERNOTIFICATION_CATEGORY
 //
 // MessageText:
@@ -138,6 +147,15 @@
 #define MSG_THREAD_HOOK_TIMER_STARTED    ((DWORD)0x40000002L)
 
 //
+// MessageId: MSG_THREAD_HOOK_TIMER_START_FAILED
+//
+// MessageText:
+//
+// Thread, Hook and Timer Start Failed.
+//
+#define MSG_THREAD_HOOK_TIMER_START_FAILED ((DWORD)0x40008002L)
+
+//
 // MessageId: MSG_THREAD_HOOK_TIMER_STOPPED
 //
 // MessageText:
@@ -154,6 +172,15 @@
 // Thread, Hook and Timer Restarted.
 //
 #define MSG_THREAD_HOOK_TIMER_RESTARTED  ((DWORD)0x40000004L)
+
+//
+// MessageId: MSG_THREAD_HOOK_TIMER_RESTART_FAILED
+//
+// MessageText:
+//
+// Thread, Hook and Timer Restart Failed.
+//
+#define MSG_THREAD_HOOK_TIMER_RESTART_FAILED ((DWORD)0x40008004L)
 
 //
 // MessageId: MSG_QUIT_FLUSHMOUSE
@@ -183,6 +210,33 @@
 #define MSG_DONE_FLUSHMOUSE              ((DWORD)0x00000007L)
 
 //
+// MessageId: MSG_TASKTRAY_REGISTERED
+//
+// MessageText:
+//
+// Registered TaskTray.
+//
+#define MSG_TASKTRAY_REGISTERED          ((DWORD)0x00000008L)
+
+//
+// MessageId: MSG_TASKTRAY_REGISTER_FAILD
+//
+// MessageText:
+//
+// Register TaskTray Failed.
+//
+#define MSG_TASKTRAY_REGISTER_FAILD      ((DWORD)0x00008008L)
+
+//
+// MessageId: MSG_DETECT_FLUSHMOUSE_STOP
+//
+// MessageText:
+//
+// Detected Stopping FlushMouse Process.
+//
+#define MSG_DETECT_FLUSHMOUSE_STOP       ((DWORD)0x00008009L)
+
+//
 // MessageId: MSG_PBT_APMSUSPEND
 //
 // MessageText:
@@ -196,7 +250,7 @@
 //
 // MessageText:
 //
-// Resuming from sleep or hibernation (APM).
+// Resuming from Sleep or Hibernation (APM).
 //
 #define MSG_PBT_APMRESUMEAUTOMATIC       ((DWORD)0x40000101L)
 

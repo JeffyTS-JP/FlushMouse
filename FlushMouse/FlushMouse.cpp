@@ -85,18 +85,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		int	iRet = 0;
 		if ((iRet = CompareStringOrdinal(lpCmdLine, -1, L"/quit", -1, TRUE)) != 0) {
 			if (iRet == CSTR_EQUAL) {
-				bReportEvent(MSG_DONE_FLUSHMOUSE, APPLICATION_CATEGORY);	// Eventlog
+				bReportEvent(MSG_DONE_FLUSHMOUSE, Installer_CATEGORY);
 				HWND	hWnd = NULL;
-				if ((hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL)) != NULL) {	// 先に起動されているウィンドウハンドルを探す
-					SetFocus(GetLastActivePopup(hWnd));					    // 先に起動されているウィンドウへフォーカスを与える
-					PostMessage(hWnd, WM_DESTROY, NULL, NULL);				// 先に起動されているウィンドウを終了させる
+				if ((hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL)) != NULL) {
+					SetFocus(GetLastActivePopup(hWnd));
+					PostMessage(hWnd, WM_DESTROY, NULL, NULL);
 					for (int i = 3; i > 0; i--) {
-						Sleep(500);											// 終了を3回待つ
+						Sleep(500);
 						if ((hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL)) != NULL) {
-							SetFocus(GetLastActivePopup(hWnd));				// 先に起動されているウィンドウへフォーカスを与える
-							PostMessage(hWnd, WM_DESTROY, NULL, NULL);		// 先に起動されているウィンドウを終了させる
+							SetFocus(GetLastActivePopup(hWnd));
+							PostMessage(hWnd, WM_DESTROY, NULL, NULL);
 							if (i == 1) {
-								return (-1);								// 終了していない場合はエラー終了
+								return (-1);
 							}
 						}
 						else return 0;
@@ -116,7 +116,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	}
 	if (!bWinMain(hInstance, hPrevInstance))		return (-1);
 
-	// メイン メッセージ ループ:
 	MSG msg{};
 	while (GetMessage(&msg, NULL, 0, 0)) {
 		HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_FLUSHMOUSE));
@@ -139,7 +138,7 @@ BOOL	bSetHeapInformation()
 		ULONG	HeapInformation = 2;
 		if (!HeapSetInformation(hHeap, HeapCompatibilityInformation, &HeapInformation, sizeof(ULONG))) {
 			_Post_equals_last_error_ DWORD err = GetLastError();
-			if (err != ERROR_INVALID_PARAMETER) {	// 87 (0x57)
+			if (err != ERROR_INVALID_PARAMETER) {
 				return FALSE;
 			}
 		}
@@ -199,35 +198,35 @@ static INT_PTR CALLBACK AboutDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 			{
 				RECT		rc{};
 				int		cx = 0, cy = 0;
-				cx = GetSystemMetrics(SM_CXSCREEN);								// スクリーンサイズの取得
+				cx = GetSystemMetrics(SM_CXSCREEN);
 				cy = GetSystemMetrics(SM_CYSCREEN);
-				GetWindowRect(hDlg, (LPRECT)&rc);								// 子ウィンドウのスクリーン座標を取得
-				rc.right = rc.right - rc.left + 1;								// 中央の計算
+				GetWindowRect(hDlg, (LPRECT)&rc);
+				rc.right = rc.right - rc.left + 1;
 				rc.bottom = rc.bottom - rc.top + 1;
 				rc.left = (cx - rc.right) / 2;
 				rc.top = (cy - rc.bottom) / 2;
-				MoveWindow(hDlg, rc.left, rc.top, rc.right, rc.bottom, TRUE);	// 移動
+				MoveWindow(hDlg, rc.left, rc.top, rc.right, rc.bottom, TRUE);
 				HICON	hIcon = NULL;
 				hIcon = (HICON)LoadImage(Resource->hLoad(), MAKEINTRESOURCE(IDI_SMALL), IMAGE_ICON, 16, 16, 0);
-				SendMessage(hDlg, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);		// Iconの設定
+				SendMessage(hDlg, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 				LPTSTR	lpszVersion = new TCHAR[MAX_LOADSTRING];
 				ZeroMemory(lpszVersion, (sizeof(TCHAR) * MAX_LOADSTRING));
 				if (lpszVersion) {
 					ZeroMemory(lpszVersion, (sizeof(TCHAR) * MAX_LOADSTRING));
 					_sntprintf_s(lpszVersion, MAX_LOADSTRING, _TRUNCATE, _T("%d.%d.%d.%d"), MAJOR_VERSION, MINOR_VERSION, BUILD_VERSION, REVISON_VERSION);
-					SetDlgItemText(hDlg, IDC_VERSION, lpszVersion);					// Versionの設定
+					SetDlgItemText(hDlg, IDC_VERSION, lpszVersion);
 					delete[]	lpszVersion;
 				}
 				else return (INT_PTR)FALSE;
 			}
 			return (INT_PTR)TRUE;
 		case WM_CTLCOLORDLG:
-			return (INT_PTR)GetStockObject(WHITE_BRUSH);						// 背景の色
+			return (INT_PTR)GetStockObject(WHITE_BRUSH);
 		case WM_CTLCOLORSTATIC:
 		case WM_CTLCOLOREDIT:
 			SetBkMode(((HDC)wParam), TRANSPARENT);
-			SetTextColor(((HDC)wParam), RGB(0, 0, 0));							// 文字の色
-			return (INT_PTR)GetStockObject(WHITE_BRUSH);						// 背景の色
+			SetTextColor(((HDC)wParam), RGB(0, 0, 0));
+			return (INT_PTR)GetStockObject(WHITE_BRUSH);
 		case WM_COMMAND:
 			if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
 				EndDialog(hDlg, LOWORD(wParam));

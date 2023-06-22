@@ -14,7 +14,7 @@
 #include "Cursor.h"
 #include "CommonDef.h"
 #include "FlushMouseLIB.h"
-#include "..\FlushMouseCursor\Resource.h"
+#include "..\FlushMouseDLL\EventlogDll.h"
 #include "..\MiscLIB\CRegistry.h"
 
 //
@@ -1131,6 +1131,11 @@ BOOL		CCursor::bSetSystemCursor(LPMOUSECURSOR lpstMC, int iCursorSizeX, int iCur
 			fuLoad = (LR_VGACOLOR | LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_CREATEDIBSECTION);
 			if ((hCur = (HCURSOR)LoadImage((HINSTANCE)hMod, MAKEINTRESOURCE(lpstMC->uResourceID),
 															IMAGE_CURSOR, iCursorSizeX, iCursorSizeY, fuLoad)) == NULL) {
+				_Post_equals_last_error_ DWORD err = GetLastError();
+				if (err == ERROR_MOD_NOT_FOUND) {
+					bReportEvent(MSG_RESTART_EVENT, APPLICATION_CATEGORY);
+					PostMessage(hMainWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+				}
 				if (!bCursorDllUnload()) return FALSE;
 				return FALSE;
 			}

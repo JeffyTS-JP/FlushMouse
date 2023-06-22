@@ -109,6 +109,7 @@ static void		Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground);
 static void		Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flags);
 static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd);
 static void		Cls_OnCheckIMEStartConvertingEx(HWND hWnd, BOOL bStartConversioning, DWORD vkCode);
+static void		Cls_OnCheckExistingJPIMEEx(HWND hWnd, BOOL bEPHelper);
 
 // Sub
 static BOOL		bSendInputSub(UINT cInputs, LPINPUT pInputs);
@@ -240,6 +241,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		HANDLE_MSG(hWnd, WM_POWERBROADCAST, Cls_OnPowerBroadcast);
 		HANDLE_MSG(hWnd, WM_EVENT_SYSTEM_FOREGROUNDEX, Cls_OnEventForegroundEx);
 		HANDLE_MSG(hWnd, WM_CHECKIMESTARTCONVEX, Cls_OnCheckIMEStartConvertingEx);
+		HANDLE_MSG(hWnd, WM_CHECKEXISTINGJPIMEEX, Cls_OnCheckExistingJPIMEEx);
 		break;
 
 	default:
@@ -304,8 +306,12 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		return FALSE;
 	}
 
-	if (bCheckExistingJPIME() && bEnableEPHelper)	bForExplorerPatcherSWS(GetForegroundWindow(), FALSE, FALSE, NULL, NULL);
-	
+	if (bCheckExistingJPIME() && (bEnableEPHelper || bIMEModeForced)) {
+		bForExplorerPatcherSWS(GetForegroundWindow(), TRUE, bIMEModeForced, NULL, NULL);
+	}
+
+	bReportEvent(MSG_START_SUCCEED, APPLICATION_CATEGORY);
+
 	return TRUE;
 }
 
@@ -344,6 +350,8 @@ static void Cls_OnDestroy(HWND hWnd)
 		delete Cime;
 		Cime = NULL;
 	}
+
+	bReportEvent(MSG_QUIT_FLUSHMOUSE, APPLICATION_CATEGORY);
 
 	PostQuitMessage(0);
 }
@@ -487,19 +495,21 @@ static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd)
 					return;
 				}
 			}
-			if (bCheckExistingJPIME() && bEnableEPHelper)	bForExplorerPatcherSWS(hWnd, FALSE, FALSE, NULL, NULL);	// @@@ for Explorer Patcher Simple Window Switcher
+			if (bCheckExistingJPIME() && (bEnableEPHelper || bIMEModeForced)) {
+				bForExplorerPatcherSWS(hWnd, TRUE, bIMEModeForced, NULL, NULL);
+			}
 			if (bOffChangedFocus) {
 				Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 			}
-			if (!Cursor->bStartIMECursorChangeThread(hWndObserved))	return;		// error
+			if (!Cursor->bStartIMECursorChangeThread(hWndObserved))	return;
 			POINT	pt{};
 			if (GetCursorPos(&pt)) {
 				RECT	rc{};
 				if (FindWindow(L"Shell_TrayWnd", NULL) == GetForegroundWindow()) {
-					if (bGetTaskTrayWindowRect(hWnd, &rc) == FALSE)	return;	// error
-					if (((pt.x >= rc.left) && (pt.x <= rc.right)) || ((pt.y <= rc.top) && (pt.y >= rc.bottom)))	return;	// Clicked on Notify Icon
+					if (bGetTaskTrayWindowRect(hWnd, &rc) == FALSE)	return;
+					if (((pt.x >= rc.left) && (pt.x <= rc.right)) || ((pt.y <= rc.top) && (pt.y >= rc.bottom)))	return;
 				}
-				if (!Cursor->bStartDrawIMEModeThread(hForeWnd))	return;		// error
+				if (!Cursor->bStartDrawIMEModeThread(hForeWnd))	return;
 			}
 		}
 	}
@@ -587,7 +597,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 			}
 			break;
 		case KEY_IME_OFF:			// IME OFF					(0x1a)
-			if (bIMEInConverting)	return;
+			bIMEInConverting = FALSE;
 			if (bEnableEPHelper || bIMEModeForced) {
 				if ((bIMEModeForced != FALSE) && (!Cime->bIsNewIME())) {
 					Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
@@ -595,7 +605,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 			}
 			break;
 		case KEY_CONVERT:			// JP(IME/ENG) ïœä∑			(0x1c)
-			bIMEInConverting = FALSE;
+			if (bIMEInConverting)	return;
 			if (bEnableEPHelper || bIMEModeForced) {
 				SetFocus(hForeWnd);
 				if (bForExplorerPatcherSWS(hForeWnd, TRUE, bIMEModeForced, &hNewHKL, &hPreviousHKL)) {
@@ -795,6 +805,19 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 }
 
 //
+// WM_CHECKEXISTINGJPIMEEX
+// Cls_OnCheckExistingJPIMEEx()
+//
+void		Cls_OnCheckExistingJPIMEEx(HWND hWnd, BOOL bEPHelper)
+{
+	UNREFERENCED_PARAMETER(hWnd);
+	UNREFERENCED_PARAMETER(bEPHelper);
+	if (!bSetEnableEPHelperLL64(bEPHelper)) {
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
+	}
+}
+
+//
 // bKBisEP()
 //
 static BOOL		bKBisEP()
@@ -968,7 +991,7 @@ BOOL		bCheckExistingJPIME()
 			if (lpHKL)	delete[]	lpHKL;
 		}
 	}
-	HWND	hWnd = FindWindow(CLASS_FLUSHMOUSE32, NULL);
+	HWND	hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
 	if (hWnd != NULL)	PostMessage(hWnd, WM_CHECKEXISTINGJPIMEEX, (WPARAM)bRet, (LPARAM)NULL);
 	return bRet;
 }
@@ -1051,7 +1074,7 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 		}
 	}
 
-	HWND	hFindWnd = FindWindow(CLASS_FLUSHMOUSE32, NULL);
+	HWND	hFindWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
 	if (hFindWnd != NULL) {
 		if (bEnableEPHelper) {
 			PostMessage(hFindWnd, WM_CHECKEXISTINGJPIMEEX, (WPARAM)bEnableEPHelper, (LPARAM)NULL);
@@ -1136,8 +1159,9 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 
 	if (uTimerID == nCheckProcTimerID) {
 		if (FindWindow(CLASS_FLUSHMOUSE32, NULL) == NULL) {
-			bReportEvent(MSG_RESTART_EVENT, APPLICATION_CATEGORY);			// çƒãNìÆÇ∑ÇÈ
-			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);		// Quit
+			bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION_CATEGORY);
+			bReportEvent(MSG_RESTART_EVENT, APPLICATION_CATEGORY);
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		}
 	}
 }

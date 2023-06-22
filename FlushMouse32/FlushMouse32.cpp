@@ -277,7 +277,7 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 			nIco.guidItem = GUID_NULL;
 			nIco.uFlags = 0;
 			try {
-				throw Shell_NotifyIcon(NIM_DELETE, &nIco);					// Delete TaskTray Icon
+				throw Shell_NotifyIcon(NIM_DELETE, &nIco);
 			}
 			catch (BOOL bRet) {
 				if (!bRet) {
@@ -287,8 +287,9 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 			catch (...) {
 				return;
 			}
-			bReportEvent(MSG_RESTART_EVENT, APPLICATION32_CATEGORY);		// FlushMouseが動いていないため再起動する
-			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);		// Quit
+			bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION32_CATEGORY);
+			bReportEvent(MSG_RESTART_EVENT, APPLICATION32_CATEGORY);
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		}
 	}
 	return;
@@ -320,8 +321,24 @@ static BOOL	bReportEvent(DWORD dwEventID, WORD wCategory)
 static void vMessageBox(HWND hWnd, UINT uID, UINT uType)
 {
 	TCHAR       lpText[MAX_LOADSTRING];
-	if (LoadString(hInst, uID, lpText, MAX_LOADSTRING) != 0) {
-		MessageBox(hWnd, lpText, szTitle, uType);
+	try {
+		throw LoadString(hInst, uID, lpText, MAX_LOADSTRING);
+	}
+	catch (int i) {
+		if (i != 0) {
+			try {
+				throw MessageBox(hWnd, lpText, szTitle, uType);
+			}
+			catch (int) {
+				return;
+			}
+			catch (...) {
+				return;
+			}
+		}
+	}
+	catch (...) {
+		return;
 	}
 }
 

@@ -68,6 +68,16 @@ Language=Japanese
 DLL32 Events
 .
 
+MessageId=0x4
+SymbolicName=Installer_CATEGORY
+Language=English
+Installer Events
+.
+
+Language=Japanese
+Installer Events
+.
+
 MessageId=0x10
 SymbolicName=POWERNOTIFICATION_CATEGORY
 Language=English
@@ -129,6 +139,18 @@ Language=Japanese
 Thread, Hook and Timer Started.
 .
 
+MessageId=0x8002
+Severity=Informational
+Facility=Application
+SymbolicName=MSG_THREAD_HOOK_TIMER_START_FAILED
+Language=English
+Thread, Hook and Timer Start Failed.
+.
+
+Language=Japanese
+Thread, Hook and Timer Start Failed.
+.
+
 MessageId=0x0003
 Severity=Informational
 Facility=Application
@@ -151,6 +173,18 @@ Thread, Hook and Timer Restarted.
 
 Language=Japanese
 Thread, Hook and Timer Restarted.
+.
+
+MessageId=0x8004
+Severity=Informational
+Facility=Application
+SymbolicName=MSG_THREAD_HOOK_TIMER_RESTART_FAILED
+Language=English
+Thread, Hook and Timer Restart Failed.
+.
+
+Language=Japanese
+Thread, Hook and Timer Restart Failed.
 .
 
 MessageId=0x0005
@@ -188,6 +222,45 @@ Quit FlushMouse(Installer).
 Language=Japanese
 FlushMouseÇèIóπÇµÇ‹Ç∑(Installer)ÅB
 .
+MessageId=0x0008
+Severity=Success
+Facility=Application
+SymbolicName=MSG_TASKTRAY_REGISTERED
+Language=English
+Registered TaskTray.
+.
+
+Language=Japanese
+Registered TaskTray.
+.
+
+MessageId=0x8008
+Severity=Success
+Facility=Application
+SymbolicName=MSG_TASKTRAY_REGISTER_FAILD
+Language=English
+Register TaskTray Failed.
+.
+
+Language=Japanese
+Register TaskTray Failed.
+.
+
+Language=Japanese
+Registered TaskTray.
+.
+
+MessageId=0x8009
+Severity=Success
+Facility=Application
+SymbolicName=MSG_DETECT_FLUSHMOUSE_STOP
+Language=English
+Detected Stopping FlushMouse Process.
+.
+
+Language=Japanese
+Detected Stopping FlushMouse Process.
+.
 
 MessageId=0x0100
 Severity=Informational
@@ -206,11 +279,11 @@ Severity=Informational
 Facility=Application
 SymbolicName=MSG_PBT_APMRESUMEAUTOMATIC
 Language=English
-Resuming from sleep or hibernation (APM).
+Resuming from Sleep or Hibernation (APM).
 .
 
 Language=Japanese
-Resuming from sleep or hibernation (APM).
+Resuming from Sleep or Hibernation (APM).
 .
 
 MessageId=0x0102

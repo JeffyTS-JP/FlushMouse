@@ -318,7 +318,7 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 //
 static BOOL		bKBisEP()
 {
-	if (GetKeyboardType(1) == 0) {		// EP Keyboard
+	if (GetKeyboardType(1) == 0) {
 		_Post_equals_last_error_ DWORD err = GetLastError();
 		if (err != 0) {
 		}
