@@ -5,12 +5,14 @@
 ||[[Thumb(FlushMouse.png, size=48x48)]]||'''[[ProjectDescription]](タスクトレイに常駐して、マウスカーソルへIMEモードの表示をするユーティリティです)[[BR]]FlushMouse is a software developed by JeffyTS . It is a mouse gesture tool that allows you to perform various operations by drawing gestures with your mouse .  (by Bing)'''||
 
 [[BR]]
-2023/06/13[[BR]]
-　　　'''Version 1.0.0.1 をリリースしました'''[[BR]]
+2023/06/28[[BR]]
+　　　'''Version 1.1.0.3 をリリースしました'''[[BR]]
 [[BR]]
 (主な変更点)[[BR]]
- * 処理のシェイプアップ及びバグ修正を行いました[[BR]]
- * IMEモードの表示の色指定でαチャネルが有効になるようにしてあります(設定画面は作成していません。レジストリを編集できる方は好みの色にしてみてください。ただし、レジストリの編集は十分注意して行ってください)[[BR]]
+ * キャレット位置の取得方法を見直しました。これで、Chromium Edge や Chrome など多数のアプリでキャレットの左側に IME のモードを表示できるようになりました[[BR]]
+ * その他、細かい処理の見直しや、バグの修正をしました[[BR]]
+[[BR]]
+ * IMEモードの表示の色指定でαチャネルが有効になるようにしてあります(設定画面は作成していません。レジストリを編集できる方は好みの色にしてみてください  (ただし、レジストリの編集は十分注意して行ってください)[[BR]]
    * HKEY_CURRENT_USER\Software\JeffyTS\FlushMouse の NearDrawCaretColor と NearDrawMouseColor です。上位バイトから、α B G R の順です[[BR]]
    * αの値は、通常と違って、大きいほうが透明度が高くなります。これは従来と互換性を持たせるためですのでご了承ください。なお、レジストリを変更した方がいたら、お手数をおかけしますが修正をお願いします[[BR]]
    * マウスカーソル右下のモード表示の色は、現状では変更できません。ご了承ください[[BR]]

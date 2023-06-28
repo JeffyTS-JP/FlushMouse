@@ -306,7 +306,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		return FALSE;
 	}
 
-	if (bCheckExistingJPIME() && (bEnableEPHelper || bIMEModeForced)) {
+	if ((bCheckExistingJPIME() && bEnableEPHelper) || bIMEModeForced) {
 		bForExplorerPatcherSWS(GetForegroundWindow(), TRUE, bIMEModeForced, NULL, NULL);
 	}
 
@@ -427,8 +427,8 @@ static void Cls_OnLButtonDownEx(HWND hWnd, int x, int y, HWND hForeground)
 	UNREFERENCED_PARAMETER(x);
 	UNREFERENCED_PARAMETER(y);
 	UNREFERENCED_PARAMETER(hForeground);
-	if (bEnableEPHelper) {
-		bForExplorerPatcherSWS(hForeground, FALSE, FALSE, NULL, NULL);
+	if (bEnableEPHelper || bIMEModeForced) {
+		bForExplorerPatcherSWS(hForeground, FALSE, bIMEModeForced, NULL, NULL);
 	}
 	return;
 }
@@ -495,7 +495,7 @@ static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd)
 					return;
 				}
 			}
-			if (bCheckExistingJPIME() && (bEnableEPHelper || bIMEModeForced)) {
+			if ((bCheckExistingJPIME() && bEnableEPHelper) || bIMEModeForced) {
 				bForExplorerPatcherSWS(hWnd, TRUE, bIMEModeForced, NULL, NULL);
 			}
 			if (bOffChangedFocus) {
@@ -509,7 +509,7 @@ static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd)
 					if (bGetTaskTrayWindowRect(hWnd, &rc) == FALSE)	return;
 					if (((pt.x >= rc.left) && (pt.x <= rc.right)) || ((pt.y <= rc.top) && (pt.y >= rc.bottom)))	return;
 				}
-				if (!Cursor->bStartDrawIMEModeThread(hForeWnd))	return;
+				if (!Cursor->bStartDrawIMEModeThreadWait(hForeWnd))	return;
 			}
 		}
 	}

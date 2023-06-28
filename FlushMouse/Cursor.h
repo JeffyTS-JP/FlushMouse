@@ -109,6 +109,10 @@ typedef struct tagIMECursorData
 	BOOL		bDenyChangedByApp;
 	BOOL		bUseBigArrow;
 	BOOL		bDisplayFocusWindowIME;
+
+	// Work data for Caret
+	HWND		hWnd;
+	RECT		rcCaret;
 } IMECURSORDATA, * PIMECURSORDATA, * LPIMECURSORDATA;
 
 typedef struct tagVirtualDesktop
@@ -199,10 +203,12 @@ public:
 	BOOL			bStartDrawIMEModeThread(HWND hWndObserved);
 	BOOL			bStartDrawIMEModeThreadWait(HWND hWndObserved);
 	BOOL			bStartDrawIMEModeThreadWaitDblClk(HWND hWndObserved);
-	BOOL			bGetCaretPos(HWND hWnd, LPPOINT lpCaretPos);
 	BOOL			bShowHideCursor(HWND hWndObserved, BOOL bShow);
+	BOOL			bGetCaretPos(HWND hWnd, LPPOINT lpCaretPos);
 
 private:
+	BOOL			_bStartDrawIMEModeThread(HWND hWndObserved);
+
 	LPTSTR			lpszGetCursorDataName();
 	HMODULE			hCursorDllLoad();
 	BOOL			bCursorDllUnload();
@@ -214,8 +220,10 @@ private:
 
 	BOOL			bRegisterDrawIMEModeThread(HWND hWndObserved);
 	BOOL			bDrawIMEModeOnDisplay(LPIMECURSORDATA lpstCursorData);
-	BOOL			bCalcDispModeRect(int iModeSizeX, int iModeSizeY, LPRECT lpRect);
-	BOOL			bCalcDispModeCaretRect(HWND hWnd, int iModeSizeX, int iModeSizeY, LPRECT lpRect, LPPOINT lpPt);
+	BOOL			_bCalcDispModeRect(int iModeSizeX, int iModeSizeY, LPRECT lpRect);
+	HWND			_hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPRECT lprcCaret);
+	HWND			_hGetCaretPosByGuiThreadInfo(HWND hForeWnd, LPRECT lpRect);
+	BOOL			_bAdjustCaretByMonitorDPI(int iModeSizeX, int iModeSizeY, LPRECT lprcCaret);
 	BOOL			bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData);
 	static BOOL		bIconDrawEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam);
 	static BOOL WINAPI	bDrawIMEModeRoutine(LPVOID lpvParam);
