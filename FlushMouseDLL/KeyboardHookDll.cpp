@@ -1,9 +1,10 @@
-﻿// KeyboardHookDll.cpp
+﻿//
+// KeyboardHookDll.cpp
 //		Copyright (C) 2022 JeffyTS
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0000	2022/02/12  JeffyTS  	New edit.
+// #0000		2022/02/12  JeffyTS  	New edit.
 //
 
 //
@@ -26,12 +27,12 @@
 #pragma comment(linker, "/SECTION:FLUSHMOUSEDLL_SEG,RWS")
 #pragma data_seg("FLUSHMOUSEDLL_SEG")
 static BOOL		bOnlyCtrlLL = FALSE;
-static DWORD	dwPreviousVKLL = 0;
+static DWORD		dwPreviousVKLL = 0;
 static HWND		hWndKBParentLL = NULL;
 static LPKEYBOARDLL_SHAREDMEM	lpDatKeyboardLL = NULL;
 static BOOL		bEnableEPHelperLL = FALSE;
 static BOOL		bStartConvertingLL = FALSE;
-static CSharedMemory	*CSharedMemLL = NULL;
+static CSharedMemory		*CSharedMemLL = NULL;
 #pragma data_seg()
 
 //
@@ -78,7 +79,7 @@ DLLEXPORT BOOL  __stdcall bKeyboardHookLLSet(HWND hWnd)
 //
 DLLEXPORT BOOL __stdcall bKeyboardHookLLUnset()
 {
-	BOOL	bRet = FALSE;
+	BOOL		bRet = FALSE;
 	if (CSharedMemLL != NULL) {
 		if ((lpDatKeyboardLL = (LPKEYBOARDLL_SHAREDMEM)CSharedMemLL->lpvSharedMemoryRead()) != NULL) {
 			if (lpDatKeyboardLL->hHook) {
@@ -103,7 +104,7 @@ DLLEXPORT BOOL __stdcall bKeyboardHookLLUnset()
 //
 DLLEXPORT BOOL __stdcall bSetEnableEPHelperLL64(BOOL bEPHelper)
 {
-	BOOL	bRet = FALSE;
+	BOOL		bRet = FALSE;
 	bEnableEPHelperLL = bEPHelper;
 	if (CSharedMemLL != NULL) {
 		if ((lpDatKeyboardLL = (LPKEYBOARDLL_SHAREDMEM)CSharedMemLL->lpvSharedMemoryRead()) != NULL) {
@@ -362,23 +363,8 @@ static BOOL	bKeyboardHookLLProcSub()
 		}
 	}
 	hWndKBParentLL = lpDatKeyboardLL->hWnd;
-	bEnableEPHelperLL = lpDatKeyboardLL->bEnableEPHelper;		// @@@ for Explorer Patcher Simple Window Switcher
+	bEnableEPHelperLL = lpDatKeyboardLL->bEnableEPHelper;
 	return TRUE;
-	/*
-	if ((hWndKBParentLL == NULL) || (lpDatKeyboardLL == NULL)) {
-		if (lpDatKeyboardLL == NULL) {
-			if ((lpDatKeyboardLL = (LPKEYBOARDLL_SHAREDMEM)lpvSharedMemoryOpen(KEYBOARDHOOKLLMEM, sizeof(KEYBOARDLL_SHAREDMEM))) == NULL) {
-				return	FALSE;
-			}
-		}
-		if (lpDatKeyboardLL->hWnd == NULL) {
-			return	FALSE;
-		}
-		hWndKBParentLL = lpDatKeyboardLL->hWnd;
-		bEnableEPHelperLL = lpDatKeyboardLL->bEnableEPHelper;		// @@@ for Explorer Patcher Simple Window Switcher
-	}
-	return TRUE;
-	*/
 }
 
 /* = EOF = */

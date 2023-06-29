@@ -1,9 +1,10 @@
-﻿// Profile.cpp
+﻿//
+// Profile.cpp
 //		Copyright (C) 2022 JeffyTS
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0000	2022/03/23  JeffyTS  	New edit.
+// #0000		2022/03/23  JeffyTS  	New edit.
 //
 
 //

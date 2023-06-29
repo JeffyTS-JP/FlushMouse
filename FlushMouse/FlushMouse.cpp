@@ -1,4 +1,5 @@
-﻿// FlushMouse.cpp
+﻿//
+// FlushMouse.cpp
 //		for Windows10/11 Win32 API msi Packaage App.
 //		Copyright (C) 1993 JeffyTS
 //
@@ -7,8 +8,8 @@
 //      
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0000	1993/11/17  JeffyTS  	New edit.
-// #0001	2022/02/04  JeffyTS		Visual Studio 2022 (C++)へ移植
+// #0000		1993/11/17  JeffyTS  	New edit.
+// #0001		2022/02/04  JeffyTS		Visual Studio 2022 (C++)へ移植
 //
 
 //
@@ -21,6 +22,7 @@
 #include "..\version.h"
 #include "FlushMouseLIB.h"
 #include "Resource.h"
+#include "TaskTray.h"
 #include "..\FlushMouseDLL\EventlogDll.h"
 
 #if defined _DEBUG
@@ -41,8 +43,8 @@
 // Global Data
 //
 // Hook
-TCHAR		szFlushMouse64[] = _T("FlushMouseDLL.dll");
-TCHAR		szFlushMouse32[] = _T("FlushMouse32.exe");
+TCHAR		szFlushMouseDLL[] = FLUSHMOUSE_DLL;
+TCHAR		szFlushMouse32[] = FLUSHMOUSE32_EXE;
 
 //
 // Local Data

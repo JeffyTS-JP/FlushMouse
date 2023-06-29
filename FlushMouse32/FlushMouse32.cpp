@@ -1,9 +1,10 @@
-﻿// FlushMouse32.cpp
+﻿//
+// FlushMouse32.cpp
 //		Copyright (C) 2022 JeffyTS
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0000	2022/04/06  JeffyTS  	New edit.
+// #0000		2022/04/06  JeffyTS  	New edit.
 //
 
 //
@@ -45,10 +46,9 @@ static UINT_PTR	uCheckProcTimer = NULL;
 //
 // Local Data
 //
-static TCHAR		szTitle[MAX_LOADSTRING]{};			// タイトル バーのテキスト
-//static TCHAR		szWindowClass[]{ CLASS_FLUSHMOUSE32 };	// メイン ウィンドウ クラス名
-static HINSTANCE	hInst = NULL;						// 現在のインターフェイス
-static HWND			hParentWnd = NULL;					// 親のWindow Handle
+static TCHAR			szTitle[MAX_LOADSTRING]{};
+static HINSTANCE		hInst = NULL;
+static HWND			hParentWnd = NULL;
 
 //
 // Global Prototype Define
@@ -68,6 +68,7 @@ static void				Cls_OnDestroy(HWND hWnd);
 // Sub
 static VOID CALLBACK	vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
 static BOOL				bReportEvent(DWORD dwEventID, WORD wCategory);
+static BOOL	 			bCreateProcess(LPCTSTR lpszExecName);
 static void				vMessageBox(HWND hWnd, UINT uID, UINT uType);
 
 //
@@ -177,7 +178,7 @@ static BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	UNREFERENCED_PARAMETER(nCmdShow);
 #define		WINDOWSTYLE		WS_OVERLAPPEDWINDOW  | WS_HSCROLL | WS_VSCROLL // | WS_VISIBLE // WS_MINIMIZE | WS_SYSMENU
 	hInst = hInstance;							// グローバル変数にインスタンス ハンドルを格納する
-	HWND	hWnd = NULL;						// メインウィンドウのハンドル
+	HWND		hWnd = NULL;						// メインウィンドウのハンドル
 	hWnd = CreateWindowEx(
 							WS_DISABLED,		// Disabled Window
 							CLASS_FLUSHMOUSE32,	// RegisterClass()呼び出しを参照
@@ -223,7 +224,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		return FALSE;
 	}
 
-	BOOL	bBool = FALSE;
+	BOOL		bBool = FALSE;
 	if (SetUserObjectInformation(GetCurrentProcess(), UOI_TIMERPROC_EXCEPTION_SUPPRESSION, &bBool, sizeof(BOOL)) != FALSE) {
 		// Set Timer for Proc
 		if (uCheckProcTimer == NULL) {
@@ -281,14 +282,13 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 			}
 			catch (BOOL bRet) {
 				if (!bRet) {
-					return;
 				}
 			}
 			catch (...) {
-				return;
 			}
 			bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION32_CATEGORY);
-			bReportEvent(MSG_RESTART_EVENT, APPLICATION32_CATEGORY);
+			bCreateProcess(FLUSHMOUSE_EXE);
+			bReportEvent(MSG_RESTART_EVENT, APPLICATION32_CATEGORY);	
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		}
 	}
@@ -300,7 +300,7 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 //
 static BOOL	bReportEvent(DWORD dwEventID, WORD wCategory)
 {
-	BOOL	bRet = FALSE;
+	BOOL		bRet = FALSE;
 	HANDLE	hEvent = RegisterEventSource(NULL, _T("FlushMouse"));
 	if (hEvent != NULL) {
 		if (ReportEvent(hEvent, (0x0000000c & (dwEventID >> 28)), wCategory, dwEventID, NULL, 0, 0, NULL, NULL) != 0) {
@@ -311,6 +311,30 @@ static BOOL	bReportEvent(DWORD dwEventID, WORD wCategory)
 		if (DeregisterEventSource(hEvent) == 0) {
 			bRet = FALSE;
 		}
+	}
+	return bRet;
+}
+
+//
+// bCreateProcess()
+//
+static BOOL	 	bCreateProcess(LPCTSTR lpszExecName)
+{
+	BOOL		bRet = FALSE;
+	DWORD	dwSize = 0;
+	dwSize = ExpandEnvironmentStrings(lpszExecName, NULL, 0);
+	LPTSTR	lpszBuffer = new TCHAR[dwSize];
+	if (lpszBuffer) {
+		ZeroMemory(lpszBuffer, dwSize);
+		dwSize = ExpandEnvironmentStrings(lpszExecName, lpszBuffer, dwSize);
+		PROCESS_INFORMATION	ProcessInfomation{};
+		STARTUPINFO	StartupInfo{};		StartupInfo.cb = sizeof(STARTUPINFO);
+		if (CreateProcess(lpszBuffer, NULL, NULL, NULL, TRUE, NORMAL_PRIORITY_CLASS, NULL, NULL, &StartupInfo, &ProcessInfomation) != FALSE) {
+			CloseHandle(ProcessInfomation.hProcess);
+			CloseHandle(ProcessInfomation.hThread);
+			bRet = TRUE;
+		}
+		delete[]		lpszBuffer;
 	}
 	return bRet;
 }

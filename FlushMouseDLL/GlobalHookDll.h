@@ -1,4 +1,5 @@
-﻿// GlobalHookDll.h
+﻿//
+// GlobalHookDll.h
 //		Copyright (C) 2022 JeffyTS
 //
 // No.      Date		    Name		    Reason & Document

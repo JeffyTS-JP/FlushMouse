@@ -1,9 +1,10 @@
-﻿// Cursor.cpp
+﻿//
+// Cursor.cpp
 //		Copyright (C) 2022 JeffyTS
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0000	2022/03/03  JeffyTS  	New edit.
+// #0000		2022/03/03  JeffyTS  	New edit.
 //
 
 // Include
@@ -12,16 +13,20 @@
 #include "pch.h"
 #include "Profile.h"
 #include "Cursor.h"
-#include "CommonDef.h"
 #include "FlushMouseLIB.h"
+#include "CommonDef.h"
 #include "..\FlushMouseDLL\EventlogDll.h"
 #include "..\MiscLIB\CRegistry.h"
 
 //
+// Library
+//
+
+//
 // Define
 //
-#define FLUSHMOUSECURSORDIR	_T("\\JeffyTS\\FlushMouse\\")
-#define FLUSHMOUSECURSORDAT	_T("FlushMouseCursor.dat")
+#define FLUSHMOUSECURSORDIR			_T("\\JeffyTS\\FlushMouse\\")
+#define FLUSHMOUSECURSORDAT			_T("FlushMouseCursor.dat")
 
 // IME Cursor Change Thread
 #define IMECURSORCHANGETHREADID		1
@@ -45,412 +50,12 @@
 //
 
 //
-// Class CIME
-//
-CIME::CIME()
-{
-	lpstVirtualDesktop = new VIRTUALDESKTOP[sizeof(VIRTUALDESKTOP)];
-	ZeroMemory(lpstVirtualDesktop, sizeof(VIRTUALDESKTOP));
-	bGetVirtualDesktopSize();
-}
-CIME::~CIME()
-{
-	if (lpstVirtualDesktop != NULL)	delete[]	lpstVirtualDesktop;
-	lpstVirtualDesktop = NULL;
-}
-
-//
-// bIsIMEOpen()
-//
-BOOL		CIME::bIsIMEOpen(HWND hWndObserved)
-{
-	HWND    hIMWnd = NULL;
-	if ((hIMWnd = ImmGetDefaultIMEWnd(hWndObserved)) != NULL) {
-		if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETOPENSTATUS, (LPARAM)NULL) != 0) {
-			return TRUE;			// IME Open
-		}
-	}
-	return FALSE;					// IME Close
-}
-
-//
-// vIMEOpenCloseForced()
-//
-VOID		CIME::vIMEOpenCloseForced(HWND hWndObserved, DWORD dwIMEOpenClose)
-{
-	if (hWndObserved == NULL)	return;
-	LPARAM	lParam = (LPARAM)dwIMEOpenClose;
-	EnumChildWindows(hWndObserved, &bEnumChildProcIMEOpenClose, lParam);
-	return;
-}
-
-//
-// vIMEConvertModeChangeForced()
-//
-VOID		CIME::vIMEConvertModeChangeForced(HWND hWndObserved, DWORD dwConvertMode)
-{
-	if (hWndObserved == NULL)	return;
-	LPARAM	lParam = (LPARAM)dwConvertMode;
-	EnumChildWindows(hWndObserved, &bEnumChildProcIMEConvertMode, lParam);
-	return;
-}
-
-//
-// bEnumChildProcIMEConvertMode()
-//
-BOOL CALLBACK CIME::bEnumChildProcIMEConvertMode(HWND hWndObserved, LPARAM lParam)
-{
-	if (hWndObserved == NULL)	return FALSE;
-	HWND    hIMWnd = NULL;
-	if ((hIMWnd = ImmGetDefaultIMEWnd(hWndObserved)) != NULL) {
-		if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETOPENSTATUS, (LPARAM)TRUE) == 0) {
-			if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETCONVERSIONMODE, (LPARAM)lParam) == 0) {
-			}
-		}
-	}
-	return TRUE;
-}
-
-//
-// bEnumChildProcIMEOpenClose()
-//
-BOOL CALLBACK CIME::bEnumChildProcIMEOpenClose(HWND hWndObserved, LPARAM lParam)
-{
-	if (hWndObserved == NULL)	return FALSE;
-	HWND    hIMWnd = NULL;
-	if ((hIMWnd = ImmGetDefaultIMEWnd(hWndObserved)) != NULL) {
-		if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETOPENSTATUS, lParam) == 0) {
-		}
-	}
-	return TRUE;
-}
-
-//
-// dwIMEMode()
-//
-DWORD		CIME::dwIMEMode(HWND hWndObserved, BOOL bForceHiragana)
-{
-	if (hWndObserved != NULL) {
-		HWND    hIMWnd = NULL;
-		HKL		hkl = NULL;
-		DWORD	dwInputLocale = 0;
-		DWORD   dwConvertMode = 0;
-		if ((hIMWnd = ImmGetDefaultIMEWnd(hWndObserved)) != NULL) {
-			if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETOPENSTATUS, NULL) != 0) {
-				if ((dwConvertMode = (DWORD)SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETCONVERSIONMODE, NULL)) != 0) {
-					switch (dwConvertMode) {
-					case IME_CMODE_NATIVE:
-						dwConvertMode = IMEOFF;
-						break;
-					case ZENHIRA_IMEON:
-					case (ZENHIRA_IMEON ^ IME_CMODE_ROMAN):
-						dwConvertMode = ZENHIRA_IMEON;
-						break;
-					case HANEISU_IMEON:
-					case (HANEISU_IMEON ^ IME_CMODE_ROMAN):
-						dwConvertMode = HANEISU_IMEON;
-						break;
-					case HANKANA_IMEON:
-					case (HANKANA_IMEON ^ IME_CMODE_ROMAN):
-						dwConvertMode = HANKANA_IMEON;
-						break;
-					case ZENEISU_IMEON:
-					case (ZENEISU_IMEON ^ IME_CMODE_ROMAN):
-						dwConvertMode = ZENEISU_IMEON;
-						break;
-					case ZENKANA_IMEON:
-					case (ZENKANA_IMEON ^ IME_CMODE_ROMAN):
-						dwConvertMode = ZENKANA_IMEON;
-						break;
-					default:
-						dwConvertMode = IMEOFF;
-					}
-					if ((bForceHiragana != FALSE) && (dwConvertMode != ZENHIRA_IMEON)) {
-						vIMEConvertModeChangeForced(hWndObserved, ZENHIRA_IMEON);
-						dwConvertMode = ZENHIRA_IMEON;
-						return ZENHIRA_IMEON;
-					}
-					if ((hkl = Cime->hklGetInputLocale(hWndObserved)) != (HKL)0) {
-						if ((dwInputLocale = Cime->dwGetInputLocale()) != 0) {
-							if ((hkl = (HKL)(((UINT64)hkl & KB_MASK) | (dwInputLocale & LANG_MASK))) != JP_IME) {	// Not JP IME KB
-								dwConvertMode = IMEOFF;					// IMEOFFとする
-							}
-						}
-					}
-					return dwConvertMode;
-				}
-			}
-		}
-	}
-	return IMEOFF;
-}
-
-//
-// vActivateIME()
-//
-VOID		CIME::vActivateIME(HWND hWndObserved)
-{
-	EnumChildWindows(hWndObserved, &bEnumChildProcActivateIME, NULL);
-}
-
-// 
-// bEnumChildProcActivateIME()
-// 
-BOOL CALLBACK CIME::bEnumChildProcActivateIME(HWND hWnd, LPARAM lParam)
-{
-	UNREFERENCED_PARAMETER(lParam);
-
-	HWND	hIMWnd = ImmGetDefaultIMEWnd(hWnd);
-	if (hIMWnd != NULL) {
-		SendMessage(hIMWnd, WM_ACTIVATE, (WPARAM)WA_ACTIVE, (LPARAM)NULL);
-		LPTSTR	lpszBuffer = new TCHAR[_MAX_PATH];
-		ZeroMemory(lpszBuffer, (sizeof(TCHAR) * _MAX_PATH));
-		if (GetClassName(hIMWnd, lpszBuffer, _MAX_PATH) != 0) {
-			HWND	hIMEWnd = FindWindow(lpszBuffer, NULL);
-			if (hIMEWnd != NULL) {
-				SendMessage(hIMEWnd, WM_ACTIVATE, (WPARAM)WA_ACTIVE, (LPARAM)NULL);
-				if (lpszBuffer != NULL)	delete[] lpszBuffer;
-				return TRUE;
-			}
-		}
-		if (lpszBuffer != NULL)	delete[] lpszBuffer;
-	}
-	return TRUE;
-}
-
-//
-// bMoveIMEToolbar()
-//
-BOOL		CIME::bMoveIMEToolbar()
-{
-	if (bExistIMEToolbar()) {
-		while ((GetAsyncKeyState(VK_MENU) & 0x8000) || (GetAsyncKeyState(VK_CONTROL) & 0x8000)) {
-			Sleep(50);
-		}
-		HWND	hIMEWnd = FindWindow(_T("ApplicationFrameWindow"), NULL);
-		if (hIMEWnd != NULL) {
-			POINT	ptCursor{};
-			if (GetCursorPos(&ptCursor)) {
-				RECT	rc{};
-				if (GetWindowRect(hIMEWnd, &rc)) {
-					HMONITOR hMonitor = NULL;
-					if ((hMonitor = MonitorFromPoint(ptCursor, MONITOR_DEFAULTTONEAREST)) != NULL) {
-						UINT		dpiCursorX = 0, dpiCursorY = 0;
-						if ((GetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiCursorX, &dpiCursorY)) == S_OK) {
-							if ((hMonitor = MonitorFromPoint(ptCursor, MONITOR_DEFAULTTONEAREST)) != NULL) {
-								UINT		dpiToolbarX = 0, dpiToolbarY = 0;
-								if ((GetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiToolbarX, &dpiToolbarY)) == S_OK) {
-									// Drawも直す必要あり
-									LONG	CursorMarginX = 0, CursorMarginY = 0;
-									if ((rc.right - rc.left) > (rc.bottom - rc.top)) {
-										CursorMarginX = 10 * ((dpiCursorX + USER_DEFAULT_SCREEN_DPI - 1) / USER_DEFAULT_SCREEN_DPI);
-										CursorMarginY = 16 * ((dpiCursorY + USER_DEFAULT_SCREEN_DPI - 1) / USER_DEFAULT_SCREEN_DPI);
-									}
-									else {
-										CursorMarginX = 16 * ((dpiCursorX + USER_DEFAULT_SCREEN_DPI - 1) / USER_DEFAULT_SCREEN_DPI);
-										CursorMarginY = 10 * ((dpiCursorY + USER_DEFAULT_SCREEN_DPI - 1) / USER_DEFAULT_SCREEN_DPI);
-									}
-									Sleep(10);
-									double	rcLeft = 0, rcTop = 0;
-									if ((rc.right - rc.left) > (rc.bottom - rc.top)) {
-										rcLeft = (LONG)((double)rc.left + (6.0 * ((double)dpiToolbarX + (double)USER_DEFAULT_SCREEN_DPI - 1.0) / (double)USER_DEFAULT_SCREEN_DPI));
-										rcTop = (LONG)((double)rc.top + (9.0 * ((double)dpiToolbarX + (double)USER_DEFAULT_SCREEN_DPI - 1.0) / (double)USER_DEFAULT_SCREEN_DPI));
-									}
-									else {
-										rcLeft = (LONG)((double)rc.left + (9.0 * ((double)dpiToolbarX + (double)USER_DEFAULT_SCREEN_DPI - 1.0) / (double)USER_DEFAULT_SCREEN_DPI));
-										rcTop = (LONG)((double)rc.top + (6.0 * ((double)dpiToolbarX + (double)USER_DEFAULT_SCREEN_DPI - 1.0) / (double)USER_DEFAULT_SCREEN_DPI));
-									}
-									double	px0 = lpstVirtualDesktop->rcMonitorSize.left;
-									double	py0 = lpstVirtualDesktop->rcMonitorSize.top;
-									double	cx = lpstVirtualDesktop->rcMonitorSize.right - lpstVirtualDesktop->rcMonitorSize.left;
-									double	cy = lpstVirtualDesktop->rcMonitorSize.bottom - lpstVirtualDesktop->rcMonitorSize.top;
-									LONG	xCursor = (LONG)(((((double)ptCursor.x - px0) * 65536.0) + cx - 1.0) / cx);
-									LONG	yCursor = (LONG)(((((double)ptCursor.y - py0) * 65536.0) + cy - 1.0) / cy);
-									LONG	xToolbar = (LONG)(((((double)rcLeft - px0) * 65536.0) + cx - 1.0) / cx);
-									LONG	yToolbar = (LONG)(((((double)rcTop - py0) * 65536.0) + cy - 1.0) / cy);
-									LPINPUT lpInputs = NULL;
-									if ((lpInputs = new INPUT[sizeof(INPUT) * 4]) != NULL) {
-										ZeroMemory(lpInputs, sizeof(INPUT) * 4);
-										UINT	cInputs = (UINT)(0);
-										// #0
-										lpInputs[cInputs].type = INPUT_MOUSE; lpInputs[cInputs].mi.dx = (DWORD)xToolbar; lpInputs[cInputs].mi.dy = (DWORD)yToolbar;
-										lpInputs[cInputs].mi.mouseData = 0; lpInputs[cInputs].mi.time = 0; lpInputs[cInputs].mi.dwExtraInfo = 0;
-										lpInputs[cInputs].mi.dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_VIRTUALDESK;
-										++cInputs;
-										// #1
-										lpInputs[cInputs].type = INPUT_MOUSE; lpInputs[cInputs].mi.dx = (DWORD)xToolbar; lpInputs[cInputs].mi.dy = (DWORD)yToolbar;
-										lpInputs[cInputs].mi.mouseData = 0; lpInputs[cInputs].mi.time = 0; lpInputs[cInputs].mi.dwExtraInfo = 0;
-										lpInputs[cInputs].mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
-										++cInputs;
-										// #2
-										lpInputs[cInputs].type = INPUT_MOUSE; lpInputs[cInputs].mi.dx = (DWORD)xCursor; lpInputs[cInputs].mi.dy = (DWORD)yCursor;
-										lpInputs[cInputs].mi.mouseData = 0; lpInputs[cInputs].mi.time = 0; lpInputs[cInputs].mi.dwExtraInfo = 0;
-										lpInputs[cInputs].mi.dwFlags = MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_VIRTUALDESK;
-										++cInputs;
-										// #3
-										lpInputs[cInputs].type = INPUT_MOUSE; lpInputs[cInputs].mi.dx = (DWORD)xCursor; lpInputs[cInputs].mi.dy = (DWORD)yCursor;
-										lpInputs[cInputs].mi.mouseData = 0; lpInputs[cInputs].mi.time = 0; lpInputs[cInputs].mi.dwExtraInfo = 0;
-										lpInputs[cInputs].mi.dwFlags = MOUSEEVENTF_LEFTUP;
-										++cInputs;
-										if (SendInput(cInputs, lpInputs, sizeof(INPUT)) == cInputs) {
-											Sleep(10);
-										}
-										delete[]	lpInputs;
-									}
-								}
-							}
-						}
-					}
-				}
-				else {
-					return FALSE;
-				}
-			}
-			else {
-				return FALSE;
-			}
-		}
-		else {
-			return FALSE;
-		}
-	}
-	return TRUE;
-}
-
-//
-// bGetVirtualDesktopSize()
-//
-BOOL			CIME::bGetVirtualDesktopSize()
-{
-	BOOL	bRet = FALSE;
-	if (lpstVirtualDesktop != NULL) {
-		ZeroMemory(lpstVirtualDesktop, sizeof(VIRTUALDESKTOP));
-		if (EnumDisplayMonitors(NULL, NULL, (MONITORENUMPROC)&bGetVirtualDesktopSizeEnumProc, (LPARAM)lpstVirtualDesktop) != 0) {
-			bRet = TRUE;
-		}
-		else {
-			_Post_equals_last_error_ DWORD	err = GetLastError();
-			if ((err == ERROR_INVALID_PARAMETER) || (err == ERROR_SUCCESS)) {
-				bRet = TRUE;
-			}
-			else if (err == ERROR_ACCESS_DENIED) {
-				bRet = TRUE;
-			}
-			else {
-			}
-		}
-	}
-	return bRet;
-}
-
-//
-// bGetVirtualDesktopSizeEnumProc()
-//
-BOOL		CIME::bGetVirtualDesktopSizeEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam)
-{
-	UNREFERENCED_PARAMETER(hDC);
-	UNREFERENCED_PARAMETER(lprcClip);
-	LPVIRTUALDESKTOP	lpstVirtualDesktop = (LPVIRTUALDESKTOP)lParam;
-	MONITORINFO	stMonInfo{};	stMonInfo.cbSize = sizeof(MONITORINFO);
-	if (GetMonitorInfo(hMonitor, &stMonInfo) != 0) {
-		if (stMonInfo.rcMonitor.left <= lpstVirtualDesktop->rcMonitorSize.left)		lpstVirtualDesktop->rcMonitorSize.left = stMonInfo.rcMonitor.left;
-		if (stMonInfo.rcMonitor.right >= lpstVirtualDesktop->rcMonitorSize.right)	lpstVirtualDesktop->rcMonitorSize.right = stMonInfo.rcMonitor.right;
-		if (stMonInfo.rcMonitor.top <= lpstVirtualDesktop->rcMonitorSize.top)		lpstVirtualDesktop->rcMonitorSize.top = stMonInfo.rcMonitor.top;
-		if (stMonInfo.rcMonitor.bottom >= lpstVirtualDesktop->rcMonitorSize.bottom)	lpstVirtualDesktop->rcMonitorSize.bottom = stMonInfo.rcMonitor.bottom;
-		++lpstVirtualDesktop->iNumOfMonitors;
-		return TRUE;
-	}
-	return FALSE;
-}
-
-//
-// bExistIMEToolbar()
-//
-BOOL		CIME::bExistIMEToolbar()
-{
-#define SUBKEY	_T("Software\\AppDataLow\\software\\Microsoft\\ime\\15.0\\IMEJP\\MSIME")
-#define VALUE	_T("ToolBarEnabled")
-	CRegistry* CReg = new CRegistry;
-	DWORD	dwToolBar = 0;
-	if (!CReg->bReadRegValueDWORD(HKEY_CURRENT_USER, SUBKEY, VALUE, &dwToolBar)) {
-	}
-	delete	CReg;
-	if ((bIsNewIME() == TRUE) && (dwToolBar != 0))	return TRUE;
-	else return FALSE;
-#undef SUBKEY
-#undef VALUE
-}
-
-//
-// bIsNewIME()
-//
-BOOL		CIME::bIsNewIME()
-{
-#define SUBKEY	_T("Software\\Microsoft\\input\\tsf\\tsf3override\\{03b5835f-f03c-411b-9ce2-aa23e1171e36}")
-#define VALUE	_T("NoTsf3Override2")
-	CRegistry* CReg = new CRegistry;
-	DWORD	dwCTF = 0;
-	if (!CReg->bReadRegValueDWORD(HKEY_CURRENT_USER, SUBKEY, VALUE, &dwCTF)) {
-		// ERROR_FILE_NOT_FOUND
-		dwCTF = 0;
-	}
-	delete	CReg;
-	if (dwCTF != 0)	return FALSE;
-	else			return TRUE;
-#undef SUBKEY
-#undef VALUE
-}
-
-//
-// dGetInputLocale()
-//
-DWORD		CIME::dwGetInputLocale()
-{
-#define SUBKEY	_T("SOFTWARE\\Microsoft\\Input\\Locales")
-#define VALUE	_T("InputLocale")
-	DWORD	dwInputLocale = 0;
-	CRegistry* CReg = new CRegistry;
-	if (CReg) {
-		if (!CReg->bReadSystemRegValueDWORD(HKEY_LOCAL_MACHINE, SUBKEY, VALUE, &dwInputLocale)) {
-		}
-		delete	CReg;
-	}
-	return (dwInputLocale & 0x0000ffff);
-#undef SUBKEY
-#undef VALUE
-}
-
-//
-// hklGetInputLocale()
-//
-HKL		CIME::hklGetInputLocale(HWND hWndObserved)
-{
-
-	DWORD	dwProcessID = 0;
-	DWORD	dwThreadID = 0;
-	HKL		hkl = NULL;
-	DWORD	dwInputLocale = 0;
-	if ((dwThreadID = GetWindowThreadProcessId(hWndObserved, &dwProcessID)) != 0) {
-		if ((hkl = GetKeyboardLayout(dwThreadID)) != NULL) {
-			int	iKeyboardType = GetKeyboardType(1);
-			if ((iKeyboardType != 2) || (hkl != JP_IME))	hkl = US_ENG;
-			hkl = (HKL)(((UINT64)hkl & KB_MASK) | (dwInputLocale & LANG_MASK));
-			return hkl;
-		}
-	}
-	return (HKL)0;
-#undef SUBKEY
-#undef VALUE
-}
-
-//S
 // class CCursor
 //
 CCursor::CCursor()
 {
 	this->hMainWnd = NULL;
 
-	// DLL data の初期化
 	hModDll = NULL;
 	iCursorDataLoadCount = 0;
 
@@ -460,6 +65,7 @@ CCursor::CCursor()
 	stIMECursorData.bDrawNearCaret = FALSE;
 	stIMECursorData.lpszLoadDatName = NULL;
 	stIMECursorData.lpstFlushMouseCursor = (LPFLUSHMOUSECURSOR)&stFlushMouseCursor;
+
 	stIMECursorData.hWnd = NULL;
 
 	IMECursorChangeThread = NULL;
@@ -472,27 +78,27 @@ CCursor::CCursor()
 CCursor::~CCursor()
 {
 	if (DrawIMEModeCaretThread != NULL) {
-		delete	DrawIMEModeCaretThread;				// Draw IME Mode near by Caret cursor Threadの後始末
+		delete	DrawIMEModeCaretThread;
 		DrawIMEModeCaretThread = NULL;
 	}
 	if (CaretWindow != NULL) {
-		delete	CaretWindow;						// Draw Window near by Caret cursorの削除
+		delete	CaretWindow;	
 		CaretWindow = NULL;
 	}
 	if (DrawIMEModeThread != NULL) {
-		delete	DrawIMEModeThread;					// Draw IME Mode near by Mouse cursor Threadの後始末
+		delete	DrawIMEModeThread;
 		DrawIMEModeThread = NULL;
 	}
 	if (CursorWindow != NULL) {
-		delete	CursorWindow;						// Draw Window near by Mouse cursorの削除
+		delete	CursorWindow;
 		CursorWindow = NULL;
 	}
 	if (IMECursorChangeThread != NULL) {
-		delete	IMECursorChangeThread;				// IME Cursor Change Threadの後始末
+		delete	IMECursorChangeThread;
 		IMECursorChangeThread = NULL;
 	}
 	if (stIMECursorData.lpszLoadDatName != NULL) {
-		delete[]	stIMECursorData.lpszLoadDatName;
+		delete []	stIMECursorData.lpszLoadDatName;
 		stIMECursorData.lpszLoadDatName = NULL;
 	}
 }
@@ -528,7 +134,7 @@ BOOL			CCursor::bInitialize(HWND hWnd)
 	if (!bChangeFlushMouseCursor(IMEOFF, &stIMECursorData)) return FALSE;
 	if (!bRegisterIMECursorChangeThread(hWnd)) return FALSE;
 	
-#define	WINDOWCLASS		_T("FlushMouseCursorWindow-{9395A3BE-4280-4AA1-9099-ADD712F982A1}")
+#define	WINDOWCLASS		_T("FlushMouseCursorWindow-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}")
 	if (CursorWindow == NULL) {
 		CursorWindow = new CCursorWindow;
 		if (!CursorWindow->bRegister((HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE), WINDOWCLASS, stIMECursorData.dwNearDrawMouseColor))		return FALSE;
@@ -536,8 +142,7 @@ BOOL			CCursor::bInitialize(HWND hWnd)
 		DrawIMEModeThread = new CThread;
 	}
 #undef WINDOWCLASS
-
-#define	WINDOWCLASS		_T("FlushMouseCaretWindow-{D40AF72E-E0D9-47DA-8A0E-7E29F6F763E4}")
+#define	WINDOWCLASS		_T("FlushMouseCaretWindow-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}")
 	if (CaretWindow == NULL) {
 		CaretWindow = new CCursorWindow;
 		if (!CaretWindow->bRegister((HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE), WINDOWCLASS, stIMECursorData.dwNearDrawCaretColor))	return FALSE;
@@ -548,7 +153,6 @@ BOOL			CCursor::bInitialize(HWND hWnd)
 
 	if (!bRegisterDrawIMEModeThread(hWnd))	return FALSE;
 	if (!bStartIMECursorChangeThread(hWnd))	return FALSE;
-
 	return TRUE;
 }
 
@@ -559,43 +163,52 @@ LPTSTR		CCursor::lpszGetCursorDataName()
 {
 	LPTSTR	lpszCursorDataName = NULL;
 	LPTSTR	lpszBuffer = new TCHAR[_MAX_PATH];
-	ZeroMemory(lpszBuffer, _MAX_PATH);
-	DWORD	dwSize = 0;
-	GetCurrentDirectory(_MAX_PATH, lpszBuffer);
-	_tcsncat_s(lpszBuffer, _MAX_PATH, _T("\\"), sizeof(_T("\\")));
-	_tcsncat_s(lpszBuffer, _MAX_PATH, FLUSHMOUSECURSORDAT, sizeof(FLUSHMOUSECURSORDAT));
-	dwSize = ExpandEnvironmentStrings(lpszBuffer, NULL, 0);
-	lpszCursorDataName = new TCHAR[dwSize];
-	ZeroMemory(lpszCursorDataName, dwSize);
-	dwSize = ExpandEnvironmentStrings(lpszBuffer, lpszCursorDataName, dwSize);
-	if (GetFileAttributes(lpszCursorDataName) == INVALID_FILE_ATTRIBUTES) {					// Try Current Dir
-		delete []	lpszCursorDataName;
+	if (lpszBuffer) {
 		ZeroMemory(lpszBuffer, _MAX_PATH);
-		_tcsncat_s(lpszBuffer, _MAX_PATH, _T("%APPDATA%"), sizeof(_T("%APPDATA%")));
-		_tcsncat_s(lpszBuffer, _MAX_PATH, FLUSHMOUSECURSORDIR, sizeof(FLUSHMOUSECURSORDIR));
+		DWORD	dwSize = 0;
+		GetCurrentDirectory(_MAX_PATH, lpszBuffer);
+		_tcsncat_s(lpszBuffer, _MAX_PATH, _T("\\"), sizeof(_T("\\")));
 		_tcsncat_s(lpszBuffer, _MAX_PATH, FLUSHMOUSECURSORDAT, sizeof(FLUSHMOUSECURSORDAT));
 		dwSize = ExpandEnvironmentStrings(lpszBuffer, NULL, 0);
 		lpszCursorDataName = new TCHAR[dwSize];
-		ZeroMemory(lpszCursorDataName, dwSize);
-		dwSize = ExpandEnvironmentStrings(lpszBuffer, lpszCursorDataName, dwSize);
-		if (GetFileAttributes(lpszCursorDataName) == INVALID_FILE_ATTRIBUTES) {				// Try %APPDATA% Dir
-			delete []	lpszCursorDataName;
-			ZeroMemory(lpszBuffer, _MAX_PATH);
-			_tcsncat_s(lpszBuffer, _MAX_PATH, _T("%ALLUSERSPROFILE%"), sizeof(_T("%ALLUSERSPROFILE%")));
-			_tcsncat_s(lpszBuffer, _MAX_PATH, FLUSHMOUSECURSORDIR, sizeof(FLUSHMOUSECURSORDIR));
-			_tcsncat_s(lpszBuffer, _MAX_PATH, FLUSHMOUSECURSORDAT, sizeof(FLUSHMOUSECURSORDAT));
-			dwSize = ExpandEnvironmentStrings(lpszBuffer, NULL, 0);
-			lpszCursorDataName = new TCHAR[dwSize];
+		if (lpszCursorDataName) {
 			ZeroMemory(lpszCursorDataName, dwSize);
 			dwSize = ExpandEnvironmentStrings(lpszBuffer, lpszCursorDataName, dwSize);
-			if (GetFileAttributes(lpszCursorDataName) == INVALID_FILE_ATTRIBUTES) {			// Try %ALLUSERSPROFILE% Dir
-				delete []	lpszBuffer;
-				delete []	lpszCursorDataName;
-				return NULL;
+			if (GetFileAttributes(lpszCursorDataName) == INVALID_FILE_ATTRIBUTES) {	
+				delete[]	lpszCursorDataName;
+				lpszCursorDataName = NULL;
+				ZeroMemory(lpszBuffer, _MAX_PATH);
+				_tcsncat_s(lpszBuffer, _MAX_PATH, _T("%APPDATA%"), sizeof(_T("%APPDATA%")));
+				_tcsncat_s(lpszBuffer, _MAX_PATH, FLUSHMOUSECURSORDIR, sizeof(FLUSHMOUSECURSORDIR));
+				_tcsncat_s(lpszBuffer, _MAX_PATH, FLUSHMOUSECURSORDAT, sizeof(FLUSHMOUSECURSORDAT));
+				dwSize = ExpandEnvironmentStrings(lpszBuffer, NULL, 0);
+				lpszCursorDataName = new TCHAR[dwSize];
+				if (lpszCursorDataName) {
+					ZeroMemory(lpszCursorDataName, dwSize);
+					dwSize = ExpandEnvironmentStrings(lpszBuffer, lpszCursorDataName, dwSize);
+					if (GetFileAttributes(lpszCursorDataName) == INVALID_FILE_ATTRIBUTES) {
+						delete[]	lpszCursorDataName;
+						lpszCursorDataName = NULL;
+						ZeroMemory(lpszBuffer, _MAX_PATH);
+						_tcsncat_s(lpszBuffer, _MAX_PATH, _T("%ALLUSERSPROFILE%"), sizeof(_T("%ALLUSERSPROFILE%")));
+						_tcsncat_s(lpszBuffer, _MAX_PATH, FLUSHMOUSECURSORDIR, sizeof(FLUSHMOUSECURSORDIR));
+						_tcsncat_s(lpszBuffer, _MAX_PATH, FLUSHMOUSECURSORDAT, sizeof(FLUSHMOUSECURSORDAT));
+						dwSize = ExpandEnvironmentStrings(lpszBuffer, NULL, 0);
+						lpszCursorDataName = new TCHAR[dwSize];
+						if (lpszCursorDataName) {
+							ZeroMemory(lpszCursorDataName, dwSize);
+							dwSize = ExpandEnvironmentStrings(lpszBuffer, lpszCursorDataName, dwSize);
+							if (GetFileAttributes(lpszCursorDataName) == INVALID_FILE_ATTRIBUTES) {
+								delete[]	lpszCursorDataName;
+								lpszCursorDataName = NULL;
+							}
+						}
+					}
+				}
 			}
 		}
+		delete[]	lpszBuffer;
 	}
-	delete []	lpszBuffer;
 	return lpszCursorDataName;
 }
 
@@ -639,6 +252,16 @@ BOOL		CCursor::bStartDrawIMEModeThreadWait(HWND hWndObserved)
 }
 
 //
+// bStartDrawIMEModeThreadWaitEventForeGround()
+//
+BOOL		CCursor::bStartDrawIMEModeThreadWaitEventForeGround(HWND hWndObserved)
+{
+	stIMECursorData.bDrawIMEModeWait = TRUE;
+	stIMECursorData.dwWaitWaveTime = 100;
+	return _bStartDrawIMEModeThread(hWndObserved);
+}
+
+//
 // bStartDrawIMEModeThreadWaitDblClk()
 //
 BOOL		CCursor::bStartDrawIMEModeThreadWaitDblClk(HWND hWndObserved)
@@ -649,17 +272,17 @@ BOOL		CCursor::bStartDrawIMEModeThreadWaitDblClk(HWND hWndObserved)
 }
 
 //
-// _bStartDrawIMEModeThreadWait()
+// _bStartDrawIMEModeThread()
 //
 BOOL		CCursor::_bStartDrawIMEModeThread(HWND hWndObserved)
 {
-	if ((Cursor == NULL) || (DrawIMEModeThread == NULL))	return FALSE;
+	if ((Cursor == NULL) || (DrawIMEModeThread == NULL))		return FALSE;
 	stIMECursorData.hWnd = _hGetCaretPosByAccessibleObjectFromWindow(hWndObserved, &stIMECursorData.rcCaret);
 	stIMECursorData.hWndObserved = hWndObserved;
 	stIMECursorData.bDisplayFocusWindowIME = bDisplayFocusWindowIME;
 	if (!DrawIMEModeThread->bStart()) {
 		if (DrawIMEModeThread != NULL) {
-			delete	DrawIMEModeThread;					// Draw IME Mode Threadの後始末
+			delete	DrawIMEModeThread;
 			DrawIMEModeThread = NULL;
 		}
 		DrawIMEModeThread = new CThread;
@@ -673,7 +296,7 @@ BOOL		CCursor::_bStartDrawIMEModeThread(HWND hWndObserved)
 //
 BOOL		CCursor::bShowHideCursor(HWND hWndObserved, BOOL bShow)
 {
-	BOOL	bRet = FALSE;
+	BOOL		bRet = FALSE;
 	if (bShow) {
 		bRet = bStartDrawIMEModeThread(hWndObserved);
 	}
@@ -688,10 +311,10 @@ BOOL		CCursor::bShowHideCursor(HWND hWndObserved, BOOL bShow)
 //
 BOOL		CCursor::bGetCaretPos(HWND hWnd, LPPOINT lpCaretPos)
 {
-	BOOL	bRet = FALSE;
-	RECT	rc{};
+	BOOL		bRet = FALSE;
+	RECT		rc{};
 	lpCaretPos->x = 0;	lpCaretPos->y = 0;
-	if (_hGetCaretPosByGuiThreadInfo(hWnd, &rc) != NULL) {
+	if (_hGetCaretPosByAccessibleObjectFromWindow(hWnd, &rc) != NULL) {
 		bRet = TRUE;
 	}
 	if (stIMECursorData.hWnd != NULL) {
@@ -738,14 +361,11 @@ BOOL		CCursor::bCursorDllUnload()
 //
 BOOL		CCursor::bSystemCursorLoad()
 {
-	// Set Flush Mouse Cursor to System
 	if (!bChangeFlushMouseCursor(IMEOFF, &stIMECursorData))		return FALSE;
 	
-	// Set Other Mouse Cursor to System
 	int	i = 0;
 	while (stAllMouseCursor[i].id != (DWORD)(-1)) {
 		if (stAllMouseCursor[i].bReadReg) {
-			// Get Other System Cursor Filename from Registry
 			if (!bGetMouseRegValue(stAllMouseCursor[i].szRegValue, stAllMouseCursor[i].szFile))		return FALSE;
 		}
 		i++;
@@ -772,7 +392,7 @@ BOOL		CCursor::bRegisterIMECursorChangeThread(HWND hWndObserved)
 BOOL		CCursor::bIMECursorChangeRoutine(LPVOID lpvParam)
 {
 	LPIMECURSORDATA	lpstCursorData = (LPIMECURSORDATA)lpvParam;
-	CCursor* This = reinterpret_cast<CCursor*>(lpvParam);
+	CCursor	*This = reinterpret_cast<CCursor*>(lpvParam);
 	BOOL		bRet = TRUE;
 	if (lpstCursorData->bDisplayIMEModeOnCursor) {
 		This->bIsIMECursorChanged(lpstCursorData);
@@ -808,16 +428,19 @@ BOOL		CCursor::bRegisterDrawIMEModeThread(HWND hWndObserved)
 BOOL WINAPI	CCursor::bDrawIMEModeRoutine(LPVOID lpvParam)
 {
 	LPIMECURSORDATA	lpstCursorData = (LPIMECURSORDATA)lpvParam;
-	CCursor* This = reinterpret_cast<CCursor*>(lpvParam);
+	CCursor	*This = reinterpret_cast<CCursor*>(lpvParam);
+	BOOL		bRet = TRUE;
 	This->bIsIMECursorChanged(lpstCursorData);
 	if (!This->bDrawIMEModeOnDisplay(lpstCursorData)) {
 		_Post_equals_last_error_ DWORD err = GetLastError();
 		if (err == ERROR_ACCESS_DENIED) {
-			return FALSE;
+			bRet = TRUE;
 		}
-		return FALSE;
+		else {
+			bRet = FALSE;
+		}
 	}
-	return	TRUE;
+	return	bRet;
 }
 
 //
@@ -830,7 +453,7 @@ BOOL		CCursor::bIsIMECursorChanged(LPIMECURSORDATA lpstCursorData)
 	dwIMEMode = Cime->dwIMEMode(lpstCursorData->hWndObserved, lpstCursorData->bForceHiragana);
 	if (lpstCursorData->dwIMEModeCursor == dwIMEMode) return FALSE;
 	lpstCursorData->dwIMEModeCursor = dwIMEMode;
-	return TRUE;
+	return TRUE;	
 }
 
 //
@@ -841,7 +464,7 @@ BOOL		CCursor::bDrawIMEModeOnDisplay(LPIMECURSORDATA lpstCursorData)
 	BOOL		bRet = FALSE;
 	RECT		rc{};
 	if (lpstCursorData->bDrawIMEModeWait) {
-		if (lpstCursorData->dwWaitWaveTime != 0)	Sleep(lpstCursorData->dwWaitWaveTime);
+		if (lpstCursorData->dwWaitWaveTime != 0)		Sleep(lpstCursorData->dwWaitWaveTime);
 	}
 	if (_bCalcDispModeRect(lpstCursorData->iModeSize, lpstCursorData->iModeSize, &rc)) {
 		if (EnumDisplayMonitors(NULL, &rc, (MONITORENUMPROC)&bIconDrawEnumProc, (LPARAM)lpstCursorData) != 0) {
@@ -885,7 +508,6 @@ BOOL		CCursor::bIconDrawEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, L
 BOOL		CCursor::_bCalcDispModeRect(int iModeSizeX, int iModeSizeY, LPRECT lpRect)
 {
 	POINT	pt{};
-	RECT	rect{};
 	if (GetCursorPos(&pt)) {
 		HMONITOR hMonitor = NULL;
 		if ((hMonitor = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST)) != NULL) {
@@ -894,7 +516,6 @@ BOOL		CCursor::_bCalcDispModeRect(int iModeSizeX, int iModeSizeY, LPRECT lpRect)
 				int iIconSizeX = 0, iIconSizeY = 0;
 				iIconSizeX = iModeSizeX * (dpiX + USER_DEFAULT_SCREEN_DPI - 1) / USER_DEFAULT_SCREEN_DPI + 1;
 				iIconSizeY = iModeSizeY * (dpiY + USER_DEFAULT_SCREEN_DPI - 1) / USER_DEFAULT_SCREEN_DPI + 1;
-				// Draw near by Mouse cursor Left
 				lpRect->left = pt.x - ((iIconSizeX * 3 + 1) / 2);	lpRect->right = lpRect->left + iIconSizeX;
 				lpRect->top = pt.y - ((iIconSizeY + 1) / 2);		lpRect->bottom = lpRect->top + iIconSizeY;
 				return TRUE;
@@ -913,85 +534,72 @@ BOOL		CCursor::_bCalcDispModeRect(int iModeSizeX, int iModeSizeY, LPRECT lpRect)
 }
 
 //
-// _hGetCarePosByAccessibleObjectFromWindow()
-//
+// _hGetCaretPosByAccessibleObjectFromWindow()
+// 
 HWND		CCursor::_hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPRECT lpRect)
 {
+	HWND		hWnd = NULL;
 	POINT	pt{};
-	RECT	rcFore{}, rcTop{};
 	DWORD	dwPID = 0, dwForeThreadID = 0;
 	if (hForeWnd != NULL) {
-		if ((dwForeThreadID = GetWindowThreadProcessId(hForeWnd, &dwPID)) != 0) {
-			GUITHREADINFO	GuiThreadInfo{};	GuiThreadInfo.cbSize = sizeof(GUITHREADINFO);
-			if (GetGUIThreadInfo(dwForeThreadID, &GuiThreadInfo)) {
-				IAccessible* IAccessible = NULL;
-				if (GuiThreadInfo.hwndFocus != NULL) {
-					HRESULT hResult = AccessibleObjectFromWindow(GuiThreadInfo.hwndFocus, (DWORD)OBJID_CARET, IID_IAccessible, (LPVOID*)&IAccessible);
-					if (hResult == S_OK) {
-						SIZE	sz{};
-						VARIANT	variant{};	variant.vt = VT_I4;	variant.lVal = CHILDID_SELF;
-						if ((hResult = IAccessible->accLocation(&pt.x, &pt.y, &sz.cx, &sz.cy, variant)) == S_OK) {
-							IAccessible->Release();
-							lpRect->left = pt.x;	lpRect->top = pt.y;	lpRect->right = pt.x + sz.cx;	lpRect->bottom = pt.y + sz.cy;
-#define	MARGIN		2
-							if (((pt.x == 0) && (pt.y == 0)) || (pt.x <= rcTop.left + MARGIN) || (pt.y <= rcTop.top + MARGIN) || (pt.x <= rcFore.left) || (pt.y <= rcFore.top)) {
-#undef MARGIN
-								lpRect->left = 0;		lpRect->right = 0;
-								lpRect->top = 0;		lpRect->bottom = 0;
-								return NULL;
-							}
-							else {
-								return GuiThreadInfo.hwndFocus;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	return NULL;
-}
-
-//
-// _hGetCaretPosByGuiThreadInfo()
-//
-HWND		CCursor::_hGetCaretPosByGuiThreadInfo(HWND hForeWnd, LPRECT lpRect)
-{
-	POINT	pt{};
-	RECT	rcFore{}, rcTop{};
-	DWORD	dwPID = 0, dwForeThreadID = 0;
-	if (hForeWnd != NULL) {
-		if (GetWindowRect(hForeWnd, &rcFore)) {
 			if ((dwForeThreadID = GetWindowThreadProcessId(hForeWnd, &dwPID)) != 0) {
-				GUITHREADINFO	GuiThreadInfo{};	GuiThreadInfo.cbSize = sizeof(GUITHREADINFO);
-				if (GetGUIThreadInfo(dwForeThreadID, &GuiThreadInfo)) {
-					if (GuiThreadInfo.hwndCaret != NULL) {
-						pt.x = GuiThreadInfo.rcCaret.left;	pt.y = GuiThreadInfo.rcCaret.top;
-						if (ClientToScreen(GuiThreadInfo.hwndCaret, &pt)) {
-							lpRect->left = pt.x;	lpRect->top = pt.y;
-							pt.x = GuiThreadInfo.rcCaret.right;	pt.y = GuiThreadInfo.rcCaret.bottom;
-							if (ClientToScreen(GuiThreadInfo.hwndCaret, &pt)) {
-								lpRect->right = pt.x;	lpRect->bottom = pt.y;
-								if (GetWindowRect(GuiThreadInfo.hwndCaret, &rcTop)) {
-#define	MARGIN		2
-									if (((pt.x == 0) && (pt.y == 0)) || (pt.x <= rcTop.left + MARGIN) || (pt.y <= rcTop.top + MARGIN) || (pt.x <= rcFore.left) || (pt.y <= rcFore.top)) {
-#undef MARGIN
-										lpRect->left = 0;		lpRect->right = 0;
-										lpRect->top = 0;		lpRect->bottom = 0;
-										return NULL;
+				LPGUITHREADINFO	lpGuiThreadInfo = new GUITHREADINFO[sizeof(GUITHREADINFO)];
+				if (lpGuiThreadInfo != NULL) {
+					lpGuiThreadInfo->cbSize = sizeof(GUITHREADINFO);
+					if (GetGUIThreadInfo(dwForeThreadID, lpGuiThreadInfo)) {
+						IAccessible* IAccessible = NULL;
+						if (lpGuiThreadInfo->hwndFocus != NULL) {
+							HRESULT hResult = AccessibleObjectFromWindow(lpGuiThreadInfo->hwndFocus, (DWORD)OBJID_CARET, IID_IAccessible, (LPVOID*)&IAccessible);
+							if (hResult == S_OK) {
+								LPVARIANT	lpVariant = new VARIANT[sizeof(VARIANT)];
+								if (lpVariant != NULL) {
+									SIZE		sz{};
+									lpVariant->vt = VT_I4;	lpVariant->lVal = CHILDID_SELF;
+									if ((hResult = IAccessible->accLocation(&pt.x, &pt.y, &sz.cx, &sz.cy, *lpVariant)) == S_OK) {
+										IAccessible->Release();
+										lpRect->left = pt.x;	lpRect->top = pt.y;	lpRect->right = pt.x + sz.cx;	lpRect->bottom = pt.y + sz.cy;
+										if ((pt.x == 0) && (pt.y == 0) && (sz.cx == 0) && (sz.cy == 0)) {
+											lpRect->left = 0;	lpRect->right = 0;	lpRect->top = 0;	lpRect->bottom = 0;
+											hWnd = NULL;
+										}
+										else {
+											hWnd = lpGuiThreadInfo->hwndFocus;
+										}
 									}
 									else {
-										return GuiThreadInfo.hwndCaret;
+										if (lpGuiThreadInfo->hwndCaret != NULL) {
+											pt.x = lpGuiThreadInfo->rcCaret.left;	pt.y = lpGuiThreadInfo->rcCaret.top;
+											if (ClientToScreen(lpGuiThreadInfo->hwndCaret, &pt)) {
+												lpRect->left = pt.x;	lpRect->top = pt.y;
+												pt.x = lpGuiThreadInfo->rcCaret.right;	pt.y = lpGuiThreadInfo->rcCaret.bottom;
+												if (ClientToScreen(lpGuiThreadInfo->hwndCaret, &pt)) {
+													lpRect->right = pt.x;	lpRect->bottom = pt.y;
+													RECT		rcFore{}, rcTop{};
+													if (GetWindowRect(lpGuiThreadInfo->hwndCaret, &rcTop)) {
+#define	MARGIN		2
+														if (((pt.x == 0) && (pt.y == 0)) || (pt.x <= rcTop.left + MARGIN) || (pt.y <= rcTop.top + MARGIN) || (pt.x <= rcFore.left) || (pt.y <= rcFore.top)) {
+#undef MARGIN
+															lpRect->left = 0;	lpRect->right = 0;	lpRect->top = 0;	lpRect->bottom = 0;
+															hWnd = NULL;
+														}
+														else {
+															hWnd = lpGuiThreadInfo->hwndCaret;
+														}
+													}
+												}
+											}
+										}
 									}
+									delete[]	lpVariant;
 								}
 							}
 						}
 					}
+					delete []	lpGuiThreadInfo;
 				}
 			}
-		}
 	}
-	return NULL;
+	return hWnd;
 }
 
 //
@@ -1012,11 +620,12 @@ BOOL		CCursor::_bAdjustCaretByMonitorDPI(int iModeSizeX, int iModeSizeY, LPRECT 
 			lpRect->right = lpRect->left + iIconSizeX;
 			if ((lpRect->bottom - lpRect->top) < iModeSizeY) {
 				lpRect->top = (lpRect->bottom - iIconSizeY) + (DESCENT * (dpiY + USER_DEFAULT_SCREEN_DPI - 1) / USER_DEFAULT_SCREEN_DPI);
+				lpRect->bottom = lpRect->top + iIconSizeY;
 			}
 			else {
-				lpRect->top = (lpRect->bottom - ((lpRect->bottom - lpRect->top) / 2) - (iIconSizeY / 2));// + (DESCENT * (dpiY + USER_DEFAULT_SCREEN_DPI - 1) / USER_DEFAULT_SCREEN_DPI);
+				lpRect->top = (lpRect->bottom - ((lpRect->bottom - lpRect->top) / 2 ) - (iIconSizeY / 2));// + (DESCENT * (dpiY + USER_DEFAULT_SCREEN_DPI - 1) / USER_DEFAULT_SCREEN_DPI);
+				lpRect->bottom = lpRect->top + iIconSizeY;
 			}
-			lpRect->bottom = lpRect->top + iIconSizeY;
 #undef DESCENT
 			return TRUE;
 		}
@@ -1024,15 +633,18 @@ BOOL		CCursor::_bAdjustCaretByMonitorDPI(int iModeSizeX, int iModeSizeY, LPRECT 
 	return FALSE;
 }
 
+//
+// bDrawIMEModeOnDisplaySub()
+//
 BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData)
 {
 	Sleep(50);
-
-	BOOL	bFoundCaret = FALSE;
-	RECT	rcCursor{}, rcCaret{};
+	
+	BOOL		bFoundCaret = FALSE;
+	RECT		rcCursor{}, rcCaret{};
 	int		iCursorSizeX = 0, iCursorSizeY = 0, iCaretSizeX = 0, iCaretSizeY = 0;
 	DWORD	dwIMEModeCursor = IMEOFF, dwIMEModeCaret = IMEOFF;
-	HWND	hCaretWnd = NULL;
+	HWND		hCaretWnd = NULL;
 	if (lpstCursorData->bDrawNearCaret != FALSE) {
 		if (lpstCursorData->hWnd != NULL) {
 			rcCaret.left = lpstCursorData->rcCaret.left;	rcCaret.top = lpstCursorData->rcCaret.top;
@@ -1040,7 +652,7 @@ BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData)
 			hCaretWnd = lpstCursorData->hWnd;
 			bFoundCaret = TRUE;
 		}
-		else if ((hCaretWnd = _hGetCaretPosByGuiThreadInfo(GetForegroundWindow(), &rcCaret)) != NULL) {
+		else if ((hCaretWnd = _hGetCaretPosByAccessibleObjectFromWindow(GetForegroundWindow(), &rcCaret)) != NULL) {
 			bFoundCaret = TRUE;
 		}
 		if (bFoundCaret && (hCaretWnd != NULL)) {
@@ -1088,8 +700,8 @@ BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData)
 	}
 
 #define	COUNT	10
-	BOOL	bRet = FALSE;
-	int	iCount = 0;
+	BOOL		bRet = FALSE;
+	int		iCount = 0;
 	if (lpstCursorData->dwDisplayModeTime != 0)	iCount = (lpstCursorData->dwDisplayModeTime + (COUNT - 1)) / COUNT;
 	else iCount = COUNT;
 	for (; iCount >= 0; iCount--) {
@@ -1114,12 +726,10 @@ BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData)
 		Sleep(COUNT);
 		bRet = TRUE;
 	}
-
 	if (!CursorWindow->bSetWindowPos(HWND_BOTTOM, rcCursor.left, rcCursor.top, iCursorSizeX, iCursorSizeY, (SWP_HIDEWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS))) {
 		bRet = FALSE;
 	}
 	CursorWindow->vSetModeString(lpstCursorData->lpstFlushMouseCursor[0].szMode);
-
 	if (bFoundCaret) {
 		if (!CaretWindow->bSetWindowPos(HWND_BOTTOM, rcCaret.left, rcCaret.top, iCaretSizeX, iCaretSizeY, (SWP_HIDEWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS))) {
 			bRet = FALSE;
@@ -1134,11 +744,10 @@ BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData)
 //
 BOOL		CCursor::bGetMouseRegValue(LPCTSTR szValue, LPTSTR szFile)
 {
-// \HKEY_CURRENT_USER\Control Panel\Cursors
 #define MOUSE_HKEY		HKEY_CURRENT_USER
 #define MOUSE_SUBKEY	_T("Control Panel\\Cursors")
-	BOOL		bRet = FALSE;
-	CRegistry* CReg = new CRegistry;
+	BOOL			bRet = FALSE;
+	CRegistry	*CReg = new CRegistry;
 	if (CReg->bReadRegValueString(MOUSE_HKEY, MOUSE_SUBKEY, szValue, szFile, _MAX_PATH)) {
 		bRet = TRUE;
 	}
@@ -1160,7 +769,7 @@ BOOL		CCursor::bChangeFlushMouseCursor(UINT uCurID, LPIMECURSORDATA lpstCursorDa
 	if (bSetSystemCursor((LPMOUSECURSOR)&(lpstCursorData->lpstFlushMouseCursor[i]).stArrow, lpstCursorData->iCursorSize, lpstCursorData->iCursorSize)) {
 		if (bSetSystemCursor((LPMOUSECURSOR) & (lpstCursorData->lpstFlushMouseCursor[i]).stHand, lpstCursorData->iCursorSize, lpstCursorData->iCursorSize)) {
 			if (bSetSystemCursor((LPMOUSECURSOR) & (lpstCursorData->lpstFlushMouseCursor[i]).stIBeam, lpstCursorData->iCursorSize, lpstCursorData->iCursorSize)) {
-				return TRUE;				// Success
+				return TRUE;	
 			}
 		}
 	}
@@ -1172,29 +781,32 @@ BOOL		CCursor::bChangeFlushMouseCursor(UINT uCurID, LPIMECURSORDATA lpstCursorDa
 //
 BOOL		CCursor::bSetSystemCursor(LPMOUSECURSOR lpstMC, int iCursorSizeX, int iCursorSizeY)
 {
-	HCURSOR		hCur;
-	UINT			fuLoad = 0;
-	if (lpstMC->bReadReg) {										// Load Cursor from registry
-		if (lpstMC->szFile[0] == '\0')		return TRUE;
+	HCURSOR	hCur;
+	UINT		fuLoad = 0;
+	if (lpstMC->bReadReg) {
+		if (lpstMC->szFile[0] == '\0')		return TRUE;	
 		fuLoad = (LR_VGACOLOR | LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_CREATEDIBSECTION | LR_LOADFROMFILE);
 		if ((hCur = (HCURSOR)LoadImage(NULL, lpstMC->szFile, IMAGE_CURSOR, iCursorSizeX, iCursorSizeY, fuLoad)) == NULL) {
 			return FALSE;
 		}
 	} else {
-		if (lpstMC->uResourceID == 0) {							// Load Cursor from file
+		if (lpstMC->uResourceID == 0) {
 			if (lpstMC->szFile[0] == '\0')		return FALSE;
 			DWORD	dwSize = 0;
 			dwSize = ExpandEnvironmentStrings(lpstMC->szFile, NULL, 0);
 			LPTSTR	lpszBuffer = new TCHAR[dwSize];
-			ZeroMemory(lpszBuffer, dwSize);
-			dwSize = ExpandEnvironmentStrings(lpstMC->szFile, lpszBuffer, dwSize);
-			fuLoad = (LR_VGACOLOR | LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_CREATEDIBSECTION | LR_LOADFROMFILE);
-			if ((hCur = (HCURSOR)LoadImage(NULL, lpszBuffer, IMAGE_CURSOR, iCursorSizeX, iCursorSizeY, fuLoad)) == NULL) {
-				delete	[]	lpszBuffer;
-				return FALSE;
+			if (lpszBuffer) {
+				ZeroMemory(lpszBuffer, dwSize);
+				dwSize = ExpandEnvironmentStrings(lpstMC->szFile, lpszBuffer, dwSize);
+				fuLoad = (LR_VGACOLOR | LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+				if ((hCur = (HCURSOR)LoadImage(NULL, lpszBuffer, IMAGE_CURSOR, iCursorSizeX, iCursorSizeY, fuLoad)) == NULL) {
+					delete[]	lpszBuffer;
+					return FALSE;
+				}
+				delete[]	lpszBuffer;
 			}
-			delete[]	lpszBuffer;
-		} else {												// Load Cursor from DLL
+			else return FALSE;
+		} else {	
 			HMODULE	hMod = NULL;
 			if ((hMod = hCursorDllLoad()) == NULL)	return FALSE;
 			fuLoad = (LR_VGACOLOR | LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_CREATEDIBSECTION);
@@ -1208,11 +820,12 @@ BOOL		CCursor::bSetSystemCursor(LPMOUSECURSOR lpstMC, int iCursorSizeX, int iCur
 				if (!bCursorDllUnload()) return FALSE;
 				return FALSE;
 			}
+			// Unload Cursor data DLL
 			if (!bCursorDllUnload()) return FALSE;
 		}
 	}
 	if (!SetSystemCursor(hCur, lpstMC->id))		return FALSE;
-	DestroyCursor(hCur);
+	DestroyCursor(hCur);	
 	return TRUE;
 }
 
@@ -1231,12 +844,11 @@ CCursorWindow::CCursorWindow()
 CCursorWindow::~CCursorWindow()
 {
 	if (hCursorWindow != NULL)	 {
-		DestroyWindow(hCursorWindow);
-		UnregisterClass(lpszWindowClass, (HINSTANCE)GetWindowLongPtr(hCursorWindow, GWLP_HINSTANCE));
+		PostMessage(hCursorWindow, WM_DESTROY, (WPARAM)0, (LPARAM)0);
 		hCursorWindow = NULL;
 	}
 	if (lpszWindowClass != NULL) {
-		delete[]	lpszWindowClass;
+		delete []	lpszWindowClass;
 		lpszWindowClass = NULL;
 	}
 }
@@ -1248,20 +860,23 @@ BOOL		CCursorWindow::bRegister(HINSTANCE hInstance, LPCTSTR szWindowClassName, C
 {
 	if (hInstance == NULL)	return FALSE;
 	lpszWindowClass = new TCHAR[MAX_LOADSTRING];
-	ZeroMemory(lpszWindowClass, MAX_LOADSTRING);
-	_tcsncpy_s(lpszWindowClass, MAX_LOADSTRING, szWindowClassName, _TRUNCATE);
+	if (lpszWindowClass) {
+		ZeroMemory(lpszWindowClass, MAX_LOADSTRING);
+		_tcsncpy_s(lpszWindowClass, MAX_LOADSTRING, szWindowClassName, _TRUNCATE);
 
-	dwTextColor = dwRGB;
-	if (dwRGB & 0x00000100)	dwBackColor = dwRGB & 0xfffffeff;
-	else dwBackColor = dwRGB | 0x00000100;
+		dwTextColor = dwRGB;
+		if (dwRGB & 0x00000100)	dwBackColor = dwRGB & 0xfffffeff;
+		else dwBackColor = dwRGB | 0x00000100;
 
-	if (!MyRegisterClass(hInstance)) {
-		return FALSE;
+		if (!MyRegisterClass(hInstance)) {
+			return FALSE;
+		}
+		if ((hCursorWindow = InitInstance(hInstance, SW_HIDE)) == NULL) {
+			return FALSE;
+		}
+		return TRUE;
 	}
-	if ((hCursorWindow = InitInstance(hInstance, SW_HIDE)) == NULL) {
-		return FALSE;
-	}
-	return TRUE;
+	return FALSE;
 }
 
 //
@@ -1291,22 +906,22 @@ ATOM CCursorWindow::MyRegisterClass(HINSTANCE hInstance)
 #define CLASSSTYLE (CS_HREDRAW | CS_VREDRAW | CS_NOCLOSE)
 	WNDCLASSEX wcex{};
 	wcex.cbSize = sizeof(WNDCLASSEX);
-	wcex.style = CLASSSTYLE;						// クラススタイル
-	wcex.lpfnWndProc = WndProc;						// Window Proc.
-	wcex.cbClsExtra = 0;							// クラスの補足データなし
-	wcex.cbWndExtra = 0;							// ウィンドウの補足データなし
-	wcex.hInstance = hInstance;						// クラスのウィンドウハンドル
-	wcex.hIcon = NULL;								// アイコンハンドル
-	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);		// マウスカーソルハンドル
-	wcex.hbrBackground = NULL;						// ウィンドウ背景色
-	wcex.lpszMenuName = NULL;						// デフォルトメニュー名
-	wcex.lpszClassName = lpszWindowClass;			// このウインドウクラスにつける名前
-	wcex.hIconSm = NULL;							// 16×16の小さいサイズのアイコン
+	wcex.style = CLASSSTYLE;	
+	wcex.lpfnWndProc = WndProc;
+	wcex.cbClsExtra = 0;	
+	wcex.cbWndExtra = 0;	
+	wcex.hInstance = hInstance;
+	wcex.hIcon = NULL;
+	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wcex.hbrBackground = NULL;
+	wcex.lpszMenuName = NULL;
+	wcex.lpszClassName = lpszWindowClass;
+	wcex.hIconSm = NULL;	
 
 	ATOM		atom = 0;
 	if ((atom = RegisterClassEx(&wcex)) == 0) {
 		_Post_equals_last_error_ DWORD err = GetLastError();
-		if (err == 1410)		return 1;			// non error
+		if (err == 1410)		return 1;
 	}
 	return atom;
 }
@@ -1319,20 +934,20 @@ HWND CCursorWindow::InitInstance(HINSTANCE hInstance, int nCmdShow)
 #define		EX_WINDOWSTYLE	(WS_EX_LAYERED | WS_EX_NOACTIVATE)
 #define		WINDOWSTYLE		(WS_POPUP)
 
-	HWND		hWnd = NULL;						// ウィンドウのハンドル
+	HWND		hWnd = NULL;	
 	hWnd = CreateWindowEx(
-					EX_WINDOWSTYLE,					// 拡張ウィンドウスタイル
-					lpszWindowClass,				// RegisterClass()呼び出しを参照
-					NULL,							// Title barのテキスト
-					WINDOWSTYLE,					// Window style
-					0, 0,							// 水平・垂直位置
-					0, 0,							// 幅・高さ
-					NULL,							// 親オーバーラップウィンドウ
-					NULL,							// ウィンドウクラスのメニューを使う
-					hInstance,						// 所有インスタンス
-					this);							// 自分のポインタを渡す
+					EX_WINDOWSTYLE,
+					lpszWindowClass,	
+					NULL,
+					WINDOWSTYLE,	
+					0, 0,
+					0, 0,
+					NULL,
+					NULL,
+					hInstance,
+					this);
 	if (!hWnd) {
-		return NULL;								// ウィンドウを作成できなかったときはNULLを返す
+		return NULL;	
 	}
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
@@ -1409,22 +1024,22 @@ void		CCursorWindow::Cls_OnPaint(HWND hWnd)
 		RECT		rc{};
 		if (GetClientRect(hWnd, &rc)) {
 			HBRUSH	hBrush = NULL;
-			if ((hBrush = CreateSolidBrush(dwBackColor & 0x00ffffff)) != NULL) {								// 背景色を設定
+			if ((hBrush = CreateSolidBrush(dwBackColor & 0x00ffffff)) != NULL) {	
 				if (SelectObject(hDC, hBrush) != HGDI_ERROR) {
 					if (FillRect(hDC, &rc, hBrush) != 0) {
 						if (SetBkMode(hDC, TRANSPARENT) != 0) {
 							COLORREF	dwColorPrev = 0;
-							if ((dwColorPrev = SetTextColor(hDC, dwTextColor & 0x00ffffff)) != CLR_INVALID) {	// 文字色を設定
+							if ((dwColorPrev = SetTextColor(hDC, dwTextColor & 0x80ffffff)) != CLR_INVALID) {
 								int	iBkModePrev = 0;
-								if ((iBkModePrev = SetBkMode(hDC, TRANSPARENT)) != 0) {							// 背景モードを設定
+								if ((iBkModePrev = SetBkMode(hDC, TRANSPARENT)) != 0) {
 									if (lpszMode != NULL) {
 										HFONT	hFont = NULL;
 										DWORD	dwUnderline = 0;
 										if (GetKeyState(VK_CAPITAL) & 0x0001) dwUnderline = TRUE;	else dwUnderline = FALSE;
 #define	FONT	_T("Yu Gothic UI")
 										if ((hFont = CreateFont((rc.bottom - rc.top), (rc.right - rc.left) / 2, 0, 0, FW_BOLD, FALSE, dwUnderline, FALSE,
-											SHIFTJIS_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS,
-											PROOF_QUALITY, FIXED_PITCH, FONT)) != NULL) {
+																		SHIFTJIS_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS,
+																					PROOF_QUALITY, FIXED_PITCH, FONT)) != NULL) {
 											HFONT	hFontPrev = NULL;
 											if ((hFontPrev = (HFONT)SelectObject(hDC, hFont)) != NULL) {
 												if (DrawTextEx(hDC, lpszMode, -1, &rc, DT_RIGHT | DT_SINGLELINE | DT_VCENTER, NULL) == 0) {

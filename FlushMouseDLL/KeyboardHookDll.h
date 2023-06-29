@@ -1,4 +1,5 @@
-﻿// KeyboardHookDll.h
+﻿//
+// KeyboardHookDll.h
 //		Copyright (C) 2022 JeffyTS
 //
 // No.      Date		    Name		    Reason & Document

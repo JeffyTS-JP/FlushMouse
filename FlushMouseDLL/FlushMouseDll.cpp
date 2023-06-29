@@ -1,9 +1,10 @@
-﻿// FlushMouseDll.cpp : DLL アプリケーションのエントリ ポイントを定義します。
+﻿//
+// FlushMouseDll.cpp
 //		Copyright (C) 2022 JeffyTS
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0000	2022/02/12  JeffyTS  	New edit.
+// #0000		2022/02/12  JeffyTS  	New edit.
 //
 
 //

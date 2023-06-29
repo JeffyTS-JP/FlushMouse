@@ -1,4 +1,5 @@
-﻿// GlobalHookDll.cpp
+﻿//
+// GlobalHookDll.cpp
 //		Copyright (C) 2022 JeffyTS
 //
 // No.      Date		    Name		    Reason & Document
@@ -77,7 +78,7 @@ DLLEXPORT BOOL  __stdcall bGlobalHookSet(HWND hWnd)
 //
 DLLEXPORT BOOL __stdcall bGlobalHookUnset()
 {
-	BOOL	bRet = FALSE;
+	BOOL		bRet = FALSE;
 	if (CSharedMem != NULL) {
 		if ((lpDatGlobal = (LPGLOBAL_SHAREDMEM)CSharedMem->lpvSharedMemoryRead()) != NULL) {
 			if (lpDatGlobal->hWnd) {

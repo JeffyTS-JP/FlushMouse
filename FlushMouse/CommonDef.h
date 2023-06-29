@@ -1,9 +1,10 @@
-﻿// CommonDef.h
+﻿//
+// CommonDef.h
 //		Copyright (C) 1993 JeffyTS
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0001	2023/04/27  JeffyTS		New edit
+// #0000		2023/04/27  JeffyTS		New edit
 //
 
 //
@@ -17,8 +18,18 @@
 //
 #define MAX_LOADSTRING 100
 
+// Files
+#define	FULL_FLUSHMOUSE_EXE		L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouse.exe"
+#define	FULL_FLUSHMOUSE32_EXE	L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouse32.exe"
+#define FULL_FLUSHMOUSE_DLL		L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouseDLL.dll"
+#define	FULL_FLUSHMOUSE32_DLL	L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouseDLL32.dll"
+#define	FLUSHMOUSE_EXE			L"FlushMouse.exe"
+#define	FLUSHMOUSE32_EXE			L"FlushMouse32.exe"
+#define FLUSHMOUSE_DLL			L"FlushMouseDLL.dll"
+#define FLUSHMOUSE32_DLL			L"FlushMouseDLL32.dll"
+
 // Window Class
-#define	CLASS_FLUSHMOUSE		L"FlushMouse-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
+#define	CLASS_FLUSHMOUSE			L"FlushMouse-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
 #define CLASS_FLUSHMOUSE32		L"FlushMouse32-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
 
 // for IME

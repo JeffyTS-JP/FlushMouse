@@ -1,3 +1,4 @@
+//
 // Eventlog.mc
 //		Copyright (C) 2023 JeffyTS
 //
@@ -108,13 +109,13 @@
 #define POWERNOTIFICATION_CATEGORY       ((DWORD)0x00000010L)
 
 //
-// MessageId: TASKSCHDULER_CATEGORY
+// MessageId: TASKSCHEDULER_CATEGORY
 //
 // MessageText:
 //
-// TaskSheduler Events
+// TaskScheduler Events
 //
-#define TASKSCHDULER_CATEGORY            ((DWORD)0x00000011L)
+#define TASKSCHEDULER_CATEGORY           ((DWORD)0x00000011L)
 
 //
 // Message definitions.
@@ -259,7 +260,7 @@
 //
 // MessageText:
 //
-// Resumeed from Susped (APM).
+// Resumed from Suspend (APM).
 //
 #define MSG_PBT_APMRESUMESUSPEND         ((DWORD)0x40000102L)
 

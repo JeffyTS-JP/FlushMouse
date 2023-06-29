@@ -66,7 +66,7 @@ DLLEXPORT BOOL  __stdcall bMouseHookSet32(HWND hWnd)
 //
 DLLEXPORT BOOL __stdcall bMouseHookUnset32()
 {
-	BOOL	bRet = FALSE;
+	BOOL		bRet = FALSE;
 	if (CSharedMem != NULL) {
 		if ((lpDatMouse = (LPMOUSE_SHAREDMEM32)CSharedMem->lpvSharedMemoryRead()) != NULL) {
 			if (lpDatMouse->hHook) {

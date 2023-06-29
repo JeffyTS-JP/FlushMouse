@@ -1,3 +1,4 @@
+;//
 ;// Eventlog.mc
 ;//		Copyright (C) 2023 JeffyTS
 ;//
@@ -89,13 +90,13 @@ PowerNotification Events
 .
 
 MessageId=0x11
-SymbolicName=TASKSCHDULER_CATEGORY
+SymbolicName=TASKSCHEDULER_CATEGORY
 Language=English
-TaskSheduler Events
+TaskScheduler Events
 .
 
 Language=Japanese
-TaskSheduler Events
+TaskScheduler Events
 .
 
 
@@ -291,11 +292,11 @@ Severity=Informational
 Facility=Application
 SymbolicName=MSG_PBT_APMRESUMESUSPEND
 Language=English
-Resumeed from Susped (APM).
+Resumed from Suspend (APM).
 .
 
 Language=Japanese
-Resumeed from Susped (APM).
+Resumed from Suspend (APM).
 .
 
 MessageId=0x0103

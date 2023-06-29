@@ -218,18 +218,22 @@
     <ClInclude Include="FlushMouseLIB.h" />
     <ClInclude Include="FlushMouseSub.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Ime.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Profile.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TaskTray.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FlushMouse.cpp" />
     <ClCompile Include="Cursor.cpp" />
     <ClCompile Include="FlushMouseLIB.cpp" />
     <ClCompile Include="FlushMouseSub.cpp" />
+    <ClCompile Include="Ime.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="Profile.cpp" />
+    <ClCompile Include="TaskTray.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FlushMouse.rc" />
