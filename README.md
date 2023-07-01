@@ -1,6 +1,5 @@
 
 ![Icon](https://osdn.net/users/jeffyts/pf/FlushMouse/wiki/FrontPage/thumb/48x48/FlushMouse.png)
-
 # FlushMouse
 
 
@@ -8,6 +7,7 @@
 ### マウスカーソルへIMEモードの表示
 
 **タスクトレイに常駐して、マウスカーソルへIMEモードの表示をするユーティリティです**
+
 **FlushMouse is a software developed by JeffyTS. It is a mouse gesture tool that allows you to perform various operations by drawing gestures with your mouse. (by Bing)**
 
 
