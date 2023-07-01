@@ -8,7 +8,7 @@
 
 
 
-使い方については [OSDN/FlushMouse](https://osdn.net/users/jeffyts/pf/FlushMouse/wiki/FrontPage "OSDN") を参照してください (どちらにも同じソースとバイナリが置いてあります)
+使い方については [OSDN/FlushMouse](https://osdn.net/users/jeffyts/pf/FlushMouse/wiki/FrontPage "https://osdn.net/users/JeffyTS/pf/FlushMouse/wiki/FrontPage)") を参照してください (どちらにも同じソースとバイナリが置いてあります)
 
 ![Cursors](https://osdn.net/users/jeffyts/pf/FlushMouse/wiki/FrontPage/thumb/230x181/Cursors.png)
 
