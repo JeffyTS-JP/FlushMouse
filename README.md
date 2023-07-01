@@ -12,8 +12,6 @@
 
 
 
-GitHubでは、プログラム的なことの説明を主にしていきます
-
 使い方やインストールについては OSDN (<https://osdn.net/users/jeffyts/pf/FlushMouse/wiki/FrontPage>) を参照してください (どちらにも同じソースとバイナリが置いてあります)
 
 ![Cursors](https://osdn.net/users/jeffyts/pf/FlushMouse/wiki/FrontPage/thumb/230x181/Cursors.png)
