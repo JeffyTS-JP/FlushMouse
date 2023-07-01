@@ -9,7 +9,7 @@
 
 **FlushMouse is a software developed by JeffyTS. It is a mouse gesture tool that allows you to perform various operations by drawing gestures with your mouse. (by Bing)**
 
-* * *
+___
 
 使い方やインストールについては OSDN (<https://osdn.net/users/jeffyts/pf/FlushMouse/wiki/FrontPage>) を参照してください (どちらにも同じソースとバイナリが置いてあります)
 
