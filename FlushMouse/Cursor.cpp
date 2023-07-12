@@ -416,16 +416,16 @@ BOOL		CCursor::bRegisterDrawIMEModeThread(HWND hWndObserved)
 	// Register thread
 	stIMECursorData.hWndObserved = hWndObserved;
 	if (!DrawIMEModeThread->bRegister(DRAWIMEMODETHREADNAME, DRAWIMEMODETHREADID,
-							(LPTHREAD_START_ROUTINE)&bDrawIMEModeRoutine, &stIMECursorData, 0)) {
+							(LPTHREAD_START_ROUTINE)&_bDrawIMEModeRoutine, &stIMECursorData, 0)) {
 		return	FALSE;
 	}
 	return	TRUE;
 }
 
 //
-// bDrawIMEModeRoutine()
+// _bDrawIMEModeRoutine()
 //
-BOOL WINAPI	CCursor::bDrawIMEModeRoutine(LPVOID lpvParam)
+BOOL WINAPI	CCursor::_bDrawIMEModeRoutine(LPVOID lpvParam)
 {
 	LPIMECURSORDATA	lpstCursorData = (LPIMECURSORDATA)lpvParam;
 	CCursor	*This = reinterpret_cast<CCursor*>(lpvParam);
@@ -467,7 +467,7 @@ BOOL		CCursor::bDrawIMEModeOnDisplay(LPIMECURSORDATA lpstCursorData)
 		if (lpstCursorData->dwWaitWaveTime != 0)		Sleep(lpstCursorData->dwWaitWaveTime);
 	}
 	if (_bCalcDispModeRect(lpstCursorData->iModeSize, lpstCursorData->iModeSize, &rc)) {
-		if (EnumDisplayMonitors(NULL, &rc, (MONITORENUMPROC)&bIconDrawEnumProc, (LPARAM)lpstCursorData) != 0) {
+		if (EnumDisplayMonitors(NULL, &rc, (MONITORENUMPROC)&_bIconDrawEnumProc, (LPARAM)lpstCursorData) != 0) {
 			bRet = TRUE;
 		}
 		else {
@@ -490,9 +490,9 @@ BOOL		CCursor::bDrawIMEModeOnDisplay(LPIMECURSORDATA lpstCursorData)
 }
 
 //
-// bIconDrawEnumProc()
+// _bIconDrawEnumProc()
 //
-BOOL		CCursor::bIconDrawEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam)
+BOOL		CCursor::_bIconDrawEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(hMonitor);
 	UNREFERENCED_PARAMETER(hDC);
@@ -503,7 +503,7 @@ BOOL		CCursor::bIconDrawEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, L
 }
 
 //
-// bCalcDispModeRect()
+// _bCalcDispModeRect()
 //
 BOOL		CCursor::_bCalcDispModeRect(int iModeSizeX, int iModeSizeY, LPRECT lpRect)
 {

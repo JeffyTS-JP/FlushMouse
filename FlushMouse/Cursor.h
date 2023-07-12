@@ -177,8 +177,8 @@ private:
 	HWND			_hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPRECT lprcCaret);
 	BOOL			_bAdjustCaretByMonitorDPI(int iModeSizeX, int iModeSizeY, LPRECT lprcCaret);
 	BOOL			bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData);
-	static BOOL	bIconDrawEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam);
-	static BOOL WINAPI	bDrawIMEModeRoutine(LPVOID lpvParam);
+	static BOOL CALLBACK	_bIconDrawEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam);
+	static BOOL WINAPI		_bDrawIMEModeRoutine(LPVOID lpvParam);
 
 	BOOL			bGetMouseRegValue(LPCTSTR szValue, LPTSTR szFile);
 	BOOL			bChangeFlushMouseCursor(UINT uCurID, LPIMECURSORDATA lpstCursorData);

@@ -6,10 +6,10 @@
 
 [[BR]]
 2023/07/05[[BR]]
-　　　'''Version 1.1.1.7 をリリースしました'''[[BR]]
+　　　'''Version 1.1.2.9 をリリースしました'''[[BR]]
 [[BR]]
 (主な変更点)[[BR]]
- * 細かい処理の見直しや、バグの修正をしました[[BR]]
+ * 今回は、プログラム的な修正はなく、GitHubにもソースを上げるようにしました。ビルド方法などはそちらに書いてあります。興味のある方はどうぞ https://github.com/JeffyTS-JP/FlushMouse [[BR]]
 [[BR]]
  * IMEモードの表示の色指定でαチャネルが有効になるようにしてあります(設定画面は作成していません。レジストリを編集できる方は好みの色にしてみてください  (ただし、レジストリの編集は十分注意して行ってください)[[BR]]
    * HKEY_CURRENT_USER\Software\JeffyTS\FlushMouse の NearDrawCaretColor と NearDrawMouseColor です。上位バイトから、α B G R の順です[[BR]]

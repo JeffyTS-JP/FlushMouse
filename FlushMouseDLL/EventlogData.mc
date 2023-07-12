@@ -1,4 +1,4 @@
-;//
+ï»¿;//
 ;// Eventlog.mc
 ;//		Copyright (C) 2023 JeffyTS
 ;//
@@ -113,7 +113,7 @@ Started FlushMouse.
 .
 
 Language=Japanese
-FlushMouse‚ğ‹N“®‚µ‚Ü‚µ‚½B
+FlushMouseã‚’èµ·å‹•ã—ã¾ã—ãŸã€‚
 .
 
 MessageId=0x0001
@@ -125,7 +125,7 @@ Restart FlushMouse.
 .
 
 Language=Japanese
-FlushMouse‚ğÄ‹N“®‚µ‚Ü‚·B
+FlushMouseã‚’å†èµ·å‹•ã—ã¾ã™ã€‚
 .
 
 MessageId=0x0002
@@ -197,7 +197,7 @@ Quit FlushMouse.
 .
 
 Language=Japanese
-FlushMouse‚ğI—¹‚µ‚Ü‚·B
+FlushMouseã‚’çµ‚äº†ã—ã¾ã™ã€‚
 .
 
 MessageId=0x0006
@@ -209,7 +209,7 @@ Start FlushMouse(Installer).
 .
 
 Language=Japanese
-FlushMouse‚ğ‹N“®‚µ‚Ü‚·(Installer)B
+FlushMouseã‚’èµ·å‹•ã—ã¾ã™(Installer)ã€‚
 .
 
 MessageId=0x0007
@@ -221,7 +221,7 @@ Quit FlushMouse(Installer).
 .
 
 Language=Japanese
-FlushMouse‚ğI—¹‚µ‚Ü‚·(Installer)B
+FlushMouseã‚’çµ‚äº†ã—ã¾ã™(Installer)ã€‚
 .
 MessageId=0x0008
 Severity=Success

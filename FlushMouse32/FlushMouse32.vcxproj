@@ -23,7 +23,7 @@
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{dbedaf04-fc3f-48dc-81ac-981a747f30a4}</ProjectGuid>
     <RootNamespace>FlushMouse32</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -214,6 +214,9 @@
   <ItemGroup>
     <ProjectReference Include="..\FlushMouseDLL32\FlushMouseDLL32.vcxproj">
       <Project>{701b5f8e-0e39-40c3-a692-b23a3836bede}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\FlushMouseDLL\FlushMouseDLL.vcxproj">
+      <Project>{ec908a5d-8859-4b02-9ace-023ff407a3a3}</Project>
     </ProjectReference>
     <ProjectReference Include="..\MiscLIB32\MiscLIB32.vcxproj">
       <Project>{3d3f632c-75bb-4830-aa8e-0871c6aa1a72}</Project>

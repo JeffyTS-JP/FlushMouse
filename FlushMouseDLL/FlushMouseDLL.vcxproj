@@ -149,8 +149,8 @@
       <AdditionalDependencies>..\$(Platform)\$(Configuration)\MiscLIB.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>move /Y $(OUTDIR)FlushMouseDLL.dll $(OUTDIR)_FlushMouseDLL.dll 
-copy /Y $(OUTDIR)_FlushMouseDLL.dll $(OUTDIR)FlushMouseDLL.dll</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>
@@ -180,8 +180,8 @@ copy /Y $(OUTDIR)_FlushMouseDLL.dll $(OUTDIR)FlushMouseDLL.dll</Command>
       <AdditionalDependencies>..\$(Platform)\$(Configuration)\MiscLIB.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>move /Y $(OUTDIR)FlushMouseDLL.dll $(OUTDIR)_FlushMouseDLL.dll 
-copy /Y $(OUTDIR)_FlushMouseDLL.dll $(OUTDIR)FlushMouseDLL.dll</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>
@@ -228,6 +228,11 @@ copy /Y $(OUTDIR)_FlushMouseDLL.dll $(OUTDIR)FlushMouseDLL.dll</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create Event Log Message</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(FileName).rc;%(FileName).h</Outputs>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MiscLIB\MiscLIB.vcxproj">
+      <Project>{ccaf431f-ce8e-4879-9b1f-3f1df4ac2269}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
