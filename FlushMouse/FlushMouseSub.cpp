@@ -15,6 +15,7 @@
 #include "FlushMouseLIB.h"
 #include "TaskTray.h"
 #include "CommonDef.h"
+#include "..\FlushMouseDLL\ShellHookDll.h"
 #include "..\FlushMouseDLL\GlobalHookDll.h"
 #include "..\FlushMouseDLL\KeyboardHookDll.h"
 #include "..\FlushMouseDLL\EventlogDll.h"
@@ -247,6 +248,7 @@ void CALLBACK CEventHook::vHandleEventIME(HWINEVENTHOOK hook, DWORD dwEvent, HWN
 CFlushMouseHook::CFlushMouseHook()
 {
 	hHook64Dll = NULL;
+	bShellHook64 = FALSE;
 	bGlobalHook64 = FALSE;
 	bKeyboardHookLL64 = FALSE;
 	bMouseHook64 = FALSE;
@@ -271,8 +273,10 @@ BOOL			CFlushMouseHook::bHookSet(HWND hWnd, LPCTSTR lpszDll64Name, LPCTSTR lpszE
 	UNREFERENCED_PARAMETER(lpszDll64Name);
 	if ((bGlobalHook64 = bGlobalHookSet(hWnd)) != FALSE) {
 		if ((bKeyboardHookLL64 = bKeyboardHookLLSet(hWnd)) != FALSE) {
-			if ((bHook32Dll = bHook32DllStart(hWnd, lpszExec32Name)) != FALSE) {
-				return TRUE;
+			if ((bShellHook64 = bShellHookSet(hWnd)) != FALSE) {
+				if ((bHook32Dll = bHook32DllStart(hWnd, lpszExec32Name)) != FALSE) {
+					return TRUE;
+				}
 			}
 		}
 	}
@@ -288,6 +292,7 @@ BOOL		CFlushMouseHook::bHookUnset()
 	if (bHook32Dll)			bHook32DllStop();
 	if (bKeyboardHookLL64)	bKeyboardHookLLUnset();
 	if (bGlobalHook64)		bGlobalHookUnset();
+	if (bShellHook64)		bShellHookUnset();
 	return TRUE;
 }
 

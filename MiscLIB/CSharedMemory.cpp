@@ -30,6 +30,7 @@ typedef     ULONGLONG	*LPQWORD;
 // Class CSharedMemory
 //
 CSharedMemory::CSharedMemory(LPCTSTR szSharedMemoryName, DWORD dwDataSize)
+	: hSharedMem(), lpszSharedMemoryName(), dwDataByteSize()
 {
 
 	size_t	size = wcsnlen_s(szSharedMemoryName, MAX_LOADSTRING);

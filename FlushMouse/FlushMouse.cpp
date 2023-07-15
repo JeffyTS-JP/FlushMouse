@@ -110,9 +110,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		return 0;
 	}
 
-#define	RESOURCEFILE		_T("FlushMouse.exe")
 	// Load Resource
-	Resource = new CResource(RESOURCEFILE);
+	Resource = new CResource(FLUSHMOUSE_EXE);
 	if (Resource->hLoad() == NULL) {
 		return (-1);
 	}

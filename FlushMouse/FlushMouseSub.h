@@ -4,7 +4,7 @@
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0000		2022/03/03  JeffyTS  	New edit.
+// #0000	2022/03/03  JeffyTS  	New edit.
 //
 
 //
@@ -46,7 +46,7 @@ private:
 	static void CALLBACK vHandleEventIME(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime);
 
 public:
-	HWND				hFormerWnd;
+	HWND			hFormerWnd;
 
 private:
 	HWINEVENTHOOK	hEventHook;
@@ -65,9 +65,9 @@ public:
 	BOOL		PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting);
 
 private:
-	HPOWERNOTIFY		hSuspendResumeNotification;
-	HPOWERNOTIFY		hPowerSettingNotification;
-	GUID				guidPowerSettingNotification;
+	HPOWERNOTIFY	hSuspendResumeNotification;
+	HPOWERNOTIFY	hPowerSettingNotification;
+	GUID			guidPowerSettingNotification;
 };
 
 //
@@ -88,10 +88,11 @@ private:
 
 private:
 	HMODULE		hHook64Dll;
-	BOOL			bGlobalHook64;
-	BOOL			bKeyboardHookLL64;
-	BOOL			bMouseHook64;
-	BOOL			bHook32Dll;
+	BOOL		bShellHook64;
+	BOOL		bGlobalHook64;
+	BOOL		bKeyboardHookLL64;
+	BOOL		bMouseHook64;
+	BOOL		bHook32Dll;
 
 private:
 	LPPROCESS_INFORMATION	lpstProcessInfomation;

@@ -46,7 +46,7 @@ static CSharedMemory* CSharedMem = NULL;
 DLLEXPORT BOOL  __stdcall bGlobalHookSet(HWND hWnd)
 {
 	hWndGLParent = hWnd;
-	if ((CSharedMem = new CSharedMemory(GLOBALHOOKMEM, sizeof(GLOBALHOOKMEM))) != NULL) {
+	if ((CSharedMem = new CSharedMemory(GLOBALHOOKMEM, sizeof(GLOBAL_SHAREDMEM))) != NULL) {
 		if ((lpDatGlobal = (LPGLOBAL_SHAREDMEM)CSharedMem->lpvSharedMemoryRead()) != NULL) {
 			lpDatGlobal->hWnd = hWnd;	lpDatGlobal->hInstance = hGetInstance();
 			if (CSharedMem->bSharedMemoryWrite(lpDatGlobal)) {
@@ -135,8 +135,7 @@ static LRESULT CALLBACK lpGlobalHookProc(int nCode, WPARAM wParam, LPARAM lParam
 						if (!bSubclassed) {
 							if (hHookGL == NULL)	break;
 							if (UnhookWindowsHookEx(hHookGL) != FALSE) {
-#define	DLLNAME		_T("FlushMouseDLL.dll")
-								if (LoadLibraryEx(DLLNAME, NULL, 0)) {
+								if (LoadLibraryEx(FLUSHMOUSE_DLL, NULL, 0)) {
 									bSubclassed = TRUE;
 								}
 								hHookGL = NULL;

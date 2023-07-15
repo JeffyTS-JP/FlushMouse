@@ -4,7 +4,7 @@
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0000		2022/03/04  JeffyTS  	New edit.
+// #0000	2022/03/04  JeffyTS  	New edit.
 //
 
 //
@@ -24,8 +24,8 @@
 #define GLOBALHOOKMEM _T("GlobalHookSharedMem")
 typedef struct tagGLOBAL_SHAREDMEM {
     HINSTANCE	hInstance;
-    HWND	hWnd;
-    HHOOK	hHook;
+    HWND	    hWnd;
+    HHOOK	    hHook;
 } GLOBAL_SHAREDMEM, * PGLOBAL_SHAREDMEM, * LPGLOBAL_SHAREDMEM;
 
 //

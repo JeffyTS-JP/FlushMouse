@@ -39,7 +39,7 @@ static CSharedMemory* CSharedMem = NULL;
 DLLEXPORT BOOL  __stdcall bMouseHookSet32(HWND hWnd)
 {
 	hWndMSParent = hWnd;
-	if ((CSharedMem = new CSharedMemory(MOUSEHOOKMEM32, sizeof(MOUSEHOOKMEM32))) != NULL) {
+	if ((CSharedMem = new CSharedMemory(MOUSEHOOKMEM32, sizeof(MOUSE_SHAREDMEM32))) != NULL) {
 		if ((lpDatMouse = (LPMOUSE_SHAREDMEM32)CSharedMem->lpvSharedMemoryRead()) != NULL) {
 			lpDatMouse->hWnd = hWnd;
 			if (CSharedMem->bSharedMemoryWrite(lpDatMouse)) {

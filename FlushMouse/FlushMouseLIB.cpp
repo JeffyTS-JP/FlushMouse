@@ -112,6 +112,7 @@ static void		Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, U
 static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd);
 static void		Cls_OnCheckIMEStartConvertingEx(HWND hWnd, BOOL bStartConversioning, DWORD vkCode);
 static void		Cls_OnCheckExistingJPIMEEx(HWND hWnd, BOOL bEPHelper);
+static void		Cls_OnInputLangChangeEx(HWND hWnd, UINT CodePage, HKL hkl);
 
 // Sub
 static BOOL		bSendInputSub(UINT cInputs, LPINPUT pInputs);
@@ -244,6 +245,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		HANDLE_MSG(hWnd, WM_EVENT_SYSTEM_FOREGROUNDEX, Cls_OnEventForegroundEx);
 		HANDLE_MSG(hWnd, WM_CHECKIMESTARTCONVEX, Cls_OnCheckIMEStartConvertingEx);
 		HANDLE_MSG(hWnd, WM_CHECKEXISTINGJPIMEEX, Cls_OnCheckExistingJPIMEEx);
+		HANDLE_MSG(hWnd, WM_INPUTLANGCHANGEEX, Cls_OnInputLangChangeEx);
 		break;
 
 	default:
@@ -422,6 +424,26 @@ static void	Cls_OnDisplayChange(HWND hWnd, UINT bitsPerPixel, UINT cxScreen, UIN
 }
 
 //
+// WM_INPUTLANGCHANGEEX
+// Cls_OnInputLangChangeEx
+//
+static void		Cls_OnInputLangChangeEx(HWND hWnd, UINT CodePage, HKL hkl)
+{
+	UNREFERENCED_PARAMETER(hWnd);
+	UNREFERENCED_PARAMETER(CodePage);
+	if ((bCheckExistingJPIME() && bEnableEPHelper) || bIMEModeForced) {
+		if (hkl == US_ENG) {
+			HWND	hForeWnd = GetForegroundWindow();
+			if (hForeWnd != NULL) {
+				HKL		hNewHKL = NULL;
+				HKL		hPreviousHKL = NULL;
+				bForExplorerPatcherSWS(hForeWnd, TRUE, bIMEModeForced, &hNewHKL, &hPreviousHKL);		// @@@ for Explorer Patcher Simple Window Switcher
+			}
+		}
+	}
+}
+
+//
 // WM_LBUTTONDOWNEX
 // Cls_OnLButtonDownEx()
 //
@@ -431,8 +453,8 @@ static void Cls_OnLButtonDownEx(HWND hWnd, int x, int y, HWND hForeground)
 	UNREFERENCED_PARAMETER(x);
 	UNREFERENCED_PARAMETER(y);
 	UNREFERENCED_PARAMETER(hForeground);
-	if (bEnableEPHelper || bIMEModeForced) {
-		bForExplorerPatcherSWS(hForeground, FALSE, bIMEModeForced, NULL, NULL);
+	if ((bCheckExistingJPIME() && bEnableEPHelper) || bIMEModeForced) {
+		bForExplorerPatcherSWS(hForeground, FALSE, FALSE, NULL, NULL);
 	}
 	return;
 }
@@ -494,9 +516,6 @@ static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd)
 				else {
 					return;
 				}
-			}
-			if ((bCheckExistingJPIME() && bEnableEPHelper) || bIMEModeForced) {
-				bForExplorerPatcherSWS(hWnd, TRUE, bIMEModeForced, NULL, NULL);
 			}
 			if (bOffChangedFocus) {
 				Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
