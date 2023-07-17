@@ -27,6 +27,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ソリューション項目", "ソリューション項目", "{4DA8FAF2-6A3D-41B4-B811-0F39BFA7CAA5}"
 	ProjectSection(SolutionItems) = preProject
 		FlushMouse_x64.msi = FlushMouse_x64.msi
+		README.md = README.md
 		version.h = version.h
 		version.wxi = version.wxi
 	EndProjectSection
