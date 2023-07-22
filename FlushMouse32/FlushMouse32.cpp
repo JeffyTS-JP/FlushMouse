@@ -14,7 +14,7 @@
 #include "pch.h"
 #include "FlushMouse32.h"
 #include "Resource.h"
-#include "..\FlushMouse\CommonDef.h"
+#include "..\FlushMouseLIB\CommonDef.h"
 #include "..\FlushMouseDLL\EventlogData.h"
 #include "..\FlushMouseDLL32\FlushMouseDll32.h"
 #include "..\FlushMouseDLL32\MouseHookDll32.h"

@@ -13,7 +13,7 @@
 #pragma once
 #include "pch.h"
 #include "GlobalHookDll.h"
-#include "..\FlushMouse\CommonDef.h"
+#include "..\FlushMouseLIB\CommonDef.h"
 
 //
 // Define

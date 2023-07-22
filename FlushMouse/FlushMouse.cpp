@@ -20,9 +20,9 @@
 
 #include "FlushMouse.h"
 #include "..\version.h"
-#include "FlushMouseLIB.h"
-#include "Resource.h"
-#include "TaskTray.h"
+#include "..\FlushMouseLIB\FlushMouseLIB.h"
+#include "..\FlushMouseLIB\Resource.h"
+#include "..\FlushMouseLIB\TaskTray.h"
 #include "..\FlushMouseDLL\EventlogDll.h"
 
 #if defined _DEBUG
@@ -214,7 +214,7 @@ static INT_PTR CALLBACK AboutDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 				ZeroMemory(lpszVersion, (sizeof(TCHAR) * MAX_LOADSTRING));
 				if (lpszVersion) {
 					ZeroMemory(lpszVersion, (sizeof(TCHAR) * MAX_LOADSTRING));
-					_sntprintf_s(lpszVersion, MAX_LOADSTRING, _TRUNCATE, _T("%d.%d.%d.%d"), MAJOR_VERSION, MINOR_VERSION, BUILD_VERSION, REVISON_VERSION);
+					_sntprintf_s(lpszVersion, MAX_LOADSTRING, _TRUNCATE, _T("%d.%d.%d.%d"), MAJOR_VERSION, MINOR_VERSION, BUILD_VERSION, REVISION_VERSION);
 					SetDlgItemText(hDlg, IDC_VERSION, lpszVersion);
 					delete[]	lpszVersion;
 				}

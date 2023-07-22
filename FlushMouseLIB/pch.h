@@ -8,10 +8,21 @@
 #define PCH_H
 
 // プリコンパイルするヘッダーをここに追加します
+#define OEMRESOURCE
 #include "framework.h"
 #include "targetver.h"
 #include <windows.h>
 #include <windowsx.h>
 #include <tchar.h>
+#include <shellapi.h>
+#include <shellscalingapi.h>
+#pragma comment(lib, "Shcore.lib")
+#include <commctrl.h>
+#pragma comment(lib, "comctl32.lib")
+#include <imm.h>
+#include <ime_cmodes.h>
+#pragma comment(lib, "Imm32.lib")
+#include <oleacc.h>
+#pragma comment(lib, "Oleacc.lib")
 
 #endif //PCH_H

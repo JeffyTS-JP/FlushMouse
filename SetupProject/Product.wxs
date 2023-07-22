@@ -33,14 +33,11 @@
 				 Comments="$(var.Comments)"
 				 Manufacturer="$(var.Manufacturer)" />
 
-		<!-- @@@ for Major Upgrade -->
-		<MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="[ProductName] の新しいバージョンがすでにインストールされています。" />
-		<!-- @@@ for Upgrade -->
+		<!-- for Upgrade -->
 		<Property Id='PREVIOUSVERSIONSINSTALLED' Secure='yes' />
 		<Upgrade Id="{8B8C6810-E467-498D-926C-F4139B2AE8AB}">
-			<!--UpgradeVersion OnlyDetect='yes' Property='NEWERFOUND' Minimum='$(var.Version)' IncludeMinimum='no' /-->
 			<UpgradeVersion OnlyDetect='no' Property='PREVIOUSFOUND' Minimum='0.0.0.0' IncludeMinimum='yes' Maximum='$(var.Version)' IncludeMaximum='no' />
-			<UpgradeVersion OnlyDetect='yes' Property='SELFFOUND' Minimum='0.0.0.0' IncludeMinimum='yes' Maximum='$(var.Version)' IncludeMaximum='yes' />
+			<UpgradeVersion OnlyDetect='yes' Property='SELFFOUND' Minimum='$(var.Version)' IncludeMinimum='yes' Maximum='$(var.Version)' IncludeMaximum='yes' />
 			<UpgradeVersion OnlyDetect='yes' Property='NEWERFOUND' Minimum='$(var.Version)' IncludeMinimum='no' />
 		</Upgrade>
 
@@ -51,12 +48,7 @@
 		<Icon Id="MainIcon" SourceFile="$(var.IcoSrcFile)" />
 		<Property Id="ARPPRODUCTICON" Value="MainIcon" />
 		<UIRef Id="_WixUI_FeatureTree" />
-		<!--UIRef Id="WixUI_Minimal" /-->
-		<!--UIRef Id="WixUI_FeatureTree" /-->
-		<!--UIRef Id="WixUI_Mondo" /-->
-		<!--UIRef Id="WixUI_Advanced" /-->
 		<UIRef Id="WixUI_ErrorProgressText" />
-		<!--Property Id="ARPNOREMOVE" Value="1"/-->
 		<Property Id="ARPNOMODIFY" Value="1"/>
 		<Property Id="ARPNOREPAIR" Value="1"/>
 		<!-- Install Directory -->
@@ -76,26 +68,16 @@
 		<!-- Condition -->
 		<Condition Message="Windows 10 Anniversary update 以降が必要です"> WindowsBuild &lt; 14390 </Condition>
 		<Condition Message="64bitのWindows 10 Anniversary update 以降が必要です"> NOT (%PROCESSOR_ARCHITECTURE="x86") </Condition>
-		<!-- Verify Dialog for Short cut , Start menu & application Launch menu -->
 		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT1" Value=" デスクトップにショートカットを作成する" />
 		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX1" Value="1" />
 		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT2" Value=" スタートメニューに登録する" />
-		<!--Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX2" Value="1" /-->
 		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT3" Value=" セットアップを終了したら、すぐに $(var.ProductName) を実行する" />
 		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX3" Value="1" />
 		<!-- Exit Dialog for application Launch -->
-		<!-- Comment out for default Check box off Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX2" Value="2" /-->
-		<!--Property Id="WIXUI_VERIFYDIALOGOPTIONALCOMMENT1" Value=" セットアップが完了したら再起動してください" /-->
 		<!-- Verify Dialog for Uninstall Registry -->
 		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT4" Value=" $(var.ProductName) の設定情報を削除する" />
-		<!--Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX4" Value="1" /-->
-		<!-- Comment out for default Check box off Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX3" Value="1" /-->
-		<!-- Exit Dialog for application Launch -->
-		<!--Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value=" セットアップを終了したら、すぐに $(var.ProductName) を実行する　　(ただし、全機能を使用するためにはWindowsの再起動が必要です)" />
-		<Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" /-->
 
 		<UI>
-			<!-- WixUtilExtension が必要 -->
 			<!-- Majour Upgrade Dialog-->
 			<Dialog Id="NewerFoundDlg" Width="270" Height="105" 	Title="[ProductName] セットアップ" NoMinimize="yes">
 				<Control Id="MessageText" Type="Text" X="48" Y="15" Width="205" Height="60" TabSkip="no" Text="[ProductName] の新しいバージョンがすでにインストールされています。" />
@@ -112,11 +94,8 @@
 				<Control Id="SeelfFoundDlgIcon" Type="Icon" X="15" Y="15" Width="24" Height="24" ToolTip="!(loc.ErrorDlgErrorIconTooltip)" FixedSize="yes" IconSize="32" Text="!(loc.ErrorDlgErrorIcon)" />
 			</Dialog>
 			<!-- _VerifyReady Dialog for Launch application -->
-			<!--Publish Dialog="_ExitDialog" Control="Finish" Event="DoAction" Value="LaunchApplication">WIXUI_VERIFYDIALOGOPTIONALCHECKBOX3 = 1 and NOT Installed</Publish-->
-			<!-- _VerifyReady Dialog for remove registry, but publish on _ExitDlg-->
 			<Publish Dialog="_ExitDialog" Control="Finish" Event="DoAction" Value="RemoveReg">WIXUI_VERIFYDIALOGOPTIONALCHECKBOX4 = 1 and Installed</Publish>
 			<!-- _Exit Dialog for Launch application -->
-			<!--Publish Dialog="_ExitDialog" Control="Finish" Event="DoAction" Value="LaunchApplication">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish-->
 		</UI>
 		<!-- Newer Version Found -->
 		<InstallUISequence>
@@ -124,56 +103,37 @@
 			<Show Dialog='SelfFoundDlg' After='FindRelatedProducts'>SELFFOUND</Show>
 		</InstallUISequence>
 		<InstallExecuteSequence>
-			<Custom Action="QuitApplication" Before="FindRelatedProducts"></Custom>
-			<!--Custom Action='WixExitEarlyWithSuccess' After='NewerFoundDlg'>NEWERFOUND</Custom-->
-			<!--Custom Action='WixExitEarlyWithSuccess' After='SelfFoundDlg'>SELFFOUND</Custom-->
-			<!--Custom Action='WixExitEarlyWithSuccess' After='FindRelatedProducts'>NEWERFOUND</Custom-->
+			<Custom Action="QuitApplication" Before="AppSearch">Installed</Custom>
 			<Custom Action='AlreadyUpdated' After='FindRelatedProducts'>SELFFOUND</Custom>
 			<Custom Action='NoDowngrade' After='FindRelatedProducts'>NEWERFOUND</Custom>
-			<!--RemoveExistingProducts After="InstallFinalize" /-->
-			<!--Custom Action="TaskKill" After="FindRelatedProducts">Installed</Custom-->
-			<Custom Action="QuitApplication2" After="InstallInitialize">Installed</Custom>
-			<!--Custom Action='QuitApplication4' After='InstallInitialize'>Installed</Custom-->
-			<Custom Action='UnregisterTaskScheduler' After='InstallInitialize'>Installed</Custom>
-			<Custom Action='UnregisterTaskScheduler2' After='InstallInitialize'>Installed</Custom>
-			<!--Custom Action='UnregisterEventlog' After='InstallInitialize'>Installed</Custom-->
-			<!--Custom Action="QuitApplication" After="InstallInitialize">Installed</Custom-->
-			<!--Custom Action="TaskKill" After="InstallInitialize">Installed</Custom-->
-			<!--Custom Action='TaskKill_force' After='InstallInitialize'>Installed</Custom-->
-
+			<Custom Action='WixExitEarlyWithSuccess' After='FindRelatedProducts'>NEWERFOUND or SELFFOUND</Custom>
+			<RemoveExistingProducts Before="InstallInitialize"/>
+			<Custom Action='QuitApplication2' After='InstallInitialize'>Installed</Custom>
+			<Custom Action='UnregisterTaskScheduler' After='QuitApplication2'>Installed</Custom>
+			<Custom Action='UnregisterTaskScheduler2' After='UnregisterTaskScheduler'>Installed</Custom>
 			<Custom Action='RegisterTaskScheduler' Before='InstallFinalize'>(NOT Installed) or REINSTALL</Custom>
 			<Custom Action='RegisterTaskScheduler2' Before='InstallFinalize'>(NOT Installed) or REINSTALL</Custom>
 			<Custom Action='LaunchApplication' After='InstallFinalize'>(WIXUI_VERIFYDIALOGOPTIONALCHECKBOX3 = 1 and NOT Installed) or (WIXUI_VERIFYDIALOGOPTIONALCHECKBOX3 = 1 and REINSTALL)</Custom>
-			<!--Custom Action='LaunchApplication' Before='InstallFinalize'>NOT Installed</Custom-->
-			<!--Custom Action='RegisterEventlog' Before='InstallFinalize'>NOT Installed</Custom-->
-
-			<!--Custom Action="QuitApplication3" Before="RemoveExistingProducts">Installed</Custom-->
 			<Custom Action='RemoveReg' After='RemoveExistingProducts'>WIXUI_VERIFYDIALOGOPTIONALCHECKBOX4 = 1 and Installed</Custom>
 		</InstallExecuteSequence>
 
 		<!-- Version Check -->
 		<CustomAction Id='AlreadyUpdated' Error='[ProductName] は既に、このバージョンに更新されています。' />
 		<CustomAction Id='NoDowngrade'    Error='[ProductName] の新しいバージョンが既にインストールされています。' />
-		<!-- Kill Own Application -->
+		<!-- Kill Application -->
 		<Binary Id="TASKKILL" SourceFile="C:\Windows\System32\taskkill.exe"> </Binary>
 		<CustomAction Id="TaskKill" BinaryKey="TASKKILL" Execute="deferred" Return="ignore" Impersonate="no"
 								ExeCommand=" /IM &quot;$(var.MainExeFileName)&quot;" />
 		<CustomAction Id="TaskKill_force" BinaryKey="TASKKILL" Execute="deferred" Return="asyncWait" Impersonate="no"
 												ExeCommand=" /F /IM &quot;$(var.MainExeFileName)&quot; /IM &quot;$(var.ProductName)32.exe&quot;" />
-		<!-- Quit Own Application -->
+		<!-- Quit Application -->
 		<Binary Id="EVENTCREATE" SourceFile="C:\Windows\System32\eventcreate.exe"> </Binary>
-		<CustomAction Id="QuitApplication" BinaryKey="EVENTCREATE" Execute="firstSequence" Return="ignore" Impersonate="yes"
+		<CustomAction Id="QuitApplication" BinaryKey="EVENTCREATE" Execute="firstSequence" Return="check" Impersonate="yes"
 								ExeCommand=" /T SUCCESS /ID 7 /L Application /SO FlushMouse /D &quot;Quit FlushMouse(Installer).&quot;" />
-		<CustomAction Id="QuitApplication2" BinaryKey="EVENTCREATE" Execute="firstSequence" Return="ignore" Impersonate="yes"
+		<CustomAction Id="QuitApplication2" BinaryKey="EVENTCREATE" Execute="deferred" Return="check" Impersonate="no"
 								ExeCommand=" /T SUCCESS /ID 7 /L Application /SO FlushMouse /D &quot;Quit FlushMouse(Installer).&quot;" />
-		<CustomAction Id="QuitApplication3" BinaryKey="EVENTCREATE" Execute="firstSequence" Return="ignore" Impersonate="yes"
-								ExeCommand=" /T SUCCESS /ID 7 /L Application /SO FlushMouse /D &quot;Quit FlushMouse(Installer).&quot;" />
-		<!--Binary Id="QUITApplication" SourceFile="C:\Program Files\JeffyTS\FlushMouse\FlushMouse.exe"> </Binary>
-		<CustomAction Id="QuitApplication4" BinaryKey="QUITApplication" Execute="deferred" Return="ignore" Impersonate="no"
-								ExeCommand=" /quit" /-->
-		<!-- Application Launch -->
-		<!--CustomAction Id="LaunchApplication" Directory="INSTALLFOLDER"
-								ExeCommand="[INSTALLFOLDER]$(var.MainExeFileName)" Return="asyncNoWait" /-->
+
+		<!-- Launch Application -->
 		<CustomAction Id="LaunchApplication" BinaryKey="EVENTCREATE" Execute="immediate" Return="ignore" Impersonate="yes"
 								ExeCommand=" /T SUCCESS /ID 6 /L Application /SO FlushMouse /D &quot;Start FlushMouse(Installer).&quot;" />
 
@@ -189,16 +149,6 @@
 								ExeCommand=" /Delete /F /TN &quot;$(var.ProductName)&quot;" />
 		<CustomAction Id="UnregisterTaskScheduler2" BinaryKey="UNREGISTERTaskScheduler" Execute="deferred" Return="asyncWait" Impersonate="no"
 								ExeCommand=" /Delete /F /TN &quot;$(var.ProductName)Installer&quot;" />
-		<!-- Register EventLog -->
-		<!--Binary Id="REGISTEREventlog" SourceFile="C:\Windows\System32\reg.exe"> </Binary>
-		<CustomAction Id="RegisterEventlog" BinaryKey="REGISTEREventlog" Execute="deferred" Return="asyncWait" Impersonate="no"
-								ExeCommand=" IMPORT &quot;[INSTALLFOLDER]Register_Eventlog.reg&quot; /reg:64" /-->
-		<!-- Unegister EventLog -->
-		<!--Binary Id="UNREGISTEREventlog" SourceFile="C:\Windows\System32\reg.exe"> </Binary-->
-		<!--CustomAction Id="UnregisterEventlog" BinaryKey="UNREGISTEREventlog" Execute="deferred" Return="asyncWait" Impersonate="no"
-								ExeCommand=" DELETE HKLM\System\CurrentControlSet\Services\Eventlog\Application\&quot;$(var.ProductName)&quot; /f /va" /-->
-		<!--CustomAction Id="UnregisterEventlog" BinaryKey="UNREGISTEREventlog" Execute="deferred" Return="asyncWait" Impersonate="no"
-								ExeCommand=" DELETE HKLM\System\CurrentControlSet\Services\Eventlog\Application\FlushMouse /f" /-->
 		<!-- Remove Registry in Uninstall -->
 		<Binary Id="REMOVEREG" SourceFile="C:\Windows\System32\reg.exe"> </Binary>
 		<CustomAction Id="RemoveReg" BinaryKey="REMOVEREG" Execute="immediate" Return="asyncNoWait" Impersonate="yes"
@@ -237,7 +187,6 @@
 		<!-- Feature -->
 		<Feature Id="EssentialFeature" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
-			<!--ComponentRef Id="AutoStartRegistry" /-->
 			<ComponentRef Id="EventLogRegistry" />
 			<ComponentRef Id="Registries" />
 			<ComponentRef Id="Shortcuts" />
@@ -279,19 +228,6 @@
 			<Component Id="Register_Eventlog.reg" Guid="{FBC3FF68-EF97-43F1-BE86-5F5CFC3AE4F1}">
 				<File Id="Register_Eventlog.reg" Name="Register_Eventlog.reg" Source="$(var.TargetDir04)Register_Eventlog.reg" />
 			</Component>
-			<!--Component Id="Register_FlushMouse.bat" Guid="{58D84ACB-D9C0-4E40-A485-3300E83F2660}">
-				<File Id="Register_FlushMouse.bat" Name="Register_FlushMouse.bat" Source="$(var.TargetDir04)Register_FlushMouse.bat" />
-			</Component>
-			<Component Id="Unregister_FlushMouse.bat" Guid="{C7B41729-230F-46C8-8E6F-724B98CD5B69}">
-				<File Id="Unregister_FlushMouse.bat" Name="Unregister_FlushMouse.bat" Source="$(var.TargetDir04)Unregister_FlushMouse.bat" />
-			</Component-->
-			<!-- Registries -->
-			<!-- Auto start by user registry -->
-			<!--Component Id="AutoStartRegistry" Guid="{AE2203C7-DFFF-40AA-873F-39C206583E9C}"-->
-			<!--RegistryKey Root="HKCU" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Run" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="no"-->
-			<!--RegistryValue Type="string" Name="$(var.ProductName)" Value="[INSTALLFOLDER]$(var.MainExeFileName)" KeyPath="yes" /-->
-			<!--/RegistryKey-->
-			<!--/Component-->
 			<!-- EventLog registry -->
 			<Component Id="EventLogRegistry" Guid="{B5A28410-C07F-43BD-BA17-D15F0331986B}">
 				<RegistryKey Root="HKLM" Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\$(var.ProductName)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">

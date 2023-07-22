@@ -13,7 +13,7 @@
 #pragma once
 #include "pch.h"
 #include "KeyboardHookDll.h"
-#include "..\FlushMouse\CommonDef.h"
+#include "..\FlushMouseLIB\CommonDef.h"
 #include "..\MiscLIB\CRegistry.h"
 
 //

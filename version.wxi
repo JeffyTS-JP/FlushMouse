@@ -1,6 +1,6 @@
 <Include>
 	<!-- for wix Setup Project -->
 	<!-- Copyright (C) 2023 JeffyTS -->
-	<?define Version = "1.1.3.7" ?>
+	<?define Version = "1.1.4.8" ?>
 </Include>
 

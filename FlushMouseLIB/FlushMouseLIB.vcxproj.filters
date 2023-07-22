@@ -21,7 +21,16 @@
     <ClInclude Include="pch.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="FlushMouseDll.h">
+    <ClInclude Include="Cursor.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="FlushMouseLIB.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="FlushMouseSub.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Profile.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
@@ -30,56 +39,50 @@
     <ClInclude Include="Resource.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="EventlogDll.h">
+    <ClInclude Include="CommonDef.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="EventlogData.h">
+    <ClInclude Include="Ime.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="..\FlushMouse\CommonDef.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="GlobalHookDll.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="KeyboardHookDll.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellHookDll.h">
+    <ClInclude Include="TaskTray.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FlushMouseDll.cpp">
+    <ClCompile Include="FlushMouseLIB.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="EventlogDll.cpp">
+    <ClCompile Include="Cursor.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="GlobalHookDll.cpp">
+    <ClCompile Include="FlushMouseSub.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="KeyboardHookDll.cpp">
+    <ClCompile Include="Profile.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="ShellHookDll.cpp">
+    <ClCompile Include="Ime.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskTray.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="FlushMouseDLL.rc">
+    <Image Include="FlushMouse.ico">
       <Filter>リソース ファイル</Filter>
-    </ResourceCompile>
-    <ResourceCompile Include="EventlogData.rc">
+    </Image>
+    <Image Include="small.ico">
       <Filter>リソース ファイル</Filter>
-    </ResourceCompile>
+    </Image>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="EventlogData.mc">
-      <Filter>ソース ファイル</Filter>
-    </CustomBuild>
+    <ResourceCompile Include="FlushMouse.rc">
+      <Filter>リソース ファイル</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

@@ -13,7 +13,7 @@
 #pragma once
 #include "pch.h"
 #include "ShellHookDll.h"
-#include "..\FlushMouse\CommonDef.h"
+#include "..\FlushMouseLIB\CommonDef.h"
 
 //
 // Define
@@ -107,14 +107,8 @@ static LRESULT CALLBACK lpShellHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 		return CallNextHookEx(NULL, nCode, wParam, lParam);
 	}
 	switch (nCode) {
-		case HSHELL_WINDOWACTIVATED:
-			PostMessage(hWndShellParent, WM_EVENT_SYSTEM_FOREGROUNDEX, (WPARAM)(-1), (LPARAM)wParam);
-			break;
 		case HSHELL_LANGUAGE:
-			PostMessage(hWndShellParent, WM_INPUTLANGCHANGEEX, wParam, lParam);
-			break;
-		case HSHELL_WINDOWREPLACED:
-			PostMessage(hWndShellParent, WM_EVENT_SYSTEM_FOREGROUNDEX, (WPARAM)(-1), (LPARAM)lParam);
+			PostMessage(FindWindow(CLASS_FLUSHMOUSE, NULL), WM_INPUTLANGCHANGEEX, wParam, lParam);
 			break;
 	}
 	return (LRESULT)0;
