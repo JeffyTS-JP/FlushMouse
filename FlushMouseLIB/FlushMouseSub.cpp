@@ -94,18 +94,14 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 		if (GetSystemPowerStatus(&PowerStatus)) {
 			switch (PowerStatus.ACLineStatus) {
 			case 0:
+				bDestroyTaskTrayWindow(hWnd);
 				bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_OFF, POWERNOTIFICATION_CATEGORY);
-				Sleep(3000);
-				vDestroyWindow(hWnd);
-				bCreateProcess(FLUSHMOUSE_EXE);
-				bReportEvent(MSG_RESTART_EVENT, POWERNOTIFICATION_CATEGORY);	
+				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 				break;
 			case 1:
+				bDestroyTaskTrayWindow(hWnd);
 				bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_ON, POWERNOTIFICATION_CATEGORY);
-				Sleep(3000);
-				vDestroyWindow(hWnd);
-				bCreateProcess(FLUSHMOUSE_EXE);
-				bReportEvent(MSG_RESTART_EVENT, POWERNOTIFICATION_CATEGORY);	
+				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 				break;
 			default:
 				break;
@@ -290,9 +286,9 @@ BOOL			CFlushMouseHook::bHookSet(HWND hWnd, LPCTSTR lpszDll64Name, LPCTSTR lpszE
 BOOL		CFlushMouseHook::bHookUnset()
 {
 	if (bHook32Dll)			bHook32DllStop();
+	if (bShellHook64)		bShellHookUnset();
 	if (bKeyboardHookLL64)	bKeyboardHookLLUnset();
 	if (bGlobalHook64)		bGlobalHookUnset();
-	if (bShellHook64)		bShellHookUnset();
 	return TRUE;
 }
 

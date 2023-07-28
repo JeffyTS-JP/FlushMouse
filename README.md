@@ -5,14 +5,12 @@
 
 #### リリース情報
 
-* **2023/07/26　　Version 1.1.4.8 をリリースしました**
+* **2023/07/29　　Version 1.1.5.6 をリリースしました**
 
 * **(主な変更点)**
-   * リリース版でもデバッグシンボルを出力するようにしました
-   * 今後、設定画面のUIを強化を予定していますので、ソース構成を変更しました
-   * 軽微なバグを修正しました
+   * 電源状態が変更された時、異常終了してしまうバグを修正しました
 
-   * 最近(2023/07以降)、[OSDN/FlushMouse](https://osdn.net/users/jeffyts/pf/FlushMouse/wiki/FrontPage) が、不安定なようですので、 [GitHub/FlushMouse](https://github.com/JeffyTS-JP/FlushMouse)の方をチェックしていただいたほうが良いかもしれません(できるだけ、どちらにも同じソースとバイナリが置くようにはします)
+   * 最近(2023/07以降)、[OSDN/FlushMouse](https://osdn.net/users/jeffyts/pf/FlushMouse/wiki/FrontPage) が、不安定なようですので、 [GitHub/FlushMouse](https://github.com/JeffyTS-JP/FlushMouse)の方をチェックしていただいたほうが良いかもしれません(どちらにも同じソースとバイナリを置くようにします)
    * 上記のような事情で、OSDNの Wikiは簡単な説明に変更して、詳しい内容はREADME.mdで行うようにしました。ビルド方法については下の方に書いてあります
 
 

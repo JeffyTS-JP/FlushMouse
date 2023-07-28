@@ -6,7 +6,7 @@
 
 [[BR]]
 
- * 最近(2023/07以降)、OSDN/FlushMouse([https://osdn.net/users/jeffyts/pf/FlushMouse/wiki/FrontPage]) が、不安定なようですので、 GitHub/FlushMouse([https://github.com/JeffyTS-JP/FlushMouse])の方をチェックしていただいたほうが良いかもしれません(できるだけ、どちらにも同じソースとバイナリが置くようにはします)[[BR]]
+ * 最近(2023/07以降)、OSDN/FlushMouse([https://osdn.net/users/jeffyts/pf/FlushMouse/wiki/FrontPage]) が、不安定なようですので、 GitHub/FlushMouse([https://github.com/JeffyTS-JP/FlushMouse])の方をチェックしていただいたほうが良いかもしれません(どちらにも同じソースとバイナリを置くようにします)[[BR]]
 [[BR]]
  * 上記のような事情で、OSDNの Wikiはタイトルのみに変更して、詳しい内容はREADME.mdで行うようにしました。下の方を参照してください[[BR]]
 

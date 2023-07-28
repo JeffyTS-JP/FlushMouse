@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 	<?include ..\version.wxi ?>
-	<?define ProductName = "FlushMouse" ?>
-	<?define Manufacturer = "JeffyTS" ?>
 	<?define MainExeFileName = "FlushMouse.exe" ?>
 	<?define Keywords = "FlushMouse Installer" ?>
 	<?define Description = "FlushMouse Installer" ?>
