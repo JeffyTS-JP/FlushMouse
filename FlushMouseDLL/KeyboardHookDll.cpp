@@ -140,6 +140,19 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 					}
 					bOnlyCtrlLL = FALSE;
 					break;
+				case VK_RETURN:			// Enter (0x0d)
+					bOnlyCtrlLL = FALSE;
+					if (bKeyboardHookLLProcSub()) {
+						if (bStartConvertingLL) {
+							bStartConvertingLL = FALSE;
+							PostMessage(hWndKBParentLL, WM_CHECKIMESTARTCONVEX, (WPARAM)bStartConvertingLL, (LPARAM)(DWORD)(WM_USER + lpstKBH->vkCode));
+						}
+						else {
+							PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, KEY_RETURN, (0x80000000 | (0xff000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24))));
+						}
+					}
+					break;
+				case VK_TAB:			// Tab (0x09)
 				case VK_KANJI:			// Alt + 漢字 (0x19)
 				case VK_OEM_3:			// @@@ JP(IME/ENG) [@] / US(ENG) IME ON (0xc0) = ['] ALT + 半角/全角 or 漢字
 				case VK_OEM_8:			// @@@ JP(IME/ENG) [`] / British(ENG) IME ON (0xdf) = ['] ALT + 半角/全角 or 漢字
@@ -281,7 +294,6 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (WM_USER + lpstKBH->vkCode), (0x7f000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24)));
 					}
 					break;
-				case VK_RETURN:			// RETURN (0x0d)
 				case VK_ESCAPE:			// ESC (0x1b)
 				case VK_NONCONVERT:		// 無変換 (0x1d)
 				case VK_INSERT:			// INSERT (0x2d)

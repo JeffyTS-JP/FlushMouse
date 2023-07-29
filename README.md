@@ -1,14 +1,15 @@
 
 # FlushMouse
-|![Icon](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/FlushMouse.png)|**タスクトレイに常駐して、マウスカーソルへIMEモードの表示をするユーティリティです<br>FlushMouse is a software developed by JeffyTS. It is a mouse gesture tool that allows you to perform various operations by drawing gestures with your mouse. (by Bing)**|
+|![Icon](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/FlushMouse.png)|**システムトレイ(タスクトレイ)に常駐して、マウスカーソルへIMEモードの表示をするユーティリティです<br>FlushMouse is a software developed by JeffyTS. It is a mouse gesture tool that allows you to perform various operations by drawing gestures with your mouse. (by Bing)**|
 | :---: | :--- |
 
 #### リリース情報
 
-* **2023/07/29　　Version 1.1.5.6 をリリースしました**
+* **2023/08/06　　Version 1.1.6.5 をリリースしました**
 
 * **(主な変更点)**
-   * 電源状態が変更された時、異常終了してしまうバグを修正しました
+   * TABキーやEnterキーでもIMEモードを表示するようにしました
+   * その他、軽微なバグを修正しました
 
    * 最近(2023/07以降)、[OSDN/FlushMouse](https://osdn.net/users/jeffyts/pf/FlushMouse/wiki/FrontPage) が、不安定なようですので、 [GitHub/FlushMouse](https://github.com/JeffyTS-JP/FlushMouse)の方をチェックしていただいたほうが良いかもしれません(どちらにも同じソースとバイナリを置くようにします)
    * 上記のような事情で、OSDNの Wikiは簡単な説明に変更して、詳しい内容はREADME.mdで行うようにしました。ビルド方法については下の方に書いてあります
@@ -35,7 +36,7 @@
      * こちらの場合は、本プログラムの設定(レジストリ)を削除するかどうかを選べます(デフォルトでは残すようにしてあります)
 
 #### 使い方
-   * スタートメニュー、デスクトップのアイコンをクリックするか、PCを起動するとタスクトレイに常駐します(ただし、PC再起動で起動しないと、一部のアプリでモード表示されない現象が発生します)
+   * スタートメニュー、デスクトップのアイコンをクリックするか、PCを起動するとシステムトレイ(タスクトレイ)に常駐します(ただし、PC再起動で起動しないと、一部のアプリでモード表示されない現象が発生します)
    * PC起動時に、タスクスケジューラーからFlushMouseを自動的に起動するようになっています
      * (これにより、以前の制限事項であった「一部のアプリ、例えば「タスクマネージャー」などがフォーカスを持っているときは、モード表示ができません」は解消されました)
    * 不要であればデスクトップのショートカットアイコンは、削除してしまっても問題ありません
@@ -48,7 +49,7 @@
 ![Cursors](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/Cursors.png)
 
 #### 設定ダイアログ画面
-   * タスクトレイの中にあるFlushMouseのアイコンをクリックすることで表示します
+   * システムトレイ(タスクトレイ)の中にあるFlushMouseのアイコンをクリックすることで表示します
    
 ![SettingDialog](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SettingDlg.png)
 
@@ -59,7 +60,7 @@
     * この変更を行うとマウスカーソルが、Windows 10 / 11特有のものになります
     * もし、Windows 7などの以前のマウスカーソルを使いたい場合は３の設定をします。必要なければ４に進んでください
   3. 設定→デバイス→マウス→「その他のマウスオプション」(これはコントロールパネルのマウスのプロパティと同じ設定画面です)の、ポインタータブで、好みのカーソル形状、大きさに設定します
-  4. タスクトレイのFlushMouseのアイコンをクリックして設定を選択し、「マウスカーソルのサイズ」を好みの大きさに設定します
+  4. システムトレイ(タスクトレイ)のFlushMouseのアイコンをクリックして設定を選択し、「マウスカーソルのサイズ」を好みの大きさに設定します
    * FlushMouseで設定するカーソルの大きさは、アプリケーション独自に表示するもの(例えばExcelの十字型のカーソルなど)には影響しませんので、１から３を繰り返して、それらが好みの大きさになるようにしてから、FlushMouseでコントロールするカーソルの大きさを合わせると使いやすくなると思います
 
 #### 設定項目について (わかりづらい項目のみ説明します)
@@ -67,7 +68,7 @@
      * 「マウスカーソル下のウィンドウのIMEモードを表示する」 / 「フォーカスウィンドウのIMEモードを表示する」から選べます
      * 設定→時刻と言語→言語→キーボードの「入力方式の切り替え」や、旧IMEのプロパティにある「IME入力モード切替の通知の画面中央に表示する」と関わってきますので、ご自分の設定に合わせて好みな方を選択してください
    * **IME関連キーが押されたときにIMEモードを表示する**
-     * IME関連キーとは「半角/全角(漢字)」「変換」「無変換」「カタカナ/ひらがな」「Ctrl + F6～F9」などを指します
+     * IME関連キーとは「半角/全角(漢字)」「変換」「無変換」「カタカナ/ひらがな」「Ctrl + F6～F9」などを指します。加えて、「TAB」「Enter」キーでも表示します
    * **モード表示の時間**
      * マウスカーソルの左に「あ」「ア」「Ａ」「_ｱ」「_A」を表示をしている時間を調整できます
    * **Ctrlキーを離してからモードを表示するまでの時間**

@@ -4,7 +4,7 @@
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0000		2022/07/09  JeffyTS  	New edit.
+// #0000	2022/07/09  JeffyTS  	New edit.
 //
 
 //
@@ -38,13 +38,13 @@
 // Global Data
 //
 // Hook
-TCHAR	szTitle[MAX_LOADSTRING]{};
+TCHAR		szTitle[MAX_LOADSTRING]{};
 HWND		hMainWnd = NULL;
 
-CProfile		*Profile = NULL;
+CProfile	*Profile = NULL;
 CCursor		*Cursor = NULL;	
 CResource	*Resource = NULL;
-CIME			*Cime = NULL;
+CIME		*Cime = NULL;
 
 // Use in FlushMouse from Registry
 BOOL		bDisplayIMEModeOnCursor = TRUE;
@@ -174,21 +174,21 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance)
 //
 static ATOM MyRegisterClass(HINSTANCE hInstance)
 {
-#define CLASSSTYLE CS_HREDRAW | CS_VREDRAW // クラススタイル
+#define CLASSSTYLE CS_HREDRAW | CS_VREDRAW
 
 	WNDCLASSEX wcex{};
 	wcex.cbSize = sizeof(WNDCLASSEX);
-	wcex.style = CLASSSTYLE;                                                // クラススタイル
-	wcex.lpfnWndProc = WndProc;												// Window Proc.
-	wcex.cbClsExtra = 0;                                                    // クラスの補足データなし
-	wcex.cbWndExtra = 0;                                                    // ウィンドウの補足データなし
-	wcex.hInstance = hInstance;                                             // クラスのウィンドウハンドル
-	wcex.hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE));	// アイコンハンドル
-	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);								// マウスカーソルハンドル
-	wcex.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);               // ウィンドウ背景色
-	wcex.lpszMenuName = MAKEINTRESOURCE(IDC_FLUSHMOUSE);                    // デフォルトメニュー名
-	wcex.lpszClassName = CLASS_FLUSHMOUSE;                                  // このウインドウクラスにつける名前
-	wcex.hIconSm = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_SMALL));	// 16×16の小さいサイズのアイコン
+	wcex.style = CLASSSTYLE;
+	wcex.lpfnWndProc = WndProc;
+	wcex.cbClsExtra = 0;
+	wcex.cbWndExtra = 0;
+	wcex.hInstance = hInstance;
+	wcex.hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE));
+	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wcex.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+	wcex.lpszMenuName = MAKEINTRESOURCE(IDC_FLUSHMOUSE);
+	wcex.lpszClassName = CLASS_FLUSHMOUSE;
+	wcex.hIconSm = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_SMALL));
 
 	return RegisterClassEx(&wcex);
 }
@@ -200,21 +200,20 @@ static HWND InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	UNREFERENCED_PARAMETER(nCmdShow);
 #define		WINDOWSTYLE		WS_DISABLED
-	// for TaskTray
-	HWND		hWnd = NULL;						// メインウィンドウのハンドル
+	HWND	hWnd = NULL;
 	hWnd = CreateWindowEx(
-					WS_EX_TOOLWINDOW,				// Tool Bar Window
-					CLASS_FLUSHMOUSE,				// RegisterClass()呼び出しを参照
-					szTitle,						// Title barのテキスト
-					WINDOWSTYLE,					// Window style
-					0, 0,							// 水平・垂直位置
-					0, 0,							// 幅・高さ
-					NULL,							// 親オーバーラップウィンドウ
-					NULL,							// ウィンドウクラスのメニューを使う
-					hInstance,						// 所有インスタンス
-					NULL);							// ポインタは不要
+					WS_EX_TOOLWINDOW,
+					CLASS_FLUSHMOUSE,
+					szTitle,
+					WINDOWSTYLE,
+					0, 0,
+					0, 0,
+					NULL,
+					NULL,
+					hInstance,
+					NULL);
 	if (!hWnd) {
-		return NULL;								// ウィンドウを作成できなかったときはNULLを返す
+		return NULL;
 	}
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
@@ -435,8 +434,8 @@ static void		Cls_OnInputLangChangeEx(HWND hWnd, UINT CodePage, HKL hkl)
 		if (hkl == US_ENG) {
 			HWND	hForeWnd = GetForegroundWindow();
 			if (hForeWnd != NULL) {
-				HKL		hNewHKL = NULL;
-				HKL		hPreviousHKL = NULL;
+				HKL	hNewHKL = NULL;
+				HKL	hPreviousHKL = NULL;
 				bForExplorerPatcherSWS(hForeWnd, TRUE, bIMEModeForced, &hNewHKL, &hPreviousHKL);		// @@@ for Explorer Patcher Simple Window Switcher
 			}
 		}
@@ -504,7 +503,7 @@ static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd)
 	if (EventHook->hFormerWnd != hForeWnd) {
 		EventHook->hFormerWnd = hForeWnd;
 		if (hWnd != hForeWnd) {
-			HWND		hWndObserved = NULL;
+			HWND	hWndObserved = NULL;
 			POINT	pt{};
 			if (bDisplayFocusWindowIME) {
 				hWndObserved = hForeWnd;
@@ -542,7 +541,7 @@ static void		Cls_OnCheckIMEStartConvertingEx(HWND hWnd, BOOL bStartConverting, D
 	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(vkCode);
 
-	HWND		hWndObserved = GetForegroundWindow();
+	HWND	hWndObserved = GetForegroundWindow();
 	POINT	pt{};
 	if (Cursor->bGetCaretPos(hWndObserved, &pt)) {
 		if ((pt.x != 0) && (pt.y != 0)) {
@@ -570,6 +569,9 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 	HWND	hForeWnd = GetForegroundWindow();
 	if ((fDown == FALSE)) {											// Key up
 		switch (vk) {
+		case KEY_TAB:
+		case KEY_RETURN:
+			break;
 		case KEY_ONLY_CTRLUP:
 			if (bEnableEPHelper)	bForExplorerPatcherSWS(hForeWnd, FALSE, FALSE, NULL, NULL);
 			if (bDoModeDispByCtrlUp) {
@@ -880,7 +882,7 @@ static BOOL		bKBisEP()
 BOOL		bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, BOOL bIMEModeForcedChange, LPHKL lpNewHKL, LPHKL lpPreviousHKL)
 {
 	if (hForeWnd == NULL)	return FALSE;
-	BOOL		bRet = FALSE;
+	BOOL	bRet = FALSE;
 	HKL		hkl = NULL;
 	HKL		hPreviousHKL = NULL;
 	DWORD	dwProcessID = 0;
@@ -928,7 +930,7 @@ BOOL		bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, BOOL bIMEModeForc
 //
 BOOL	bChangeHKLbySendInput(HKL hNewHKL, HKL hPreviousHKL)
 {
-	BOOL		bRet = FALSE;
+	BOOL	bRet = FALSE;
 	int		iKBList = 0;
 	if ((iKBList = GetKeyboardLayoutList(0, NULL)) != 0) {
 		LPHKL	lpHKL = NULL;
@@ -940,7 +942,6 @@ BOOL	bChangeHKLbySendInput(HKL hNewHKL, HKL hPreviousHKL)
 					if (lpHKL[i] == hPreviousHKL)	iPreviousKB = i;
 					if (lpHKL[i] == hNewHKL)		iNewKB = i;
 				}
-				//if ((GetAsyncKeyState(VK_SHIFT) & 0x8000)) iKB = iKBList - iKB;
 				while (GetAsyncKeyState(VK_SHIFT) & 0x8000) {
 					Sleep(1);
 				}
@@ -1040,7 +1041,6 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 	
 	vGetSetProfileData();
 
-	// Load Cursor
 	if (Cursor == NULL) {
 		Cursor = new CCursor;
 		if (!Cursor->bInitialize(hWnd)) {
@@ -1050,7 +1050,6 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 		}
 	}
 
-	// Register Hook
 	if (FlushMouseHook == NULL) {
 		FlushMouseHook = new CFlushMouseHook;
 		if (!FlushMouseHook->bHookSet(hWnd, szFlushMouseDLL, szFlushMouse32)) {
@@ -1060,8 +1059,7 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 		}
 	}
 
-	// Set Timer
-	BOOL		bBool = FALSE;
+	BOOL	bBool = FALSE;
 	if (SetUserObjectInformation(GetCurrentProcess(), UOI_TIMERPROC_EXCEPTION_SUPPRESSION, &bBool, sizeof(BOOL)) != FALSE) {
 		// Set Timer for Cursor
 		if (uCheckFocusTimer == NULL) {
@@ -1072,7 +1070,6 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 			}
 		}
 
-		// Set Timer for Proc
 		if (uCheckProcTimer == NULL) {
 			if ((uCheckProcTimer = SetTimer(hWnd, nCheckProcTimerID, nCheckProcTimerTickValue, (TIMERPROC)&vCheckProcTimerProc)) == 0) {
 				vMessageBox(hWnd, IDS_NOTIMERESOUCE, MessageBoxTYPE);
@@ -1087,7 +1084,6 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 		return FALSE;
 	}
 
-	// Set Event Handler
 	if (EventHook == NULL) {
 		EventHook = new CEventHook;
 		if (!EventHook->bEventSet()) {
@@ -1195,7 +1191,7 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 //
 BOOL	 	bCreateProcess(LPCTSTR lpszExecName)
 {
-	BOOL		bRet = FALSE;
+	BOOL	bRet = FALSE;
 	DWORD	dwSize = 0;
 	dwSize = ExpandEnvironmentStrings(lpszExecName, NULL, 0);
 	LPTSTR	lpszBuffer = new TCHAR[dwSize];

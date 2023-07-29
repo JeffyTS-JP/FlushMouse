@@ -4,7 +4,7 @@
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0000		2023/04/27  JeffyTS		New edit
+// #0000	2023/04/27  JeffyTS		New edit
 //
 
 //
@@ -24,12 +24,12 @@
 #define FULL_FLUSHMOUSE_DLL		L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouseDLL.dll"
 #define	FULL_FLUSHMOUSE32_DLL	L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouseDLL32.dll"
 #define	FLUSHMOUSE_EXE			L"FlushMouse.exe"
-#define	FLUSHMOUSE32_EXE			L"FlushMouse32.exe"
+#define	FLUSHMOUSE32_EXE		L"FlushMouse32.exe"
 #define FLUSHMOUSE_DLL			L"FlushMouseDLL.dll"
-#define FLUSHMOUSE32_DLL			L"FlushMouseDLL32.dll"
+#define FLUSHMOUSE32_DLL		L"FlushMouseDLL32.dll"
 
 // Window Class
-#define	CLASS_FLUSHMOUSE			L"FlushMouse-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
+#define	CLASS_FLUSHMOUSE		L"FlushMouse-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
 #define CLASS_FLUSHMOUSE32		L"FlushMouse32-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
 
 // for IME
@@ -148,10 +148,12 @@ typedef struct tagSIZED
 #define HANDLE_WM_TESTEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (WPARAM)(wParam), (LPARAM)(lParam)), 0L)
 
 
+#define KEY_TAB				(WM_USER + VK_TAB)						// Tab    (0x09)
+#define KEY_RETURN			(WM_USER + VK_RETURN)					// Enter  (0x0d)
 #define KEY_CTRL			(WM_USER + VK_CONTROL)					// Ctrl   (0x11)
 #define KEY_LCTRL			(WM_USER + VK_LCONTROL)					// Ctrl L (0xa2)
 #define KEY_RCTRL			(WM_USER + VK_RCONTROL)					// Ctrl R (0xa3)
-#define	KEY_ALT				(WM_USER + VK_MENU)						// ALT    (0x12
+#define	KEY_ALT				(WM_USER + VK_MENU)						// ALT    (0x12)
 #define	KEY_LALT			(WM_USER + VK_LMENU)					// ALT L  (0xa4)
 #define	KEY_RALT			(WM_USER + VK_RMENU)					// ALT R  (0xa5)
 #define KEY_SHIFT			(WM_USER + VK_SHIFT)					// Shift  (0x10)

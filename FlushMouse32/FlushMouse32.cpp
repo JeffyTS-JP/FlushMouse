@@ -15,9 +15,8 @@
 #include "FlushMouse32.h"
 #include "Resource.h"
 #include "..\FlushMouseLIB\CommonDef.h"
-#include "..\FlushMouseDLL\EventlogData.h"
-#include "..\FlushMouseDLL32\FlushMouseDll32.h"
 #include "..\FlushMouseDLL32\MouseHookDll32.h"
+#include "..\FlushMouseDLL\EventlogData.h"
 
 #ifdef _DEBUG
 #define DEBUG_CLIENTBLOCK   new( _CLIENT_BLOCK, __FILE__, __LINE__)
@@ -217,13 +216,13 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 {
 	UNREFERENCED_PARAMETER(lpCreateStruct);
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK)						// MessageBox style
-	if (!bMouseHookSet32(hParentWnd)) {	
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK)
+
+	if (!bMouseHookSet32(hParentWnd)) {
 		vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE);
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		return FALSE;
 	}
-
 	BOOL		bBool = FALSE;
 	if (SetUserObjectInformation(GetCurrentProcess(), UOI_TIMERPROC_EXCEPTION_SUPPRESSION, &bBool, sizeof(BOOL)) != FALSE) {
 		// Set Timer for Proc
