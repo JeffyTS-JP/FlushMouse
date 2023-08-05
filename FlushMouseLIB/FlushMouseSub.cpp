@@ -17,6 +17,7 @@
 #include "CommonDef.h"
 #include "..\FlushMouseDLL\ShellHookDll.h"
 #include "..\FlushMouseDLL\GlobalHookDll.h"
+#include "..\FlushMouseDLL\MouseHookDll.h"
 #include "..\FlushMouseDLL\KeyboardHookDll.h"
 #include "..\FlushMouseDLL\EventlogDll.h"
 #include "..\FlushMouseDLL32\FlushMouseDll32.h"
@@ -44,6 +45,7 @@
 //
 CPowerNotification::CPowerNotification(HWND hWnd)
 {
+	guidPowerSettingNotification = GUID_NULL;
 	if ((hSuspendResumeNotification = RegisterSuspendResumeNotification(hWnd, DEVICE_NOTIFY_WINDOW_HANDLE)) == NULL) {
 	}
 	if ((hPowerSettingNotification = RegisterPowerSettingNotification(hWnd, &guidPowerSettingNotification, DEVICE_NOTIFY_WINDOW_HANDLE)) == NULL) {
@@ -83,7 +85,9 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 		bReportEvent(MSG_PBT_APMRESUMEAUTOMATIC, POWERNOTIFICATION_CATEGORY);
 		break;
 	case PBT_APMRESUMESUSPEND:
+		bDestroyTaskTrayWindow(hWnd);
 		bReportEvent(MSG_PBT_APMRESUMESUSPEND, POWERNOTIFICATION_CATEGORY);
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		break;
 	case PBT_POWERSETTINGCHANGE:
 		bReportEvent(MSG_PBT_POWERSETTINGCHANGE, POWERNOTIFICATION_CATEGORY);
@@ -298,7 +302,7 @@ BOOL		CFlushMouseHook::bHookUnset()
 BOOL	 	CFlushMouseHook::bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name)
 {
 #define	COMAMANDLINESIZE (sizeof(_T(" ")) * (sizeof(unsigned long long) + 1))
-	BOOL		bRet = FALSE;
+	BOOL	bRet = FALSE;
 	DWORD	dwSize = 0;
 	dwSize = ExpandEnvironmentStrings(lpszExec32Name, NULL, 0);
 	LPTSTR	lpszBuffer = new TCHAR[dwSize];

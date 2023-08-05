@@ -4,7 +4,7 @@
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0000		2022/03/04  JeffyTS  	New edit.
+// #0000	2022/03/04  JeffyTS  	New edit.
 //
 
 //
@@ -23,8 +23,6 @@
 // Local Prototype Define
 //
 static LRESULT CALLBACK lpGlobalHookProc(int, WPARAM, LPARAM);
-static BOOL	bGlobalHookProcSub()
-;
 
 //
 // Local Data
@@ -106,6 +104,9 @@ DLLEXPORT BOOL __stdcall bGlobalHookUnset()
 //
 //フックの処理
 //
+template<typename T1, typename T2>
+constexpr DWORD WORD2DWORD(T1 h, T2  l) { return (DWORD)(((((DWORD)(l)) << 16) & 0xffff0000) | ((DWORD)(h) & 0xffff)); }
+
 static LRESULT CALLBACK lpGlobalHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
 	if (nCode < 0) {
@@ -116,37 +117,31 @@ static LRESULT CALLBACK lpGlobalHookProc(int nCode, WPARAM wParam, LPARAM lParam
 		switch (lpCW->message) {
 		case WM_IME_STARTCOMPOSITION:		// 0x010D
 			if (lpCW->lResult != 0) {
-				if (bGlobalHookProcSub()) {
-					PostMessage(hWndGLParent, WM_CHECKIMESTARTCONVEX, (WPARAM)TRUE, (LPARAM)0);
-				}
+				PostMessage(hWndGLParent, WM_CHECKIMESTARTCONVEX, (WPARAM)TRUE, (LPARAM)0);
 			}
 			return CallNextHookEx(NULL, nCode, wParam, lParam);
 		case WM_IME_ENDCOMPOSITION:			// 0x010E
 			if (lpCW->lResult != 0) {
-				if (bGlobalHookProcSub()) {
-					PostMessage(hWndGLParent, WM_CHECKIMESTARTCONVEX, (WPARAM)FALSE, (LPARAM)0);
-				}
+				PostMessage(hWndGLParent, WM_CHECKIMESTARTCONVEX, (WPARAM)FALSE, (LPARAM)0);
 			}
 			return CallNextHookEx(NULL, nCode, wParam, lParam);
 		default:
 			if (lpCW->message == WM_HOOKEX) {
-				if (bGlobalHookProcSub()) {
-					if (lpCW->lParam) {
-						if (!bSubclassed) {
-							if (hHookGL == NULL)	break;
-							if (UnhookWindowsHookEx(hHookGL) != FALSE) {
-								if (LoadLibraryEx(FLUSHMOUSE_DLL, NULL, 0)) {
-									bSubclassed = TRUE;
-								}
-								hHookGL = NULL;
+				if (lpCW->lParam) {
+					if (!bSubclassed) {
+						if (hHookGL == NULL)	break;
+						if (UnhookWindowsHookEx(hHookGL) != FALSE) {
+							if (LoadLibraryEx(FLUSHMOUSE_DLL, NULL, 0)) {
+								bSubclassed = TRUE;
 							}
+							hHookGL = NULL;
 						}
 					}
-					else {
-						if (bSubclassed) {
-							if (hHookGL == NULL)	break;
-							bSubclassed = FALSE;
-						}
+				}
+				else {
+					if (bSubclassed) {
+						if (hHookGL == NULL)	break;
+						bSubclassed = FALSE;
 					}
 				}
 			}
@@ -156,19 +151,5 @@ static LRESULT CALLBACK lpGlobalHookProc(int nCode, WPARAM wParam, LPARAM lParam
 	return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
 
-//
-// bGlobalHookProcSub
-//
-static BOOL	bGlobalHookProcSub()
-{
-	if (lpDatGlobal == NULL) {
-		if ((lpDatGlobal = (LPGLOBAL_SHAREDMEM)CSharedMem->lpvSharedMemoryRead()) == NULL) {
-			return FALSE;
-		}
-	}
-	hWndGLParent = lpDatGlobal->hWnd;
-	hHookGL = lpDatGlobal->hHook;
-	return TRUE;
-}
 
 /* = EOF = */

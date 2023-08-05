@@ -115,6 +115,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>..\$(Platform)\$(Configuration)\FlushMouseDLL32.lib;..\$(Platform)\$(Configuration)\MiscLIB32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EnableUAC>false</EnableUAC>
+      <UACUIAccess>false</UACUIAccess>
     </Link>
     <PostBuildEvent>
       <Command>copy ..\$(Platform)\$(Configuration)\FlushMouse32.exe ..\x64\$(Configuration)\</Command>
@@ -143,6 +144,7 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalDependencies>..\$(Platform)\$(Configuration)\FlushMouseDLL32.lib;..\$(Platform)\$(Configuration)\MiscLIB32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EnableUAC>false</EnableUAC>
+      <UACUIAccess>false</UACUIAccess>
     </Link>
     <PostBuildEvent>
       <Command>copy ..\$(Platform)\$(Configuration)\FlushMouse32.exe ..\x64\$(Configuration)\</Command>
@@ -165,6 +167,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <EnableUAC>false</EnableUAC>
+      <UACUIAccess>false</UACUIAccess>
     </Link>
     <Manifest>
       <InputResourceManifests>FlushMouse32.exe.manifest</InputResourceManifests>
@@ -188,6 +191,7 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <EnableUAC>false</EnableUAC>
+      <UACUIAccess>false</UACUIAccess>
     </Link>
     <Manifest>
       <InputResourceManifests>FlushMouse32.exe.manifest</InputResourceManifests>
@@ -222,9 +226,6 @@
     <ProjectReference Include="..\MiscLIB32\MiscLIB32.vcxproj">
       <Project>{3d3f632c-75bb-4830-aa8e-0871c6aa1a72}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Manifest Include="FlushMouse32.exe.manifest" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -27,10 +27,10 @@
     <ClInclude Include="resource.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="MouseHookDll32.h">
+    <ClInclude Include="..\FlushMouse\CommonDef.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="..\FlushMouse\CommonDef.h">
+    <ClInclude Include="MouseHookDll32.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

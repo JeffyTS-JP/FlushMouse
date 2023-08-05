@@ -4,8 +4,8 @@
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0000		2022/03/03  JeffyTS  	New edit.
-// #0001		2023/06/30	JeffyTS		Divided from FlushMouseSub.cpp
+// #0000	2022/03/03  JeffyTS  	New edit.
+// #0001	2023/06/30	JeffyTS		Divided from FlushMouseSub.cpp
 //
 
 // Include
@@ -51,7 +51,7 @@ static BOOL		bInitDlgCenter(HWND hDlg, HICON hIcon, DWORD dwICC);
 static BOOL		bSetCheckDlgButton(HWND hDlg, int iIDButton, BOOL bCheck);
 static VOID		vSetTrackbar(HWND hDlg, int iIDTrackbar, int iRangeMin, int iRangeMax, int iTickFreq, int iPos, int iPageSize);
 static BOOL		bGetDlgButtonChecked(HWND hDlg, int iIDButton);
-static DWORD		dwGetTrackbarPos(HWND hDlg, int iIDTrackbar);
+static DWORD	dwGetTrackbarPos(HWND hDlg, int iIDTrackbar);
 
 //
 // bCreateTaskTrayWindow()
@@ -69,9 +69,6 @@ BOOL		bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle)
 	nIco.dwInfoFlags = NIIF_USER | NIIF_LARGE_ICON | NIIF_NOSOUND;
 	nIco.uVersion = NOTIFYICON_VERSION_4;
 	nIco.hIcon = hIcon;
-	if ((nIco.hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE))) == NULL) {
-		return FALSE;
-	}
 	_tcsncpy_s(nIco.szTip, ARRAYSIZE(nIco.szTip), lpszTitle, _TRUNCATE);
 	try {
 		throw Shell_NotifyIcon(NIM_ADD, &nIco);
@@ -231,7 +228,6 @@ void		Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg)
 			Cime->vIMEOpenCloseForced(hWnd, IMECLOSE);
 		}
 		[[fallthrough]];	
-		//break;
 	case WM_RBUTTONDOWN:
 		bDisplayIMEModeOnCursor = FALSE;
 		bDoModeDispByMouseBttnUp = FALSE;
@@ -246,7 +242,7 @@ void		Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg)
 		stAppBarData.cbSize = sizeof(APPBARDATA);
 		stAppBarData.hWnd = hWnd;
 		SHAppBarMessage(ABM_GETTASKBARPOS, &stAppBarData);
-		UINT		uFlags = 0;
+		UINT	uFlags = 0;
 		switch (stAppBarData.uEdge) {
 			case ABE_TOP:
 				uFlags = TPM_RIGHTALIGN | TPM_TOPALIGN;
@@ -268,6 +264,7 @@ void		Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg)
 		TrackPopupMenu(hSubMenu, uFlags, pt.x, pt.y, 0, hWnd, NULL);
 		break;
 	}
+	return;
 }
 
 //
@@ -296,7 +293,7 @@ static INT_PTR CALLBACK SettingDlg(HWND hDlg, UINT message, WPARAM wParam, LPARA
 				bInitDlgCenter(hDlg, hIcon, (ICC_BAR_CLASSES | ICC_HOTKEY_CLASS));
 			}
 			{
-				TCHAR       lpText[MAX_LOADSTRING];
+				TCHAR	lpText[MAX_LOADSTRING];
 				if (LoadString(Resource->hLoad(), IDS_CMBX_LIST01, lpText, MAX_LOADSTRING) == 0)		return (INT_PTR)FALSE;
 				SendDlgItemMessage(hDlg, IDC_COMBO1, CB_ADDSTRING, 0, (LPARAM)lpText);
 				if (LoadString(Resource->hLoad(), IDS_CMBX_LIST02, lpText, MAX_LOADSTRING) == 0)		return (INT_PTR)FALSE;

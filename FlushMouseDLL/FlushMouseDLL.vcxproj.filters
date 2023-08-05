@@ -48,6 +48,9 @@
     <ClInclude Include="ShellHookDll.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="MouseHookDll.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FlushMouseDll.cpp">
@@ -66,6 +69,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="ShellHookDll.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="MouseHookDll.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

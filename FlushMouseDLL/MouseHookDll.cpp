@@ -11,7 +11,7 @@
 //
 #pragma once
 #include "pch.h"
-#include "MouseHookDll32.h"
+#include "MouseHookDll.h"
 #include "..\FlushMouseLIB\CommonDef.h"
 
 //
@@ -26,21 +26,21 @@ static LRESULT  CALLBACK    lpMouseHookProc(int nCode, WPARAM wParam, LPARAM lPa
 //
 // Local Data
 //
-#pragma comment( linker, "/SECTION:FLUSHMOUSEDLL_SEG32,RWS" )
-#pragma data_seg("FLUSHMOUSEDLL_SEG32")
+#pragma comment( linker, "/SECTION:FLUSHMOUSEDLL_SEG,RWS" )
+#pragma data_seg("FLUSHMOUSEDLL_SEG")
 static HWND		hWndMSParent = NULL;
-static LPMOUSE_SHAREDMEM32  lpDatMouse = NULL;
+static LPMOUSE_SHAREDMEM  lpDatMouse = NULL;
 static CSharedMemory* CSharedMem = NULL;
 #pragma data_seg()
 
 //
 // bMouseHookSet()
 //
-DLLEXPORT BOOL  __stdcall bMouseHookSet32(HWND hWnd)
+DLLEXPORT BOOL  __stdcall bMouseHookSet(HWND hWnd)
 {
 	hWndMSParent = hWnd;
-	if ((CSharedMem = new CSharedMemory(MOUSEHOOKMEM32, sizeof(MOUSE_SHAREDMEM32))) != NULL) {
-		if ((lpDatMouse = (LPMOUSE_SHAREDMEM32)CSharedMem->lpvSharedMemoryRead()) != NULL) {
+	if ((CSharedMem = new CSharedMemory(MOUSEHOOKMEM, sizeof(MOUSE_SHAREDMEM))) != NULL) {
+		if ((lpDatMouse = (LPMOUSE_SHAREDMEM)CSharedMem->lpvSharedMemoryRead()) != NULL) {
 			lpDatMouse->hWnd = hWnd;
 			if (CSharedMem->bSharedMemoryWrite(lpDatMouse)) {
 				HHOOK	hHook = SetWindowsHookEx(WH_MOUSE, (HOOKPROC)lpMouseHookProc, hGetInstance(), 0);
@@ -64,11 +64,11 @@ DLLEXPORT BOOL  __stdcall bMouseHookSet32(HWND hWnd)
 //
 // bMouseHookUnset()
 //
-DLLEXPORT BOOL __stdcall bMouseHookUnset32()
+DLLEXPORT BOOL __stdcall bMouseHookUnset()
 {
 	BOOL		bRet = FALSE;
 	if (CSharedMem != NULL) {
-		if ((lpDatMouse = (LPMOUSE_SHAREDMEM32)CSharedMem->lpvSharedMemoryRead()) != NULL) {
+		if ((lpDatMouse = (LPMOUSE_SHAREDMEM)CSharedMem->lpvSharedMemoryRead()) != NULL) {
 			if (lpDatMouse->hHook) {
 				if (UnhookWindowsHookEx(lpDatMouse->hHook)) {
 					bRet = TRUE;
@@ -95,7 +95,7 @@ static LRESULT CALLBACK lpMouseHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 		return CallNextHookEx(NULL, nCode, wParam, lParam);
 	}
 
-	if (nCode == HC_ACTION) {
+	if ((nCode == HC_ACTION) || (nCode == HC_NOREMOVE)) {
 		switch (wParam) {
 		case WM_LBUTTONDOWN:
 		case WM_RBUTTONDOWN:
@@ -110,7 +110,7 @@ static LRESULT CALLBACK lpMouseHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 			DWORD pt = WORD2DWORD(mh->pt.x, mh->pt.y);
 			PostMessage(hWndMSParent, (UINT)(WM_USER + wParam), (WPARAM)mh->hwnd, (LPARAM)pt);
 		}
-		break;
+			break;
 		default:
 			break;
 		}

@@ -5,10 +5,11 @@
 
 #### リリース情報
 
-* **2023/08/06　　Version 1.1.6.5 をリリースしました**
+* **2023/08/24　　Version 1.1.7.24 をリリースしました**
 
 * **(主な変更点)**
-   * TABキーやEnterキーでもIMEモードを表示するようにしました
+   * マウスクリックでIMEモードを表示しないことがあるバグを修正しました
+   * 漢字(半角 / 全角)キーを押したときの処理を見直しました
    * その他、軽微なバグを修正しました
 
    * 最近(2023/07以降)、[OSDN/FlushMouse](https://osdn.net/users/jeffyts/pf/FlushMouse/wiki/FrontPage) が、不安定なようですので、 [GitHub/FlushMouse](https://github.com/JeffyTS-JP/FlushMouse)の方をチェックしていただいたほうが良いかもしれません(どちらにも同じソースとバイナリを置くようにします)
@@ -93,16 +94,17 @@
   * IME関連キーの動作は下記のようになります(IMEの設定でキーマップを変更している場合は異なることがあります)
   * FlushMouse 動作時 (ExplorerPatcher Simple Window Switcher HelperをONにした場合)
      * JA / IME の時は、英数、ひらがな、カタカナ(Shift + ひらがな)のみコントロールしています。その他は,Windowsのデフォルトの動作です (以前のバージョンの IMEを使用してキーマップを変更すると使いやすくなると思います)
+     * JA / ENG の時、キーボードロケールを返さないアプリがあります。この場合は、前のIMEの状態に戻すことができません(これは制限事項となります)
     
 |↓押下キー　　　IMEの状態→|　　JA / IME 　　|　　JA / ENG 　　|　　US / ENG 　　|
 | :---: | :---: | :---: | :---: |
 |半角 / 全角 (漢字)         |　　 あ / A　　　|(前のIME ON状態) |(前のIME ON状態) |
-|無変換                     |　　 IME OFF 　　|　　 IME OFF 　　|　　 IME OFF 　　|
+|無変換                     |　　 IME OFF 　　|　　　 －　　　　|　　 IME OFF 　　|
 |無変換(IME ONの状態から)   |　あ / ア / _ｱ 　|(前のIME ON状態) |(前のIME ON状態) |
 |変換                       |(前のIME ON状態) |(前のIME ON状態) |(前のIME ON状態) |
 |ひらがな                   |　　　 あ　　　　|(前のIME ON状態) |(前のIME ON状態) |
 |カタカナ (Shift + ひらがな)|　　　 カ　　　　|(前のIME ON状態) |(前のIME ON状態) |
-|英数                       |　　　 A 　　　　|(前のIME ON状態) |(前のIME ON状態) |
+|英数                       |　　　 A 　　　　|　　　 －　　　　|(前のIME ON状態) |
 
   * Windowsのデフォルト(参考)
  
@@ -146,7 +148,8 @@
   3. 次に、WiXを使用するために、Windowsの設定 -> アプリ -> オプション機能 -> Windowsのその他の機能 -> Windowsの機能の有効化または無効化 -> .NET Framework 3.5.1(.NET 2.0及び3.0を含む)にチェックを入れてOKを押して、インストール、再起動します
   4. [https://github.com/wixtoolset/wix3](https://github.com/wixtoolset/wix3) から、Wix311.exeをダウンロードしてインストールします
   5. Visual Studioを起動して 右下の「コードなし」で起動します
-  6. 拡張機能 -> 検索で　WiXと入力し「 WiX v3 - Visual Studio 2022 Extension」を選択して、Visual Studioを終了するとインストールが始まります
+  6. Tools -> Options -> Environment -> International Settings をクリックして、Languageを日本語にします
+  7. 拡張機能 -> 検索で　WiXと入力し「 WiX v3 - Visual Studio 2022 Extension」を選択して、Visual Studioを終了するとインストールが始まります
 
 * ビルド方法です
   1. Visual Studioを起動して、リポジトリのクローン -> リポジトリの場所に [https://github.com/JeffyTS-JP/FlushMouse.git](https://github.com/JeffyTS-JP/FlushMouse.git)　を入力してクローンします

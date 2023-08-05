@@ -234,9 +234,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Manifest Include="FlushMouse.exe.manifest" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="..\FlushMouseLIB\FlushMouse.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

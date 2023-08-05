@@ -1,6 +1,6 @@
 ﻿//
 // FlushMouse.cpp
-//		for Windows10/11 Win32 API msi Packaage App.
+//		for Windows10/11 Win32 API msi Package App.
 //		Copyright (C) 1993 JeffyTS
 //
 //  FlushMouse.exe
@@ -8,8 +8,8 @@
 //      
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0000		1993/11/17  JeffyTS  	New edit.
-// #0001		2022/02/04  JeffyTS		Visual Studio 2022 (C++)へ移植
+// #0000	1993/11/17  JeffyTS  	New edit.
+// #0001	2022/02/04  JeffyTS		Visual Studio 2022 (C++)へ移植
 //
 
 //
@@ -115,7 +115,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	if (Resource->hLoad() == NULL) {
 		return (-1);
 	}
-	if (!bWinMain(hInstance, hPrevInstance))		return (-1);
+	
+	if (!bWinMain(hInstance, hPrevInstance, nCmdShow))	return (-1);
 
 	MSG msg{};
 	while (GetMessage(&msg, NULL, 0, 0)) {
@@ -153,7 +154,7 @@ BOOL	bSetHeapInformation()
 //
 void vMessageBox(HWND hWnd, UINT uID, UINT uType)
 {
-	TCHAR       lpText[MAX_LOADSTRING];
+	TCHAR	lpText[MAX_LOADSTRING];
 	try {
 		throw LoadString(Resource->hLoad(), uID, lpText, MAX_LOADSTRING);
 	}

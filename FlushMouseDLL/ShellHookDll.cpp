@@ -108,10 +108,10 @@ static LRESULT CALLBACK lpShellHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 	}
 	switch (nCode) {
 		case HSHELL_LANGUAGE:
-			PostMessage(FindWindow(CLASS_FLUSHMOUSE, NULL), WM_INPUTLANGCHANGEEX, wParam, lParam);
+			PostMessage(hWndShellParent, WM_INPUTLANGCHANGEEX, wParam, lParam);
 			break;
 	}
-	return (LRESULT)0;
+	return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
 
 

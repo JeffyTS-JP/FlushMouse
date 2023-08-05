@@ -638,13 +638,13 @@ BOOL		CCursor::_bAdjustCaretByMonitorDPI(int iModeSizeX, int iModeSizeY, LPRECT 
 //
 BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData)
 {
-	Sleep(50);
+	Sleep(300);
 	
-	BOOL		bFoundCaret = FALSE;
-	RECT		rcCursor{}, rcCaret{};
+	BOOL	bFoundCaret = FALSE;
+	RECT	rcCursor{}, rcCaret{};
 	int		iCursorSizeX = 0, iCursorSizeY = 0, iCaretSizeX = 0, iCaretSizeY = 0;
 	DWORD	dwIMEModeCursor = IMEOFF, dwIMEModeCaret = IMEOFF;
-	HWND		hCaretWnd = NULL;
+	HWND	hCaretWnd = NULL;
 	if (lpstCursorData->bDrawNearCaret != FALSE) {
 		if (lpstCursorData->hWnd != NULL) {
 			rcCaret.left = lpstCursorData->rcCaret.left;	rcCaret.top = lpstCursorData->rcCaret.top;
@@ -1044,7 +1044,6 @@ void		CCursorWindow::Cls_OnPaint(HWND hWnd)
 											if ((hFontPrev = (HFONT)SelectObject(hDC, hFont)) != NULL) {
 												if (DrawTextEx(hDC, lpszMode, -1, &rc, DT_RIGHT | DT_SINGLELINE | DT_VCENTER, NULL) == 0) {
 												}
-												SelectObject(hDC, hFontPrev);
 											}
 											DeleteObject(hFont);
 										}

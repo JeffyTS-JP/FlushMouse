@@ -32,7 +32,7 @@ private:
 
 public:
 	HMODULE	hLoad();
-	BOOL		bUnload();
+	BOOL	bUnload();
 
 private:
 	LPTSTR	szResFile;
@@ -44,7 +44,7 @@ private:
 //
 // Global Prototype Define
 //
-extern BOOL			bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance);
+extern BOOL			bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, int nCmdShow);
 extern VOID			vDestroyWindow(HWND hWnd);
 extern BOOL			bStartThreadHookTimer(HWND hWnd);
 extern VOID			vStopThreadHookTimer(HWND hWnd);
@@ -55,10 +55,10 @@ extern BOOL			bCheckExistingJPIME();
 //
 // Global Data
 //
-extern TCHAR			szFlushMouseDLL[];
-extern TCHAR			szFlushMouse32[];
+extern TCHAR		szFlushMouseDLL[];
+extern TCHAR		szFlushMouse32[];
 
-extern TCHAR			szTitle[];
+extern TCHAR		szTitle[];
 extern HWND			hMainWnd;
 
 extern BOOL			bOffChangedFocus;
@@ -74,7 +74,7 @@ extern BOOL			bIMEModeForced;
 
 extern CProfile		*Profile;
 extern CCursor		*Cursor;
-extern CResource		*Resource;
+extern CResource	*Resource;
 extern CIME			*Cime;
 
 /* = EOF = */

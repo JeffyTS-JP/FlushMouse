@@ -45,9 +45,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Manifest Include="FlushMouse.exe.manifest" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="..\FlushMouseLIB\FlushMouse.rc">
       <Filter>リソース ファイル</Filter>
     </ResourceCompile>

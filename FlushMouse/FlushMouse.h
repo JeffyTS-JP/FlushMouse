@@ -24,8 +24,8 @@
 //
 // Global Data
 //
-extern TCHAR			szFlushMouseDLL[];
-extern TCHAR			szFlushMouse32[];
+extern TCHAR		szFlushMouseDLL[];
+extern TCHAR		szFlushMouse32[];
 
 
 /* = EOF = */

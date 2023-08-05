@@ -2,7 +2,7 @@
 
 [[RepositoryInfo]]
 
-||[[Thumb(FlushMouse.png, size=48x48)]]||'''[[ProjectDescription]](タスクトレイに常駐して、マウスカーソルへIMEモードの表示をするユーティリティです)[[BR]]FlushMouse is a software developed by JeffyTS . It is a mouse gesture tool that allows you to perform various operations by drawing gestures with your mouse .  (by Bing)'''||
+||[[Thumb(FlushMouse.png, size=48x48)]]||'''[[ProjectDescription]](システムトレイ(タスクトレイ)に常駐して、マウスカーソルへIMEモードの表示をするユーティリティです)[[BR]]FlushMouse is a software developed by JeffyTS . It is a mouse gesture tool that allows you to perform various operations by drawing gestures with your mouse .  (by Bing)'''||
 
 [[BR]]
 

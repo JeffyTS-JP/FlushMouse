@@ -42,8 +42,6 @@ CIME::CIME()
 {
 	lpstVirtualDesktop = new VIRTUALDESKTOP[sizeof(VIRTUALDESKTOP)];
 	if (lpstVirtualDesktop != NULL) {
-		ZeroMemory(lpstVirtualDesktop, sizeof(VIRTUALDESKTOP));
-		bGetVirtualDesktopSize();
 	}
 }
 CIME::~CIME()

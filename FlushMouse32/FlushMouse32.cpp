@@ -14,8 +14,8 @@
 #include "pch.h"
 #include "FlushMouse32.h"
 #include "Resource.h"
+#include "..\FlushMouseDLL32\MouseHookDLL32.h"
 #include "..\FlushMouseLIB\CommonDef.h"
-#include "..\FlushMouseDLL32\MouseHookDll32.h"
 #include "..\FlushMouseDLL\EventlogData.h"
 
 #ifdef _DEBUG
@@ -111,7 +111,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		}
 	}
 
-	HWND	    hWnd = NULL;
+	HWND	hWnd = NULL;
 	if ((hWnd = FindWindow(CLASS_FLUSHMOUSE32, NULL)) != NULL) {
 		SetFocus(GetLastActivePopup(hWnd));
 		PostMessage(hWnd, WM_DESTROY, NULL, NULL);
@@ -149,22 +149,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 //
 static ATOM MyRegisterClass(HINSTANCE hInstance)
 {
-#define CLASSSTYLE CS_HREDRAW | CS_VREDRAW // クラススタイル
+#define CLASSSTYLE CS_HREDRAW | CS_VREDRAW
 
 	WNDCLASSEX wcex{};
 
 	wcex.cbSize = sizeof(WNDCLASSEX);
-	wcex.style = CLASSSTYLE;                                                // クラススタイル
+	wcex.style = CLASSSTYLE;
 	wcex.lpfnWndProc = WndProc;
-	wcex.cbClsExtra = 0;                                                    // クラスの補足データなし
-	wcex.cbWndExtra = 0;                                                    // ウィンドウの補足データなし
-	wcex.hInstance = hInstance;                                             // クラスのウィンドウハンドル
-	wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_FLUSHMOUSE32));    // アイコンハンドル
-	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);								// マウスカーソルハンドル
-	wcex.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);               // ウィンドウ背景色
-	wcex.lpszMenuName = MAKEINTRESOURCE(IDC_FLUSHMOUSE32);                  // デフォルトメニュー名
-	wcex.lpszClassName = CLASS_FLUSHMOUSE32;								// このウインドウクラスにつける名前
-	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));    // 16×16の小さいサイズのアイコン
+	wcex.cbClsExtra = 0;
+	wcex.cbWndExtra = 0;
+	wcex.hInstance = hInstance;
+	wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_FLUSHMOUSE32));
+	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wcex.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+	wcex.lpszMenuName = MAKEINTRESOURCE(IDC_FLUSHMOUSE32);
+	wcex.lpszClassName = CLASS_FLUSHMOUSE32;
+	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
 	return RegisterClassEx(&wcex);
 }
@@ -175,22 +175,22 @@ static ATOM MyRegisterClass(HINSTANCE hInstance)
 static BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	UNREFERENCED_PARAMETER(nCmdShow);
-#define		WINDOWSTYLE		WS_OVERLAPPEDWINDOW  | WS_HSCROLL | WS_VSCROLL // | WS_VISIBLE // WS_MINIMIZE | WS_SYSMENU
-	hInst = hInstance;							// グローバル変数にインスタンス ハンドルを格納する
-	HWND		hWnd = NULL;						// メインウィンドウのハンドル
+#define		WINDOWSTYLE		WS_OVERLAPPEDWINDOW  | WS_HSCROLL | WS_VSCROLL
+	hInst = hInstance;
+	HWND	hWnd = NULL;
 	hWnd = CreateWindowEx(
-							WS_DISABLED,		// Disabled Window
-							CLASS_FLUSHMOUSE32,	// RegisterClass()呼び出しを参照
-							szTitle,            // Title barのテキスト
-							WINDOWSTYLE,        // Window style
-							0, 0,               // 水平・垂直位置
-							0, 0,               // 幅・高さ
-							NULL,				// 親オーバーラップウィンドウ
-							NULL,				// ウィンドウクラスのメニューを使う
-							hInstance,			// 所有インスタンス
-							NULL);				// ポインタは不要
+					WS_DISABLED,
+					CLASS_FLUSHMOUSE32,
+					szTitle,
+					WINDOWSTYLE,
+					0, 0,
+					0, 0,
+					NULL,
+					NULL,
+					hInstance,
+					NULL);
 	if (!hWnd) {
-		return FALSE;							// ウィンドウを作成できなかったときはFALSEを返す
+		return FALSE;
 	}
 	return TRUE;
 }
@@ -223,9 +223,9 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		return FALSE;
 	}
-	BOOL		bBool = FALSE;
+	
+	BOOL	bBool = FALSE;
 	if (SetUserObjectInformation(GetCurrentProcess(), UOI_TIMERPROC_EXCEPTION_SUPPRESSION, &bBool, sizeof(BOOL)) != FALSE) {
-		// Set Timer for Proc
 		if (uCheckProcTimer == NULL) {
 			if ((uCheckProcTimer = SetTimer(hWnd, nCheckProcTimerID, nCheckProcTimerTickValue, (TIMERPROC)&vCheckProcTimerProc)) == 0) {
 				vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE);
@@ -249,13 +249,14 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 //
 static void Cls_OnDestroy(HWND hWnd)
 {
-	bMouseHookUnset32();
-
 	if (uCheckProcTimer != NULL) {
 		if (KillTimer(hWnd, nCheckProcTimerID)) {
 			uCheckProcTimer = NULL;
 		}
 	}
+
+	bMouseHookUnset32();
+
 	PostQuitMessage(0);
 }
 
@@ -299,7 +300,7 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 //
 static BOOL	bReportEvent(DWORD dwEventID, WORD wCategory)
 {
-	BOOL		bRet = FALSE;
+	BOOL	bRet = FALSE;
 	HANDLE	hEvent = RegisterEventSource(NULL, _T("FlushMouse"));
 	if (hEvent != NULL) {
 		if (ReportEvent(hEvent, (0x0000000c & (dwEventID >> 28)), wCategory, dwEventID, NULL, 0, 0, NULL, NULL) != 0) {
@@ -333,7 +334,7 @@ static BOOL	 	bCreateProcess(LPCTSTR lpszExecName)
 			CloseHandle(ProcessInfomation.hThread);
 			bRet = TRUE;
 		}
-		delete[]		lpszBuffer;
+		delete[]	lpszBuffer;
 	}
 	return bRet;
 }

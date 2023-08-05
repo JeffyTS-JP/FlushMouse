@@ -103,7 +103,7 @@ typedef struct tagSIZED
 #define WM_CHECKEXISTINGJPIMEEX				(WM_USER + 0x0003)
 #define	HANDLE_WM_CHECKEXISTINGJPIMEEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (BOOL)(wParam)), 0L)
 
-// void	Cls_OnCheckIMEStartConversioningEx(HWND hWnd, BOOL bStartConversioning, DWORD vkCode);
+// void	Cls_OnCheckIMEStartConvertingEx(HWND hWnd, BOOL bStartConverting, DWORD vkCode);
 #define WM_CHECKIMESTARTCONVEX				(WM_USER + 0x0004)
 #define	HANDLE_WM_CHECKIMESTARTCONVEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (BOOL)(wParam), (DWORD)(lParam)), 0L)
 
