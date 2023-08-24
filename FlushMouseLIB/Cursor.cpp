@@ -296,7 +296,7 @@ BOOL		CCursor::_bStartDrawIMEModeThread(HWND hWndObserved)
 //
 BOOL		CCursor::bShowHideCursor(HWND hWndObserved, BOOL bShow)
 {
-	BOOL		bRet = FALSE;
+	BOOL	bRet = FALSE;
 	if (bShow) {
 		bRet = bStartDrawIMEModeThread(hWndObserved);
 	}
@@ -311,8 +311,8 @@ BOOL		CCursor::bShowHideCursor(HWND hWndObserved, BOOL bShow)
 //
 BOOL		CCursor::bGetCaretPos(HWND hWnd, LPPOINT lpCaretPos)
 {
-	BOOL		bRet = FALSE;
-	RECT		rc{};
+	BOOL	bRet = FALSE;
+	RECT	rc{};
 	lpCaretPos->x = 0;	lpCaretPos->y = 0;
 	if (_hGetCaretPosByAccessibleObjectFromWindow(hWnd, &rc) != NULL) {
 		bRet = TRUE;
@@ -393,7 +393,7 @@ BOOL		CCursor::bIMECursorChangeRoutine(LPVOID lpvParam)
 {
 	LPIMECURSORDATA	lpstCursorData = (LPIMECURSORDATA)lpvParam;
 	CCursor	*This = reinterpret_cast<CCursor*>(lpvParam);
-	BOOL		bRet = TRUE;
+	BOOL	bRet = TRUE;
 	if (lpstCursorData->bDisplayIMEModeOnCursor) {
 		This->bIsIMECursorChanged(lpstCursorData);
 		if (!This->bChangeFlushMouseCursor(lpstCursorData->dwIMEModeCursor, lpstCursorData)) {
@@ -429,7 +429,7 @@ BOOL WINAPI	CCursor::_bDrawIMEModeRoutine(LPVOID lpvParam)
 {
 	LPIMECURSORDATA	lpstCursorData = (LPIMECURSORDATA)lpvParam;
 	CCursor	*This = reinterpret_cast<CCursor*>(lpvParam);
-	BOOL		bRet = TRUE;
+	BOOL	bRet = TRUE;
 	This->bIsIMECursorChanged(lpstCursorData);
 	if (!This->bDrawIMEModeOnDisplay(lpstCursorData)) {
 		_Post_equals_last_error_ DWORD err = GetLastError();
@@ -448,7 +448,7 @@ BOOL WINAPI	CCursor::_bDrawIMEModeRoutine(LPVOID lpvParam)
 //
 BOOL		CCursor::bIsIMECursorChanged(LPIMECURSORDATA lpstCursorData)
 {
-	DWORD		dwIMEMode = (DWORD)(-1);
+	DWORD	dwIMEMode = (DWORD)(-1);
 
 	dwIMEMode = Cime->dwIMEMode(lpstCursorData->hWndObserved, lpstCursorData->bForceHiragana);
 	if (lpstCursorData->dwIMEModeCursor == dwIMEMode) return FALSE;
@@ -461,8 +461,8 @@ BOOL		CCursor::bIsIMECursorChanged(LPIMECURSORDATA lpstCursorData)
 //
 BOOL		CCursor::bDrawIMEModeOnDisplay(LPIMECURSORDATA lpstCursorData)
 {
-	BOOL		bRet = FALSE;
-	RECT		rc{};
+	BOOL	bRet = FALSE;
+	RECT	rc{};
 	if (lpstCursorData->bDrawIMEModeWait) {
 		if (lpstCursorData->dwWaitWaveTime != 0)		Sleep(lpstCursorData->dwWaitWaveTime);
 	}
@@ -538,7 +538,7 @@ BOOL		CCursor::_bCalcDispModeRect(int iModeSizeX, int iModeSizeY, LPRECT lpRect)
 // 
 HWND		CCursor::_hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPRECT lpRect)
 {
-	HWND		hWnd = NULL;
+	HWND	hWnd = NULL;
 	POINT	pt{};
 	DWORD	dwPID = 0, dwForeThreadID = 0;
 	if (hForeWnd != NULL) {
@@ -574,7 +574,7 @@ HWND		CCursor::_hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPRECT l
 												pt.x = lpGuiThreadInfo->rcCaret.right;	pt.y = lpGuiThreadInfo->rcCaret.bottom;
 												if (ClientToScreen(lpGuiThreadInfo->hwndCaret, &pt)) {
 													lpRect->right = pt.x;	lpRect->bottom = pt.y;
-													RECT		rcFore{}, rcTop{};
+													RECT	rcFore{}, rcTop{};
 													if (GetWindowRect(lpGuiThreadInfo->hwndCaret, &rcTop)) {
 #define	MARGIN		2
 														if (((pt.x == 0) && (pt.y == 0)) || (pt.x <= rcTop.left + MARGIN) || (pt.y <= rcTop.top + MARGIN) || (pt.x <= rcFore.left) || (pt.y <= rcFore.top)) {
@@ -700,7 +700,7 @@ BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData)
 	}
 
 #define	COUNT	10
-	BOOL		bRet = FALSE;
+	BOOL	bRet = FALSE;
 	int		iCount = 0;
 	if (lpstCursorData->dwDisplayModeTime != 0)	iCount = (lpstCursorData->dwDisplayModeTime + (COUNT - 1)) / COUNT;
 	else iCount = COUNT;
@@ -746,7 +746,7 @@ BOOL		CCursor::bGetMouseRegValue(LPCTSTR szValue, LPTSTR szFile)
 {
 #define MOUSE_HKEY		HKEY_CURRENT_USER
 #define MOUSE_SUBKEY	_T("Control Panel\\Cursors")
-	BOOL			bRet = FALSE;
+	BOOL		bRet = FALSE;
 	CRegistry	*CReg = new CRegistry;
 	if (CReg->bReadRegValueString(MOUSE_HKEY, MOUSE_SUBKEY, szValue, szFile, _MAX_PATH)) {
 		bRet = TRUE;
@@ -762,7 +762,7 @@ BOOL		CCursor::bGetMouseRegValue(LPCTSTR szValue, LPTSTR szFile)
 //
 BOOL		CCursor::bChangeFlushMouseCursor(UINT uCurID, LPIMECURSORDATA lpstCursorData)
 {
-	int		i = 0;
+	int	i = 0;
 	while (uCurID != lpstCursorData->lpstFlushMouseCursor[i].dwIMEMode) {
 		++i;
 	}
@@ -782,7 +782,7 @@ BOOL		CCursor::bChangeFlushMouseCursor(UINT uCurID, LPIMECURSORDATA lpstCursorDa
 BOOL		CCursor::bSetSystemCursor(LPMOUSECURSOR lpstMC, int iCursorSizeX, int iCursorSizeY)
 {
 	HCURSOR	hCur;
-	UINT		fuLoad = 0;
+	UINT	fuLoad = 0;
 	if (lpstMC->bReadReg) {
 		if (lpstMC->szFile[0] == '\0')		return TRUE;	
 		fuLoad = (LR_VGACOLOR | LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_CREATEDIBSECTION | LR_LOADFROMFILE);
@@ -1021,7 +1021,7 @@ void		CCursorWindow::Cls_OnPaint(HWND hWnd)
 	PAINTSTRUCT	ps{};
 	HDC hDC = BeginPaint(hWnd, &ps);
 	if (hDC != NULL) {
-		RECT		rc{};
+		RECT	rc{};
 		if (GetClientRect(hWnd, &rc)) {
 			HBRUSH	hBrush = NULL;
 			if ((hBrush = CreateSolidBrush(dwBackColor & 0x00ffffff)) != NULL) {	

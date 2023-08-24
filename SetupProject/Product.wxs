@@ -259,7 +259,7 @@
 			<Component Id="DesktopShortcut" Guid="{2E074233-454E-41B4-918F-8C6A1FBAD304}">
 				<Condition>WIXUI_VERIFYDIALOGOPTIONALCHECKBOX1 = 1</Condition>
 				<RegistryValue Root="HKCU" Key="$(var.AppRegKey)" Name="InstalledDesktopShortcut" Type="integer" Value="1" KeyPath="yes" />
-				<Shortcut Id="desktopShortcut" Name="$(var.ProductName)" Target="[INSTALLFOLDER]$(var.MainExeFileName)" WorkingDirectory="INSTALLFOLDER" />
+				<Shortcut Id="desktopShortcut" Name="$(var.ProductName)" Target="[INSTALLFOLDER]$(var.MainExeFileName)" Arguments="/start" WorkingDirectory="INSTALLFOLDER" />
 			</Component>
 		</DirectoryRef>
 		<DirectoryRef Id="AppStartMenuDir">

@@ -626,11 +626,23 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 				if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 				DWORD	dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
 				if (bForExplorerPatcherSWS(hForeWnd, TRUE, TRUE, &hNewHKL, &hPreviousHKL)) {
-					if (dwBeforeIMEMode != IMEOFF) {
-						Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
+						if (dwBeforeIMEMode != IMEOFF) {
+							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+						}
+						else {
+							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+							Sleep(50);
+							Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
+						}
 					}
 					else {
-						Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
+						if (dwBeforeIMEMode != IMEOFF) {
+							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+						}
+						else {
+							Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
+						}
 					}
 				}
 			}
@@ -679,9 +691,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 								PostMessage(hWnd, WM_SYSKEYDOWNUPEX, KEY_OEM_PA1, (0x80000000));
 							}
 						}
-					}
-					else {
-						if ((dwBeforeIMEMode != IMEOFF)) {
+						else {
 							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 						}
 					}
@@ -698,6 +708,8 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 				if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 				if (bForExplorerPatcherSWS(hForeWnd, TRUE, TRUE, &hNewHKL, &hPreviousHKL)) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
+						Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+						Sleep(50);
 						Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
 					}
 					else {
@@ -752,6 +764,8 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 						Cime->vIMEConvertModeChangeForced(hForeWnd, ZENKANA_IMEON);
 					}
 					else {
+						Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+						Sleep(50);
 						Cime->vIMEConvertModeChangeForced(hForeWnd, ZENKANA_IMEON);
 					}
 				}
@@ -781,14 +795,21 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 			}
 			if (bEnableEPHelper || bIMEModeForced) {
 				if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
+				HWND	hWndHidemaru = FindWindow(_T("Hidemaru32Class"), NULL);
+				if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
+					break;
+				}
 				DWORD	dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
 				if (bForExplorerPatcherSWS(hForeWnd, TRUE, TRUE, &hNewHKL, &hPreviousHKL)) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
-						if (dwBeforeIMEMode == IMEOFF) {
-							Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
+						if (dwBeforeIMEMode != IMEOFF) {
+							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 						}
 						else {
 							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+							Sleep(50);
+							Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
+							Sleep(50);
 						}
 					}
 					else {
@@ -797,6 +818,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 						}
 						else {
 							Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
+							Sleep(100);
 						}
 					}
 				}
@@ -808,14 +830,21 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 			}
 			if (bEnableEPHelper || bIMEModeForced) {
 				if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
+				HWND	hWndHidemaru = FindWindow(_T("Hidemaru32Class"), NULL);
+				if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
+					break;
+				}
 				DWORD	dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
 				if (bForExplorerPatcherSWS(hForeWnd, TRUE, TRUE, &hNewHKL, &hPreviousHKL)) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
-						if (dwBeforeIMEMode == IMEOFF) {
-							Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
+						if (dwBeforeIMEMode != IMEOFF) {
+							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 						}
 						else {
 							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+							Sleep(50);
+							Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
+							Sleep(50);
 						}
 					}
 					else {
@@ -824,9 +853,11 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 						}
 						else {
 							Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
+							Sleep(100);
 						}
 					}
 				}
+				Sleep(10);
 			}
 			break;
 		case KEY_OEM_BACKTAB:		// OEM Alt+カタカナ/ひらがな	(0xf5)
@@ -839,6 +870,8 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 				SetFocus(hForeWnd);
 				if (bForExplorerPatcherSWS(hForeWnd, TRUE, TRUE, &hNewHKL, &hPreviousHKL)) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
+						Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+						Sleep(50);
 						Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
 					}
 					else {
@@ -959,17 +992,24 @@ BOOL		bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, BOOL bIMEModeForc
 				if ((bChangeToIME && (hkl != JP_IME)) || (hkl == US_ENG) || bIMEModeForcedChange) {
 					hkl = JP_IME;
 					if (ActivateKeyboardLayout(hkl, (KLF_SETFORPROCESS | KLF_REORDER)) != 0) {
-						if ((hkl = GetKeyboardLayout(dwThreadID)) != NULL) {				// Re Check
+						if ((hkl = GetKeyboardLayout(dwThreadID)) != NULL) {
 							if (hkl != JP_IME) {
 								if (bChangeHKLbySendInput(JP_IME, hkl)) {
 									hkl = JP_IME;
-									bRet = TRUE;
+									if (ActivateKeyboardLayout(hkl, (KLF_SETFORPROCESS | KLF_REORDER)) != 0) {
+										bRet = TRUE;
+									}
 								}
 							}
 							else {
 								bRet = TRUE;
 							}
 						}
+					}
+				}
+				else {
+					if (ActivateKeyboardLayout(hkl, (KLF_SETFORPROCESS | KLF_REORDER)) != 0) {
+						bRet = TRUE;
 					}
 				}
 			}
@@ -1034,7 +1074,7 @@ BOOL	bChangeHKLbySendInput(HKL hNewHKL, HKL hPreviousHKL)
 //
 BOOL CALLBACK bEnumChildProcChangeHKL(HWND hWnd, LPARAM lParam)
 {
-	HWND		hIMWnd = NULL;
+	HWND	hIMWnd = NULL;
 	if (ActivateKeyboardLayout((HKL)lParam, KLF_SETFORPROCESS) != 0) {
 		if ((hIMWnd = ImmGetDefaultIMEWnd(hWnd)) != NULL) {
 			SendMessage(hIMWnd, WM_INPUTLANGCHANGEREQUEST, (WPARAM)INPUTLANGCHANGE_SYSCHARSET, lParam);

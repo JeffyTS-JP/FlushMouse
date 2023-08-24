@@ -105,6 +105,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 					}
 				}
 			}
+			else if ((iRet = CompareStringOrdinal(lpCmdLine, -1, L"/start", -1, TRUE)) != 0) {
+				if (iRet == CSTR_EQUAL) {
+					bReportEvent(MSG_START_FLUSHMOUSE, Shortcut_CATEGORY);		// Eventlog
+					if (hHandle != NULL)	CloseHandle(hHandle);
+					return 0;
+				}
+			}
 		}
 		if (hHandle != NULL)	CloseHandle(hHandle);
 		return 0;

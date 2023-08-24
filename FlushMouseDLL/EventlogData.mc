@@ -79,6 +79,16 @@ Language=Japanese
 Installer Events
 .
 
+MessageId=0x5
+SymbolicName=Shortcut_CATEGORY
+Language=English
+Sortcut Events
+.
+
+Language=Japanese
+Sortcut Events
+.
+
 MessageId=0x10
 SymbolicName=POWERNOTIFICATION_CATEGORY
 Language=English
@@ -203,13 +213,13 @@ FlushMouseを終了します。
 MessageId=0x0006
 Severity=Success
 Facility=Application
-SymbolicName=MSG_RESTART_INSTALLER
+SymbolicName=MSG_START_FLUSHMOUSE
 Language=English
-Start FlushMouse(Installer).
+Start FlushMouse.
 .
 
 Language=Japanese
-FlushMouseを起動します(Installer)。
+FlushMouseを起動します。
 .
 
 MessageId=0x0007
@@ -217,12 +227,13 @@ Severity=Success
 Facility=Application
 SymbolicName=MSG_DONE_FLUSHMOUSE
 Language=English
-Quit FlushMouse(Installer).
+Quit FlushMouse.
 .
 
 Language=Japanese
-FlushMouseを終了します(Installer)。
+FlushMouseを終了します。
 .
+
 MessageId=0x0008
 Severity=Success
 Facility=Application

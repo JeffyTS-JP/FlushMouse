@@ -278,7 +278,6 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (KEY_OEM_COPY), (0x7f000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24)));
 					}
 					break;
-				case VK_RETURN:			// RETURN (0x0d)
 				case VK_ESCAPE:			// ESC (0x1b)
 				case VK_INSERT:			// INSERT (0x2d)
 					bOnlyCtrlLL = FALSE;

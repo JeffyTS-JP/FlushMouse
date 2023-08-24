@@ -100,6 +100,15 @@
 #define Installer_CATEGORY               ((DWORD)0x00000004L)
 
 //
+// MessageId: Shortcut_CATEGORY
+//
+// MessageText:
+//
+// Sortcut Events
+//
+#define Shortcut_CATEGORY                ((DWORD)0x00000005L)
+
+//
 // MessageId: POWERNOTIFICATION_CATEGORY
 //
 // MessageText:
@@ -193,20 +202,20 @@
 #define MSG_QUIT_FLUSHMOUSE              ((DWORD)0x40000005L)
 
 //
-// MessageId: MSG_RESTART_INSTALLER
+// MessageId: MSG_START_FLUSHMOUSE
 //
 // MessageText:
 //
-// Start FlushMouse(Installer).
+// Start FlushMouse.
 //
-#define MSG_RESTART_INSTALLER            ((DWORD)0x00000006L)
+#define MSG_START_FLUSHMOUSE             ((DWORD)0x00000006L)
 
 //
 // MessageId: MSG_DONE_FLUSHMOUSE
 //
 // MessageText:
 //
-// Quit FlushMouse(Installer).
+// Quit FlushMouse.
 //
 #define MSG_DONE_FLUSHMOUSE              ((DWORD)0x00000007L)
 

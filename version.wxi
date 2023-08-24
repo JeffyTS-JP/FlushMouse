@@ -1,7 +1,7 @@
 <Include>
 	<!-- for wix Setup Project -->
 	<!-- Copyright (C) 2023 JeffyTS -->
-	<?define Version = "1.1.7.24" ?>
+	<?define Version = "1.1.8.0" ?>
 
 	<?define ProductName = "FlushMouse" ?>
 	<?define Manufacturer = "JeffyTS" ?>
