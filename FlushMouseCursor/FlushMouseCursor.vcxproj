@@ -194,7 +194,8 @@
       <UACUIAccess>false</UACUIAccess>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(OutDir)FlushMouseCursor.dll $(OutDir)FlushMouseCursor.dat
+      <Command>Start /min /wait cmd /c "..\Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
+copy $(OutDir)FlushMouseCursor.dll $(OutDir)FlushMouseCursor.dat
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

@@ -139,7 +139,8 @@
       <UACUIAccess>false</UACUIAccess>
     </Link>
     <PostBuildEvent>
-      <Command>copy ..\$(Platform)\$(Configuration)\FlushMouseDLL32.dll ..\x64\$(Configuration)\</Command>
+      <Command>Start /min /wait cmd /c "..\Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
+copy ..\$(Platform)\$(Configuration)\FlushMouseDLL32.dll ..\x64\$(Configuration)\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

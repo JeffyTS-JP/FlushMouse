@@ -68,7 +68,7 @@ static UINT     nCheckFocusTimerTickValue = FOCUSINITTIMERVALUE;
 static UINT_PTR nCheckFocusTimerID = CHECKFOCUSTIMERID;
 static UINT_PTR	uCheckFocusTimer = NULL;
 // Timer for Poc
-#define PROCINITTIMERVALUE		1000
+#define PROCINITTIMERVALUE		5000
 #define CHECKPROCTIMERID		2
 static UINT     nCheckProcTimerTickValue = PROCINITTIMERVALUE;
 static UINT_PTR nCheckProcTimerID = CHECKPROCTIMERID;
@@ -99,8 +99,6 @@ static INT_PTR CALLBACK AboutDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 // Handler
 static BOOL		Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct);
 static void		Cls_OnDestroy(HWND hWnd);
-static void		Cls_OnKillFocus(HWND hWnd, HWND hWndOldFocus);
-static void		Cls_OnSetFocus(HWND hWnd, HWND hWndNewFocus);
 static void		Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify);
 static void		Cls_OnDisplayChange(HWND hWnd, UINT bitsPerPixel, UINT cxScreen, UINT cyScreen);
 static LRESULT	Cls_OnPowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting);
@@ -132,6 +130,8 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, int n
 	SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 	SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 
+	bReportEvent(MSG_STARTING_FLUSHMOUSE, APPLICATION_CATEGORY);
+	
 	if (!hPrevInstance) {
 		if (!MyRegisterClass(hInstance)) {
 			return FALSE;
@@ -233,8 +233,6 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 	switch (message) {
 		HANDLE_MSG(hWnd, WM_CREATE, Cls_OnCreate);
 		HANDLE_MSG(hWnd, WM_DESTROY, Cls_OnDestroy);
-		HANDLE_MSG(hWnd, WM_SETFOCUS, Cls_OnSetFocus);
-		HANDLE_MSG(hWnd, WM_KILLFOCUS, Cls_OnKillFocus);
 		HANDLE_MSG(hWnd, WM_COMMAND, Cls_OnCommand);
 		HANDLE_MSG(hWnd, WM_DISPLAYCHANGE, Cls_OnDisplayChange);
 
@@ -316,7 +314,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		bForExplorerPatcherSWS(GetForegroundWindow(), TRUE, TRUE, NULL, NULL);
 	}
 
-	bReportEvent(MSG_START_SUCCEED, APPLICATION_CATEGORY);
+	bReportEvent(MSG_STARTED_FLUSHMOUSE, APPLICATION_CATEGORY);
 
 	return TRUE;
 }
@@ -327,7 +325,11 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 //
 static void Cls_OnDestroy(HWND hWnd)
 {
+	bReportEvent(MSG_QUIT_FLUSHMOUSE, APPLICATION_CATEGORY);
+
 	vDestroyWindow(hWnd);
+
+	PostQuitMessage(0);
 }
 
 //
@@ -357,34 +359,6 @@ void		vDestroyWindow(HWND hWnd)
 		delete Cime;
 		Cime = NULL;
 	}
-
-	bReportEvent(MSG_QUIT_FLUSHMOUSE, APPLICATION_CATEGORY);
-
-	PostQuitMessage(0);
-}
-
-//
-// WM_SETFOCUS
-// Cls_OnSetFocus()
-//
-static void Cls_OnSetFocus(HWND hWnd, HWND hWndOldFocus)
-{
-	UNREFERENCED_PARAMETER(hWnd);
-	UNREFERENCED_PARAMETER(hWndOldFocus);
-	bDisplayIMEModeOnCursor = FALSE;
-	bDoModeDispByMouseBttnUp = FALSE;
-	bDrawNearCaret = FALSE;
-}
-
-//
-// WM_KILLFOCUS
-// Cls_OnKillFocus()
-//
-static void Cls_OnKillFocus(HWND hWnd, HWND hWndNewFocus)
-{
-	UNREFERENCED_PARAMETER(hWnd);
-	UNREFERENCED_PARAMETER(hWndNewFocus);
-	vGetSetProfileData();
 }
 
 //
@@ -1156,9 +1130,27 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 		}
 	}
 
+	if (EventHook == NULL) {
+		EventHook = new CEventHook;
+		if (!EventHook->bEventSet()) {
+			vMessageBox(hWnd, IDS_NOTRREGISTEVH, MessageBoxTYPE);
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			return FALSE;
+		}
+	}
+
+	HWND	hFindWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
+	if (hFindWnd != NULL) {
+		if (bEnableEPHelper) {
+			PostMessage(hFindWnd, WM_CHECKEXISTINGJPIMEEX, (WPARAM)bEnableEPHelper, (LPARAM)NULL);
+		}
+		else {
+			PostMessage(hFindWnd, WM_CHECKEXISTINGJPIMEEX, (WPARAM)FALSE, (LPARAM)NULL);
+		}
+	}
+
 	BOOL	bBool = FALSE;
 	if (SetUserObjectInformation(GetCurrentProcess(), UOI_TIMERPROC_EXCEPTION_SUPPRESSION, &bBool, sizeof(BOOL)) != FALSE) {
-		// Set Timer for Cursor
 		if (uCheckFocusTimer == NULL) {
 			if ((uCheckFocusTimer = SetTimer(hWnd, nCheckFocusTimerID, nCheckFocusTimerTickValue, (TIMERPROC)&vCheckFocusTimerProc)) == 0) {
 				vMessageBox(hWnd, IDS_NOTIMERESOUCE, MessageBoxTYPE);
@@ -1181,25 +1173,6 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 		return FALSE;
 	}
 
-	if (EventHook == NULL) {
-		EventHook = new CEventHook;
-		if (!EventHook->bEventSet()) {
-			vMessageBox(hWnd, IDS_NOTRREGISTEVH, MessageBoxTYPE);
-			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-			return FALSE;
-		}
-	}
-
-	HWND	hFindWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
-	if (hFindWnd != NULL) {
-		if (bEnableEPHelper) {
-			PostMessage(hFindWnd, WM_CHECKEXISTINGJPIMEEX, (WPARAM)bEnableEPHelper, (LPARAM)NULL);
-		}
-		else {
-			PostMessage(hFindWnd, WM_CHECKEXISTINGJPIMEEX, (WPARAM)FALSE, (LPARAM)NULL);
-		}
-	}
-
 	return TRUE;
 }
 
@@ -1212,11 +1185,6 @@ VOID		vStopThreadHookTimer(HWND hWnd)
 	bDoModeDispByMouseBttnUp = FALSE;
 	bDrawNearCaret = FALSE;
 
-	if (EventHook != NULL) {
-		delete EventHook;
-		EventHook = NULL;
-	}
-
 	if (uCheckProcTimer != NULL) {
 		if (KillTimer(hWnd, nCheckProcTimerID)) {
 			uCheckProcTimer = NULL;
@@ -1227,6 +1195,11 @@ VOID		vStopThreadHookTimer(HWND hWnd)
 		if (KillTimer(hWnd, nCheckFocusTimerID)) {
 			uCheckFocusTimer = NULL;
 		}
+	}
+
+	if (EventHook != NULL) {
+		delete EventHook;
+		EventHook = NULL;
 	}
 
 	if (FlushMouseHook != NULL) {
@@ -1277,8 +1250,9 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 		if (FindWindow(CLASS_FLUSHMOUSE32, NULL) == NULL) {
 			vDestroyWindow(hWnd);
 			bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION_CATEGORY);
-			bCreateProcess(FLUSHMOUSE_EXE);
-			bReportEvent(MSG_RESTART_EVENT, APPLICATION_CATEGORY);
+			//bCreateProcess(FLUSHMOUSE32_EXE);
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
 		}
 	}
 }

@@ -202,8 +202,7 @@
       <EnableUAC>false</EnableUAC>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>Start /min /wait cmd /c  "..\Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)</Command>
     </PostBuildEvent>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
@@ -222,16 +221,16 @@
     <ClCompile Include="pch.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="FlushMouse.ico" />
-    <Image Include="small.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\FlushMouseDLL\FlushMouseDLL.vcxproj">
       <Project>{ec908a5d-8859-4b02-9ace-023ff407a3a3}</Project>
     </ProjectReference>
     <ProjectReference Include="..\FlushMouseLIB\FlushMouseLIB.vcxproj">
       <Project>{24085cf0-ec19-4a1c-9ddf-1c04a571ed57}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\FlushMouseLIB\FlushMouse.ico" />
+    <Image Include="..\FlushMouseLIB\small.ico" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\FlushMouseLIB\FlushMouse.rc" />

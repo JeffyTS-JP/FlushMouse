@@ -115,7 +115,7 @@
 //
 // PowerNotification Events
 //
-#define POWERNOTIFICATION_CATEGORY       ((DWORD)0x00000010L)
+#define POWERNOTIFICATION_CATEGORY       ((DWORD)0x00000006L)
 
 //
 // MessageId: TASKSCHEDULER_CATEGORY
@@ -124,73 +124,37 @@
 //
 // TaskScheduler Events
 //
-#define TASKSCHEDULER_CATEGORY           ((DWORD)0x00000011L)
+#define TASKSCHEDULER_CATEGORY           ((DWORD)0x00000007L)
 
 //
 // Message definitions.
 //
 //
-// MessageId: MSG_START_SUCCEED
+// MessageId: MSG_STARTING_FLUSHMOUSE
 //
 // MessageText:
 //
-// Started FlushMouse.
+// Starting FlushMouse.
 //
-#define MSG_START_SUCCEED                ((DWORD)0x40000000L)
+#define MSG_STARTING_FLUSHMOUSE          ((DWORD)0x40000100L)
 
 //
-// MessageId: MSG_RESTART_EVENT
+// MessageId: MSG_RESTART_FLUSHMOUSE_EVENT
 //
 // MessageText:
 //
 // Restart FlushMouse.
 //
-#define MSG_RESTART_EVENT                ((DWORD)0x40000001L)
+#define MSG_RESTART_FLUSHMOUSE_EVENT     ((DWORD)0x40000101L)
 
 //
-// MessageId: MSG_THREAD_HOOK_TIMER_STARTED
+// MessageId: MSG_STARTED_FLUSHMOUSE
 //
 // MessageText:
 //
-// Thread, Hook and Timer Started.
+// Started FlushMouse.
 //
-#define MSG_THREAD_HOOK_TIMER_STARTED    ((DWORD)0x40000002L)
-
-//
-// MessageId: MSG_THREAD_HOOK_TIMER_START_FAILED
-//
-// MessageText:
-//
-// Thread, Hook and Timer Start Failed.
-//
-#define MSG_THREAD_HOOK_TIMER_START_FAILED ((DWORD)0x40008002L)
-
-//
-// MessageId: MSG_THREAD_HOOK_TIMER_STOPPED
-//
-// MessageText:
-//
-// Thread, Hook and Timer Stopped.
-//
-#define MSG_THREAD_HOOK_TIMER_STOPPED    ((DWORD)0x40000003L)
-
-//
-// MessageId: MSG_THREAD_HOOK_TIMER_RESTARTED
-//
-// MessageText:
-//
-// Thread, Hook and Timer Restarted.
-//
-#define MSG_THREAD_HOOK_TIMER_RESTARTED  ((DWORD)0x40000004L)
-
-//
-// MessageId: MSG_THREAD_HOOK_TIMER_RESTART_FAILED
-//
-// MessageText:
-//
-// Thread, Hook and Timer Restart Failed.
-//
-#define MSG_THREAD_HOOK_TIMER_RESTART_FAILED ((DWORD)0x40008004L)
+#define MSG_STARTED_FLUSHMOUSE           ((DWORD)0x40000102L)
 
 //
 // MessageId: MSG_QUIT_FLUSHMOUSE
@@ -199,25 +163,79 @@
 //
 // Quit FlushMouse.
 //
-#define MSG_QUIT_FLUSHMOUSE              ((DWORD)0x40000005L)
+#define MSG_QUIT_FLUSHMOUSE              ((DWORD)0x00000103L)
 
 //
-// MessageId: MSG_START_FLUSHMOUSE
+// MessageId: MSG_STOPPED_FLUSHMOUSE
+//
+// MessageText:
+//
+// Stoped FlushMouse.
+//
+#define MSG_STOPPED_FLUSHMOUSE           ((DWORD)0x00000104L)
+
+//
+// MessageId: MSG_START_FLUSHMOUSE_EVENT
 //
 // MessageText:
 //
 // Start FlushMouse.
 //
-#define MSG_START_FLUSHMOUSE             ((DWORD)0x00000006L)
+#define MSG_START_FLUSHMOUSE_EVENT       ((DWORD)0x00000105L)
 
 //
-// MessageId: MSG_DONE_FLUSHMOUSE
+// MessageId: MSG_QUIT_FLUSHMOUSE_EVENT
 //
 // MessageText:
 //
 // Quit FlushMouse.
 //
-#define MSG_DONE_FLUSHMOUSE              ((DWORD)0x00000007L)
+#define MSG_QUIT_FLUSHMOUSE_EVENT        ((DWORD)0x00000106L)
+
+//
+// MessageId: MSG_THREAD_HOOK_TIMER_STARTED
+//
+// MessageText:
+//
+// Thread, Hook and Timer Started.
+//
+#define MSG_THREAD_HOOK_TIMER_STARTED    ((DWORD)0x40000107L)
+
+//
+// MessageId: MSG_THREAD_HOOK_TIMER_START_FAILED
+//
+// MessageText:
+//
+// Thread, Hook and Timer Start Failed.
+//
+#define MSG_THREAD_HOOK_TIMER_START_FAILED ((DWORD)0x40008108L)
+
+//
+// MessageId: MSG_THREAD_HOOK_TIMER_STOPPED
+//
+// MessageText:
+//
+// Thread, Hook and Timer Stopped.
+//
+#define MSG_THREAD_HOOK_TIMER_STOPPED    ((DWORD)0x40000109L)
+
+//
+// MessageId: MSG_THREAD_HOOK_TIMER_RESTARTED
+//
+// MessageText:
+//
+// Thread, Hook and Timer Restarted.
+//
+#define MSG_THREAD_HOOK_TIMER_RESTARTED  ((DWORD)0x4000010AL)
+
+//
+// MessageId: MSG_THREAD_HOOK_TIMER_RESTART_FAILED
+//
+// MessageText:
+//
+// Thread, Hook and Timer Restart Failed.
+//
+#define MSG_THREAD_HOOK_TIMER_RESTART_FAILED ((DWORD)0x4000810AL)
 
 //
 // MessageId: MSG_TASKTRAY_REGISTERED
@@ -226,7 +244,7 @@
 //
 // Registered TaskTray.
 //
-#define MSG_TASKTRAY_REGISTERED          ((DWORD)0x00000008L)
+#define MSG_TASKTRAY_REGISTERED          ((DWORD)0x0000010BL)
 
 //
 // MessageId: MSG_TASKTRAY_REGISTER_FAILD
@@ -235,7 +253,7 @@
 //
 // Register TaskTray Failed.
 //
-#define MSG_TASKTRAY_REGISTER_FAILD      ((DWORD)0x00008008L)
+#define MSG_TASKTRAY_REGISTER_FAILD      ((DWORD)0x0000810BL)
 
 //
 // MessageId: MSG_DETECT_FLUSHMOUSE_STOP
@@ -244,7 +262,7 @@
 //
 // Detected Stopping FlushMouse Process.
 //
-#define MSG_DETECT_FLUSHMOUSE_STOP       ((DWORD)0x00008009L)
+#define MSG_DETECT_FLUSHMOUSE_STOP       ((DWORD)0x0000810CL)
 
 //
 // MessageId: MSG_PBT_APMSUSPEND
@@ -253,7 +271,7 @@
 //
 // Entering into suspend (APM).
 //
-#define MSG_PBT_APMSUSPEND               ((DWORD)0x40000100L)
+#define MSG_PBT_APMSUSPEND               ((DWORD)0x40000200L)
 
 //
 // MessageId: MSG_PBT_APMRESUMEAUTOMATIC
@@ -262,7 +280,7 @@
 //
 // Resuming from Sleep or Hibernation (APM).
 //
-#define MSG_PBT_APMRESUMEAUTOMATIC       ((DWORD)0x40000101L)
+#define MSG_PBT_APMRESUMEAUTOMATIC       ((DWORD)0x40000201L)
 
 //
 // MessageId: MSG_PBT_APMRESUMESUSPEND
@@ -271,7 +289,7 @@
 //
 // Resumed from Suspend (APM).
 //
-#define MSG_PBT_APMRESUMESUSPEND         ((DWORD)0x40000102L)
+#define MSG_PBT_APMRESUMESUSPEND         ((DWORD)0x40000202L)
 
 //
 // MessageId: MSG_PBT_POWERSETTINGCHANGE
@@ -280,7 +298,7 @@
 //
 // Power settings changed (APM).
 //
-#define MSG_PBT_POWERSETTINGCHANGE       ((DWORD)0x40000103L)
+#define MSG_PBT_POWERSETTINGCHANGE       ((DWORD)0x40000203L)
 
 //
 // MessageId: MSG_PBT_APMPOWERSTATUSCHANGE
@@ -289,7 +307,7 @@
 //
 // Changed the power status (APM).
 //
-#define MSG_PBT_APMPOWERSTATUSCHANGE     ((DWORD)0x40000104L)
+#define MSG_PBT_APMPOWERSTATUSCHANGE     ((DWORD)0x40000204L)
 
 //
 // MessageId: MSG_PBT_APMPOWERSTATUSCHANGE_AC_ON
@@ -298,7 +316,7 @@
 //
 // Changed the power status to AC Online (APM).
 //
-#define MSG_PBT_APMPOWERSTATUSCHANGE_AC_ON ((DWORD)0x40000105L)
+#define MSG_PBT_APMPOWERSTATUSCHANGE_AC_ON ((DWORD)0x40000205L)
 
 //
 // MessageId: MSG_PBT_APMPOWERSTATUSCHANGE_AC_OFF
@@ -307,7 +325,7 @@
 //
 // Changed the power status to AC Offline (APM).
 //
-#define MSG_PBT_APMPOWERSTATUSCHANGE_AC_OFF ((DWORD)0x40000106L)
+#define MSG_PBT_APMPOWERSTATUSCHANGE_AC_OFF ((DWORD)0x40000206L)
 
 //
 // MessageId: MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_ON
@@ -316,7 +334,7 @@
 //
 // Changed the display state to ON (APM).
 //
-#define MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_ON ((DWORD)0x40000107L)
+#define MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_ON ((DWORD)0x40000207L)
 
 //
 // MessageId: MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_OFF
@@ -325,6 +343,6 @@
 //
 // Changed the display state to OFF (APM).
 //
-#define MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_OFF ((DWORD)0x40000108L)
+#define MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_OFF ((DWORD)0x40000208L)
 
 ///* = EOF = */

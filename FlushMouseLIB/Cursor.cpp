@@ -814,7 +814,7 @@ BOOL		CCursor::bSetSystemCursor(LPMOUSECURSOR lpstMC, int iCursorSizeX, int iCur
 															IMAGE_CURSOR, iCursorSizeX, iCursorSizeY, fuLoad)) == NULL) {
 				_Post_equals_last_error_ DWORD err = GetLastError();
 				if (err == ERROR_MOD_NOT_FOUND) {
-					bReportEvent(MSG_RESTART_EVENT, APPLICATION_CATEGORY);
+					bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
 					PostMessage(hMainWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 				}
 				if (!bCursorDllUnload()) return FALSE;
@@ -901,7 +901,7 @@ VOID		CCursorWindow::vSetModeString(LPTSTR lpszIMEMode)
 //
 // CursorWindowRegisterClass()
 //
-ATOM CCursorWindow::MyRegisterClass(HINSTANCE hInstance)
+ATOM CCursorWindow::MyRegisterClass(HINSTANCE hInstance) const
 {
 #define CLASSSTYLE (CS_HREDRAW | CS_VREDRAW | CS_NOCLOSE)
 	WNDCLASSEX wcex{};

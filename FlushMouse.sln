@@ -26,15 +26,17 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiscLIB32", "MiscLIB32\Misc
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ソリューション項目", "ソリューション項目", "{4DA8FAF2-6A3D-41B4-B811-0F39BFA7CAA5}"
 	ProjectSection(SolutionItems) = preProject
-		FlushMouse_x64.msi = FlushMouse_x64.msi
 		README.md = README.md
+		Sign_Modules.bat = Sign_Modules.bat
+		Sign_Products.bat = Sign_Products.bat
 		version.h = version.h
-		version.wxi = version.wxi
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FlushMouseDLL", "FlushMouseDLL\FlushMouseDLL.vcxproj", "{EC908A5D-8859-4B02-9ACE-023FF407A3A3}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FlushMouseLIB", "FlushMouseLIB\FlushMouseLIB.vcxproj", "{24085CF0-EC19-4A1C-9DDF-1C04A571ED57}"
+EndProject
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "SetupProject-exe", "SetupProject-exe\SetupProject-exe.wixproj", "{ECB3C2E4-5915-4FB4-A8D5-93155D9F6339}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -139,6 +141,17 @@ Global
 		{24085CF0-EC19-4A1C-9DDF-1C04A571ED57}.Release|x64.Build.0 = Release|x64
 		{24085CF0-EC19-4A1C-9DDF-1C04A571ED57}.Release|x86.ActiveCfg = Release|Win32
 		{24085CF0-EC19-4A1C-9DDF-1C04A571ED57}.Release|x86.Build.0 = Release|Win32
+		{ECB3C2E4-5915-4FB4-A8D5-93155D9F6339}.Debug|Mixed Platform for FlushMouse.ActiveCfg = Debug|x86
+		{ECB3C2E4-5915-4FB4-A8D5-93155D9F6339}.Debug|x64.ActiveCfg = Debug|x86
+		{ECB3C2E4-5915-4FB4-A8D5-93155D9F6339}.Debug|x64.Build.0 = Debug|x86
+		{ECB3C2E4-5915-4FB4-A8D5-93155D9F6339}.Debug|x86.ActiveCfg = Debug|x86
+		{ECB3C2E4-5915-4FB4-A8D5-93155D9F6339}.Debug|x86.Build.0 = Debug|x86
+		{ECB3C2E4-5915-4FB4-A8D5-93155D9F6339}.Release|Mixed Platform for FlushMouse.ActiveCfg = Release|x86
+		{ECB3C2E4-5915-4FB4-A8D5-93155D9F6339}.Release|Mixed Platform for FlushMouse.Build.0 = Release|x86
+		{ECB3C2E4-5915-4FB4-A8D5-93155D9F6339}.Release|x64.ActiveCfg = Release|x86
+		{ECB3C2E4-5915-4FB4-A8D5-93155D9F6339}.Release|x64.Build.0 = Release|x86
+		{ECB3C2E4-5915-4FB4-A8D5-93155D9F6339}.Release|x86.ActiveCfg = Release|x86
+		{ECB3C2E4-5915-4FB4-A8D5-93155D9F6339}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

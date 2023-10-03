@@ -21,7 +21,7 @@
   <String Id="WixUIOK" Overridable="yes">OK</String>
   <String Id="WixUIPrint" Overridable="yes">印刷(&amp;P)</String>
 
-  <String Id="AdvancedWelcomeEulaDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="AdvancedWelcomeEulaDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="AdvancedWelcomeEulaDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
   <String Id="AdvancedWelcomeEulaDlgTitle" Overridable="yes">{\WixUI_Font_Title}[ProductName] のソフトウェア使用許諾契約書をお読みください。</String>
   <String Id="AdvancedWelcomeEulaDlgLicenseAcceptedCheckBox" Overridable="yes">ソフトウェア使用許諾契約書に同意します(&amp;A)</String>
@@ -35,7 +35,7 @@
   <String Id="Advanced_Font_Emphasized_Size" Overridable="yes">8</String>
   <String Id="Advanced_Font_FaceName" Overridable="yes">Tahoma</String>
 
-  <String Id="BrowseDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="BrowseDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="BrowseDlgComboLabel" Overridable="yes">場所(&amp;L):</String>
   <String Id="BrowseDlgWixUI_Bmp_Up" Overridable="yes">WixUI_Bmp_Up</String>
   <String Id="BrowseDlgWixUI_Bmp_UpTooltip" Overridable="yes">ひとつ上のフォルダーへ移動</String>
@@ -46,12 +46,12 @@
   <String Id="BrowseDlgDescription" Overridable="yes">インストール先フォルダーを参照してください。</String>
   <String Id="BrowseDlgTitle" Overridable="yes">{\WixUI_Font_Title}インストール先フォルダーの変更</String>
 
-  <String Id="CancelDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="CancelDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="CancelDlgText" Overridable="yes">[ProductName] のセットアップをキャンセルしますか?</String>
   <String Id="CancelDlgIcon" Overridable="yes">WixUI_Ico_Info</String>
   <String Id="CancelDlgIconTooltip" Overridable="yes">情報アイコン</String>
 
-  <String Id="CustomizeDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="CustomizeDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="CustomizeDlgTree" Overridable="yes">選択項目のツリー</String>
   <String Id="CustomizeDlgBrowse" Overridable="yes">参照(&amp;R)...</String>
   <String Id="CustomizeDlgReset" Overridable="yes">リセット(&amp;S)</String>
@@ -65,30 +65,30 @@
   <String Id="CustomizeDlgLocation" Overridable="yes">CustomizeDlgLocation-CustomizeDlgLocation</String>
   <String Id="CustomizeDlgLocationLabel" Overridable="yes">場所:</String>
 
-  <String Id="DiskCostDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="DiskCostDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="DiskCostDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
   <String Id="DiskCostDlgText" Overridable="yes">反転表示されたボリュームがある場合、そのボリュームには選択された機能をインストールするために必要なディスク領域がありません。反転表示されたボリュームからいくつかファイルを削除するか、インストールする機能を少なくするか、または別のインストール先を選択してください。</String>
   <String Id="DiskCostDlgDescription" Overridable="yes">選択した機能をインストールするために必要なディスク領域です。</String>
   <String Id="DiskCostDlgTitle" Overridable="yes">{\WixUI_Font_Title}必要なディスク領域</String>
   <String Id="DiskCostDlgVolumeList" Overridable="yes">{70}{70}{60}{60}{60}</String>
 
-  <String Id="ErrorDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="ErrorDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="ErrorDlgErrorText" Overridable="yes">情報テキスト</String>
   <String Id="ErrorDlgErrorIcon" Overridable="yes">WixUI_Ico_Info</String>
   <String Id="ErrorDlgErrorIconTooltip" Overridable="yes">情報アイコン</String>
 
-  <String Id="ExitDialog_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="ExitDialog_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="ExitDialogBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
   <String Id="ExitDialogDescription" Overridable="yes">［終了］をクリックして、セットアップ ウィザードを終了してください。</String>
   <String Id="ExitDialogTitle" Overridable="yes">{\WixUI_Font_Bigger}[ProductName] のセットアップ ウィザードが完了しました。</String>
 
-  <String Id="FatalError_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="FatalError_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="FatalErrorBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
   <String Id="FatalErrorTitle" Overridable="yes">{\WixUI_Font_Bigger}インストールを完了する前に [ProductName] のセットアップ ウィザードが終了しました。</String>
   <String Id="FatalErrorDescription1" Overridable="yes">エラーによって、[ProductName] のセットアップ ウィザードはインストール完了前に終了しました。システムの状態は変更されていません。改めてインストールする場合は、再度セットアップ ウィザードを実行してください。</String>
   <String Id="FatalErrorDescription2" Overridable="yes">［終了］をクリックして、セットアップ ウィザードを終了してください。</String>
 
-  <String Id="FeaturesDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="FeaturesDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="FeaturesDlgTree" Overridable="yes">製品の機能</String>
   <String Id="FeaturesDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
   <String Id="FeaturesDlgDescription" Overridable="yes">機能のインストール方法を選択してください。</String>
@@ -98,21 +98,21 @@
   <String Id="FeaturesDlgInstall" Overridable="yes">インストール(&amp;I)</String>
   <String Id="FeaturesDlgChange" Overridable="yes">変更(&amp;C)</String>
 
-  <String Id="FilesInUse_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="FilesInUse_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="FilesInUseExit" Overridable="yes">終了(&amp;X)</String>
   <String Id="FilesInUseBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
   <String Id="FilesInUseText" Overridable="yes">次のプログラムが、セットアップで更新する必要のあるファイルを使用しています。インストールを続行する場合は、一覧に表示されたプログラムを閉じてから、［再試行(&amp;R)］をクリックしてください。インストールをキャンセルする場合は、［終了］をクリックしてください。</String>
   <String Id="FilesInUseDescription" Overridable="yes">更新する必要のあるファイルが現在使用されています。</String>
   <String Id="FilesInUseTitle" Overridable="yes">{\WixUI_Font_Title}使用中のファイル</String>
 
-  <String Id="InstallDirDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="InstallDirDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="InstallDirDlgChange" Overridable="yes">変更(&amp;C)...</String>
   <String Id="InstallDirDlgTitle" Overridable="yes">{\WixUI_Font_Title}インストール先フォルダー</String>
   <String Id="InstallDirDlgDescription" Overridable="yes">［次へ］をクリックして既定のフォルダーにインストールするか、［変更］をクリックして別のインストール先を選択してください。</String>
   <String Id="InstallDirDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
   <String Id="InstallDirDlgFolderLabel" Overridable="yes">[ProductName] のインストール先:</String>
 
-  <String Id="InstallScopeDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="InstallScopeDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="InstallScopeDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
   <String Id="InstallScopeDlgDescription" Overridable="yes">インストールの種類とインストール先フォルダーを選択してください。</String>
   <String Id="InstallScopeDlgTitle" Overridable="yes">{\WixUI_Font_Title}インストールの種類</String>
@@ -124,18 +124,18 @@
   <String Id="InstallScopeDlgFolderLabel" Overridable="yes">インストール先フォルダー(&amp;F):</String>
   <String Id="InstallScopeDlgChange" Overridable="yes">変更(&amp;C)...</String>
 
-  <String Id="InvalidDirDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="InvalidDirDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="InvalidDirDlgText" Overridable="yes">インストール先フォルダーは、ローカル ハード ドライブ上にある必要があります。</String>
   <String Id="InvalidDirDlgIcon" Overridable="yes">WixUI_Ico_Info</String>
   <String Id="InvalidDirDlgIconTooltip" Overridable="yes">Information icon</String>
 
-  <String Id="LicenseAgreementDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="LicenseAgreementDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="LicenseAgreementDlgLicenseAcceptedCheckBox" Overridable="yes">ソフトウェア使用許諾契約書に同意します(&amp;A)</String>
   <String Id="LicenseAgreementDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
-  <String Id="LicenseAgreementDlgDescription" Overridable="yes">次の使用許諾契約書を注意深くお読みください。</String>
+  <String Id="LicenseAgreementDlgDescription" Overridable="yes">次のソフトウェア使用許諾契約書をお読みください。</String>
   <String Id="LicenseAgreementDlgTitle" Overridable="yes">{\WixUI_Font_Title}使用許諾契約書</String>
 
-  <String Id="MaintenanceTypeDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="MaintenanceTypeDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="MaintenanceTypeDlgChangeButton" Overridable="yes">変更(&amp;C)</String>
   <String Id="MaintenanceTypeDlgChangeButtonTooltip" Overridable="yes">インストールの変更</String>
   <String Id="MaintenanceTypeDlgRepairButton" Overridable="yes">修復(&amp;P)</String>
@@ -153,28 +153,29 @@
   <!--@@@String Id="MaintenanceTypeDlgRepairDisabledText" Overridable="yes">[ProductName] は修復できません。</String-->
   <String Id="MaintenanceTypeDlgRepairDisabledText" Overridable="yes">[ProductName] には修復の機能はありません。</String>
 
-	<String Id="MaintenanceWelcomeDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+	<String Id="MaintenanceWelcomeDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="MaintenanceWelcomeDlgBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
   <!--@@@String Id="MaintenanceWelcomeDlgDescription" Overridable="yes">このセットアップ ウィザードによって [ProductName] のインストールの変更、修復、または削除が出来ます。続行する場合は［次へ］を、セットアップ ウィザードを終了する場合は［キャンセル］をクリックしてください。</String-->
-  <String Id="MaintenanceWelcomeDlgDescription" Overridable="yes">このセットアップ ウィザードによって [ProductName] のインストールの変更、修復、または削除が出来ます。続行する場合は［次へ］を、セットアップ ウィザードを終了する場合は［キャンセル］をクリックしてください。削除後、再度インストール場合はもう一度インストールを実行してください</String>
+  <String Id="MaintenanceWelcomeDlgDescription" Overridable="yes">このセットアップ ウィザードによって [ProductName] のインストールの変更、修復、または削除が出来ます。続行する場合は［次へ］を、セットアップ ウィザードを終了する場合は［キャンセル］をクリックしてください。削除後、再度インストール場合はもう一度セットアップを実行してください</String>
   <String Id="MaintenanceWelcomeDlgTitle" Overridable="yes">{\WixUI_Font_Bigger}[ProductName] のセットアップ ウィザードへようこそ。</String>
 
-  <String Id="MsiRMFilesInUse_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="MsiRMFilesInUse_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="MsiRMFilesInUseBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
   <String Id="MsiRMFilesInUseText" Overridable="yes">次のプログラムが、セットアップで更新する必要のあるファイルを使用しています。セットアップ ウィザードがそのプログラムの終了と再開を試みることも出来ますが、プログラムを起動したままにすることも出来ます。</String>
   <String Id="MsiRMFilesInUseDescription" Overridable="yes">更新する必要のあるファイルが現在使用されています。</String>
   <String Id="MsiRMFilesInUseTitle" Overridable="yes">{\WixUI_Font_Title}使用中のファイル</String>
   <String Id="MsiRMFilesInUseUseRM" Overridable="yes">プログラムの終了と再開を試みる(&amp;C)。</String>
-  <String Id="MsiRMFilesInUseDontUseRM" Overridable="yes">プログラムを終了しない(&amp;D)。 Windows の再起動が必要になります。</String>
+  <!--@@@String Id="MsiRMFilesInUseDontUseRM" Overridable="yes">プログラムを終了しない(&amp;D)。 Windows の再起動が必要になります。</String-->
+  <String Id="MsiRMFilesInUseDontUseRM" Overridable="yes">プログラムを終了しない(&amp;D)。 Windows の再起動が必要な場合があります。</String>
 
-  <String Id="OutOfDiskDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="OutOfDiskDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="OutOfDiskDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
   <String Id="OutOfDiskDlgText" Overridable="yes">反転表示されたボリュームには、現在選択されている機能をインストールするために必要なディスク領域がありません。反転表示されたボリュームからいくつかファイルを削除するか、インストールする機能を少なくするか、または別のインストール先を選択してください。</String>
   <String Id="OutOfDiskDlgDescription" Overridable="yes">インストールに必要なディスク領域が使用可能なディスク領域を超えています。</String>
   <String Id="OutOfDiskDlgTitle" Overridable="yes">{\WixUI_Font_Title}ディスク領域不足</String>
   <String Id="OutOfDiskDlgVolumeList" Overridable="yes">{70}{70}{60}{60}{60}</String>
 
-  <String Id="OutOfRbDiskDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="OutOfRbDiskDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="OutOfRbDiskDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
   <String Id="OutOfRbDiskDlgText" Overridable="yes">反転表示されたボリュームには、現在選択されている機能をインストールするために必要なディスク領域がありません。反転表示されたボリュームからいくつかファイルを削除するか、インストールする機能を少なくするか、または別のインストール先を選択してください。</String>
   <String Id="OutOfRbDiskDlgDescription" Overridable="yes">インストールに必要なディスク領域が使用可能なディスク領域を超えています。</String>
@@ -182,12 +183,12 @@
   <String Id="OutOfRbDiskDlgVolumeList" Overridable="yes">{70}{70}{60}{60}{60}</String>
   <String Id="OutOfRbDiskDlgText2" Overridable="yes">セットアップのロールバック機能を使用不可能にすることができます。ただしロールバックを無効にすると、インストールが何らかの原因で中止された場合にコンピューターを元の状態に復元できなくなります。ロールバックを無効にするには ［はい］ をクリックしてください。</String>
 
-  <String Id="PrepareDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="PrepareDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="PrepareDlgBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
   <String Id="PrepareDlgDescription" Overridable="yes">セットアップ ウィザードがインストールの準備をしています。しばらくお待ちください。</String>
   <String Id="PrepareDlgTitle" Overridable="yes">{\WixUI_Font_Bigger}[ProductName] のセットアップ ウィザードへようこそ。</String>
 
-  <String Id="ProgressDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="ProgressDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="ProgressDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
   <String Id="ProgressDlgTextInstalling" Overridable="yes">セットアップ ウィザードが [ProductName] をインストールする間、しばらくお待ちください。</String>
   <String Id="ProgressDlgTitleInstalling" Overridable="yes">{\WixUI_Font_Title}[ProductName] をインストールしています</String>
@@ -200,13 +201,13 @@
   <String Id="ProgressDlgProgressBar" Overridable="yes">処理完了</String>
   <String Id="ProgressDlgStatusLabel" Overridable="yes">状態:</String>
 
-  <String Id="ResumeDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="ResumeDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="ResumeDlgInstall" Overridable="yes">インストール(&amp;I)</String>
   <String Id="ResumeDlgBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
   <String Id="ResumeDlgDescription" Overridable="yes">セットアップ ウィザードは、[ProductName] のコンピューターへの再インストールを開始します。続行する場合は［インストール］を、セットアップ ウィザードを終了する場合は［キャンセル］をクリックしてください。</String>
   <String Id="ResumeDlgTitle" Overridable="yes">{\WixUI_Font_Bigger}[ProductName] のセットアップ ウィザードを再開します。</String>
 
-  <String Id="SetupTypeDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="SetupTypeDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="SetupTypeDlgTypicalButton" Overridable="yes">標準(&amp;T)</String>
   <String Id="SetupTypeDlgTypicalButtonTooltip" Overridable="yes">標準インストール</String>
   <String Id="SetupTypeDlgCustomButton" Overridable="yes">カスタム(&amp;U)</String>
@@ -220,16 +221,16 @@
   <String Id="SetupTypeDlgCustomText" Overridable="yes">ユーザーが、インストールするプログラムの機能やインストール先を選択することができます。詳しい知識のある方にお勧めします。</String>
   <String Id="SetupTypeDlgCompleteText" Overridable="yes">プログラムのすべての機能がインストールされます。</String>
 
-  <String Id="UserExit_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="UserExit_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="UserExitBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
   <String Id="UserExitTitle" Overridable="yes">{\WixUI_Font_Bigger}[ProductName] のセットアップ ウィザードが中止されました。</String>
   <String Id="UserExitDescription1" Overridable="yes">[ProductName] のセットアップ ウィザードが中止されました。システムは変更されていません。後でこのプログラムをインストールする場合は、再度インストールを実行してください。</String>
   <String Id="UserExitDescription2" Overridable="yes">［終了］をクリックして、セットアップ ウィザードを終了してください。</String>
 
-  <String Id="VerifyReadyDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="VerifyReadyDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="VerifyReadyDlgBannerBitmap" Overridable="yes">WixUI_Bmp_Banner</String>
   <String Id="VerifyReadyDlgInstall" Overridable="yes">インストール(&amp;I)</String>
-  <String Id="VerifyReadyDlgInstallText" Overridable="yes">［インストール］をクリックして、インストールを開始してください。インストール設定を確認または変更するには、［戻る］をクリックします。［キャンセル］をクリックすると、ウィザードを終了します。</String>
+  <String Id="VerifyReadyDlgInstallText" Overridable="yes">［インストール］をクリックして、インストールを開始してください。［キャンセル］をクリックすると、ウィザードを終了します。</String>
   <String Id="VerifyReadyDlgInstallTitle" Overridable="yes">{\WixUI_Font_Title}[ProductName] のインストールの準備が完了しました。</String>
   <String Id="VerifyReadyDlgChange" Overridable="yes">変更(&amp;C)</String>
   <String Id="VerifyReadyDlgChangeText" Overridable="yes">［変更］をクリックして、インストールの変更を開始してください。インストール設定を確認または変更するには、［戻る］をクリックします。［キャンセル］をクリックすると、ウィザードを終了します。</String>
@@ -238,21 +239,21 @@
   <String Id="VerifyReadyDlgRepairText" Overridable="yes">［修復］をクリックして、[ProductName] を修復してください。インストール設定を確認または変更するには、［戻る］をクリックします。［キャンセル］をクリックすると、ウィザードを終了します。</String>
   <String Id="VerifyReadyDlgRepairTitle" Overridable="yes">{\WixUI_Font_Title}[ProductName] の修復の準備が完了しました。</String>
   <String Id="VerifyReadyDlgRemove" Overridable="yes">削除(&amp;R)</String>
-  <String Id="VerifyReadyDlgRemoveText" Overridable="yes">［削除］をクリックして、[ProductName] を削除してください。インストール設定を確認または変更するには、［戻る］をクリックします。［キャンセル］をクリックすると、ウィザードを終了します。</String>
+  <String Id="VerifyReadyDlgRemoveText" Overridable="yes">［削除］をクリックして、[ProductName] を削除してください。［キャンセル］をクリックすると、ウィザードを終了します。</String>
   <String Id="VerifyReadyDlgRemoveTitle" Overridable="yes">{\WixUI_Font_Title}[ProductName] の削除の準備が完了しました。</String>
 
-  <String Id="WaitForCostingDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="WaitForCostingDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="WaitForCostingDlgReturn" Overridable="yes">戻る(&amp;R)</String>
   <String Id="WaitForCostingDlgText" Overridable="yes">セットアップ ウィザードが必要なディスク領域を調べている間お待ちください。</String>
   <String Id="WaitForCostingDlgIcon" Overridable="yes">WixUI_Ico_Exclam</String>
   <String Id="WaitForCostingDlgIconTooltip" Overridable="yes">感嘆符アイコン</String>
 
-  <String Id="WelcomeDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="WelcomeDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="WelcomeDlgBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
-  <String Id="WelcomeDlgDescription" Overridable="yes">セットアップ ウィザードは、[ProductName] をコンピューターにインストールします。続行する場合は［次へ］を、セットアップ ウィザードを終了する場合は［キャンセル］をクリックしてください。</String>
+  <String Id="WelcomeDlgDescription" Overridable="yes">セットアップ ウィザードは、[ProductName] をコンピューターにインストール、またはアンインストールします。続行する場合は［次へ］を、セットアップ ウィザードを終了する場合は［キャンセル］をクリックしてください。</String>
   <String Id="WelcomeDlgTitle" Overridable="yes">{\WixUI_Font_Bigger}[ProductName] のセットアップ ウィザードへようこそ。</String>
 
-  <String Id="WelcomeEulaDlg_Title" Overridable="yes">[ProductName] のセットアップ</String>
+  <String Id="WelcomeEulaDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="WelcomeEulaDlgBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
   <String Id="WelcomeEulaDlgLicenseAcceptedCheckBox" Overridable="yes">ソフトウェア使用許諾契約書に同意します(&amp;A)</String>
   <String Id="WelcomeEulaDlgInstall" Overridable="yes">インストール(&amp;I)</String>

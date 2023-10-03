@@ -95,7 +95,7 @@ static LRESULT CALLBACK lpMouseHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 		return CallNextHookEx(NULL, nCode, wParam, lParam);
 	}
 
-	if ((nCode == HC_ACTION) || (nCode == HC_NOREMOVE)) {
+	if (nCode == HC_ACTION) {
 		switch (wParam) {
 		case WM_LBUTTONDOWN:
 		case WM_RBUTTONDOWN:

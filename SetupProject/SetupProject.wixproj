@@ -37,6 +37,7 @@
   <ItemGroup>
     <Compile Include="Product.wxs" />
     <Compile Include="_ExitDialog.wxs" />
+    <Compile Include="_MaintenanceTypeDlg.wxs" />
     <Compile Include="_VerifyReadyDlg.wxs" />
     <Compile Include="_WixUI_FeatureTree.wxs" />
   </ItemGroup>
@@ -47,7 +48,9 @@
     <Content Include="Readme.txt" />
     <Content Include="Register_Eventlog.reg" />
     <Content Include="Register_TaskScheduler.xml" />
+    <Content Include="Register_TaskScheduler1.xml" />
     <Content Include="Register_TaskScheduler2.xml" />
+    <Content Include="version.wxi" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FlushMouse32\FlushMouse32.vcxproj">
@@ -94,7 +97,7 @@
     <Error Text="The WiX Toolset v3.11 (or newer) build tools must be installed to build this project. To download the WiX Toolset, see http://wixtoolset.org/releases/" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetDir)ja-JP\$(TargetFileName)" "$(SolutionDir)$(TargetFileName)"</PostBuildEvent>
+    <PostBuildEvent>Start /wait /min cmd /c "$(SolutionDir)Sign_Modules.bat" $(TargetDir)ja-JP\$(TargetFileName)</PostBuildEvent>
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.

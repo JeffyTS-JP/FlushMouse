@@ -1,0 +1,25 @@
+<Include>
+	<!-- for wix Setup Project -->
+	<!-- Copyright (C) 2023 JeffyTS -->
+	<?define Version = "1.2.0.11" ?>
+
+	<!-- Common -->
+	<?define ProductName = "FlushMouse" ?>
+	<?define Manufacturer = "JeffyTS" ?>
+	<?define IconSrcFile = "..\FlushMouseLIB\FlushMouse.ico" ?>
+	
+	<!-- Product.wxs -->
+	<?define Comments = "Mouse UTY" ?>
+	<?define IcoSrcFile = "..\FlushMouseLIB\FlushMouse.ico" ?>
+
+	<!-- Bundle.wxs -->
+	<?define LogoSrc = "..\OSDN Wiki\FlushMouse.png" ?>
+	<?define IconSrc = "..\FlushMouseLIB\FlushMouse.ico" ?>
+	<?define AboutUrlSrc = "https://github.com/JeffyTS-JP/FlushMouse" ?>
+
+	<!-- Never change ProducdID and ReversedProductID in same application-->
+	<?define ProductID="{A117193D-ABED-461A-93B8-4D7E1E856740}"?>
+	<?define ReversedProductID="D391711ADEBAA164398BD4E7E1587604"?>
+
+</Include>
+

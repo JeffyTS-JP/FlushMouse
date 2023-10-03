@@ -147,7 +147,8 @@
       <UACUIAccess>false</UACUIAccess>
     </Link>
     <PostBuildEvent>
-      <Command>copy ..\$(Platform)\$(Configuration)\FlushMouse32.exe ..\x64\$(Configuration)\</Command>
+      <Command>Start /min /wait cmd /c "..\Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
+copy ..\$(Platform)\$(Configuration)\FlushMouse32.exe ..\x64\$(Configuration)\</Command>
     </PostBuildEvent>
     <Manifest>
       <InputResourceManifests>
@@ -213,10 +214,6 @@
     <ResourceCompile Include="FlushMouse32.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="FlushMouse32.ico" />
-    <Image Include="small.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\FlushMouseDLL32\FlushMouseDLL32.vcxproj">
       <Project>{701b5f8e-0e39-40c3-a692-b23a3836bede}</Project>
     </ProjectReference>
@@ -226,6 +223,10 @@
     <ProjectReference Include="..\MiscLIB32\MiscLIB32.vcxproj">
       <Project>{3d3f632c-75bb-4830-aa8e-0871c6aa1a72}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\FlushMouseLIB\FlushMouse.ico" />
+    <Image Include="..\FlushMouseLIB\small.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

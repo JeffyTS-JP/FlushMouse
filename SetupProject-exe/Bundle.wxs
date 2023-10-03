@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+	 xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+	 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+	<?include ..\SetupProject\version.wxi ?>
+	<?define LicenseSrc = "..\SetupProject\License.rtf" ?>
+
+	<?define LocalizationSrc = "customtheme.wxl" ?>
+	<?define CustomThemeSrc = "customtheme.xml" ?>
+	
+	<Bundle Name="$(var.ProductName)"
+			Version="$(var.Version)"
+			Manufacturer="$(var.Manufacturer)"
+			Copyright="Copyright (c) $(var.Manufacturer)"
+			IconSourceFile="$(var.IconSrcFile)"
+			AboutUrl="$(var.AboutUrlSrc)"
+			UpgradeCode="{2590C08A-B975-41F3-ACA2-1DA69A22DA1D}"
+			DisableModify="yes"
+			DisableRemove="yes">
+
+		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
+			<bal:WixStandardBootstrapperApplication
+				LicenseFile="$(var.LicenseSrc)"
+				ShowVersion="yes"
+				LogoFile="$(var.LogoSrc)"
+				LogoSideFile="$(var.LogoSrc)"
+				SuppressOptionsUI="yes"
+				SuppressRepair="yes"
+				ThemeFile="$(var.CustomThemeSrc)"
+				LocalizationFile="$(var.LocalizationSrc)"
+				/>
+		</BootstrapperApplicationRef>
+
+		<OptionalUpdateRegistration Name="$(var.ProductName)"/>
+		<Variable Name="SearchProductVersion" bal:Overridable="yes" Type="numeric" Value="0" />
+		<Variable Name="SearchBundleVersion" bal:Overridable="yes" Type="numeric" Value="0"/>
+		<util:RegistrySearch
+			Id="SearchForProductVersion"
+			ExpandEnvironmentVariables="yes"
+			Root="HKLM"
+			Key="SOFTWARE\WOW6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)"
+			Value="ProductVersion"
+			Variable="SearchProductVersion" />
+		<util:RegistrySearch
+			Id="SearchForBundleVersion"
+			ExpandEnvironmentVariables="yes"
+			Root="HKLM"
+			Key="SOFTWARE\WOW6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)"
+			Value="BundleVersion"
+			Variable="SearchBundleVersion" />
+		<util:RegistrySearch
+			Id="SearchForBundleID"
+			ExpandEnvironmentVariables="yes"
+			Root="HKLM"
+			Key="SOFTWARE\WOW6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)"
+			Value="BundleID"
+			Variable="SearchBundleID" />
+
+		<bal:Condition Message ="別のバージョンの $(var.ProductName) が既にインストールされているため、このバージョンのインストールを続行できません。既にインストールされているバージョンを削除するには、設定の「アプリ」から「インストールされているアプリ」、またはコントロールパネルの「プログラムと機能」を使用します。">
+			<![CDATA[NOT ((NOT SearchBundleVersion) AND SearchProductVersion)]]>
+		</bal:Condition>
+		<bal:Condition Message ="新しいバージョンの $(var.ProductName) が既にインストールされているため、このバージョンのインストールを続行できません。既にインストールされているバージョンを削除するには、設定の「アプリ」から「インストールされているアプリ」、またはコントロールパネルの「プログラムと機能」を使用します。">
+			<![CDATA[NOT (SearchBundleVersion AND SearchProductVersion AND (SearchProductVersion > WixBundleFileVersion))]]>
+		</bal:Condition>
+
+		<Variable Name="AddDesktopShortcut" bal:Overridable="yes" Value="1" />
+		<Variable Name="AddDesktopShortcutVariable" bal:Overridable="yes" Value="[AddDesktopShortcut]" />
+		<Variable Name="RegisterStartMenu" bal:Overridable="yes" Value="1" />
+		<Variable Name="RegisterStartMenuVariable" bal:Overridable="yes" Value="[RegisterStartMenu]" />
+		<Variable Name="StartApplication" bal:Overridable="yes" Value="1" />
+		<Variable Name="StartApplicationVariable" bal:Overridable="yes" Value="[StartApplication]" />
+		<Variable Name="RemoveAppRegstry" bal:Overridable="yes" Value="0" />
+		<Variable Name="RemoveAppRegstryVariable" bal:Overridable="yes" Value="[RemoveAppRegstry]" />
+
+		<Chain>
+			<!-- TODO: Define the list of chained packages. -->
+			<MsiPackage Id="MainPackage"
+						SourceFile="..\SetupProject\bin\x64\Release\ja-JP\$(var.ProductName)_x64.msi"
+						Description="$(var.ProductName) by $(var.Manufacturer)"
+						DisplayName="$(var.ProductName) $(var.Version)"
+						Permanent="no"
+						Cache="yes"
+						EnableFeatureSelection="no"
+						DisplayInternalUI="no"
+						Visible="yes"
+						Compressed="yes"
+						Vital="no">
+				<MsiProperty Name='BUNDLE' Value='1'/>
+				<MsiProperty Name='BUNDLE_ID' Value='[WixBundleProviderKey]'/>
+				<MsiProperty Name='BUNDLE_VERSION' Value='[WixBundleVersion]'/>
+				<MsiProperty Name="ADDDESKTOPSHORTCUT" Value="[AddDesktopShortcutVariable]" />
+				<MsiProperty Name="REGISTERSTARTMENU" Value="[RegisterStartMenuVariable]" />
+				<MsiProperty Name="STARTAPPLICATION" Value="[StartApplicationVariable]" />
+				<MsiProperty Name="REMOVEAPPREGISTRY" Value="[RemoveAppRegstryVariable]" />
+			</MsiPackage>
+		</Chain>
+	</Bundle>
+</Wix>
+

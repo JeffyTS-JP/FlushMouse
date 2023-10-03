@@ -48,10 +48,10 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="small.ico">
+    <Image Include="..\FlushMouseLIB\FlushMouse.ico">
       <Filter>リソース ファイル</Filter>
     </Image>
-    <Image Include="FlushMouse32.ico">
+    <Image Include="..\FlushMouseLIB\small.ico">
       <Filter>リソース ファイル</Filter>
     </Image>
   </ItemGroup>

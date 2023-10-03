@@ -74,47 +74,47 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 #endif
 	
 	HANDLE	hHandle = GetCurrentProcess();
-	if (!SetPriorityClass(hHandle, NORMAL_PRIORITY_CLASS)) {
-		return (-1);
+	if (hHandle != NULL) {
+		if (!SetPriorityClass(hHandle, NORMAL_PRIORITY_CLASS)) {
+			CloseHandle(hHandle);
+			return (-1);
+		}
+		CloseHandle(hHandle);
 	}
 
 	if (!bSetHeapInformation())	return (-1);
 
-	if (*lpCmdLine == _T('\0')) {
-		// NOP
-	}
-	else {
+	if (*lpCmdLine != _T('\0')) {
 		int	iRet = 0;
-		if ((iRet = CompareStringOrdinal(lpCmdLine, -1, L"/quit", -1, TRUE)) != 0) {
+		if ((iRet = CompareStringOrdinal(lpCmdLine, -1, L"/Start", -1, TRUE)) != 0) {
 			if (iRet == CSTR_EQUAL) {
-				bReportEvent(MSG_DONE_FLUSHMOUSE, Installer_CATEGORY);
+				bReportEvent(MSG_START_FLUSHMOUSE_EVENT, Shortcut_CATEGORY);
+				return 0;
+			}
+		}
+		if ((iRet = CompareStringOrdinal(lpCmdLine, -1, L"/Quit", -1, TRUE)) != 0) {
+			if (iRet == CSTR_EQUAL) {
 				HWND	hWnd = NULL;
 				if ((hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL)) != NULL) {
+					bReportEvent(MSG_QUIT_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
 					SetFocus(GetLastActivePopup(hWnd));
 					PostMessage(hWnd, WM_DESTROY, NULL, NULL);
-					for (int i = 3; i > 0; i--) {
+					for (int i = 5; i > 0; i--) {
 						Sleep(500);
 						if ((hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL)) != NULL) {
+							bReportEvent(MSG_QUIT_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
 							SetFocus(GetLastActivePopup(hWnd));
 							PostMessage(hWnd, WM_DESTROY, NULL, NULL);
 							if (i == 1) {
 								return (-1);
 							}
 						}
-						else return 0;
+						else break;
 					}
 				}
-			}
-			else if ((iRet = CompareStringOrdinal(lpCmdLine, -1, L"/start", -1, TRUE)) != 0) {
-				if (iRet == CSTR_EQUAL) {
-					bReportEvent(MSG_START_FLUSHMOUSE, Shortcut_CATEGORY);		// Eventlog
-					if (hHandle != NULL)	CloseHandle(hHandle);
-					return 0;
-				}
+				return 0;
 			}
 		}
-		if (hHandle != NULL)	CloseHandle(hHandle);
-		return 0;
 	}
 
 	// Load Resource
@@ -123,7 +123,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		return (-1);
 	}
 	
-	if (!bWinMain(hInstance, hPrevInstance, nCmdShow))	return (-1);
+	if (!bWinMain(hInstance, hPrevInstance, nCmdShow)) {
+		return (-1);
+	}
 
 	MSG msg{};
 	while (GetMessage(&msg, NULL, 0, 0)) {
@@ -134,6 +136,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		}
 	}
 	if (Resource)	delete	Resource;
+	bReportEvent(MSG_STOPPED_FLUSHMOUSE, APPLICATION_CATEGORY);
 	return (int)msg.wParam;
 }
 

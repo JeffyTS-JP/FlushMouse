@@ -120,7 +120,7 @@ public:
 	VOID			vSetModeString(LPTSTR lpszIMEMode);
 
 private:
-	ATOM			MyRegisterClass(HINSTANCE hInstance);
+	ATOM			MyRegisterClass(HINSTANCE hInstance) const;
 	HWND			InitInstance(HINSTANCE hInstance, int nCmdShow);
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK _WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

@@ -192,6 +192,9 @@
       <Message>
       </Message>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>Start /min /wait cmd /c "..\Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\FlushMouse\CommonDef.h" />

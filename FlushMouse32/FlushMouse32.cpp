@@ -28,7 +28,7 @@
 // Define
 //
 // Timer
-#define PROCINITTIMERVALUE		1000
+#define PROCINITTIMERVALUE		5000
 #define CHECKPROCTIMERID		2
 static UINT     nCheckProcTimerTickValue = PROCINITTIMERVALUE;		// Timer tick
 static UINT_PTR nCheckProcTimerID = CHECKPROCTIMERID;				// Timer ID
@@ -47,7 +47,7 @@ static UINT_PTR	uCheckProcTimer = NULL;
 //
 static TCHAR			szTitle[MAX_LOADSTRING]{};
 static HINSTANCE		hInst = NULL;
-static HWND			hParentWnd = NULL;
+static HWND				hParentWnd = NULL;
 
 //
 // Global Prototype Define
@@ -67,7 +67,6 @@ static void				Cls_OnDestroy(HWND hWnd);
 // Sub
 static VOID CALLBACK	vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
 static BOOL				bReportEvent(DWORD dwEventID, WORD wCategory);
-static BOOL	 			bCreateProcess(LPCTSTR lpszExecName);
 static void				vMessageBox(HWND hWnd, UINT uID, UINT uType);
 
 //
@@ -84,22 +83,30 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 #endif	
 
 	HANDLE	hHandle = GetCurrentProcess();
-	if (!SetPriorityClass(hHandle, NORMAL_PRIORITY_CLASS)) {
-		return (-1);
+	if (hHandle != NULL) {
+		if (!SetPriorityClass(hHandle, NORMAL_PRIORITY_CLASS)) {
+			CloseHandle(hHandle);
+			return (-1);
+		}
+		CloseHandle(hHandle);
 	}
 
+	bReportEvent(MSG_STARTING_FLUSHMOUSE, APPLICATION32_CATEGORY);
+
 	if (*lpCmdLine == _T('\0')) {
-		hParentWnd = NULL;
-		vMessageBox(NULL, IDS_NOTFORKBY64, MessageBoxTYPE);
-		return (-1);
+		if ((hParentWnd = FindWindow(CLASS_FLUSHMOUSE, NULL)) == NULL) {
+			vMessageBox(NULL, IDS_NOTFORKBY64, MessageBoxTYPE);
+			return (-1);
+		}
 	}
 	else {
 		unsigned long long ll = 0;
 		if ((ll = _tstoll(lpCmdLine)) == 0) return (-1);
 		hParentWnd = (HWND)ll;
 		if (hParentWnd != FindWindow(CLASS_FLUSHMOUSE, NULL)) {
-			vMessageBox(NULL, IDS_NOTFORKBY64, MessageBoxTYPE);
-			return (-1);
+			hParentWnd = NULL;
+			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION32_CATEGORY);
+			return(-1);
 		}
 	}
 
@@ -141,6 +148,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 			DispatchMessage(&msg);
 		}
 	}
+	bReportEvent(MSG_STOPPED_FLUSHMOUSE, APPLICATION32_CATEGORY);
 	return (int)msg.wParam;
 }
 
@@ -217,7 +225,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 {
 	UNREFERENCED_PARAMETER(lpCreateStruct);
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK)
-
+	
 	if (!bMouseHookSet32(hParentWnd)) {
 		vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE);
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
@@ -240,6 +248,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		return FALSE;
 	}
 
+	bReportEvent(MSG_STARTED_FLUSHMOUSE, APPLICATION32_CATEGORY);
 	return TRUE;
 }
 
@@ -249,6 +258,8 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 //
 static void Cls_OnDestroy(HWND hWnd)
 {
+	bReportEvent(MSG_QUIT_FLUSHMOUSE, APPLICATION32_CATEGORY);
+
 	if (uCheckProcTimer != NULL) {
 		if (KillTimer(hWnd, nCheckProcTimerID)) {
 			uCheckProcTimer = NULL;
@@ -271,6 +282,12 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 
 	if (uTimerID == nCheckProcTimerID) {
 		if (FindWindow(CLASS_FLUSHMOUSE, NULL) == NULL) {
+			bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION32_CATEGORY);
+			if (uCheckProcTimer != NULL) {
+				if (KillTimer(hWnd, nCheckProcTimerID)) {
+					uCheckProcTimer = NULL;
+				}
+			}
 			NOTIFYICONDATA nIco{};
 			nIco.cbSize = sizeof(NOTIFYICONDATA);
 			nIco.hWnd = hParentWnd;
@@ -286,10 +303,8 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 			}
 			catch (...) {
 			}
-			bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION32_CATEGORY);
-			bCreateProcess(FLUSHMOUSE_EXE);
-			bReportEvent(MSG_RESTART_EVENT, APPLICATION32_CATEGORY);	
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION32_CATEGORY);
 		}
 	}
 	return;
@@ -311,30 +326,6 @@ static BOOL	bReportEvent(DWORD dwEventID, WORD wCategory)
 		if (DeregisterEventSource(hEvent) == 0) {
 			bRet = FALSE;
 		}
-	}
-	return bRet;
-}
-
-//
-// bCreateProcess()
-//
-static BOOL	 	bCreateProcess(LPCTSTR lpszExecName)
-{
-	BOOL		bRet = FALSE;
-	DWORD	dwSize = 0;
-	dwSize = ExpandEnvironmentStrings(lpszExecName, NULL, 0);
-	LPTSTR	lpszBuffer = new TCHAR[dwSize];
-	if (lpszBuffer) {
-		ZeroMemory(lpszBuffer, dwSize);
-		dwSize = ExpandEnvironmentStrings(lpszExecName, lpszBuffer, dwSize);
-		PROCESS_INFORMATION	ProcessInfomation{};
-		STARTUPINFO	StartupInfo{};		StartupInfo.cb = sizeof(STARTUPINFO);
-		if (CreateProcess(lpszBuffer, NULL, NULL, NULL, TRUE, NORMAL_PRIORITY_CLASS, NULL, NULL, &StartupInfo, &ProcessInfomation) != FALSE) {
-			CloseHandle(ProcessInfomation.hProcess);
-			CloseHandle(ProcessInfomation.hThread);
-			bRet = TRUE;
-		}
-		delete[]	lpszBuffer;
 	}
 	return bRet;
 }

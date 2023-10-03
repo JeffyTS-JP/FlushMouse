@@ -134,7 +134,8 @@ BOOL		bReCreateTaskTrayWindow(HWND hWnd, UINT message)
 					bTaskTray = FALSE;
 				}
 				bReportEvent(MSG_TASKTRAY_REGISTER_FAILD, APPLICATION_CATEGORY);
-				bReportEvent(MSG_RESTART_EVENT, APPLICATION_CATEGORY);
+				vStopThreadHookTimer(hWnd);
+				bReportEvent(MSG_START_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
 				return TRUE;
 			}
 		}

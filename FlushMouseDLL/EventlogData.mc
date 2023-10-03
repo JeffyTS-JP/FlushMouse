@@ -39,7 +39,7 @@ Language=Japanese
 Application Events
 .
 
-MessageId=0x1
+MessageId=0x01
 SymbolicName=APPLICATION32_CATEGORY
 Language=English
 Application32 Events
@@ -49,7 +49,7 @@ Language=Japanese
 Application32 Events
 .
 
-MessageId=0x2
+MessageId=0x02
 SymbolicName=DLL_CATEGORY
 Language=English
 DLL Events
@@ -59,7 +59,7 @@ Language=Japanese
 DLL Events
 .
 
-MessageId=0x3
+MessageId=0x03
 SymbolicName=DLL32_CATEGORY
 Language=English
 DLL32 Events
@@ -69,7 +69,7 @@ Language=Japanese
 DLL32 Events
 .
 
-MessageId=0x4
+MessageId=0x04
 SymbolicName=Installer_CATEGORY
 Language=English
 Installer Events
@@ -79,7 +79,7 @@ Language=Japanese
 Installer Events
 .
 
-MessageId=0x5
+MessageId=0x05
 SymbolicName=Shortcut_CATEGORY
 Language=English
 Sortcut Events
@@ -89,7 +89,7 @@ Language=Japanese
 Sortcut Events
 .
 
-MessageId=0x10
+MessageId=0x06
 SymbolicName=POWERNOTIFICATION_CATEGORY
 Language=English
 PowerNotification Events
@@ -99,7 +99,7 @@ Language=Japanese
 PowerNotification Events
 .
 
-MessageId=0x11
+MessageId=0x07
 SymbolicName=TASKSCHEDULER_CATEGORY
 Language=English
 TaskScheduler Events
@@ -114,22 +114,22 @@ TaskScheduler Events
 ;// Message definitions.
 ;//
 
-MessageId=0x0000
+MessageId=0x0100
 Severity=Informational
 Facility=Application
-SymbolicName=MSG_START_SUCCEED
+SymbolicName=MSG_STARTING_FLUSHMOUSE
 Language=English
-Started FlushMouse.
+Starting FlushMouse.
 .
 
 Language=Japanese
-FlushMouseを起動しました。
+FlushMouseを起動しています。
 .
 
-MessageId=0x0001
+MessageId=0x0101
 Severity=Informational
 Facility=Application
-SymbolicName=MSG_RESTART_EVENT
+SymbolicName=MSG_RESTART_FLUSHMOUSE_EVENT
 Language=English
 Restart FlushMouse.
 .
@@ -138,7 +138,67 @@ Language=Japanese
 FlushMouseを再起動します。
 .
 
-MessageId=0x0002
+MessageId=0x0102
+Severity=Informational
+Facility=Application
+SymbolicName=MSG_STARTED_FLUSHMOUSE
+Language=English
+Started FlushMouse.
+.
+
+Language=Japanese
+FlushMouseを起動しました。
+.
+
+MessageId=0x0103
+Severity=Success
+Facility=Application
+SymbolicName=MSG_QUIT_FLUSHMOUSE
+Language=English
+Quit FlushMouse.
+.
+
+Language=Japanese
+FlushMouseを終了します。
+.
+
+MessageId=0x0104
+Severity=Success
+Facility=Application
+SymbolicName=MSG_STOPPED_FLUSHMOUSE
+Language=English
+Stoped FlushMouse.
+.
+
+Language=Japanese
+FlushMouseを終了しました。
+.
+
+MessageId=0x0105
+Severity=Success
+Facility=Application
+SymbolicName=MSG_START_FLUSHMOUSE_EVENT
+Language=English
+Start FlushMouse.
+.
+
+Language=Japanese
+FlushMouseを起動します。
+.
+
+MessageId=0x0106
+Severity=Success
+Facility=Application
+SymbolicName=MSG_QUIT_FLUSHMOUSE_EVENT
+Language=English
+Quit FlushMouse.
+.
+
+Language=Japanese
+FlushMouseを終了します。
+.
+
+MessageId=0x00107
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_THREAD_HOOK_TIMER_STARTED
@@ -150,7 +210,7 @@ Language=Japanese
 Thread, Hook and Timer Started.
 .
 
-MessageId=0x8002
+MessageId=0x8108
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_THREAD_HOOK_TIMER_START_FAILED
@@ -162,7 +222,7 @@ Language=Japanese
 Thread, Hook and Timer Start Failed.
 .
 
-MessageId=0x0003
+MessageId=0x0109
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_THREAD_HOOK_TIMER_STOPPED
@@ -174,7 +234,7 @@ Language=Japanese
 Thread, Hook and Timer Stopped.
 .
 
-MessageId=0x0004
+MessageId=0x010A
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_THREAD_HOOK_TIMER_RESTARTED
@@ -186,7 +246,7 @@ Language=Japanese
 Thread, Hook and Timer Restarted.
 .
 
-MessageId=0x8004
+MessageId=0x810A
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_THREAD_HOOK_TIMER_RESTART_FAILED
@@ -198,43 +258,7 @@ Language=Japanese
 Thread, Hook and Timer Restart Failed.
 .
 
-MessageId=0x0005
-Severity=Informational
-Facility=Application
-SymbolicName=MSG_QUIT_FLUSHMOUSE
-Language=English
-Quit FlushMouse.
-.
-
-Language=Japanese
-FlushMouseを終了します。
-.
-
-MessageId=0x0006
-Severity=Success
-Facility=Application
-SymbolicName=MSG_START_FLUSHMOUSE
-Language=English
-Start FlushMouse.
-.
-
-Language=Japanese
-FlushMouseを起動します。
-.
-
-MessageId=0x0007
-Severity=Success
-Facility=Application
-SymbolicName=MSG_DONE_FLUSHMOUSE
-Language=English
-Quit FlushMouse.
-.
-
-Language=Japanese
-FlushMouseを終了します。
-.
-
-MessageId=0x0008
+MessageId=0x010B
 Severity=Success
 Facility=Application
 SymbolicName=MSG_TASKTRAY_REGISTERED
@@ -246,7 +270,7 @@ Language=Japanese
 Registered TaskTray.
 .
 
-MessageId=0x8008
+MessageId=0x810B
 Severity=Success
 Facility=Application
 SymbolicName=MSG_TASKTRAY_REGISTER_FAILD
@@ -262,7 +286,7 @@ Language=Japanese
 Registered TaskTray.
 .
 
-MessageId=0x8009
+MessageId=0x810C
 Severity=Success
 Facility=Application
 SymbolicName=MSG_DETECT_FLUSHMOUSE_STOP
@@ -274,7 +298,7 @@ Language=Japanese
 Detected Stopping FlushMouse Process.
 .
 
-MessageId=0x0100
+MessageId=0x0200
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_PBT_APMSUSPEND
@@ -286,7 +310,7 @@ Language=Japanese
 Entering into suspend (APM).
 .
 
-MessageId=0x0101
+MessageId=0x0201
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_PBT_APMRESUMEAUTOMATIC
@@ -298,7 +322,7 @@ Language=Japanese
 Resuming from Sleep or Hibernation (APM).
 .
 
-MessageId=0x0102
+MessageId=0x0202
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_PBT_APMRESUMESUSPEND
@@ -310,7 +334,7 @@ Language=Japanese
 Resumed from Suspend (APM).
 .
 
-MessageId=0x0103
+MessageId=0x0203
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_PBT_POWERSETTINGCHANGE
@@ -322,7 +346,7 @@ Language=Japanese
 Power settings changed (APM).
 .
 
-MessageId=0x0104
+MessageId=0x0204
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_PBT_APMPOWERSTATUSCHANGE
@@ -334,7 +358,7 @@ Language=Japanese
 Changed the power status (APM).
 .
 
-MessageId=0x0105
+MessageId=0x0205
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_PBT_APMPOWERSTATUSCHANGE_AC_ON
@@ -346,7 +370,7 @@ Language=Japanese
 Changed the power status to AC Online (APM).
 .
 
-MessageId=0x0106
+MessageId=0x0206
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_PBT_APMPOWERSTATUSCHANGE_AC_OFF
@@ -358,7 +382,7 @@ Language=Japanese
 Changed the power status to AC Offline (APM).
 .
 
-MessageId=0x0107
+MessageId=0x0207
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_ON
@@ -370,7 +394,7 @@ Language=Japanese
 Changed the display state to ON (APM).
 .
 
-MessageId=0x0108
+MessageId=0x0208
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_OFF

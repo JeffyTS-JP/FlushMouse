@@ -274,8 +274,10 @@ BOOL			CFlushMouseHook::bHookSet(HWND hWnd, LPCTSTR lpszDll64Name, LPCTSTR lpszE
 	if ((bGlobalHook64 = bGlobalHookSet(hWnd)) != FALSE) {
 		if ((bKeyboardHookLL64 = bKeyboardHookLLSet(hWnd)) != FALSE) {
 			if ((bShellHook64 = bShellHookSet(hWnd)) != FALSE) {
-				if ((bHook32Dll = bHook32DllStart(hWnd, lpszExec32Name)) != FALSE) {
-					return TRUE;
+				if ((bMouseHook64 = bMouseHookSet(hWnd)) != FALSE) {
+					if ((bHook32Dll = bHook32DllStart(hWnd, lpszExec32Name)) != FALSE) {
+						return TRUE;
+					}
 				}
 			}
 		}
@@ -292,6 +294,7 @@ BOOL		CFlushMouseHook::bHookUnset()
 	if (bHook32Dll)			bHook32DllStop();
 	if (bShellHook64)		bShellHookUnset();
 	if (bKeyboardHookLL64)	bKeyboardHookLLUnset();
+	if (bMouseHook64)		bMouseHookUnset();
 	if (bGlobalHook64)		bGlobalHookUnset();
 	return TRUE;
 }
@@ -309,19 +312,27 @@ BOOL	 	CFlushMouseHook::bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name)
 	if (lpszBuffer) {
 		ZeroMemory(lpszBuffer, dwSize);
 		dwSize = ExpandEnvironmentStrings(lpszExec32Name, lpszBuffer, dwSize);
-
 		LPTSTR	lpszCommandLine = NULL;
 		lpszCommandLine = new TCHAR[dwSize + COMAMANDLINESIZE];
 		if (lpszCommandLine) {
 			ZeroMemory(lpszCommandLine, (dwSize + sizeof(COMAMANDLINESIZE)));
 			_sntprintf_s(lpszCommandLine, (dwSize + COMAMANDLINESIZE), _TRUNCATE, _T("%s %llu"), lpszBuffer, (unsigned long long)hWnd);
 			if (lpstProcessInfomation) {
-				STARTUPINFO	stStartupInfo{};		stStartupInfo.cb = sizeof(STARTUPINFO);
+				STARTUPINFO	stStartupInfo{};	stStartupInfo.cb = sizeof(STARTUPINFO);
 				if ((bRet = CreateProcess(NULL, lpszCommandLine, NULL, NULL, TRUE,
-					NORMAL_PRIORITY_CLASS, NULL, NULL, &stStartupInfo, lpstProcessInfomation)) == FALSE) {
-				}
-				else {
-					bHook32Dll = TRUE;
+					NORMAL_PRIORITY_CLASS, NULL, NULL, &stStartupInfo, lpstProcessInfomation)) != FALSE) {
+					for (int i = 3; i > 0; i--) {
+						Sleep(500);
+						if (FindWindow(CLASS_FLUSHMOUSE32, NULL) != NULL) {
+							bHook32Dll = TRUE;
+							bRet = TRUE;
+							break;
+						}
+						else {
+							bHook32Dll = FALSE;
+							bRet = FALSE;
+						}
+					}
 				}
 			}
 			delete[]	lpszCommandLine;
