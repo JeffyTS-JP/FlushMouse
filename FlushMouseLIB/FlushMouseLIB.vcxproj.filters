@@ -48,6 +48,9 @@
     <ClInclude Include="TaskTray.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Eventlog.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FlushMouseLIB.cpp">
@@ -69,6 +72,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="TaskTray.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Eventlog.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

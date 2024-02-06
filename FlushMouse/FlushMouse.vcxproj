@@ -154,7 +154,8 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -184,11 +185,12 @@
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SupportJustMyCode>true</SupportJustMyCode>
       <Optimization>MaxSpeed</Optimization>
       <WholeProgramOptimization>true</WholeProgramOptimization>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -202,7 +204,7 @@
       <EnableUAC>false</EnableUAC>
     </Link>
     <PostBuildEvent>
-      <Command>Start /min /wait cmd /c  "..\Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)</Command>
+      <Command>Start /min /wait cmd /c  "$(MSBuildStartupDirectory)\Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)</Command>
     </PostBuildEvent>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
@@ -211,12 +213,14 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Dialogs.h" />
     <ClInclude Include="FlushMouse.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Dialogs.cpp" />
     <ClCompile Include="FlushMouse.cpp" />
     <ClCompile Include="pch.cpp" />
   </ItemGroup>

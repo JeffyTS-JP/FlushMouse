@@ -18,15 +18,19 @@
 //
 #define MAX_LOADSTRING 100
 
+#define FLUSHMOUSE				L"FlushMouse"
+
 // Files
 #define	FULL_FLUSHMOUSE_EXE		L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouse.exe"
 #define	FULL_FLUSHMOUSE32_EXE	L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouse32.exe"
 #define FULL_FLUSHMOUSE_DLL		L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouseDLL.dll"
 #define	FULL_FLUSHMOUSE32_DLL	L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouseDLL32.dll"
+#define FULL_FLUSHMOUSEUI3_DLL	L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouseUI3DLL.dll"
 #define	FLUSHMOUSE_EXE			L"FlushMouse.exe"
 #define	FLUSHMOUSE32_EXE		L"FlushMouse32.exe"
 #define FLUSHMOUSE_DLL			L"FlushMouseDLL.dll"
 #define FLUSHMOUSE32_DLL		L"FlushMouseDLL32.dll"
+#define FLUSHMOUSEUI3_DLL		L"FlushMouseUI3DLL.dll"
 
 // Window Class
 #define	CLASS_FLUSHMOUSE		L"FlushMouse-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
@@ -143,10 +147,9 @@ typedef struct tagSIZED
 #define WM_INPUTLANGCHANGEEX				(WM_USER + WM_INPUTLANGCHANGE)
 #define HANDLE_WM_INPUTLANGCHANGEEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (UINT)(wParam), (HKL)(lParam)), 0L)
 
-// void Cls_OnTestEX(HWND hWnd, WPARAM wParam, LPARAM lParam);
-#define WM_TESTEX							(WM_USER + 0xff)	// for Test
-#define HANDLE_WM_TESTEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (WPARAM)(wParam), (LPARAM)(lParam)), 0L)
-
+// void Cls_OnSettings(HWND hWnd, WPARAM wParam, LPARAM lParam);
+#define WM_SETTINGSEX						(WM_USER + 0xfe)
+#define HANDLE_WM_SETTINGSEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (WPARAM)(wParam), (LPARAM)(lParam)), 0L)
 
 #define KEY_TAB				(WM_USER + VK_TAB)						// Tab    (0x09)
 #define KEY_RETURN			(WM_USER + VK_RETURN)					// Enter  (0x0d)

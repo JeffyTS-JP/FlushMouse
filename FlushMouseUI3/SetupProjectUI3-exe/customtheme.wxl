@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="ja-jp" Language="1041" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+	<String Id="Caption">[WixBundleName] Setup</String>
+	<String Id="Title">[WixBundleName]</String>
+	<String Id="ConfirmCancelMessage">セットアップを終了してもよろしいですか?</String>
+
+	<String Id="HelpHeader">セットアップのヘルプ</String>
+	<String Id="HelpText">
+
+/passive | /quiet
+	最少の UI だけを表示してプロンプトは表示しないか、UIもプロンプトも表示しません。既定では、UI とすべてのプロンプトが表示されます。
+
+/norestart
+	再起動の試みをすべて抑制します。既定では、再起動の前に UI によりプロンプトが表示されます。
+
+/log log.txt
+	特定のファイルにログを記録します。既定では、%TEMP% にログ ファイルが作成されます。
+	</String>
+	<String Id="HelpCloseButton">閉じる(&amp;C)</String>
+
+	<String Id ="InstallVersion">Version [WixBundleVersion]</String>
+	<String Id="InstallLicenseTerms">Microsoft .NET Framework の&lt;a href="#"&gt;ライセンス条項&lt;/a&gt;に同意する場合は、［同意してインストール］5D; ボタンをクリックします。</String>
+	<String Id="InstallLicenseLinkText">ソフトウェア使用許諾契約書に同意します &lt;a href="#"&gt;license terms&lt;/a&gt;</String>
+	<String Id="InstallAcceptAndInstallButton">同意してインストール(&amp;A)</String>
+	<String Id="InstallDesktopShortcut">デスクトップにショートカットを作成する</String>
+	<String Id="InstallRegisterStartMenu">スタートメニューに登録する</String>
+	<String Id="InstallStartApplication">セットアップを終了したら、すぐに [WixBundleName] を実行する</String>
+	<String Id="InstallAcceptCheckbox">ソフトウェア使用許諾契約書に同意します(&amp;A)</String>
+	<String Id="InstallDeclineButton">同意しない</String>
+	<String Id="InstallOptionsButton">オプション(&amp;O)</String>
+	<String Id="InstallInstallButton">Install(&amp;I)</String>
+	<String Id="InstallCloseButton">閉じる(&amp;C)</String>
+
+	<String Id="OptionsHeader">セットアップオプション</String>
+	<String Id="OptionsLocationLabel">場所 :</String>
+	<String Id="OptionsBrowseButton">Browse(&amp;B)</String>
+	<String Id="OptionsOkButton">OK(&amp;O)</String>
+	<String Id="OptionsCancelButton">キャンセル(&amp;C)</String>
+
+	<!--String Id="ProgressHeader">セットアップの進行状況</String-->
+	<String Id="ProgressHeader">セットアップ中</String>
+	<String Id="ProgressLabel">処理 :</String>
+	<String Id="ProgressCancelButton">キャンセル(&amp;C)</String>
+
+	<String Id="OverallProgressPackageText">初期化中...</String>
+
+	<String Id="ModifyHeader">[WixBundleName] をアンインストールします</String>
+	<String Id="RemoveAppRegstry">[WixBundleName] の設定情報を削除する</String>
+	<String Id="ModifyRepairButton">修復(&amp;R)</String>
+	<String Id="ModifyUninstallButton">Uninstall(&amp;U)</String>
+	<String Id="ModifyCloseButton">閉じる(&amp;C)</String>
+
+	<String Id="SuccessHeader">セットアップが正常に終了しました</String>
+	<String Id="SuccessUninstallHeader">アンインストールが正常に終了しました</String>
+	<String Id="SuccessLaunchButton">ソフトウェア起動</String>
+	<!--String Id="SuccessRestartText">このまま使用することもできますが、続けてインストール / アンインストールするためには、コンピューターの再起動が必要です</String-->
+	<String Id="SuccessRestartText">インストール / アンインストールを完了するには、コンピューターを再起動する必要があります。</String>
+	<String Id="SuccessRestartButton">今すぐ再起動(&amp;R)</String>
+	<String Id="SuccessCloseButton">閉じる(&amp;C)</String>
+
+	<String Id="FailureHeader">セットアップに失敗しました</String>
+	<String Id="FailureHyperlinkLogText">問題を解決してからセットアップをやり直してください。詳細については、&lt;a href="#"&gt;ログ ファイル&lt;/a&gt;を参照してください。</String>
+	<String Id="FailureRestartText">インストール / アンインストールを完了するには、コンピューターを再起動する必要があります。</String>
+	<String Id="FailureRestartButton">今すぐ再起動(&amp;R)</String>
+	<String Id="FailureCloseButton">閉じる(&amp;C)</String>
+
+</WixLocalization>

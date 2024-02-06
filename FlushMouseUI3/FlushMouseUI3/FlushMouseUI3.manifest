@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- FlushMouseUI3.manifest for FlushMouseUI3 Copyright (C) 2022 JeffyTS -->
+
+<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">
+	<compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
+	</compatibility>
+	<application xmlns="urn:schemas-microsoft-com:asm.v3">
+		<windowsSettings>
+			<!-- The combination of below two tags have the following effect:
+				1) Per-Monitor for >= Windows 10 Anniversary Update
+				2) System < Windows 10 Anniversary Update
+			-->
+			<!-- DPI Awareness -->
+			<dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">true/PM</dpiAware>
+			<dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">PerMonitorV2, PerMonitor</dpiAwareness>
+		</windowsSettings>
+	</application>
+	<file name="WinRT.Host.dll">
+		<activatableClass
+		  name="FlushMouseUI3DLL.FlushMouseUI3DLL_XamlTypeInfo.XamlMetaDataProvider"
+		  threadingModel="both" xmlns="urn:schemas-microsoft-com:winrt.v1" />
+		<activatableClass
+			name="FlushMouseUI3DLL.Settings"
+			threadingModel="both" xmlns="urn:schemas-microsoft-com:winrt.v1" />
+	</file>
+
+</assembly>
+
+
+<!-- EOF -->

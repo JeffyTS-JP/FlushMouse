@@ -28,6 +28,7 @@ typedef struct tagAppRegData
 	int			iModeSize;
 	DWORD		dwInThreadSleepTime;
 	DWORD		dwWaitWaveTime;
+	DWORD		dwAdditionalWaitTime;
 	DWORD		dwDisplayModeTime;
 	BOOL		bDisplayIMEModeOnCursor;
 	BOOL		bForceHiragana;
@@ -69,8 +70,8 @@ class CProfile
 public:
 				CProfile();
 				~CProfile();
-	BOOL		bGetProfileData();
-	BOOL		bSetProfileData();
+	BOOL		bGetProfileData() const;
+	BOOL		bSetProfileData() const;
 
 public:
 	LPAPPREGDATA	lpstAppRegData;

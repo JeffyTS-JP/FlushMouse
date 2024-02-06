@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
+	<Identity Name="FlushMouseUI3DLL"
+			  Version="1.0.0.0"
+			  Publisher="CN=JeffyTS, O=JeffyTS, L=MyCity, S=MyState, C=JP" />
+	<Properties>
+		<DisplayName>FlushMouseUI3DLL</DisplayName>
+		<PublisherDisplayName>JeffyTS</PublisherDisplayName>
+		<Logo>FlushMouse.png</Logo>
+	</Properties>
+	<Prerequisites>
+		<OSMinVersion>6.2.1</OSMinVersion>
+		<OSMaxVersionTested>6.2.1</OSMaxVersionTested>
+	</Prerequisites>
+	<Resources>
+		<!--Resource Language="" /-->
+		<Resource Language="en-US"/>
+		<Resource Language="ja-JP"/>
+	</Resources>
+	<Applications>
+		<Application Id="FlushMouse" StartPage="default.html">
+			<VisualElements DisplayName="FlushMouse" Description="Mouse and IME UTY."
+				 Logo="FlushMouse.png" SmallLogo="FlushMouse.png"
+				 ForegroundText="dark" BackgroundColor="#FFFFFF" >
+				<SplashScreen Image="FlushMouse.png" />
+			</VisualElements>
+		</Application>
+	</Applications>
+</Package>

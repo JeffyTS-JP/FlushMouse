@@ -19,10 +19,21 @@
 #include "..\FlushMouseDLL\EventlogData.h"
 
 #ifdef _DEBUG
-#define DEBUG_CLIENTBLOCK   new( _CLIENT_BLOCK, __FILE__, __LINE__)
+#include <stdlib.h>
 #include <crtdbg.h>
+#define DEBUG_CLIENTBLOCK   new( _CLIENT_BLOCK, __FILE__, __LINE__)
 #define new DEBUG_CLIENTBLOCK
-#endif // _DEBUG
+#define _CRTDBG_MAP_ALLOC
+#define new DEBUG_CLIENTBLOCK
+#endif
+
+#ifdef _DEBUG
+#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the
+// allocations to be of _CLIENT_BLOCK type
+#else
+#define DBG_NEW new
+#endif
 
 //
 // Define
@@ -33,6 +44,12 @@
 static UINT     nCheckProcTimerTickValue = PROCINITTIMERVALUE;		// Timer tick
 static UINT_PTR nCheckProcTimerID = CHECKPROCTIMERID;				// Timer ID
 static UINT_PTR	uCheckProcTimer = NULL;
+
+#define HOOKINITTIMERVALUE		300000
+#define CHECKHOOKIMERID		3
+static UINT     nCheckHookTimerTickValue = HOOKINITTIMERVALUE;		// Timer tick
+static UINT_PTR nCheckHookTimerID = CHECKHOOKIMERID;				// Timer ID
+static UINT_PTR	uCheckHookTimer = NULL;
 
 //
 // Struct Define
@@ -66,6 +83,7 @@ static void				Cls_OnDestroy(HWND hWnd);
 
 // Sub
 static VOID CALLBACK	vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
+static VOID CALLBACK	vCheckHookTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
 static BOOL				bReportEvent(DWORD dwEventID, WORD wCategory);
 static void				vMessageBox(HWND hWnd, UINT uID, UINT uType);
 
@@ -140,14 +158,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		return (-1);
 	}
 	
-	MSG		msg;
-	while (GetMessage(&msg, NULL, 0, 0)) {
-		HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_FLUSHMOUSE32));
-		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+	MSG		msg{};
+	BOOL	bRet = NULL;
+	while ((bRet = GetMessage(&msg, NULL, 0, 0)) != 0) {
+		if (bRet == (-1)) {
+			break;
+		}
+		else {
+			HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_FLUSHMOUSE32));
+			if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
 		}
 	}
+
 	bReportEvent(MSG_STOPPED_FLUSHMOUSE, APPLICATION32_CATEGORY);
 	return (int)msg.wParam;
 }
@@ -231,11 +256,18 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		return FALSE;
 	}
-	
+
 	BOOL	bBool = FALSE;
 	if (SetUserObjectInformation(GetCurrentProcess(), UOI_TIMERPROC_EXCEPTION_SUPPRESSION, &bBool, sizeof(BOOL)) != FALSE) {
 		if (uCheckProcTimer == NULL) {
 			if ((uCheckProcTimer = SetTimer(hWnd, nCheckProcTimerID, nCheckProcTimerTickValue, (TIMERPROC)&vCheckProcTimerProc)) == 0) {
+				vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE);
+				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+				return FALSE;
+			}
+		}
+		if (uCheckHookTimer == NULL) {
+			if ((uCheckHookTimer = SetTimer(hWnd, nCheckHookTimerID, nCheckHookTimerTickValue, (TIMERPROC)&vCheckHookTimerProc)) == 0) {
 				vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE);
 				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 				return FALSE;
@@ -260,6 +292,12 @@ static void Cls_OnDestroy(HWND hWnd)
 {
 	bReportEvent(MSG_QUIT_FLUSHMOUSE, APPLICATION32_CATEGORY);
 
+	if (uCheckHookTimer != NULL) {
+		if (KillTimer(hWnd, nCheckHookTimerID)) {
+			uCheckHookTimer = NULL;
+		}
+	}
+	
 	if (uCheckProcTimer != NULL) {
 		if (KillTimer(hWnd, nCheckProcTimerID)) {
 			uCheckProcTimer = NULL;
@@ -311,12 +349,29 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 }
 
 //
+// vCheckHookTimerProc()
+//
+static VOID CALLBACK vCheckHookTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime)
+{
+	UNREFERENCED_PARAMETER(hWnd);
+	UNREFERENCED_PARAMETER(uMsg);
+	UNREFERENCED_PARAMETER(dwTime);
+
+	if (uTimerID == nCheckHookTimerID) {
+		bMouseHookUnset32();
+		Sleep(100);
+		bMouseHookSet32(hParentWnd);
+	}
+	return;
+}
+
+//
 // bReportEvent()
 //
 static BOOL	bReportEvent(DWORD dwEventID, WORD wCategory)
 {
 	BOOL	bRet = FALSE;
-	HANDLE	hEvent = RegisterEventSource(NULL, _T("FlushMouse"));
+	HANDLE	hEvent = RegisterEventSource(NULL, FLUSHMOUSE);
 	if (hEvent != NULL) {
 		if (ReportEvent(hEvent, (0x0000000c & (dwEventID >> 28)), wCategory, dwEventID, NULL, 0, 0, NULL, NULL) != 0) {
 			bRet = TRUE;

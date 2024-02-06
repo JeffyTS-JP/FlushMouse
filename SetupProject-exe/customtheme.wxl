@@ -53,7 +53,7 @@
 	<String Id="SuccessHeader">セットアップが正常に終了しました</String>
 	<String Id="SuccessUninstallHeader">アンインストールが正常に終了しました</String>
 	<String Id="SuccessLaunchButton">ソフトウェア起動</String>
-	<String Id="SuccessRestartText">このまま使用することもできますが、続けてインストール / アンインストールするためには、コンピューターの再起動が必要です</String>
+	<String Id="SuccessRestartText">インストール / アンインストールを完了するには、コンピューターを再起動する必要があります。</String>
 	<String Id="SuccessRestartButton">今すぐ再起動(&amp;R)</String>
 	<String Id="SuccessCloseButton">閉じる(&amp;C)</String>
 

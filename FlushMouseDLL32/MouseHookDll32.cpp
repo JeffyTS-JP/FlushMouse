@@ -13,6 +13,7 @@
 #include "pch.h"
 #include "MouseHookDll32.h"
 #include "..\FlushMouseLIB\CommonDef.h"
+#include "..\FlushMouseDLL\EventlogData.h"
 
 //
 // Define
@@ -22,6 +23,7 @@
 // Local Prototype Define
 //
 static LRESULT  CALLBACK    lpMouseHookProc(int nCode, WPARAM wParam, LPARAM lParam);
+static BOOL	bReportEvent(DWORD dwEventID, WORD wCategory);
 
 //
 // Local Data
@@ -108,7 +110,19 @@ static LRESULT CALLBACK lpMouseHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 		{
 			MOUSEHOOKSTRUCT* mh = (MOUSEHOOKSTRUCT*)lParam;
 			DWORD pt = WORD2DWORD(mh->pt.x, mh->pt.y);
-			PostMessage(hWndMSParent, (UINT)(WM_USER + wParam), (WPARAM)mh->hwnd, (LPARAM)pt);
+			try {
+				PostMessage(hWndMSParent, (UINT)(WM_USER + wParam), (WPARAM)mh->hwnd, (LPARAM)pt);
+			}
+			catch (BOOL bRet) {
+				if (bRet == FALSE) {
+					if (GetLastError() == ERROR_ACCESS_DENIED) {
+						bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, DLL32_CATEGORY);
+					}
+				}
+			}
+			catch (...) {
+				//
+			}
 		}
 		break;
 		default:
@@ -118,5 +132,24 @@ static LRESULT CALLBACK lpMouseHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 	return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
 
+//
+// bReportEvent()
+//
+static BOOL		bReportEvent(DWORD dwEventID, WORD wCategory)
+{
+	BOOL	bRet = FALSE;
+	HANDLE	hEvent = RegisterEventSource(NULL, FLUSHMOUSE);
+	if (hEvent != NULL) {
+		if (ReportEvent(hEvent, (0x0000000c & (dwEventID >> 28)), wCategory, dwEventID, NULL, 0, 0, NULL, NULL) != 0) {
+			bRet = TRUE;
+		}
+		else {
+		}
+		if (DeregisterEventSource(hEvent) == 0) {
+			bRet = FALSE;
+		}
+	}
+	return bRet;
+}
 
 /* = EOF = */

@@ -79,30 +79,29 @@ typedef struct tagFLUSHMOUSECURSOR {
 
 typedef struct tagIMECursorData
 {
-	HWND			hWndObserved;
+	HWND		hWndObserved;
 	DWORD		dwIMEModeCursor;
-	//DWORD		dwIMEModeCaret;
-	BOOL			bDrawIMEModeWait;
+	DWORD		dwWaitTime;
+	BOOL		bDrawIMEModeWait;
 	LPCTSTR		lpszLoadDatName;
 	LPFLUSHMOUSECURSOR	lpstFlushMouseCursor;
 
 	int			iCursorSize;
 	int			iModeSize;
 	DWORD		dwInThreadSleepTime;
-	DWORD		dwWaitWaveTime;
 	DWORD		dwDisplayModeTime;
-	BOOL			bDisplayIMEModeOnCursor;
-	BOOL			bForceHiragana;
-	BOOL			bDrawNearCaret;
-	COLORREF		dwNearDrawCaretColor;
-	COLORREF		dwNearDrawMouseColor;
+	BOOL		bDisplayIMEModeOnCursor;
+	BOOL		bForceHiragana;
+	BOOL		bDrawNearCaret;
+	COLORREF	dwNearDrawCaretColor;
+	COLORREF	dwNearDrawMouseColor;
 
-	BOOL			bDenyChangedByApp;
-	BOOL			bUseBigArrow;
-	BOOL			bDisplayFocusWindowIME;
+	BOOL		bDenyChangedByApp;
+	BOOL		bUseBigArrow;
+	BOOL		bDisplayFocusWindowIME;
 
-	HWND			hWnd;
-	RECT			rcCaret;
+	HWND		hWndCaret;
+	RECT		rcCaret;
 } IMECURSORDATA, * PIMECURSORDATA, * LPIMECURSORDATA;
 
 //
@@ -116,6 +115,7 @@ public:
 
 public:
 	BOOL			bRegister(HINSTANCE hInstance, LPCTSTR szWindowClass, COLORREF dwRGB);
+	VOID			vSetTextColor(COLORREF dwRGB);
 	BOOL			bSetWindowPos(HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags);
 	VOID			vSetModeString(LPTSTR lpszIMEMode);
 
@@ -132,9 +132,9 @@ private:
 public:
 
 private:
-	LPTSTR		lpszWindowClass;
+	LPTSTR			lpszWindowClass;
 	HWND			hCursorWindow;
-	LPTSTR		lpszMode;
+	LPTSTR			lpszMode;
 	COLORREF		dwTextColor;
 	COLORREF		dwBackColor;
 };
@@ -150,31 +150,33 @@ public:
 
 public:
 	BOOL			bInitialize(HWND hWnd);
+	BOOL			bReloadCursor();
+	VOID			vSetParamFromRegistry();
 	BOOL			bStartIMECursorChangeThread(HWND hWndObserved);
 	BOOL			bStartDrawIMEModeThread(HWND hWndObserved);
 	BOOL			bStartDrawIMEModeThreadWait(HWND hWndObserved);
+	BOOL			bStartDrawIMEModeThreadWaitWave(HWND hWndObserved);
 	BOOL			bStartDrawIMEModeThreadWaitEventForeGround(HWND hWndObserved);
 	BOOL			bStartDrawIMEModeThreadWaitDblClk(HWND hWndObserved);
 
 	BOOL			bShowHideCursor(HWND hWndObserved, BOOL bShow);
-	BOOL			bGetCaretPos(HWND hWnd, LPPOINT lpCaretPos);
 
 private:
 	BOOL			_bStartDrawIMEModeThread(HWND hWndObserved);
 
-	LPTSTR		lpszGetCursorDataName();
-	HMODULE		hCursorDllLoad();
+	LPTSTR			lpszGetCursorDataName();
+	HMODULE			hCursorDllLoad();
 	BOOL			bCursorDllUnload();
 	BOOL			bSystemCursorLoad();
 
 	BOOL			bRegisterIMECursorChangeThread(HWND hWndObserved);
 	BOOL			bIsIMECursorChanged(LPIMECURSORDATA lpstCursorData);
-	static BOOL WINAPI	bIMECursorChangeRoutine(LPVOID lpvParam);
+	static BOOL WINAPI		bIMECursorChangeRoutine(LPVOID lpvParam);
 
 	BOOL			bRegisterDrawIMEModeThread(HWND hWndObserved);
 	BOOL			bDrawIMEModeOnDisplay(LPIMECURSORDATA lpstCursorData);
 	BOOL			_bCalcDispModeRect(int iModeSizeX, int iModeSizeY, LPRECT lpRect);
-	HWND			_hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPRECT lprcCaret);
+	HWND			_hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPRECT lprcCaret, BOOL bAttachThreadInput);
 	BOOL			_bAdjustCaretByMonitorDPI(int iModeSizeX, int iModeSizeY, LPRECT lprcCaret);
 	BOOL			bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData);
 	static BOOL CALLBACK	_bIconDrawEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam);
@@ -189,13 +191,13 @@ public:
 private:
 	IMECURSORDATA	stIMECursorData;
 
-	HWND				hMainWnd;
+	HWND			hMainWnd;
 	HMODULE			hModDll;
 	int				iCursorDataLoadCount;
 
-	CThread*			IMECursorChangeThread;
-	CThread*			DrawIMEModeThread;
-	CThread*			DrawIMEModeCaretThread;
+	CThread*		IMECursorChangeThread;
+	CThread*		DrawIMEModeThread;
+	CThread*		DrawIMEModeCaretThread;
 	CCursorWindow*	CursorWindow;
 	CCursorWindow*	CaretWindow;
 

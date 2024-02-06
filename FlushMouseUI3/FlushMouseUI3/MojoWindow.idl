@@ -1,0 +1,17 @@
+// MojoWindow.idl for FlushMouseUI3
+//		Copyright (C) 1993 JeffyTS
+//
+//	  
+// No.	  Date			Name			Reason & Document
+// -------+-----------+-----------+-------------------------------------------- -
+// #0000	2022/07/16  JeffyTS  	New edit.
+//
+
+namespace FlushMouseUI3
+{
+	[default_interface]
+	runtimeclass MojoWindow : Microsoft.UI.Xaml.Window
+	{
+		MojoWindow();
+	}
+}

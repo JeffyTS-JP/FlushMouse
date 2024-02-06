@@ -1,0 +1,95 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
+		<RootNamespace>FlushMouseUI3DLL</RootNamespace>
+		<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+		<UseWinUI>true</UseWinUI>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Title>$(AssemblyName)</Title>
+		<PackageReadmeFile>readme.md</PackageReadmeFile>
+		<AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
+		<FileVersion>$(VersionPrefix)</FileVersion>
+		<PackageId>$(AssemblyName)</PackageId>
+		<PackAsTool>False</PackAsTool>
+		<WindowsAppContainer>true</WindowsAppContainer>
+		<CsWinRTComponent>true</CsWinRTComponent>
+		<Platforms>x64</Platforms>
+		<PlatformTarget>x64</PlatformTarget>
+		<OutputType>Library</OutputType>
+		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+		<WindowsPackageType>None</WindowsPackageType>
+		<TargetCulture>jp-JP</TargetCulture>
+		<AppxPackage>false</AppxPackage>
+		<DisableXbfLineInfo>False</DisableXbfLineInfo>
+		<GenerateLibraryLayout>true</GenerateLibraryLayout>
+<PublishReadyToRun>false</PublishReadyToRun>
+<IsPublishable>False</IsPublishable>
+	</PropertyGroup>
+	<PropertyGroup Label="Configuration">
+		<DesktopCompatible>true</DesktopCompatible>
+		<SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+		<ApplicationIcon>FlushMouse.ico</ApplicationIcon>
+		<RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+	  <NoWarn>NU5100;CS8785;NETSDK1206</NoWarn>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+	  <NoWarn>NU5100;CS8785;NETSDK1206</NoWarn>
+	</PropertyGroup>
+	<ItemGroup>
+	  <None Remove="readme.md" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Content Include="FlushMouse.ico" />
+	</ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Include="readme.md">
+		<Pack>True</Pack>
+		<PackagePath>\</PackagePath>
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.0.6" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.231115000" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Properties\Resources.Designer.cs">
+		<DesignTime>True</DesignTime>
+		<AutoGen>True</AutoGen>
+		<DependentUpon>Resources.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Properties\Resources.resx">
+		<Generator>ResXFileCodeGenerator</Generator>
+		<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="&#xD;&#xA;Xcopy /Y &quot;$(BaseOutputPath)$(Platform)\$(Configuration)\$(TargetFramework)\*.xbf&quot; &quot;$(MSBuildStartupDirectory)\$(Platform)\$(Configuration)\FlushMouseUI3\&quot;&#xD;&#xA;&#xD;&#xA;Xcopy /Y &quot;$(BaseOutputPath)$(Platform)\$(Configuration)\$(TargetFramework)\$(ProjectName).dll&quot; &quot;$(MSBuildStartupDirectory)\$(Platform)\$(Configuration)\FlushMouseUI3&quot;&#xD;&#xA;&#xD;&#xA;Xcopy /Y &quot;$(BaseOutputPath)$(Platform)\$(Configuration)\$(TargetFramework)\$(ProjectName).pdb&quot; &quot;$(MSBuildStartupDirectory)\$(Platform)\$(Configuration)\FlushMouseUI3\&quot;&#xD;&#xA;&#xD;&#xA;Xcopy /Y &quot;$(BaseIntermediateOutputPath)$(Platform)\$(Configuration)\$(TargetFramework)\Generated Files\CsWinRT\$(ProjectName).winmd&quot; &quot;$(MSBuildStartupDirectory)\$(Platform)\$(Configuration)\FlushMouseUI3\&quot;&#xD;&#xA;&#xD;&#xA;Xcopy /Y &quot;$(BaseOutputPath)$(Platform)\$(Configuration)\$(TargetFramework)\*.pdb&quot; &quot;$(MSBuildStartupDirectory)\$(Platform)\$(Configuration)\FlushMouseUI3\&quot;&#xD;&#xA;&#xD;&#xA;touch &quot;$(MSBuildStartupDirectory)\FlushMouseUI3\FlushMouseUI3\FlushMouseUI3.xaml.cpp&quot;&#xD;&#xA;&#xD;&#xA;" />
+	</Target>
+
+	<ItemGroup>
+	  <None Remove="C:\Users\takafumi\.nuget\packages\microsoft.windows.cswinrt\2.0.4\hosting\x64\native\WinRT.Host.dll" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="C:\Users\takafumi\.nuget\packages\microsoft.windows.cswinrt\2.0.4\hosting\x64\native\WinRT.Host.dll" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="C:\Users\takafumi\.nuget\packages\microsoft.windows.cswinrt\2.0.4\hosting\x64\native\en-US\WinRT.Host.dll.mui" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="C:\Users\takafumi\.nuget\packages\microsoft.windows.cswinrt\2.0.4\lib\net8.0\WinRT.Host.Shim.dll" />
+	</ItemGroup>
+</Project>

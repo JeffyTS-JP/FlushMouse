@@ -158,7 +158,8 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -167,7 +168,8 @@
       <UACUIAccess>false</UACUIAccess>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(OutDir)FlushMouseCursor.dll $(OutDir)FlushMouseCursor.dat
+      <Command>copy /Y $(OutDir)$(TargetName)$(TargetExt) $(OutDir)$(TargetName).dat
+Xcopy /Y $(OutDir)$(TargetName).dat $(OutDir)FlushMouseUI3\
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -181,9 +183,10 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SupportJustMyCode>true</SupportJustMyCode>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -194,8 +197,10 @@
       <UACUIAccess>false</UACUIAccess>
     </Link>
     <PostBuildEvent>
-      <Command>Start /min /wait cmd /c "..\Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
-copy $(OutDir)FlushMouseCursor.dll $(OutDir)FlushMouseCursor.dat
+      <Command>Start /min /wait cmd /c "$(MSBuildStartupDirectory)\Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
+copy /Y $(OutDir)FlushMouseCursor.dll $(OutDir)$(TargetName).dat
+Xcopy /Y $(OutDir)$(TargetName).dat $(OutDir)FlushMouseUI3\
+
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

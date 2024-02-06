@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Product.wxs for FlushMouse Copyright (C) 2023 JeffyTS -->
+
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
   xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
   xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
   xmlns:dep="http://schemas.microsoft.com/wix/DependencyExtension">
-
+	
 	<?include version.wxi ?>
 	<?define MainExeFileName = "$(var.ProductName).exe" ?>
 	<?define Keywords = "$(var.ProductName) Installer" ?>
 	<?define Description = "$(var.ProductName) Installer" ?>
 	<?define AppRegKey = "SOFTWARE\$(var.Manufacturer)\$(var.ProductName)" ?>
+	<?define IconSrcFile = "..\FlushMouseLIB\FlushMouse.ico" ?>
 
 	<!-- Target Source file Dir -->
 	<?define TargetDir01=$(var.FlushMouse.TargetDir)?>
 	<?define TargetDir02=$(var.FlushMouse32.TargetDir)?>
 	<?define TargetDir03=$(var.FlushMouseCursor.TargetDir)?>
 	<?define TargetDir04=$(var.ProjectDir)?>
-
+	
 	<Product Id="$(var.ProductID)"
 			 UpgradeCode="{CAD3E2E9-B511-4EA2-8794-9BFB299D05F6}"
 			 Name="$(var.ProductName)"
@@ -34,23 +38,23 @@
 				 Manufacturer="$(var.Manufacturer)" />
 		
 		<Property Id='PREVIOUSFOUND' Secure='yes' />
-
+		
 		<CustomActionRef Id="WixExitEarlyWithSuccess" />
 		<Upgrade Id="{8B8C6810-E467-498D-926C-F4139B2AE8AB}">
-			<UpgradeVersion OnlyDetect='no' Property='PREVIOUSFOUND' Minimum='0.0.0.0' IncludeMinimum='yes' Maximum='$(var.Version)' IncludeMaximum='no' />
-			<UpgradeVersion OnlyDetect='no' Property='SELFFOUND' Minimum='$(var.Version)' IncludeMinimum='yes' Maximum='$(var.Version)' IncludeMaximum='yes' />
+			<UpgradeVersion OnlyDetect="no" Property="PREVIOUSFOUND" Minimum="0.0.0.0" IncludeMinimum="yes" Maximum="$(var.Version)" IncludeMaximum="no" />
+			<UpgradeVersion OnlyDetect="no" Property="SELFFOUND" Minimum="$(var.Version)" IncludeMinimum="yes" Maximum="$(var.Version)" IncludeMaximum="yes" />
 			<UpgradeVersion OnlyDetect="no" Property="NEWERFOUND" Minimum="$(var.Version)" IncludeMinimum="no" />
 		</Upgrade>
-
+		
 		<!-- Media Template-->
 		<MediaTemplate EmbedCab="yes" />
-
+		
 		<!-- Icon -->
 		<Icon Id="MainIcon.ico" SourceFile="$(var.IconSrcFile)" />
 		<Property Id="ARPPRODUCTICON">MainIcon.ico</Property>
-
+		
 		<!-- Other Info. -->
-		<Property Id='ARPCOMMENTS'>Mouse UTY</Property>
+		<Property Id='ARPCOMMENTS'>Mouse and IME UTY</Property>
 		<Property Id='ARPCONTACT'>Twitter @JeffyTSonTW</Property>
 		<Property Id='ARPHELPLINK'>https://github.com/JeffyTS-JP/FlushMouse</Property>
 		<Property Id='ARPURLINFOABOUT'>https://github.com/JeffyTS-JP/FlushMouse</Property>
@@ -58,28 +62,28 @@
 		<Property Id='ARPINSTALLLOCATION'>&quot;%ProgramFiles%\$(var.Manufacturer)\$(var.ProductName)&quot;</Property>
 		<Property Id="ARPNOMODIFY" Value="1" Secure="no" />
 		<Property Id="ARPNOREPAIR" Value="1" Secure="no" />
-
+		
 		<PropertyRef Id="WIX_DIR_COMMON_DOCUMENTS" />
-
+		
 		<UIRef Id="_WixUI_FeatureTree" />
 		<UIRef Id="WixUI_ErrorProgressText" />
 		
 		<!-- Install Directory -->
 		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
 		<Property Id="WIXUI_DATAINSTALLDIR" Value="DATAINSTALLFOLDER" />
-
+		
 		<!-- Feature -->
 		<Feature Id="ProductFeature" Title="$(var.ProductName)" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
 		</Feature>
-
+		
 		<!-- Bitmap -->
 		<WixVariable Id="WixUIBannerBmp" Value="banner.bmp" />
 		<WixVariable Id="WixUIDialogBmp" Value="dialog.bmp" />
-
+		
 		<!-- License.rtf -->
 		<WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
-
+		
 		<!-- Condition -->
 		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT1" Value=" デスクトップにショートカットを作成する" />
 		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX1" Value="1" />
@@ -87,9 +91,9 @@
 		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX2" Value="1" />
 		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT3" Value=" セットアップを終了したら、すぐに $(var.ProductName) を実行する" />
 		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX3" Value="1" />
-
+		
 		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT4" Value=" $(var.ProductName) の設定情報を削除する" />
-
+		
 		<!-- Public Property (value will be overwritten with variable from the bootstrapper during installation) -->
 		<Property Id="BUNDLE" Value="0" />
 		<Property Id="PRODUCTED_ID">
@@ -141,7 +145,7 @@
 							Name="Dependents"
 							Type="file" />
 		</Property>
-
+		
 		<!-- Searching for Package Cache location for the current bundle -->
 		<Property Id="BUNDLED_CACHE_PATH">
 			<RegistrySearch Id="Bundled_CachePath"
@@ -150,7 +154,7 @@
 							Name="BundledCachedPath"
 							Type="raw" />
 		</Property>
-
+		
 		<!-- UI Dialog -->
 		<UI>
 			<Dialog Id="NewerFoundDlg" Width="270" Height="105" Title="[ProductName] セットアップ" NoMinimize="yes">
@@ -174,10 +178,10 @@
 				</Control>
 				<Control Id="PreviousFoundDlgIcon" Type="Icon" X="15" Y="15" Width="24" Height="24" ToolTip="!(loc.ErrorDlgErrorIconTooltip)" FixedSize="yes" IconSize="32" Text="!(loc.ErrorDlgErrorIcon)" />
 			</Dialog>
-
+			
 			<Publish Dialog="_ExitDialog" Control="Finish" Event="DoAction" Value="RemoveAppReg">Installed and ((WIXUI_VERIFYDIALOGOPTIONALCHECKBOX4 = 1) or (REMOVEAPPREGISTRY = 1))</Publish>
 		</UI>
-
+		
 		<!-- Install UI Sequence -->
 		<InstallUISequence>
 			<Show Dialog='NewerFoundDlg' After='FindRelatedProducts'>NEWERFOUND</Show>
@@ -186,12 +190,12 @@
 			<Show Dialog="_VerifyReadyDlg" Before="MaintenanceWelcomeDlg">Installed and NOT RESUME and NOT Preselected and NOT PATCH</Show>
 			<Show Dialog="MaintenanceWelcomeDlg" Before="ProgressDlg">False</Show>
 		</InstallUISequence>
-
+		
 		<SetProperty Id="REINSTALL" After='FindRelatedProducts' Value="ALL" Sequence="first">Installed and REINSTALL</SetProperty>
 		<SetProperty Id="REINSTALLMODE" After='FindRelatedProducts' Value="vomus" Sequence="first">Installed and REINSTALL</SetProperty>
 		<SetProperty Id="ADDSOURCE" After='FindRelatedProducts' Value="ALL" Sequence="first">Installed and REINSTALL</SetProperty>
 		<SetProperty Id="ADDLOCAL" After='FindRelatedProducts' Value="ALL" Sequence="first">Installed and REINSTALL</SetProperty>
-
+		
 		<!-- Quit Application -->
 		<InstallExecuteSequence>
 			<Custom Action="QuitApplication" After="CostFinalize">Installed or REINSTALL</Custom>
@@ -199,7 +203,7 @@
 		</InstallExecuteSequence>
 		<CustomAction Id="QuitApplication" FileKey="$(var.MainExeFileName)" ExeCommand=" /Quit" Execute="immediate" Return="ignore"/>
 		<CustomAction Id="QuitApplication2" FileKey="$(var.MainExeFileName)" ExeCommand=" /Quit" Execute="immediate" Return="ignore"/>
-
+		
 		<!-- Version Check -->
 		<InstallExecuteSequence>
 			<Custom Action='AlreadyUpdated' After='FindRelatedProducts'>SELFFOUND</Custom>
@@ -209,9 +213,10 @@
 		<CustomAction Id='AlreadyUpdated' Error='[ProductName] は既に、このバージョンに更新されています。' />
 		<CustomAction Id='NoDowngrade'    Error='[ProductName] の新しいバージョンが既にインストールされています。' />
 
+		<Property Id="WixUI_InstallMode" Value="Remove"/>
 		<Property Id="REBOOT" Secure="yes" Value="ReallySuppress" />
 		<Property Id="MSIRESTARTMANAGERCONTROL" Secure="yes" Value="Disable" />
-
+		
 		<!-- Set Registry -->
 		<InstallExecuteSequence>
 			<Custom Action='SetUpdateProductReg' Before='InstallFinalize'>(NOT Installed) or REINSTALL</Custom>
@@ -245,7 +250,7 @@
 		<CustomAction Id="SetUpdateDependenciesReg" Property="UpdateDependenciesReg"
 			Value="&quot;[System64Folder]reg.exe&quot; add HKLM\Software\Classes\Installer\Dependencies\[ProductCode] /t REG_SZ /d [ProductCode] /F" />
 		<CustomAction Id="UpdateDependenciesReg" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
-
+		
 		<!-- Register TaskScheduler -->
 		<InstallExecuteSequence>
 			<Custom Action='SetRegisterTaskScheduler' Before='InstallFinalize'>(NOT Installed) or REINSTALL</Custom>
@@ -267,7 +272,7 @@
 		<CustomAction Id="SetRegisterTaskScheduler2" Property="RegisterTaskScheduler2"
 			Value="&quot;[System64Folder]schtasks.exe&quot; /Create /F /TN &quot;$(var.ProductName)_Quit&quot; /XML &quot;[INSTALLFOLDER]Register_TaskScheduler2.xml&quot;"/>
 		<CustomAction Id="RegisterTaskScheduler2" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
-
+		
 		<!-- Unregister TaskScheduler on Uninstall -->
 		<InstallExecuteSequence>
 			<Custom Action='SetUnregisterTaskScheduler' After='InstallInitialize'>Installed or REINSTALL</Custom>
@@ -289,7 +294,7 @@
 		<CustomAction Id="SetUnregisterTaskScheduler2" Property="UnregisterTaskScheduler2"
 			Value="&quot;[System64Folder]schtasks.exe&quot; /Delete /F /TN &quot;$(var.ProductName)_Quit&quot;"/>
 		<CustomAction Id="UnregisterTaskScheduler2" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
-
+		
 		<!-- Remove App Registry on Uninstall -->
 		<UI>
 			<Publish Dialog="_ExitDialog" Control="Finish" Event="DoAction" Value="RemoveAppRegMSI">Installed and (WIXUI_VERIFYDIALOGOPTIONALCHECKBOX4 = 1)</Publish>
@@ -314,8 +319,8 @@
 			<Custom Action='RemoveBundleReg' After='SetRemoveBundleReg'>(Installed or REINSTALL) and BUNDLED_ID</Custom>
 			<Custom Action='SetRemoveUninstallBundleReg' Before='InstallFinalize'>Installed and REINSTALL and BUNDLED_ID</Custom>
 			<Custom Action='RemoveUninstallBundleReg' After='SetRemoveUninstallBundleReg'>Installed and REINSTALL and BUNDLED_ID</Custom>
-			<Custom Action='SetRemoveUninstallBundleReg2' After='InstallInitialize'>Installed and (NOT REINSTALL) and BUNDLE_ID</Custom>
-			<Custom Action='RemoveUninstallBundleReg2' After='SetRemoveUninstallBundleReg2'>Installed and (NOT REINSTALL)  and BUNDLE_ID</Custom>
+			<Custom Action='SetRemoveUninstallBundleReg2' After='InstallInitialize'>Installed and (NOT REINSTALL) and BUNDLED_ID</Custom>
+			<Custom Action='RemoveUninstallBundleReg2' After='SetRemoveUninstallBundleReg2'>Installed and (NOT REINSTALL)  and BUNDLED_ID</Custom>
 		</InstallExecuteSequence>
 		<Property Id="RemoveProductReg" Value=" "/>
 		<CustomAction Id="SetRemoveProductReg" Property="RemoveProductReg"
@@ -341,12 +346,12 @@
 		<CustomAction Id="SetRemoveUninstallBundleReg2" Property="RemoveUninstallBundleReg2"
 			Value="&quot;[System64Folder]reg.exe&quot; delete HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\[BUNDLED_ID] /F"/>
 		<CustomAction Id="RemoveUninstallBundleReg2" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
-
+		
 		<!-- Remove Cache files on Uninstall -->
 		<InstallExecuteSequence>
 			<Custom Action='RemoveBundledCache' After='InstallInitialize'>(Installed or REINSTALL) and BUNDLED_ID</Custom>
 			<Custom Action='RemoveBundleCache' Before='InstallFinalize'>Installed and (NOT REINSTALL) and BUNDLE_ID and (NOT (BUNDLE = 1))</Custom>
-			<Custom Action='RemoveProductedCache' Before='InstallFinalize'>(Installed or REINSTALL) and BUNDLED_VERSION</Custom>
+			<Custom Action='RemoveProductedCache' Before='InstallFinalize'>(Installed or REINSTALL) and BUNDLED_VERSION</Custom>		
 		</InstallExecuteSequence>
 		<Property Id="CMD" Value="cmd.exe"/>
 		<CustomAction Id="RemoveBundledCache" Property="CMD" Execute="deferred" Return="ignore" Impersonate="no"
@@ -355,7 +360,7 @@
 			ExeCommand="/c rmdir /S /Q &quot;%ProgramData%\Package Cache\&quot;[BUNDLE_ID]&quot;&quot;" />
 		<CustomAction Id="RemoveProductedCache" Property="CMD" Execute="deferred" Return="ignore" Impersonate="no"
 			ExeCommand="/c rmdir /S /Q &quot;%ProgramData%\Package Cache\&quot;[ProductCode]&quot;v[BUNDLED_VERSION]&quot;" />
-
+		
 		<!-- Remove App Start Menu dir and Desktop shortcut -->
 		<InstallExecuteSequence>
 			<Custom Action='RemoveDesktopShorcutDir' Before='InstallFinalize'>
@@ -369,7 +374,7 @@
 			ExeCommand="/c del /F /Q &quot;[DesktopFolder]$(var.ProductName).lnk&quot;" />
 		<CustomAction Id="RemoveAppStartMenu" Property="CMD" Execute="deferred" Return="ignore" Impersonate="no"
 			ExeCommand="/c rmdir /S /Q &quot;[AppStartMenuFolder]&quot;" />
-
+		
 		<!-- Launch Application -->
 		<InstallExecuteSequence>
 			<Custom Action='LaunchApplication' After='InstallFinalize'>((NOT Installed) or REINSTALL) and ((NOT (BUNDLE = 1) and WIXUI_VERIFYDIALOGOPTIONALCHECKBOX3 = 1) or ((BUNDLE = 1) and STARTAPPLICATION = 1))</Custom>
@@ -377,12 +382,12 @@
 		</InstallExecuteSequence>
 		<CustomAction Id="LaunchApplication" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]$(var.MainExeFileName) /Start" Execute="immediate" Return="ignore"/>
 		<CustomAction Id="LaunchApplication2" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]$(var.MainExeFileName) /Start" Execute="immediate" Return="ignore"/>
-
+		
 		<InstallExecuteSequence>
 			<RemoveExistingProducts After="InstallValidate"/>
 		</InstallExecuteSequence>
 	</Product>
-
+	
 	<Fragment>
 		<!-- Directory Structure -->
 		<Directory Id="TARGETDIR" Name="SourceDir">
@@ -410,7 +415,7 @@
 			</Directory>
 		</Directory>
 	</Fragment>
-
+	
 	<Fragment>
 		<!-- Feature -->
 		<Feature Id="EssentialFeature" Title="$(var.ProductName)" Level="1">

@@ -31,6 +31,7 @@ static DWORD	dwPreviousVKLL = 0;
 static HWND		hWndKBParentLL = NULL;
 static LPKEYBOARDLL_SHAREDMEM	lpDatKeyboardLL = NULL;
 static BOOL		bEnableEPHelperLL = FALSE;
+static BOOL		bIMEModeForcedLL = FALSE;
 static BOOL		bStartConvertingLL = FALSE;
 static CSharedMemory	*CSharedMemLL = NULL;
 #pragma data_seg()
@@ -49,7 +50,9 @@ DLLEXPORT BOOL  __stdcall bKeyboardHookLLSet(HWND hWnd)
 	hWndKBParentLL = hWnd;
 	if((CSharedMemLL = new CSharedMemory(KEYBOARDHOOKLLMEM, sizeof(KEYBOARDLL_SHAREDMEM))) != NULL) {
 		if ((lpDatKeyboardLL = (LPKEYBOARDLL_SHAREDMEM)CSharedMemLL->lpvSharedMemoryRead()) != NULL) {
-			lpDatKeyboardLL->hWnd = hWnd;	lpDatKeyboardLL->bEnableEPHelper = FALSE;
+			lpDatKeyboardLL->hWnd = hWnd;
+			lpDatKeyboardLL->bEnableEPHelper = FALSE;
+			lpDatKeyboardLL->bIMEModeForced = FALSE;
 			if (CSharedMemLL->bSharedMemoryWrite(lpDatKeyboardLL)) {
 				HHOOK	hHook = SetWindowsHookEx(WH_KEYBOARD_LL, (HOOKPROC)lpKeyboardHookLLProc, hGetInstance(), 0);
 				if (hHook) {
@@ -68,6 +71,7 @@ DLLEXPORT BOOL  __stdcall bKeyboardHookLLSet(HWND hWnd)
 		hWndKBParentLL = NULL;
 		lpDatKeyboardLL = NULL;
 		bEnableEPHelperLL = FALSE;
+		bIMEModeForcedLL = FALSE;
 		bStartConvertingLL = FALSE;
 	}
 	return FALSE;
@@ -94,6 +98,7 @@ DLLEXPORT BOOL __stdcall bKeyboardHookLLUnset()
 		hWndKBParentLL = NULL;
 		lpDatKeyboardLL = NULL;
 		bEnableEPHelperLL = FALSE;
+		bIMEModeForcedLL = FALSE;
 		bStartConvertingLL = FALSE;
 	}
 	return bRet;
@@ -103,11 +108,29 @@ DLLEXPORT BOOL __stdcall bKeyboardHookLLUnset()
 //
 DLLEXPORT BOOL __stdcall bSetEnableEPHelperLL64(BOOL bEPHelper)
 {
-	BOOL		bRet = FALSE;
+	BOOL	bRet = FALSE;
 	bEnableEPHelperLL = bEPHelper;
 	if (CSharedMemLL != NULL) {
 		if ((lpDatKeyboardLL = (LPKEYBOARDLL_SHAREDMEM)CSharedMemLL->lpvSharedMemoryRead()) != NULL) {
 			lpDatKeyboardLL->bEnableEPHelper = bEPHelper;
+			if (CSharedMemLL->bSharedMemoryWrite(lpDatKeyboardLL)) {
+				bRet = TRUE;
+			}
+		}
+	}
+	return bRet;
+}
+
+//
+// bSetEnableIMEModeForcedLL64()
+//
+DLLEXPORT BOOL __stdcall bSetEnableIMEModeForcedLL64(BOOL bIMEModeForced)
+{
+	BOOL	bRet = FALSE;
+	bIMEModeForcedLL = bIMEModeForced;
+	if (CSharedMemLL != NULL) {
+		if ((lpDatKeyboardLL = (LPKEYBOARDLL_SHAREDMEM)CSharedMemLL->lpvSharedMemoryRead()) != NULL) {
+			lpDatKeyboardLL->bIMEModeForced = bIMEModeForced;
 			if (CSharedMemLL->bSharedMemoryWrite(lpDatKeyboardLL)) {
 				bRet = TRUE;
 			}
@@ -167,8 +190,8 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 				//case VK_FINAL:		// (0x18)
 				case VK_IME_OFF:		// IME OFF (0x1a)
 				//case VK_ESCAPE:		// Esc (0x1b)
-				case VK_CONVERT:		// 変換 (0x1c)
-				case VK_NONCONVERT:		// 無変換 (0x1d)
+				//case VK_CONVERT:		// 変換 (0x1c)
+				//case VK_NONCONVERT:		// 無変換 (0x1d)
 				//case VK_ACCEPT:		// (0x1e)
 				//case VK_MODECHANGE:	// (0x1f)
 				//case VK_APPS:			// (0x5d)
@@ -246,6 +269,14 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 					if (GetAsyncKeyState(VK_MENU) & 0x8000) {
 						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, KEY_KANJI, (0x7f000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24)));
 					}
+					break;
+				case VK_CONVERT:		// 変換 (0x1c)
+				case VK_NONCONVERT:		// 無変換 (0x1d)
+					bOnlyCtrlLL = FALSE;
+					bStartConvertingLL = FALSE;
+					dwPreviousVKLL = 0;
+					PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (WM_USER + lpstKBH->vkCode), (0x7f000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24)));
+					if ((lpstKBH->vkCode == VK_NONCONVERT) && bIMEModeForcedLL)	return 1;
 					break;
 				case VK_OEM_3:			// JP(IME/ENG) [@] / US(ENG) IME ON (0xc0) = ['] ALT + 半角/全角 or 漢字
 				case VK_OEM_8:			// JP(IME/ENG) [`] / British(ENG) IME ON (0xdf) = ['] ALT + 半角/全角 or 漢字

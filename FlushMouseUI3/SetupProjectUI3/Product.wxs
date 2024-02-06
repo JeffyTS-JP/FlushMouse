@@ -1,0 +1,711 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Product.wxs for FlushMouseUI3 Copyright (C) 2023 JeffyTS -->
+
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+  xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
+  xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+  xmlns:dep="http://schemas.microsoft.com/wix/DependencyExtension">
+	
+	<?include ..\..\SetupProject\version.wxi ?>
+	<?define MainExeFileName = "$(var.ProductName).exe" ?>
+	<?define Keywords = "$(var.ProductName) Installer" ?>
+	<?define Description = "$(var.ProductName) Installer" ?>
+	<?define AppRegKey = "SOFTWARE\$(var.Manufacturer)\$(var.ProductName)" ?>
+	<?define IconSrcFile = "..\..\FlushMouseLIB\FlushMouse.ico" ?>
+
+	<!-- Target Source file Dir -->
+	<?define TargetDir01=$(var.FlushMouseUI3.TargetDir)?>
+	<?define TargetDir02=$(var.FlushMouse32.TargetDir)?>
+	<?define TargetDir03=$(var.FlushMouseCursor.TargetDir)?>
+	<?define TargetDir04=$(var.ProjectDir)?>
+	
+	<Product Id="$(var.ProductID)"
+			 UpgradeCode="{CAD3E2E9-B511-4EA2-8794-9BFB299D05F6}"
+			 Name="$(var.ProductName)UI3"
+			 Manufacturer="$(var.Manufacturer)"
+			 Version="$(var.Version)"
+			 Language="1041" Codepage="932">
+		<!--Package Id='*'-->
+		<Package Id="*"
+				 InstallerVersion="200"
+				 Compressed="yes"
+				 InstallScope="perMachine"
+				 SummaryCodepage="932"
+				 Platform="x64"
+				 Keywords="$(var.Keywords)"
+				 Description="$(var.Description)"
+				 Comments="$(var.Comments)"
+				 Manufacturer="$(var.Manufacturer)" />
+		
+		<Property Id='PREVIOUSFOUND' Secure='yes' />
+		
+		<CustomActionRef Id="WixExitEarlyWithSuccess" />
+		<Upgrade Id="{8B8C6810-E467-498D-926C-F4139B2AE8AB}">
+			<!--UpgradeVersion OnlyDetect='yes' Property='NEWERFOUND' Minimum='$(var.Version)' IncludeMinimum='no' /-->
+			<UpgradeVersion OnlyDetect="no" Property="PREVIOUSFOUND" Minimum="0.0.0.0" IncludeMinimum="yes" Maximum="$(var.Version)" IncludeMaximum="no" />
+			<UpgradeVersion OnlyDetect="no" Property="SELFFOUND" Minimum="$(var.Version)" IncludeMinimum="yes" Maximum="$(var.Version)" IncludeMaximum="yes" />
+			<UpgradeVersion OnlyDetect="no" Property="NEWERFOUND" Minimum="$(var.Version)" IncludeMinimum="no" />
+		</Upgrade>
+		
+		<!-- Media Template-->
+		<MediaTemplate EmbedCab="yes" />
+		
+		<!-- Icon -->
+		<Icon Id="MainIcon.ico" SourceFile="$(var.IconSrcFile)" />
+		<Property Id="ARPPRODUCTICON" Value="MainIcon.ico" />
+		
+		<!-- Other Info. -->
+		<Property Id="ARPCOMMENTS" Value="Mouse and IME UTY" />
+		<Property Id="ARPCONTACT" Value="Twitter @JeffyTSonTW" />
+		<Property Id="ARPHELPLINK" Value="https://github.com/JeffyTS-JP/FlushMouse" />
+		<Property Id="ARPURLINFOABOUT" Value="https://github.com/JeffyTS-JP/FlushMouse" />
+		<Property Id="ARPURLUPDATEINFO" Value="https://github.com/JeffyTS-JP/FlushMouse/releases" />
+		<Property Id="ARPINSTALLLOCATION" Value="&quot;%ProgramFiles%\$(var.Manufacturer)\$(var.ProductName)&quot;" />
+		
+		<Property Id="ARPNOMODIFY" Value="1" Secure="no" />
+		<Property Id="ARPNOREPAIR" Value="1" Secure="no" />
+		
+		<PropertyRef Id="WIX_DIR_COMMON_DOCUMENTS" />
+		
+		<UIRef Id="_WixUI_FeatureTree" />
+		<UIRef Id="WixUI_ErrorProgressText" />
+		
+		<!-- Install Directory -->
+		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+		<Property Id="WIXUI_DATAINSTALLDIR" Value="DATAINSTALLFOLDER" />
+		<!-- Feature -->
+		<Feature Id="ProductFeature" Title="$(var.ProductName)" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+		</Feature>
+		<!-- Bitmap -->
+		<WixVariable Id="WixUIBannerBmp" Value="banner.bmp" />
+		<!-- 493x58 -->
+		<WixVariable Id="WixUIDialogBmp" Value="dialog.bmp" />
+		<!-- 493x312 -->
+		<!-- License.rtf -->
+		<WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+		
+		<!-- Condition -->
+		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT1" Value=" デスクトップにショートカットを作成する" />
+		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX1" Value="1" />
+		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT2" Value=" スタートメニューに登録する" />
+		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX2" Value="1" />
+		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT3" Value=" セットアップを終了したら、すぐに $(var.ProductName) を実行する" />
+		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX3" Value="1" />
+		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT4" Value=" $(var.ProductName) の設定情報を削除する" />
+		
+		<Property Id="BUNDLE" Value="0" />
+		<Property Id="PRODUCTED_ID">
+			<RegistrySearch Id="Producted_ID" Root="HKLM" Key="SOFTWARE\Wow6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)" Name="ProductID" Type="raw" />
+		</Property>
+		<Property Id="BUNDLED_ID">
+			<RegistrySearch Id="Bundled_ID" Root="HKLM" Key="SOFTWARE\Wow6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)" Name="BundleID" Type="raw" />
+		</Property>
+		<Property Id="BUNDLED_VERSION">
+			<RegistrySearch Id="Bundled_Version" Root="HKLM" Key="SOFTWARE\Wow6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)" Name="BundleVersion" Type="raw" />
+		</Property>
+		<Property Id="PRODUCT_DEPENDENCIES">
+			<RegistrySearch Id="Product_Dependencies" Root="HKLM" Key="SOFTWARE\Classes\Installer\Dependencies\&quot;[ProductCode]&quot;" Name="Dependents" Type="raw" />
+		</Property>
+		<Property Id="PRODUCT_DEPENDENCIES1">
+			<RegistrySearch Id="Product_Dependencies1" Root="HKLM" Key="SOFTWARE\Classes\Installer\Dependencies\&quot;$(var.ProductID)&quot;" Name="Dependents" Type="raw" />
+		</Property>
+		<Property Id="PRODUCT_DEPENDENCIES2">
+			<RegistrySearch Id="Product_Dependencies2" Root="HKLM" Key="SOFTWARE\Classes\Installer\Dependencies\&quot;[ProductCode]&quot;" Name="Dependents" Type="directory" />
+		</Property>
+		<Property Id="PRODUCT_DEPENDENCIES3">
+			<RegistrySearch Id="Product_Dependencies3" Root="HKLM" Key="SOFTWARE\Classes\Installer\Dependencies\&quot;$(var.ProductID)&quot;" Name="Dependents" Type="file" />
+		</Property>
+		
+		<!-- Searching for Package Cache location for the current bundle -->
+		<Property Id="BUNDLED_CACHE_PATH">
+			<RegistrySearch Id="Bundled_CachePath" Root="HKLM" Key="SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\[BUNDLED_ID]" Name="BundledCachedPath" Type="raw" />
+		</Property>
+		
+		<!-- UI Dialog -->
+		<UI>
+			<!-- Majour Upgrade Dialog-->
+			<Dialog Id="NewerFoundDlg" Width="270" Height="105" Title="[ProductName] セットアップ" NoMinimize="yes">
+				<Control Id="MessageText" Type="Text" X="48" Y="15" Width="205" Height="60" TabSkip="no" Text="[ProductName] の新しいバージョンがすでにインストールされています。" />
+				<Control Id="Y" Type="PushButton" X="200" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUIOK)">
+					<Publish Event="EndDialog" Value="Return">1</Publish>
+				</Control>
+				<Control Id="NewerFoundDlgIcon" Type="Icon" X="15" Y="15" Width="24" Height="24" ToolTip="!(loc.ErrorDlgErrorIconTooltip)" FixedSize="yes" IconSize="32" Text="!(loc.ErrorDlgErrorIcon)" />
+			</Dialog>
+			<Dialog Id="SelfFoundDlg" Width="270" Height="105" 	Title="[ProductName] セットアップ" NoMinimize="yes">
+				<Control Id="MessageText" Type="Text" X="48" Y="15" Width="205" Height="60" TabSkip="no" Text="[ProductName] の同じバージョンがすでにインストールされています。" />
+				<Control Id="Y" Type="PushButton" X="200" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUIOK)">
+					<Publish Event="EndDialog" Value="Return">1</Publish>
+				</Control>
+				<Control Id="SelfFoundDlgIcon" Type="Icon" X="15" Y="15" Width="24" Height="24" ToolTip="!(loc.ErrorDlgErrorIconTooltip)" FixedSize="yes" IconSize="32" Text="!(loc.ErrorDlgErrorIcon)" />
+			</Dialog>
+			<Dialog Id="PreviousFoundDlg" Width="270" Height="105" 	Title="[ProductName] セットアップ" NoMinimize="yes">
+				<Control Id="MessageText" Type="Text" X="48" Y="15" Width="205" Height="60" TabSkip="no" Text="[ProductName] の同じバージョンがすでにインストールされています。" />
+				<Control Id="Y" Type="PushButton" X="200" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUIOK)">
+					<Publish Event="EndDialog" Value="Return">1</Publish>
+				</Control>
+				<Control Id="PreviousFoundDlgIcon" Type="Icon" X="15" Y="15" Width="24" Height="24" ToolTip="!(loc.ErrorDlgErrorIconTooltip)" FixedSize="yes" IconSize="32" Text="!(loc.ErrorDlgErrorIcon)" />
+			</Dialog>
+			<Publish Dialog="_ExitDialog" Control="Finish" Event="DoAction" Value="RemoveAppReg">Installed and ((WIXUI_VERIFYDIALOGOPTIONALCHECKBOX4 = 1) or (REMOVEAPPREGISTRY = 1))</Publish>
+		</UI>
+		
+		<!-- Install UI Sequence -->
+		<InstallUISequence>
+			<Show Dialog='NewerFoundDlg' After='FindRelatedProducts'>NEWERFOUND</Show>
+			<Show Dialog='SelfFoundDlg' After='FindRelatedProducts'>SELFFOUND</Show>
+			<Show Dialog='PreviousFoundDlg' After='FindRelatedProducts'>PREVIOUSFOUND</Show>
+			<Show Dialog="_VerifyReadyDlg" Before="MaintenanceWelcomeDlg">Installed and NOT RESUME and NOT Preselected and NOT PATCH</Show>
+			<Show Dialog="MaintenanceWelcomeDlg" Before="ProgressDlg">False</Show>
+		</InstallUISequence>
+		
+		<SetProperty Id="REINSTALL" After='FindRelatedProducts' Value="ALL" Sequence="first">Installed and REINSTALL</SetProperty>
+		<SetProperty Id="REINSTALLMODE" After='FindRelatedProducts' Value="vomus" Sequence="first">Installed and REINSTALL</SetProperty>
+		<SetProperty Id="ADDSOURCE" After='FindRelatedProducts' Value="ALL" Sequence="first">Installed and REINSTALL</SetProperty>
+		<SetProperty Id="ADDLOCAL" After='FindRelatedProducts' Value="ALL" Sequence="first">Installed and REINSTALL</SetProperty>
+		
+		<!-- Quit Application -->
+		<InstallExecuteSequence>
+			<Custom Action="QuitApplication" After="CostFinalize">Installed or REINSTALL</Custom>
+			<Custom Action="QuitApplication2" Before="InstallInitialize">Installed or REINSTALL</Custom>
+			<!--Custom Action="QuitApplication2" After="CostFinalize">Installed or REINSTALL</Custom-->
+		</InstallExecuteSequence>
+		<CustomAction Id="QuitApplication" FileKey="$(var.MainExeFileName)" ExeCommand=" /Quit" Execute="immediate" Return="ignore"/>
+		<CustomAction Id="QuitApplication2" FileKey="$(var.MainExeFileName)" ExeCommand=" /Quit" Execute="immediate" Return="ignore"/>
+		
+		<!-- Version Check -->
+		<InstallExecuteSequence>
+			<Custom Action='AlreadyUpdated' After='FindRelatedProducts'>SELFFOUND</Custom>
+			<Custom Action='NoDowngrade' After='FindRelatedProducts'>NEWERFOUND</Custom>
+			<Custom Action='WixExitEarlyWithSuccess' After='FindRelatedProducts'>NEWERFOUND or SELFFOUND</Custom>
+		</InstallExecuteSequence>
+		<CustomAction Id='AlreadyUpdated' Error='[ProductName] は既に、このバージョンに更新されています。' />
+		<CustomAction Id='NoDowngrade'    Error='[ProductName] の新しいバージョンが既にインストールされています。' />
+		
+		<Property Id="WixUI_InstallMode" Value="Remove"/>
+		<Property Id="REBOOT" Secure="yes" Value="ReallySuppress" />
+		<Property Id="MSIRESTARTMANAGERCONTROL" Secure="yes" Value="Disable" />
+		
+		<!-- Set Registry -->
+		<InstallExecuteSequence>
+			<Custom Action='SetUpdateProductReg' Before='InstallFinalize'>(NOT Installed) or REINSTALL</Custom>
+			<Custom Action='UpdateProductReg' After='SetUpdateProductReg'>(NOT Installed) or REINSTALL</Custom>
+			<Custom Action='SetUpdateProductVersioReg' Before='InstallFinalize'>(NOT Installed) or REINSTALL</Custom>
+			<Custom Action='UpdateProductVersionReg' After='SetUpdateProductVersioReg'>(NOT Installed) or REINSTALL</Custom>
+			<Custom Action='SetUpdateBundleReg' Before='InstallFinalize'>((NOT Installed) or REINSTALL) and BUNDLE_ID</Custom>
+			<Custom Action='UpdateBundleReg' After='SetUpdateBundleReg'>((NOT Installed) or REINSTALL) and BUNDLE_ID</Custom>
+			<Custom Action='SetUpdateVersionReg' After='InstallInitialize'>((NOT Installed) or REINSTALL) and BUNDLE_VERSION</Custom>
+			<Custom Action='UpdateVersionReg' After='SetUpdateVersionReg'>((NOT Installed) or REINSTALL) and BUNDLE_VERSION</Custom>
+			<Custom Action='SetUpdateDependenciesReg' Before='InstallFinalize'>((NOT Installed) or REINSTALL) and NOT (BUNDLE_ID = 1)</Custom>
+			<Custom Action='UpdateDependenciesReg' After='SetUpdateDependenciesReg'>((NOT Installed) or REINSTALL) and NOT (BUNDLE_ID = 1)</Custom>
+		</InstallExecuteSequence>
+		<Property Id="UpdateProductReg" Value=" "/>
+		<CustomAction Id="SetUpdateProductReg" Property="UpdateProductReg"
+			Value="&quot;[System64Folder]reg.exe&quot; add HKLM\SOFTWARE\Wow6432Node\$(var.Manufacturer)\Updates\$(var.ProductName) /v ProductID /t REG_SZ /d [ProductCode] /F" />
+		<CustomAction Id="UpdateProductReg" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		<Property Id="UpdateProductVersionReg" Value=" "/>
+		<CustomAction Id="SetUpdateProductVersioReg" Property="UpdateProductVersionReg"
+			Value="&quot;[System64Folder]reg.exe&quot; add HKLM\SOFTWARE\Wow6432Node\$(var.Manufacturer)\Updates\$(var.ProductName) /v ProductVersion /t REG_SZ /d $(var.Version) /F" />
+		<CustomAction Id="UpdateProductVersionReg" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		<Property Id="UpdateBundleReg" Value=" "/>
+		<CustomAction Id="SetUpdateBundleReg" Property="UpdateBundleReg"
+			Value="&quot;[System64Folder]reg.exe&quot; add HKLM\SOFTWARE\Wow6432Node\$(var.Manufacturer)\Updates\$(var.ProductName) /v BundleID /t REG_SZ /d [BUNDLE_ID] /F" />
+		<CustomAction Id="UpdateBundleReg" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		<Property Id="UpdateVersionReg" Value=" "/>
+		<CustomAction Id="SetUpdateVersionReg" Property="UpdateVersionReg"
+			Value="&quot;[System64Folder]reg.exe&quot; add HKLM\SOFTWARE\Wow6432Node\$(var.Manufacturer)\Updates\$(var.ProductName) /v BundleVersion /t REG_SZ /d [BUNDLE_VERSION] /F" />
+		<CustomAction Id="UpdateVersionReg" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		<Property Id="UpdateDependenciesReg" Value=" "/>
+		<CustomAction Id="SetUpdateDependenciesReg" Property="UpdateDependenciesReg"
+			Value="&quot;[System64Folder]reg.exe&quot; add HKLM\Software\Classes\Installer\Dependencies\[ProductCode] /t REG_SZ /d [ProductCode] /F" />
+		<CustomAction Id="UpdateDependenciesReg" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		
+		<!-- Register TaskScheduler -->
+		<InstallExecuteSequence>
+			<Custom Action='SetRegisterTaskScheduler' Before='InstallFinalize'>(NOT Installed) or REINSTALL</Custom>
+			<Custom Action='RegisterTaskScheduler' After='SetRegisterTaskScheduler'>(NOT Installed) or REINSTALL</Custom>
+			<Custom Action='SetRegisterTaskScheduler1' Before='InstallFinalize'>(NOT Installed) or REINSTALL</Custom>
+			<Custom Action='RegisterTaskScheduler1' After='SetRegisterTaskScheduler1'>(NOT Installed) or REINSTALL</Custom>
+			<Custom Action='SetRegisterTaskScheduler2' Before='InstallFinalize'>(NOT Installed) or REINSTALL</Custom>
+			<Custom Action='RegisterTaskScheduler2' After='SetRegisterTaskScheduler2'>(NOT Installed) or REINSTALL</Custom>
+		</InstallExecuteSequence>
+		<Property Id="RegisterTaskScheduler" Value=" "/>
+		<CustomAction Id="SetRegisterTaskScheduler" Property="RegisterTaskScheduler"
+			Value="&quot;[System64Folder]schtasks.exe&quot; /Create /F /TN &quot;$(var.ProductName)_Start&quot; /XML &quot;[INSTALLFOLDER]Register_TaskScheduler.xml&quot;"/>
+		<CustomAction Id="RegisterTaskScheduler" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		<Property Id="RegisterTaskScheduler1" Value=" "/>
+		<CustomAction Id="SetRegisterTaskScheduler1" Property="RegisterTaskScheduler1"
+			Value="&quot;[System64Folder]schtasks.exe&quot; /Create /F /TN &quot;$(var.ProductName)_StartEvent&quot; /XML &quot;[INSTALLFOLDER]Register_TaskScheduler1.xml&quot;"/>
+		<CustomAction Id="RegisterTaskScheduler1" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		<Property Id="RegisterTaskScheduler2" Value=" "/>
+		<CustomAction Id="SetRegisterTaskScheduler2" Property="RegisterTaskScheduler2"
+			Value="&quot;[System64Folder]schtasks.exe&quot; /Create /F /TN &quot;$(var.ProductName)_Quit&quot; /XML &quot;[INSTALLFOLDER]Register_TaskScheduler2.xml&quot;"/>
+		<CustomAction Id="RegisterTaskScheduler2" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		
+		<!-- Unregister TaskScheduler on Uninstall -->
+		<InstallExecuteSequence>
+			<Custom Action='SetUnregisterTaskScheduler' After='InstallInitialize'>Installed or REINSTALL</Custom>
+			<Custom Action='UnregisterTaskScheduler' After='SetUnregisterTaskScheduler'>Installed or REINSTALL</Custom>
+			<Custom Action='SetUnregisterTaskScheduler1' After='InstallInitialize'>Installed or REINSTALL</Custom>
+			<Custom Action='UnregisterTaskScheduler1' After='SetUnregisterTaskScheduler1'>Installed or REINSTALL</Custom>
+			<Custom Action='SetUnregisterTaskScheduler2' After='InstallInitialize'>Installed or REINSTALL</Custom>
+			<Custom Action='UnregisterTaskScheduler2' After='SetUnregisterTaskScheduler2'>Installed or REINSTALL</Custom>
+		</InstallExecuteSequence>
+		<Property Id="UnregisterTaskScheduler" Value=" "/>
+		<CustomAction Id="SetUnregisterTaskScheduler" Property="UnregisterTaskScheduler"
+			Value="&quot;[System64Folder]schtasks.exe&quot; /Delete /F /TN &quot;$(var.ProductName)_Start&quot;"/>
+		<CustomAction Id="UnregisterTaskScheduler" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		<Property Id="UnregisterTaskScheduler1" Value=" "/>
+		<CustomAction Id="SetUnregisterTaskScheduler1" Property="UnregisterTaskScheduler1"
+			Value="&quot;[System64Folder]schtasks.exe&quot; /Delete /F /TN &quot;$(var.ProductName)_StartEvent&quot;"/>
+		<CustomAction Id="UnregisterTaskScheduler1" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		<Property Id="UnregisterTaskScheduler2" Value=" "/>
+		<CustomAction Id="SetUnregisterTaskScheduler2" Property="UnregisterTaskScheduler2"
+			Value="&quot;[System64Folder]schtasks.exe&quot; /Delete /F /TN &quot;$(var.ProductName)_Quit&quot;"/>
+		<CustomAction Id="UnregisterTaskScheduler2" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		
+		<!-- Remove App Registry on Uninstall -->
+		<UI>
+			<Publish Dialog="_ExitDialog" Control="Finish" Event="DoAction" Value="RemoveAppRegMSI">Installed and (WIXUI_VERIFYDIALOGOPTIONALCHECKBOX4 = 1)</Publish>
+		</UI>
+		<Property Id="REGISTRY" Value="reg.exe"/>
+		<CustomAction Id="RemoveAppRegMSI" Property="REGISTRY" Execute="immediate" Return="asyncNoWait" Impersonate="yes"
+			ExeCommand="delete HKCU\$(var.AppRegKey) /F" />
+		<InstallExecuteSequence>
+			<Custom Action='RemoveAppReg' After='RemoveExistingProducts'>Installed and (REMOVEAPPREGISTRY = 1)</Custom>
+		</InstallExecuteSequence>
+		<Binary Id="REGISTRY" SourceFile="C:\Windows\System32\reg.exe"> </Binary>
+		<CustomAction Id="RemoveAppReg" BinaryKey="REGISTRY" Execute="immediate" Return="ignore" Impersonate="yes"
+			ExeCommand=" delete HKCU\$(var.AppRegKey) /F" />
+		
+		<!-- Remove Registry on Uninstall -->
+		<InstallExecuteSequence>
+			<Custom Action='SetRemoveProductReg' Before='InstallFinalize'>(Installed or REINSTALL) and ProductCode and (NOT (BUNDLE = 1))</Custom>
+			<Custom Action='RemoveProductReg' After='SetRemoveProductReg'>(Installed or REINSTALL) and ProductCode and (NOT (BUNDLE = 1))</Custom>
+			<Custom Action='SetRemoveProductBundledReg' Before='InstallFinalize'>Installed and REINSTALL and ProductCode and BUNDLED_ID</Custom>
+			<Custom Action='RemoveProductBundledReg' After='SetRemoveProductBundledReg'>Installed and REINSTALL and ProductCode and BUNDLED_ID</Custom>
+			<Custom Action='SetRemoveBundleReg' After='InstallInitialize'>(Installed or REINSTALL) and BUNDLED_ID</Custom>
+			<Custom Action='RemoveBundleReg' After='SetRemoveBundleReg'>(Installed or REINSTALL) and BUNDLED_ID</Custom>
+			<Custom Action='SetRemoveUninstallBundleReg' Before='InstallFinalize'>Installed and REINSTALL and BUNDLED_ID</Custom>
+			<Custom Action='RemoveUninstallBundleReg' After='SetRemoveUninstallBundleReg'>Installed and REINSTALL and BUNDLED_ID</Custom>
+			<Custom Action='SetRemoveUninstallBundleReg2' After='InstallInitialize'>Installed and (NOT REINSTALL) and BUNDLED_ID</Custom>
+			<Custom Action='RemoveUninstallBundleReg2' After='SetRemoveUninstallBundleReg2'>Installed and (NOT REINSTALL)  and BUNDLED_ID</Custom>
+		</InstallExecuteSequence>
+		<Property Id="RemoveProductReg" Value=" "/>
+		<CustomAction Id="SetRemoveProductReg" Property="RemoveProductReg"
+			Value="&quot;[System64Folder]reg.exe&quot; delete HKLM\SOFTWARE\Classes\Installer\Dependencies\[ProductCode] /F"/>
+		<CustomAction Id="RemoveProductReg" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		<Property Id="RemoveProductBundledReg" Value=" "/>
+		<CustomAction Id="SetRemoveProductBundledReg" Property="RemoveProductBundledReg"
+			Value="&quot;[System64Folder]reg.exe&quot; delete HKLM\SOFTWARE\Classes\Installer\Dependencies\[ProductCode]\Dependents\[BUNDLED_ID] /F"/>
+		<CustomAction Id="RemoveProductBundledReg" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		<Property Id="RemoveBundleReg" Value=" "/>
+		<CustomAction Id="SetRemoveBundleReg" Property="RemoveBundleReg"
+			Value="&quot;[System64Folder]reg.exe&quot; delete HKLM\SOFTWARE\Classes\Installer\Dependencies\[BUNDLED_ID] /F"/>
+		<CustomAction Id="RemoveBundleReg" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		<Property Id="RemoveBundleReg2" Value=" "/>
+		<CustomAction Id="SetRemoveBundleReg2" Property="RemoveBundleReg2"
+			Value="&quot;[System64Folder]reg.exe&quot; delete HKLM\SOFTWARE\Classes\Installer\Dependencies\[BUNDLE_ID] /F"/>
+		<CustomAction Id="RemoveBundleReg2" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		<Property Id="RemoveUninstallBundleReg" Value=" "/>
+		<CustomAction Id="SetRemoveUninstallBundleReg" Property="RemoveUninstallBundleReg"
+			Value="&quot;[System64Folder]reg.exe&quot; delete HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\[BUNDLED_ID] /F"/>
+		<CustomAction Id="RemoveUninstallBundleReg" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		<Property Id="RemoveUninstallBundleReg2" Value=" "/>
+		<CustomAction Id="SetRemoveUninstallBundleReg2" Property="RemoveUninstallBundleReg2"
+			Value="&quot;[System64Folder]reg.exe&quot; delete HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\[BUNDLED_ID] /F"/>
+		<CustomAction Id="RemoveUninstallBundleReg2" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		
+		<!-- Remove Cache files on Uninstall -->
+		<InstallExecuteSequence>
+			<Custom Action='RemoveBundledCache' After='InstallInitialize'>(Installed or REINSTALL) and BUNDLED_ID</Custom>
+			<Custom Action='RemoveBundleCache' Before='InstallFinalize'>Installed and (NOT REINSTALL) and BUNDLE_ID and (NOT (BUNDLE = 1))</Custom>
+			<Custom Action='RemoveProductedCache' Before='InstallFinalize'>(Installed or REINSTALL) and BUNDLED_VERSION</Custom>			
+		</InstallExecuteSequence>
+		<Property Id="CMD" Value="cmd.exe"/>
+		<CustomAction Id="RemoveBundledCache" Property="CMD" Execute="deferred" Return="ignore" Impersonate="no"
+			ExeCommand="/c rmdir /S /Q &quot;%ProgramData%\Package Cache\&quot;[BUNDLED_ID]&quot;&quot;" />
+		<CustomAction Id="RemoveBundleCache" Property="CMD" Execute="deferred" Return="ignore" Impersonate="no"
+			ExeCommand="/c rmdir /S /Q &quot;%ProgramData%\Package Cache\&quot;[BUNDLE_ID]&quot;&quot;" />
+		<CustomAction Id="RemoveProductedCache" Property="CMD" Execute="deferred" Return="ignore" Impersonate="no"
+			ExeCommand="/c rmdir /S /Q &quot;%ProgramData%\Package Cache\&quot;[ProductCode]&quot;v[BUNDLED_VERSION]&quot;" />
+		
+		<!-- Remove App Start Menu dir and Desktop shortcut -->
+		<InstallExecuteSequence>
+			<Custom Action='RemoveDesktopShorcutDir' Before='InstallFinalize'>
+				((NOT (BUNDLE = 1) and (WIXUI_VERIFYDIALOGOPTIONALCHECKBOX1 = 0)) or ((BUNDLE = 1) and (ADDDESKTOPSHORTCUT = 0)))
+			</Custom>
+			<Custom Action='RemoveAppStartMenu' Before='InstallFinalize'>
+				((NOT (BUNDLE = 1) and (WIXUI_VERIFYDIALOGOPTIONALCHECKBOX2 = 0)) or ((BUNDLE = 1) and (REGISTERSTARTMENU = 0)))
+			</Custom>
+		</InstallExecuteSequence>
+		<CustomAction Id="RemoveDesktopShorcutDir" Property="CMD" Execute="deferred" Return="ignore" Impersonate="no"
+			ExeCommand="/c del /F /Q &quot;[DesktopFolder]$(var.ProductName).lnk&quot;" />
+		<CustomAction Id="RemoveAppStartMenu" Property="CMD" Execute="deferred" Return="ignore" Impersonate="no"
+			ExeCommand="/c rmdir /S /Q &quot;[AppStartMenuFolder]&quot;" />
+		
+		<!-- Launch Application -->
+		<InstallExecuteSequence>
+			<Custom Action='LaunchApplication' After='InstallFinalize'>((NOT Installed) or REINSTALL) and ((NOT (BUNDLE = 1) and WIXUI_VERIFYDIALOGOPTIONALCHECKBOX3 = 1) or ((BUNDLE = 1) and STARTAPPLICATION = 1))</Custom>
+			<Custom Action='LaunchApplication2' After='InstallInitialize'>((Installed and NOT RESUME and NOT Preselected and NOT PATCH) or REINSTALL) and (NOT BUNDLED_ID) and ((NOT (BUNDLE = 1) and WIXUI_VERIFYDIALOGOPTIONALCHECKBOX3 = 1) or ((BUNDLE = 1) and STARTAPPLICATION = 1))</Custom>
+		</InstallExecuteSequence>
+		<CustomAction Id="LaunchApplication" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]$(var.MainExeFileName) /Start" Execute="immediate" Return="ignore"/>
+		<CustomAction Id="LaunchApplication2" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]$(var.MainExeFileName) /Start" Execute="immediate" Return="ignore"/>
+		
+		<InstallExecuteSequence>
+			<RemoveExistingProducts After="InstallValidate"/>
+		</InstallExecuteSequence>
+		<!---->
+	</Product>
+	
+	<Fragment>
+		<!-- Directory Structure -->
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<!-- INSTALLFOLDER -->
+			<Directory Id="ProgramFiles64Folder" Name="ProgramFiles">
+				<Directory Id="ProgramFilesManufacturer" Name="$(var.Manufacturer)">
+					<Directory Id="INSTALLFOLDER" Name="$(var.ProductName)">
+						<!-- WinUI3 MUIs -->
+						<Directory Id="WinUI3_MUIs_Folder_01" Name="en-us">
+						</Directory>
+						<Directory Id="WinUI3_MUIs_Folder_02" Name="ja-JP">
+						</Directory>
+						<Directory Id="WinUI3_Assets_Folder_01" Name="Microsoft.UI.Xaml">
+							<!-- WinUI3 Assets -->
+							<Directory Id="WinUI3_Assets_Folder_01_01" Name="Assets">
+							</Directory>
+						</Directory>
+					</Directory>
+				</Directory>
+			</Directory>
+			<Directory Id="CommonAppDataFolder" Name="AppDataFiles">
+				<!-- DATA INSTALLFOLDER -->
+				<Directory Id="AppDataFilesManufacturer" Name="$(var.Manufacturer)">
+					<Directory Id="DATAINSTALLFOLDER" Name="$(var.ProductName)">
+					</Directory>
+				</Directory>
+			</Directory>
+			<!-- Start Menu -->
+			<Directory Id="ProgramMenuFolder" Name="Programs">
+				<Directory Id="AppStartMenuFolder" Name="$(var.Manufacturer)">
+				</Directory>
+			</Directory>
+			<!-- Desktop -->
+			<Directory Id="DesktopFolder" Name="Desktop">
+			</Directory>
+		</Directory>
+	</Fragment>
+	
+	<Fragment>
+		<!-- Feature -->
+		<Feature Id="EssentialFeature" Title="$(var.ProductName)" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+			<ComponentRef Id="EventLogRegistry" />
+			<ComponentRef Id="WixBundleRegistry" />
+			<ComponentGroupRef Id="WinUI3_Folders_01" />
+			<ComponentGroupRef Id="WinUI3_Folders_02" />
+			<ComponentGroupRef Id="WinUI3_Folders_03" />
+			<ComponentGroupRef Id="ProductDataComponents" />
+			<ComponentRef Id="AppDatacomponents" />
+			<ComponentRef Id="DesktopShortcut" />
+			<ComponentRef Id="AppStartMenuShortcut" />
+		</Feature>
+		<!-- Files -->
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+			<!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
+			<!-- <Component Id="ProductComponent"> -->
+			<!-- TODO: Insert files, registry keys, and other resources here. -->
+			<!-- </Component> -->
+			<Component Id="$(var.MainExeFileName)" Guid="{25BEEEA7-583D-4C15-9566-FFA42716A1C9}">
+				<File Id="$(var.MainExeFileName)" Name="$(var.MainExeFileName)" Source="$(var.TargetDir01)$(var.MainExeFileName)" />
+			</Component>
+			<Component Id="$(var.ProductName)DLL.dll" Guid="{3C81EF6B-D231-4739-8361-496FE5BE93D3}">
+				<File Id="$(var.ProductName)DLL.dll" Name="$(var.ProductName)DLL.dll" Source="$(var.TargetDir01)$(var.ProductName)DLL.dll" />
+			</Component>
+			<Component Id="$(var.ProductName)32.exe" Guid="{CB3543F9-1CA7-4773-9105-CB1BD98F49FD}">
+				<File Id="$(var.ProductName)32.exe" Name="$(var.ProductName)32.exe" Source="$(var.TargetDir02)$(var.ProductName)32.exe" />
+			</Component>
+			<Component Id="$(var.ProductName)DLL32.dll" Guid="{CCBA3647-0988-463A-89E4-0BFD5EA13DA0}">
+				<File Id="$(var.ProductName)DLL32.dll" Name="$(var.ProductName)DLL32.dll" Source="$(var.TargetDir02)$(var.ProductName)DLL32.dll" />
+			</Component>
+			<Component Id="Register_TaskScheduler.xml" Guid="{3FA0C6AB-6E9C-4B55-BE44-A02A3B6A0C3E}">
+				<File Id="Register_TaskScheduler.xml" Name="Register_TaskScheduler.xml" Source="$(var.TargetDir04)Register_TaskScheduler.xml" />
+			</Component>
+			<Component Id="Register_TaskScheduler1.xml" Guid="{FCA13B82-211A-4716-B6F0-C8AECCE4C72B}">
+				<File Id="Register_TaskScheduler1.xml" Name="Register_TaskScheduler1.xml" Source="$(var.TargetDir04)Register_TaskScheduler1.xml" />
+			</Component>
+			<Component Id="Register_TaskScheduler2.xml" Guid="{17BD4844-87C4-4A06-BBF3-86C94D22C5DC}">
+				<File Id="Register_TaskScheduler2.xml" Name="Register_TaskScheduler2.xml" Source="$(var.TargetDir04)Register_TaskScheduler2.xml" />
+			</Component>
+			<Component Id="License.rtf" Guid="{E6E55A92-6BE8-4612-8172-0BC04811D6E1}">
+				<File Id="License.rtf" Name="License.rtf" Source="$(var.TargetDir04)License.rtf" />
+			</Component>
+			<Component Id="Readme.txt" Guid="{061E1F61-3726-49AC-A504-2A4D115635F3}">
+				<File Id="Readme.txt" Name="Readme.txt" Source="$(var.TargetDir04)Readme.txt" />
+			</Component>
+			<Component Id="Register_Eventlog.reg" Guid="{FBC3FF68-EF97-43F1-BE86-5F5CFC3AE4F1}">
+				<File Id="Register_Eventlog.reg" Name="Register_Eventlog.reg" Source="$(var.TargetDir04)Register_Eventlog.reg" />
+			</Component>
+			<!-- For WinUI3 -->
+			<!-- DLL -->
+			<Component Id="WinUI3_DLL_01" Guid="{9F85333C-F9D6-4166-8DF3-F1E001DFB240}">
+				<File Id="WinUI3__DLL_01" Name="FlushMouseUI3DLL.dll" Source="$(var.TargetDir01)FlushMouseUI3DLL.dll" />
+			</Component>
+			<!-- Icon -->
+			<Component Id="WinUI3_Icon_01" Guid="{592E3E6A-D526-4FBB-AB23-2E259DB76A05}">
+				<File Id="WinUI3__Icon_01" Name="FlushMouse.ico" Source="$(var.TargetDir01)FlushMouse.ico" />
+			</Component>
+			<!-- pri -->
+			<Component Id="WinUI3_Pri_01" Guid="{374D0217-AF35-4F6C-B167-B14F7C3CC6EB}">
+				<File Id="WinUI3__Pri_01" Name="FlushMouse.pri" Source="$(var.TargetDir01)FlushMouse.pri" />
+			</Component>
+			<!-- xbf -->
+			<Component Id="WinUI3_xbf_01" Guid="{8624A1D0-DF2E-427D-9151-FD0A44ABA963}">
+				<File Id="WinUI3__xbf_01" Name="FlushMouse.xbf" Source="$(var.TargetDir01)FlushMouse.xbf" />
+			</Component>
+			<Component Id="WinUI3_xbf_02" Guid="{7BD1F8ED-7985-4F8B-9B88-0D017F4C9D2A}">
+				<File Id="WinUI3__xbf_02" Name="MojoWindow.xbf" Source="$(var.TargetDir01)MojoWindow.xbf" />
+			</Component>
+			<Component Id="WinUI3_xbf_03" Guid="{9E400D6D-E159-413C-B2CC-ED8D72F05D8E}">
+				<File Id="WinUI3__xbf_03" Name="Settings.xbf" Source="$(var.TargetDir01)Settings.xbf" />
+			</Component>
+			<Component Id="WinUI3_xbf_04" Guid="{D40591ED-CA33-4220-9485-A1B8C7297BFD}">
+				<File Id="WinUI3__xbf_04" Name="About.xbf" Source="$(var.TargetDir01)About.xbf" />
+			</Component>
+
+			<!-- WinUI3 DLLs and some Files-->
+			<Component Id="WinUI3_DLLs_01" Guid="{C132F5C7-A802-46F3-B302-8E6E16CBE41B}">
+				<File Id="WinUI3_DLLs_01" Name="CoreMessagingXP.dll" Source="$(var.TargetDir01)CoreMessagingXP.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_02" Guid="{2D2486F4-F84D-436A-B8C0-010D79C7F092}">
+				<File Id="WinUI3_DLLs_02" Name="dcompi.dll" Source="$(var.TargetDir01)dcompi.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_03" Guid="{8F734FC6-2310-48E9-81C7-02F2B4C41CFC}">
+				<File Id="WinUI3_DLLs_03" Name="dwmcorei.dll" Source="$(var.TargetDir01)dwmcorei.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_04" Guid="{EBE867CD-774D-4E3F-8857-4983A06662E7}">
+				<File Id="WinUI3_DLLs_04" Name="DwmSceneI.dll" Source="$(var.TargetDir01)DwmSceneI.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_05" Guid="{DCDB79CB-F4B8-4D77-B3DA-DD9225B3230E}">
+				<File Id="WinUI3_DLLs_05" Name="DWriteCore.dll" Source="$(var.TargetDir01)DWriteCore.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_06" Guid="{22B6C248-C46A-4107-A784-45CFAD5C87C0}">
+				<File Id="WinUI3_DLLs_06" Name="marshal.dll" Source="$(var.TargetDir01)marshal.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_07" Guid="{22F260A3-447A-4A1F-816C-3F8C5CFACAF5}">
+				<File Id="WinUI3_DLLs_07" Name="Microsoft.DirectManipulation.dll" Source="$(var.TargetDir01)Microsoft.DirectManipulation.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_08" Guid="{DBB5FB81-BC97-43B4-A085-E9FA2392F107}">
+				<File Id="WinUI3_DLLs_08" Name="Microsoft.Graphics.Display.dll" Source="$(var.TargetDir01)Microsoft.Graphics.Display.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_09" Guid="{B3125BE9-4F02-4178-AF42-D89FF6B58B43}">
+				<File Id="WinUI3_DLLs_09" Name="Microsoft.InputStateManager.dll" Source="$(var.TargetDir01)Microsoft.InputStateManager.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_10" Guid="{CA5CB024-06B7-49D9-B2B9-709BD9472553}">
+				<File Id="WinUI3_DLLs_10" Name="Microsoft.InteractiveExperiences.Projection.dll" Source="$(var.TargetDir01)Microsoft.InteractiveExperiences.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_11" Guid="{12DF648D-34F3-43E0-BB3B-0F5FF2C2A461}">
+				<File Id="WinUI3_DLLs_11" Name="Microsoft.Internal.FrameworkUdk.dll" Source="$(var.TargetDir01)Microsoft.Internal.FrameworkUdk.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_12" Guid="{7417A58D-1AB8-4160-B1FC-3E81129C54C5}">
+				<File Id="WinUI3_DLLs_12" Name="Microsoft.UI.Composition.OSSupport.dll" Source="$(var.TargetDir01)Microsoft.UI.Composition.OSSupport.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_13" Guid="{8CE6F139-F843-48E8-AD5A-1C3617AF41E6}">
+				<File Id="WinUI3_DLLs_13" Name="Microsoft.UI.dll" Source="$(var.TargetDir01)Microsoft.UI.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_14" Guid="{2CB7F360-1334-4158-8FC6-DFECB20E65DF}">
+				<File Id="WinUI3_DLLs_14" Name="Microsoft.UI.Input.dll" Source="$(var.TargetDir01)Microsoft.UI.Input.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_15" Guid="{4332EB29-6E59-448D-AA6A-E88A9E060BA9}">
+				<File Id="WinUI3_DLLs_15" Name="Microsoft.UI.Windowing.Core.dll" Source="$(var.TargetDir01)Microsoft.UI.Windowing.Core.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_16" Guid="{94768C35-8A92-4E1D-A252-5F11265E2037}">
+				<File Id="WinUI3_DLLs_16" Name="Microsoft.UI.Windowing.dll" Source="$(var.TargetDir01)Microsoft.UI.Windowing.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_17" Guid="{380FE697-975C-483A-B661-3BCC851A7BF8}">
+				<File Id="WinUI3_DLLs_17" Name="RestartAgent.exe" Source="$(var.TargetDir01)RestartAgent.exe" />
+			</Component>
+			<Component Id="WinUI3_DLLs_18" Guid="{F74444B8-DF83-45E6-A9D8-424CF69C5CF3}">
+				<File Id="WinUI3_DLLs_18" Name="Microsoft.UI.Xaml.Controls.dll" Source="$(var.TargetDir01)Microsoft.UI.Xaml.Controls.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_19" Guid="{E87282BA-3380-49C2-80EF-4C3A5BB61383}">
+				<File Id="WinUI3_DLLs_19" Name="Microsoft.UI.Xaml.Controls.pri" Source="$(var.TargetDir01)Microsoft.UI.Xaml.Controls.pri" />
+			</Component>
+			<Component Id="WinUI3_DLLs_20" Guid="{25B29663-0F89-4D29-82E4-B71A9EBB9BA5}">
+				<File Id="WinUI3_DLLs_20" Name="Microsoft.ui.xaml.dll" Source="$(var.TargetDir01)Microsoft.ui.xaml.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_21" Guid="{354C9FB6-7723-4C81-9BD1-768091829513}">
+				<File Id="WinUI3_DLLs_21" Name="Microsoft.UI.Xaml.Internal.dll" Source="$(var.TargetDir01)Microsoft.UI.Xaml.Internal.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_22" Guid="{5F19341F-74A9-4C98-AD88-EDF9C844F7F0}">
+				<File Id="WinUI3_DLLs_22" Name="Microsoft.UI.Xaml.Phone.dll" Source="$(var.TargetDir01)Microsoft.UI.Xaml.Phone.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_23" Guid="{3902111E-2D7D-48AD-B3D0-28CCD39B03F1}">
+				<File Id="WinUI3_DLLs_23" Name="Microsoft.ui.xaml.resources.19h1.dll" Source="$(var.TargetDir01)Microsoft.ui.xaml.resources.19h1.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_24" Guid="{CA218B78-04BB-4BE9-BEEB-EC6354BC3EE9}">
+				<File Id="WinUI3_DLLs_24" Name="Microsoft.ui.xaml.resources.common.dll" Source="$(var.TargetDir01)Microsoft.ui.xaml.resources.common.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_25" Guid="{64F7D907-C246-4649-84A0-4BB19EAC1E80}">
+				<File Id="WinUI3_DLLs_25" Name="Microsoft.Web.WebView2.Core.dll" Source="$(var.TargetDir01)Microsoft.Web.WebView2.Core.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_26" Guid="{83EB6961-4826-4BAA-B33D-5DAD07B1104A}">
+				<File Id="WinUI3_DLLs_26" Name="Microsoft.Windows.ApplicationModel.DynamicDependency.Projection.dll" Source="$(var.TargetDir01)Microsoft.Windows.ApplicationModel.DynamicDependency.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_27" Guid="{260AF955-E6B4-479C-9506-895B73F84703}">
+				<File Id="WinUI3_DLLs_27" Name="Microsoft.Windows.ApplicationModel.Resources.dll" Source="$(var.TargetDir01)Microsoft.Windows.ApplicationModel.Resources.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_28" Guid="{F6B0514E-319D-4DAC-89F5-C0A35F180641}">
+				<File Id="WinUI3_DLLs_28" Name="Microsoft.Windows.ApplicationModel.Resources.Projection.dll" Source="$(var.TargetDir01)Microsoft.Windows.ApplicationModel.Resources.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_29" Guid="{981DE7F1-5D10-4E96-88D9-0005D58B0B9F}">
+				<File Id="WinUI3_DLLs_29" Name="Microsoft.Windows.ApplicationModel.WindowsAppRuntime.Projection.dll" Source="$(var.TargetDir01)Microsoft.Windows.ApplicationModel.WindowsAppRuntime.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_30" Guid="{028D0780-9F77-4F92-9B7B-C47E9CF04CAD}">
+				<File Id="WinUI3_DLLs_30" Name="Microsoft.Windows.AppLifecycle.Projection.dll" Source="$(var.TargetDir01)Microsoft.Windows.AppLifecycle.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_31" Guid="{F482B5A2-D544-4697-B23D-E1AD4EC8B994}">
+				<File Id="WinUI3_DLLs_31" Name="Microsoft.Windows.AppNotifications.Builder.Projection.dll" Source="$(var.TargetDir01)Microsoft.Windows.AppNotifications.Builder.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_32" Guid="{ADC38393-B4B1-4424-9F96-F2F1C57564C4}">
+				<File Id="WinUI3_DLLs_32" Name="Microsoft.Windows.AppNotifications.Projection.dll" Source="$(var.TargetDir01)Microsoft.Windows.AppNotifications.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_33" Guid="{86B1173E-EA6B-4940-8F11-4A80DE680FCD}">
+				<File Id="WinUI3_DLLs_33" Name="Microsoft.Windows.PushNotifications.Projection.dll" Source="$(var.TargetDir01)Microsoft.Windows.PushNotifications.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_34" Guid="{6A666B84-6531-4334-9C6B-4BC06FC896B3}">
+				<File Id="WinUI3_DLLs_34" Name="Microsoft.Windows.SDK.NET.dll" Source="$(var.TargetDir01)Microsoft.Windows.SDK.NET.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_35" Guid="{6D3E2568-6868-4FA3-86BA-89BF95A26C47}">
+				<File Id="WinUI3_DLLs_35" Name="Microsoft.Windows.Security.AccessControl.Projection.dll" Source="$(var.TargetDir01)Microsoft.Windows.Security.AccessControl.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_36" Guid="{15DDE89C-7C01-4278-A437-176FEFFB65E2}">
+				<File Id="WinUI3_DLLs_36" Name="Microsoft.Windows.System.Power.Projection.dll" Source="$(var.TargetDir01)Microsoft.Windows.System.Power.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_37" Guid="{DD66763D-13A9-4E97-9390-2D08A8C8DA0B}">
+				<File Id="WinUI3_DLLs_37" Name="Microsoft.Windows.System.Projection.dll" Source="$(var.TargetDir01)Microsoft.Windows.System.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_38" Guid="{4439D615-B81B-413D-9C7C-8C94E0AC6737}">
+				<File Id="WinUI3_DLLs_38" Name="Microsoft.Windows.Widgets.dll" Source="$(var.TargetDir01)Microsoft.Windows.Widgets.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_39" Guid="{71AA72E3-3090-472C-89E6-B737C18128E7}">
+				<File Id="WinUI3_DLLs_39" Name="Microsoft.Windows.Widgets.Providers.Projection.dll" Source="$(var.TargetDir01)Microsoft.Windows.Widgets.Providers.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_40" Guid="{0A887DDE-2A11-40DF-8297-5AA24CD6B81E}">
+				<File Id="WinUI3_DLLs_40" Name="Microsoft.WindowsAppRuntime.Bootstrap.dll" Source="$(var.TargetDir01)Microsoft.WindowsAppRuntime.Bootstrap.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_41" Guid="{6EE02715-F8CD-4FFA-AE2E-D51213759CA0}">
+				<File Id="WinUI3_DLLs_41" Name="Microsoft.WindowsAppRuntime.Bootstrap.Net.dll" Source="$(var.TargetDir01)Microsoft.WindowsAppRuntime.Bootstrap.Net.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_42" Guid="{C82CF71B-34EE-44EA-9D1C-BC3DD39F3BAB}">
+				<File Id="WinUI3_DLLs_42" Name="Microsoft.WindowsAppRuntime.dll" Source="$(var.TargetDir01)Microsoft.WindowsAppRuntime.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_43" Guid="{C3FEAF51-F041-493C-AC8C-9BFA9F9C5A08}">
+				<File Id="WinUI3_DLLs_43" Name="Microsoft.WindowsAppRuntime.Insights.Resource.dll" Source="$(var.TargetDir01)Microsoft.WindowsAppRuntime.Insights.Resource.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_44" Guid="{62EB8752-7148-475A-B4F5-F4FF58DFF22E}">
+				<File Id="WinUI3_DLLs_44" Name="Microsoft.WinUI.dll" Source="$(var.TargetDir01)Microsoft.WinUI.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_45" Guid="{4282D34A-C410-4F5E-9AB4-BB067F5E346B}">
+				<File Id="WinUI3_DLLs_45" Name="MRM.dll" Source="$(var.TargetDir01)MRM.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_46" Guid="{7C453688-9345-4D61-97D9-60763768F2AF}">
+				<File Id="WinUI3_DLLs_46" Name="PushNotificationsLongRunningTask.ProxyStub.dll" Source="$(var.TargetDir01)PushNotificationsLongRunningTask.ProxyStub.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_47" Guid="{3B47D195-828A-4B7F-A87F-8C66AEC1804A}">
+				<File Id="WinUI3_DLLs_47" Name="WindowsAppRuntime.png" Source="$(var.TargetDir01)WindowsAppRuntime.png" />
+			</Component>
+			<Component Id="WinUI3_DLLs_48" Guid="{2B537BB3-F9FB-4CFD-B956-133A1E26EA9E}">
+				<File Id="WinUI3_DLLs_48" Name="WindowsAppSdk.AppxDeploymentExtensions.Desktop-EventLog-Instrumentation.dll" Source="$(var.TargetDir01)WindowsAppSdk.AppxDeploymentExtensions.Desktop-EventLog-Instrumentation.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_49" Guid="{F71CA315-423C-4EBF-A57F-DE744D8E640F}">
+				<File Id="WinUI3_DLLs_49" Name="WindowsAppSdk.AppxDeploymentExtensions.Desktop.dll" Source="$(var.TargetDir01)WindowsAppSdk.AppxDeploymentExtensions.Desktop.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_50" Guid="{3232D528-6DCE-4791-9CB6-8C29C7EBAD36}">
+				<File Id="WinUI3_DLLs_50" Name="WinRT.Host.dll" Source="$(var.TargetDir01)WinRT.Host.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_51" Guid="{15137C21-3FE1-4B52-A902-76559DFDB1D6}">
+				<File Id="WinUI3_DLLs_51" Name="WinRT.Host.dll.mui" Source="$(var.TargetDir01)WinRT.Host.dll.mui" />
+			</Component>
+			<Component Id="WinUI3_DLLs_52" Guid="{13E8EC96-24F9-4402-A0F7-72F7264025AA}">
+				<File Id="WinUI3_DLLs_52" Name="WinRT.Host.runtimeconfig.json" Source="$(var.TargetDir01)WinRT.Host.runtimeconfig.json" />
+			</Component>
+			<Component Id="WinUI3_DLLs_53" Guid="{4AB71974-CBE6-42B0-B479-A92760FF78E9}">
+				<File Id="WinUI3_DLLs_53" Name="WinRT.Host.Shim.dll" Source="$(var.TargetDir01)WinRT.Host.Shim.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_54" Guid="{FA92DA53-61F1-4181-AD92-9D86A2E823FE}">
+				<File Id="WinUI3_DLLs_54" Name="WinRT.Runtime.dll" Source="$(var.TargetDir01)WinRT.Runtime.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_55" Guid="{DDBC54CF-C854-4D03-8862-F7BEB4EE047E}">
+				<File Id="WinUI3_DLLs_55" Name="WinUIEdit.dll" Source="$(var.TargetDir01)WinUIEdit.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_56" Guid="{731FE55D-675F-4B31-A141-C87CF28FB218}">
+				<File Id="WinUI3_DLLs_56" Name="wuceffectsi.dll" Source="$(var.TargetDir01)wuceffectsi.dll" />
+			</Component>
+
+			<!-- Application registry -->
+			<Component Id="EventLogRegistry" Guid="{B5A28410-C07F-43BD-BA17-D15F0331986B}">
+				<RegistryKey Root="HKLM" Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\$(var.ProductName)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
+					<RegistryValue Type="integer" Name="CustomSource" Value="00000001" KeyPath="yes" />
+					<RegistryValue Type="integer" Name="TypesSupported" Value="00000007" KeyPath="no" />
+					<RegistryValue Type="expandable" Name="EventMessageFile" Value="%ProgramFiles%\$(var.Manufacturer)\$(var.ProductName)\FlushMouseDLL.dll" KeyPath="no" />
+				</RegistryKey>
+			</Component>
+			<!-- Wix Bundle registries -->
+			<Component Id="WixBundleRegistry" Guid="{1CEF426E-33C4-4D16-B666-DE3F9084411E}">
+				<RegistryKey Root="HKLM" Key="SOFTWARE\WOW6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
+					<RegistryValue Type="string" Name="ProductID" Value="[ProductCode]" KeyPath="yes" />
+					<RegistryValue Type="string" Name="BundleID" Value="[BUNDLE_ID]" KeyPath="no" />
+					<RegistryValue Type="string" Name="BundleVersion" Value="[BUNDLE_VERSION]" KeyPath="no" />
+				</RegistryKey>
+			</Component>
+		</ComponentGroup>
+		<!-- WinUI3 MUI -->
+		<ComponentGroup Id="WinUI3_Folders_01" Directory="WinUI3_MUIs_Folder_01">
+			<Component Id="WinUI3_Folders_01" Guid="{C569982F-3E9E-41AD-B0D3-06EC4458EA51}">
+				<File Id="WinUI3_Folders_01_01" Name="Microsoft.ui.xaml.dll.mui" Source="$(var.TargetDir01)en-us\Microsoft.ui.xaml.dll.mui" />
+				<File Id="WinUI3_Folders_01_02" Name="Microsoft.UI.Xaml.Phone.dll.mui" Source="$(var.TargetDir01)en-us\Microsoft.UI.Xaml.Phone.dll.mui" />
+				<RemoveFolder Id="WinUI3_MUIs_Folder_01" On="uninstall" />
+			</Component>
+		</ComponentGroup>
+		<ComponentGroup Id="WinUI3_Folders_02" Directory="WinUI3_MUIs_Folder_02">
+			<Component Id="WinUI3_Folders_02" Guid="{88CB9695-48AD-440D-9D35-AB0DC4C6726E}">
+				<File Id="WinUI3_Folders_02_01" Name="Microsoft.ui.xaml.dll.mui" Source="$(var.TargetDir01)ja-JP\Microsoft.ui.xaml.dll.mui" />
+				<File Id="WinUI3_Folders_02_02" Name="Microsoft.UI.Xaml.Phone.dll.mui" Source="$(var.TargetDir01)ja-JP\Microsoft.UI.Xaml.Phone.dll.mui" />
+				<RemoveFolder Id="WinUI3_MUIs_Folder_02" On="uninstall" />
+			</Component>
+		</ComponentGroup>
+		<!-- WinUI3 Assets -->
+		<ComponentGroup Id="WinUI3_Folders_03" Directory="WinUI3_Assets_Folder_01_01">
+			<Component Id="WinUI3_Folders_03" Guid="{1AEFF58C-4EEC-4151-9656-93EFE037369D}">
+				<File Id="WinUI3_Folders_03_01" Name="NoiseAsset_256X256_PNG.png" Source="$(var.TargetDir01)Microsoft.UI.Xaml\Assets\NoiseAsset_256X256_PNG.png" />
+				<RemoveFolder Id="WinUI3_Assets_Folder_01_01" On="uninstall" />
+			</Component>
+		</ComponentGroup>
+
+		<!-- Data Files -->
+		<ComponentGroup Id="ProductDataComponents" Directory="DATAINSTALLFOLDER">
+			<Component Id="AppDatacomponents" Guid="{3A125A04-4180-457A-8F41-B6DC29E61431}">
+				<File Id="$(var.ProductName)Cursor.dat" Name="$(var.ProductName)Cursor.dat" Source="$(var.TargetDir03)$(var.ProductName)Cursor.dat" />
+				<RemoveFolder Id="AppDatacomponents" On="uninstall" />
+			</Component>
+		</ComponentGroup>
+		<!-- Shortcuts -->
+		<DirectoryRef Id="DesktopFolder">
+			<Component Id="DesktopShortcut" Guid="{2E074233-454E-41B4-918F-8C6A1FBAD304}">
+				<Condition>((NOT (BUNDLE = 1)) and (WIXUI_VERIFYDIALOGOPTIONALCHECKBOX1 = 1)) or (BUNDLE = 1)</Condition>
+				<RegistryValue Root="HKCU" Key="$(var.AppRegKey)" Name="InstalledDesktopShortcut" Type="integer" Value="1" KeyPath="yes" />
+				<RemoveFolder Id="DesktopFolder" On="uninstall" />
+				<Shortcut Id="DesktopShortcut" Name="$(var.ProductName)" Target="[INSTALLFOLDER]$(var.MainExeFileName)" Arguments="/Start" WorkingDirectory="INSTALLFOLDER" Advertise="no" />
+			</Component>
+		</DirectoryRef>
+		<DirectoryRef Id="AppStartMenuFolder">
+			<Component Id="AppStartMenuShortcut" Guid="{53762501-B26D-44E7-A14D-C74508107C19}">
+				<Condition>((NOT (BUNDLE = 1)) and (WIXUI_VERIFYDIALOGOPTIONALCHECKBOX2 = 1)) or (BUNDLE = 1)</Condition>
+				<RegistryValue Root="HKCU" Key="$(var.AppRegKey)" Name="InstalledStartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
+				<RemoveFolder Id="AppStartMenuFolder" On="uninstall" />
+				<Shortcut Id="StartMenuShortcut" Name="$(var.ProductName)" Target="[INSTALLFOLDER]$(var.MainExeFileName)" Arguments="/Start" WorkingDirectory="INSTALLFOLDER" Advertise="no" />
+			</Component>
+		</DirectoryRef>
+	</Fragment>
+</Wix>

@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Bundle.wxs for FlushMouse Copyright (C) 2023 JeffyTS -->
+
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
 	 xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
 	 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 	<?include ..\SetupProject\version.wxi ?>
+	<?define LogoSrc = "..\OSDN Wiki\FlushMouse.png" ?>
 	<?define LicenseSrc = "..\SetupProject\License.rtf" ?>
+	<?define IconSrcFile = "..\FlushMouseLIB\FlushMouse.ico" ?>
 
 	<?define LocalizationSrc = "customtheme.wxl" ?>
 	<?define CustomThemeSrc = "customtheme.xml" ?>
@@ -17,7 +22,7 @@
 			UpgradeCode="{2590C08A-B975-41F3-ACA2-1DA69A22DA1D}"
 			DisableModify="yes"
 			DisableRemove="yes">
-
+		
 		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
 			<bal:WixStandardBootstrapperApplication
 				LicenseFile="$(var.LicenseSrc)"
@@ -30,7 +35,7 @@
 				LocalizationFile="$(var.LocalizationSrc)"
 				/>
 		</BootstrapperApplicationRef>
-
+		
 		<OptionalUpdateRegistration Name="$(var.ProductName)"/>
 		<Variable Name="SearchProductVersion" bal:Overridable="yes" Type="numeric" Value="0" />
 		<Variable Name="SearchBundleVersion" bal:Overridable="yes" Type="numeric" Value="0"/>
@@ -55,14 +60,14 @@
 			Key="SOFTWARE\WOW6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)"
 			Value="BundleID"
 			Variable="SearchBundleID" />
-
+		
 		<bal:Condition Message ="別のバージョンの $(var.ProductName) が既にインストールされているため、このバージョンのインストールを続行できません。既にインストールされているバージョンを削除するには、設定の「アプリ」から「インストールされているアプリ」、またはコントロールパネルの「プログラムと機能」を使用します。">
 			<![CDATA[NOT ((NOT SearchBundleVersion) AND SearchProductVersion)]]>
 		</bal:Condition>
 		<bal:Condition Message ="新しいバージョンの $(var.ProductName) が既にインストールされているため、このバージョンのインストールを続行できません。既にインストールされているバージョンを削除するには、設定の「アプリ」から「インストールされているアプリ」、またはコントロールパネルの「プログラムと機能」を使用します。">
 			<![CDATA[NOT (SearchBundleVersion AND SearchProductVersion AND (SearchProductVersion > WixBundleFileVersion))]]>
 		</bal:Condition>
-
+		
 		<Variable Name="AddDesktopShortcut" bal:Overridable="yes" Value="1" />
 		<Variable Name="AddDesktopShortcutVariable" bal:Overridable="yes" Value="[AddDesktopShortcut]" />
 		<Variable Name="RegisterStartMenu" bal:Overridable="yes" Value="1" />
@@ -71,7 +76,7 @@
 		<Variable Name="StartApplicationVariable" bal:Overridable="yes" Value="[StartApplication]" />
 		<Variable Name="RemoveAppRegstry" bal:Overridable="yes" Value="0" />
 		<Variable Name="RemoveAppRegstryVariable" bal:Overridable="yes" Value="[RemoveAppRegstry]" />
-
+		
 		<Chain>
 			<!-- TODO: Define the list of chained packages. -->
 			<MsiPackage Id="MainPackage"

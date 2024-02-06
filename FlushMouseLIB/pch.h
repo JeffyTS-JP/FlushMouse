@@ -17,8 +17,6 @@
 #include <shellapi.h>
 #include <shellscalingapi.h>
 #pragma comment(lib, "Shcore.lib")
-#include <commctrl.h>
-#pragma comment(lib, "comctl32.lib")
 #include <imm.h>
 #include <ime_cmodes.h>
 #pragma comment(lib, "Imm32.lib")

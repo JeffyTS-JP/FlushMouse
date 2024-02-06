@@ -102,7 +102,8 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -112,7 +113,10 @@
       <UACUIAccess>false</UACUIAccess>
     </Link>
     <PostBuildEvent>
-      <Command>copy ..\$(Platform)\$(Configuration)\FlushMouseDLL32.dll ..\x64\$(Configuration)\</Command>
+      <Command>Xcopy /Y $(OutDir)$(TargetName)$(TargetExt) $(MSBuildStartupDirectory)\x64\$(Configuration)\
+Xcopy /Y $(OutDir)$(TargetName).pdb $(MSBuildStartupDirectory)\x64\$(Configuration)\
+Xcopy /Y $(OutDir)$(TargetName)$(TargetExt) $(MSBuildStartupDirectory)\x64\$(Configuration)\FlushMouseUI3\
+Xcopy /Y $(OutDir)$(TargetName).pdb $(MSBuildStartupDirectory)\x64\$(Configuration)\FlushMouseUI3\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -125,9 +129,10 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SupportJustMyCode>true</SupportJustMyCode>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -139,8 +144,11 @@
       <UACUIAccess>false</UACUIAccess>
     </Link>
     <PostBuildEvent>
-      <Command>Start /min /wait cmd /c "..\Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
-copy ..\$(Platform)\$(Configuration)\FlushMouseDLL32.dll ..\x64\$(Configuration)\</Command>
+      <Command>Start /min /wait cmd /c "$(MSBuildStartupDirectory)\Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
+Xcopy /Y $(OutDir)$(TargetName)$(TargetExt) $(MSBuildStartupDirectory)\x64\$(Configuration)\
+Xcopy /Y $(OutDir)$(TargetName).pdb $(MSBuildStartupDirectory)\x64\$(Configuration)\
+Xcopy /Y $(OutDir)$(TargetName)$(TargetExt) $(MSBuildStartupDirectory)\x64\$(Configuration)\FlushMouseUI3\
+Xcopy /Y $(OutDir)$(TargetName).pdb $(MSBuildStartupDirectory)\x64\$(Configuration)\FlushMouseUI3\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

@@ -44,13 +44,19 @@ private:
 //
 // Global Prototype Define
 //
-extern BOOL			bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, int nCmdShow);
+extern BOOL			bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_opt_ LPWSTR lpCmdLine, _In_ int nCmdShow);
+extern int			iCheckCmdLine(LPTSTR lpCmdLine);
 extern VOID			vDestroyWindow(HWND hWnd);
 extern BOOL			bStartThreadHookTimer(HWND hWnd);
-extern VOID			vStopThreadHookTimer(HWND hWnd);
 extern BOOL	 		bCreateProcess(LPCTSTR lpszExecName);
 extern BOOL			bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, BOOL bIMEModeForcedChange, LPHKL lpNewHKL, LPHKL lpPreviousHKL);
 extern BOOL			bCheckExistingJPIME();
+
+extern void			vMessageBox(HWND hWnd, UINT uID, UINT uType);
+extern VOID			vAboutDialog(HWND hWnd);
+extern VOID			vSettingDialog(HWND hWnd);
+extern VOID			vSettingDialogApply();
+extern VOID			vSettingDialogClose();
 
 //
 // Global Data
@@ -61,20 +67,11 @@ extern TCHAR		szFlushMouse32[];
 extern TCHAR		szTitle[];
 extern HWND			hMainWnd;
 
-extern BOOL			bOffChangedFocus;
-extern BOOL			bDoModeDispByIMEKeyDown;
-extern BOOL			bDoModeDispByCtrlUp;
-extern BOOL			bDisplayFocusWindowIME;
-extern BOOL			bDisplayIMEModeOnCursor;
-extern BOOL			bDoModeDispByMouseBttnUp;
-extern BOOL			bDrawNearCaret;
-extern BOOL			bEnableEPHelper;
-extern BOOL			bMoveIMEToolbar;
-extern BOOL			bIMEModeForced;
-
 extern CProfile		*Profile;
 extern CCursor		*Cursor;
 extern CResource	*Resource;
 extern CIME			*Cime;
+
+extern BOOL			bIMEInConverting;
 
 /* = EOF = */

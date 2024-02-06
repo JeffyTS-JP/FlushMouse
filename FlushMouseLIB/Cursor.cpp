@@ -15,7 +15,7 @@
 #include "Cursor.h"
 #include "FlushMouseLIB.h"
 #include "CommonDef.h"
-#include "..\FlushMouseDLL\EventlogDll.h"
+#include "Eventlog.h"
 #include "..\MiscLIB\CRegistry.h"
 
 //
@@ -66,7 +66,7 @@ CCursor::CCursor()
 	stIMECursorData.lpszLoadDatName = NULL;
 	stIMECursorData.lpstFlushMouseCursor = (LPFLUSHMOUSECURSOR)&stFlushMouseCursor;
 
-	stIMECursorData.hWnd = NULL;
+	stIMECursorData.hWndCaret = NULL;
 
 	IMECursorChangeThread = NULL;
 	CursorWindow = NULL;
@@ -77,21 +77,21 @@ CCursor::CCursor()
 
 CCursor::~CCursor()
 {
-	if (DrawIMEModeCaretThread != NULL) {
-		delete	DrawIMEModeCaretThread;
-		DrawIMEModeCaretThread = NULL;
-	}
-	if (CaretWindow != NULL) {
-		delete	CaretWindow;	
-		CaretWindow = NULL;
-	}
 	if (DrawIMEModeThread != NULL) {
 		delete	DrawIMEModeThread;
 		DrawIMEModeThread = NULL;
 	}
+	if (DrawIMEModeCaretThread != NULL) {
+		delete	DrawIMEModeCaretThread;
+		DrawIMEModeCaretThread = NULL;
+	}
 	if (CursorWindow != NULL) {
 		delete	CursorWindow;
 		CursorWindow = NULL;
+	}
+	if (CaretWindow != NULL) {
+		delete	CaretWindow;
+		CaretWindow = NULL;
 	}
 	if (IMECursorChangeThread != NULL) {
 		delete	IMECursorChangeThread;
@@ -100,6 +100,9 @@ CCursor::~CCursor()
 	if (stIMECursorData.lpszLoadDatName != NULL) {
 		delete []	stIMECursorData.lpszLoadDatName;
 		stIMECursorData.lpszLoadDatName = NULL;
+	}
+	if (hModDll != NULL) {
+		bCursorDllUnload();
 	}
 }
 
@@ -110,51 +113,81 @@ BOOL			CCursor::bInitialize(HWND hWnd)
 {
 	this->hMainWnd = hWnd;
 
-	// from Registry
-	stIMECursorData.iCursorSize = Profile->lpstAppRegData->iCursorSize;
-	stIMECursorData.iModeSize = Profile->lpstAppRegData->iModeSize;
-	stIMECursorData.dwInThreadSleepTime = Profile->lpstAppRegData->dwInThreadSleepTime;
-	stIMECursorData.dwWaitWaveTime = Profile->lpstAppRegData->dwWaitWaveTime;
-	stIMECursorData.dwDisplayModeTime = Profile->lpstAppRegData->dwDisplayModeTime;
-	stIMECursorData.bDisplayFocusWindowIME = Profile->lpstAppRegData->bDisplayFocusWindowIME;
-	stIMECursorData.bDisplayIMEModeOnCursor = Profile->lpstAppRegData->bDisplayIMEModeOnCursor;
-	stIMECursorData.bForceHiragana = Profile->lpstAppRegData->bForceHiragana;
-	stIMECursorData.bDrawNearCaret = Profile->lpstAppRegData->bDrawNearCaret;
-	stIMECursorData.dwNearDrawMouseColor = (~Profile->lpstAppRegData->dwNearDrawMouseColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseColor & 0x00ffffff);
-	stIMECursorData.dwNearDrawCaretColor = (~Profile->lpstAppRegData->dwNearDrawCaretColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawCaretColor & 0x00ffffff);
+	return bReloadCursor();
+}
 
-	stIMECursorData.bDenyChangedByApp = Profile->lpstAppRegData->bDenyChangedByApp;
-	stIMECursorData.bUseBigArrow = Profile->lpstAppRegData->bUseBigArrow;
+//
+// bReloadCursor()
+//
+BOOL			CCursor::bReloadCursor()
+{
+	vSetParamFromRegistry();
 
-	if ((stIMECursorData.lpszLoadDatName = lpszGetCursorDataName()) == NULL)		return FALSE;
-	if (hCursorDllLoad() == NULL)	return FALSE;
-	if (!bSystemCursorLoad())	return FALSE;
+	if (stIMECursorData.lpszLoadDatName == NULL) {
+		if ((stIMECursorData.lpszLoadDatName = lpszGetCursorDataName()) == NULL)	return FALSE;
+	}
+	if (hModDll == NULL) {
+		if (hCursorDllLoad() == NULL)	return FALSE;
+		if (!bSystemCursorLoad())	return FALSE;
+	}
 
-	IMECursorChangeThread = new CThread;
-	if (!bChangeFlushMouseCursor(IMEOFF, &stIMECursorData)) return FALSE;
-	if (!bRegisterIMECursorChangeThread(hWnd)) return FALSE;
-	
 #define	WINDOWCLASS		_T("FlushMouseCursorWindow-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}")
 	if (CursorWindow == NULL) {
 		CursorWindow = new CCursorWindow;
-		if (!CursorWindow->bRegister((HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE), WINDOWCLASS, stIMECursorData.dwNearDrawMouseColor))		return FALSE;
+		if (!CursorWindow->bRegister((HINSTANCE)GetWindowLongPtr(hMainWnd, GWLP_HINSTANCE), WINDOWCLASS, stIMECursorData.dwNearDrawMouseColor))		return FALSE;
 		CursorWindow->vSetModeString(stIMECursorData.lpstFlushMouseCursor[0].szMode);
 		DrawIMEModeThread = new CThread;
+	}
+	else {
+		CursorWindow->vSetTextColor(stIMECursorData.dwNearDrawMouseColor);
 	}
 #undef WINDOWCLASS
 #define	WINDOWCLASS		_T("FlushMouseCaretWindow-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}")
 	if (CaretWindow == NULL) {
 		CaretWindow = new CCursorWindow;
-		if (!CaretWindow->bRegister((HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE), WINDOWCLASS, stIMECursorData.dwNearDrawCaretColor))	return FALSE;
+		if (!CaretWindow->bRegister((HINSTANCE)GetWindowLongPtr(hMainWnd, GWLP_HINSTANCE), WINDOWCLASS, stIMECursorData.dwNearDrawCaretColor))	return FALSE;
 		CaretWindow->vSetModeString(stIMECursorData.lpstFlushMouseCursor[0].szMode);
 		DrawIMEModeCaretThread = new CThread;
 	}
+	else {
+		CaretWindow->vSetTextColor(stIMECursorData.dwNearDrawCaretColor);
+	}
 #undef WINDOWCLASS
 
-	if (!bRegisterDrawIMEModeThread(hWnd))	return FALSE;
-	if (!bStartIMECursorChangeThread(hWnd))	return FALSE;
+	if (IMECursorChangeThread == NULL) {
+		IMECursorChangeThread = new CThread;
+		if (!bChangeFlushMouseCursor(IMEOFF, &stIMECursorData)) return FALSE;
+		if (!bRegisterIMECursorChangeThread(hMainWnd)) return FALSE;
+		if (!bStartIMECursorChangeThread(hMainWnd))	return FALSE;
+	}
+	if (DrawIMEModeThread == NULL) {
+		if (!bRegisterDrawIMEModeThread(hMainWnd))	return FALSE;
+	}
 	return TRUE;
 }
+
+//
+// vSetParamFromRegistry()
+//
+VOID			CCursor::vSetParamFromRegistry()
+{
+	if (Profile != NULL) {
+		stIMECursorData.iCursorSize = Profile->lpstAppRegData->iCursorSize;
+		stIMECursorData.iModeSize = Profile->lpstAppRegData->iModeSize;
+		stIMECursorData.dwInThreadSleepTime = Profile->lpstAppRegData->dwInThreadSleepTime;
+		stIMECursorData.dwDisplayModeTime = Profile->lpstAppRegData->dwDisplayModeTime;
+		stIMECursorData.bDisplayFocusWindowIME = Profile->lpstAppRegData->bDisplayFocusWindowIME;
+		stIMECursorData.bDisplayIMEModeOnCursor = Profile->lpstAppRegData->bDisplayIMEModeOnCursor;
+		stIMECursorData.bForceHiragana = Profile->lpstAppRegData->bForceHiragana;
+		stIMECursorData.bDrawNearCaret = Profile->lpstAppRegData->bDrawNearCaret;
+		stIMECursorData.dwNearDrawMouseColor = (~Profile->lpstAppRegData->dwNearDrawMouseColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseColor & 0x00ffffff);
+		stIMECursorData.dwNearDrawCaretColor = (~Profile->lpstAppRegData->dwNearDrawCaretColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawCaretColor & 0x00ffffff);
+
+		stIMECursorData.bDenyChangedByApp = Profile->lpstAppRegData->bDenyChangedByApp;
+		stIMECursorData.bUseBigArrow = Profile->lpstAppRegData->bUseBigArrow;
+	}
+}	
+
 
 //
 // lpszGetCursorDataName()
@@ -218,8 +251,8 @@ LPTSTR		CCursor::lpszGetCursorDataName()
 BOOL		CCursor::bStartIMECursorChangeThread(HWND hWndObserved)
 {
 	if ((Cursor == NULL) || (IMECursorChangeThread == NULL))	return FALSE;
+	vSetParamFromRegistry();
 	stIMECursorData.hWndObserved = hWndObserved;
-	stIMECursorData.bDisplayFocusWindowIME = bDisplayFocusWindowIME;
 	if (!IMECursorChangeThread->bStart()) {
 		if (IMECursorChangeThread != NULL) {
 			delete	IMECursorChangeThread;
@@ -236,8 +269,9 @@ BOOL		CCursor::bStartIMECursorChangeThread(HWND hWndObserved)
 //
 BOOL		CCursor::bStartDrawIMEModeThread(HWND hWndObserved)
 {
+	vSetParamFromRegistry();
 	stIMECursorData.bDrawIMEModeWait = FALSE;
-	stIMECursorData.dwWaitWaveTime = Profile->lpstAppRegData->dwWaitWaveTime;
+	stIMECursorData.dwWaitTime = 0;
 	return _bStartDrawIMEModeThread(hWndObserved);
 }
 
@@ -246,8 +280,22 @@ BOOL		CCursor::bStartDrawIMEModeThread(HWND hWndObserved)
 //
 BOOL		CCursor::bStartDrawIMEModeThreadWait(HWND hWndObserved)
 {
+	vSetParamFromRegistry();
 	stIMECursorData.bDrawIMEModeWait = TRUE;
-	stIMECursorData.dwWaitWaveTime = Profile->lpstAppRegData->dwWaitWaveTime;
+	if (Profile == NULL)	return FALSE;
+	stIMECursorData.dwWaitTime = Profile->lpstAppRegData->dwAdditionalWaitTime;
+	return _bStartDrawIMEModeThread(hWndObserved);
+}
+
+//
+// bStartDrawIMEModeThreadWaitWave()
+//
+BOOL		CCursor::bStartDrawIMEModeThreadWaitWave(HWND hWndObserved)
+{
+	vSetParamFromRegistry();
+	stIMECursorData.bDrawIMEModeWait = TRUE;
+	if (Profile == NULL)	return FALSE;
+	stIMECursorData.dwWaitTime = Profile->lpstAppRegData->dwWaitWaveTime;
 	return _bStartDrawIMEModeThread(hWndObserved);
 }
 
@@ -256,8 +304,10 @@ BOOL		CCursor::bStartDrawIMEModeThreadWait(HWND hWndObserved)
 //
 BOOL		CCursor::bStartDrawIMEModeThreadWaitEventForeGround(HWND hWndObserved)
 {
+	vSetParamFromRegistry();
 	stIMECursorData.bDrawIMEModeWait = TRUE;
-	stIMECursorData.dwWaitWaveTime = 100;
+	if (Profile == NULL)	return FALSE;
+	stIMECursorData.dwWaitTime = GetDoubleClickTime() +  Profile->lpstAppRegData->dwAdditionalWaitTime;
 	return _bStartDrawIMEModeThread(hWndObserved);
 }
 
@@ -266,8 +316,10 @@ BOOL		CCursor::bStartDrawIMEModeThreadWaitEventForeGround(HWND hWndObserved)
 //
 BOOL		CCursor::bStartDrawIMEModeThreadWaitDblClk(HWND hWndObserved)
 {
+	vSetParamFromRegistry();
 	stIMECursorData.bDrawIMEModeWait = TRUE;
-	stIMECursorData.dwWaitWaveTime = GetDoubleClickTime();
+	if (Profile == NULL)	return FALSE;
+	stIMECursorData.dwWaitTime = GetDoubleClickTime() +  Profile->lpstAppRegData->dwAdditionalWaitTime;
 	return _bStartDrawIMEModeThread(hWndObserved);
 }
 
@@ -277,9 +329,8 @@ BOOL		CCursor::bStartDrawIMEModeThreadWaitDblClk(HWND hWndObserved)
 BOOL		CCursor::_bStartDrawIMEModeThread(HWND hWndObserved)
 {
 	if ((Cursor == NULL) || (DrawIMEModeThread == NULL))		return FALSE;
-	stIMECursorData.hWnd = _hGetCaretPosByAccessibleObjectFromWindow(hWndObserved, &stIMECursorData.rcCaret);
 	stIMECursorData.hWndObserved = hWndObserved;
-	stIMECursorData.bDisplayFocusWindowIME = bDisplayFocusWindowIME;
+	stIMECursorData.hWndCaret = _hGetCaretPosByAccessibleObjectFromWindow(hWndObserved, &stIMECursorData.rcCaret, FALSE);
 	if (!DrawIMEModeThread->bStart()) {
 		if (DrawIMEModeThread != NULL) {
 			delete	DrawIMEModeThread;
@@ -303,28 +354,6 @@ BOOL		CCursor::bShowHideCursor(HWND hWndObserved, BOOL bShow)
 	else {
 		bRet = bChangeFlushMouseCursor(IMEHIDE, &stIMECursorData);
 	}
-	return bRet;
-}
-
-//
-// bGetCaretPos()
-//
-BOOL		CCursor::bGetCaretPos(HWND hWnd, LPPOINT lpCaretPos)
-{
-	BOOL	bRet = FALSE;
-	RECT	rc{};
-	lpCaretPos->x = 0;	lpCaretPos->y = 0;
-	if (_hGetCaretPosByAccessibleObjectFromWindow(hWnd, &rc) != NULL) {
-		bRet = TRUE;
-	}
-	if (stIMECursorData.hWnd != NULL) {
-		rc.left = stIMECursorData.rcCaret.left;	rc.top = stIMECursorData.rcCaret.top;
-		rc.right = stIMECursorData.rcCaret.right;	rc.bottom = stIMECursorData.rcCaret.bottom;
-		bRet = TRUE;
-	}
-
-	if (bRet != FALSE)	lpCaretPos->x = rc.left;	lpCaretPos->y = rc.top + (rc.bottom - rc.top) / 2;
-
 	return bRet;
 }
 
@@ -361,6 +390,7 @@ BOOL		CCursor::bCursorDllUnload()
 //
 BOOL		CCursor::bSystemCursorLoad()
 {
+	if (&stIMECursorData == NULL)	return FALSE;
 	if (!bChangeFlushMouseCursor(IMEOFF, &stIMECursorData))		return FALSE;
 	
 	int	i = 0;
@@ -378,6 +408,7 @@ BOOL		CCursor::bSystemCursorLoad()
 //
 BOOL		CCursor::bRegisterIMECursorChangeThread(HWND hWndObserved)
 {
+	if (&stIMECursorData == NULL)	return FALSE;
 	stIMECursorData.hWndObserved = hWndObserved;
 	if (!IMECursorChangeThread->bRegister(IMECURSORCHANGETHREADNAME, IMECURSORCHANGETHREADID,
 							(LPTHREAD_START_ROUTINE)&bIMECursorChangeRoutine, &stIMECursorData, stIMECursorData.dwInThreadSleepTime)) {
@@ -391,6 +422,7 @@ BOOL		CCursor::bRegisterIMECursorChangeThread(HWND hWndObserved)
 //
 BOOL		CCursor::bIMECursorChangeRoutine(LPVOID lpvParam)
 {
+	if (lpvParam == NULL)	return FALSE;
 	LPIMECURSORDATA	lpstCursorData = (LPIMECURSORDATA)lpvParam;
 	CCursor	*This = reinterpret_cast<CCursor*>(lpvParam);
 	BOOL	bRet = TRUE;
@@ -413,6 +445,7 @@ BOOL		CCursor::bIMECursorChangeRoutine(LPVOID lpvParam)
 //
 BOOL		CCursor::bRegisterDrawIMEModeThread(HWND hWndObserved)
 {
+	if (&stIMECursorData == NULL)	return FALSE;
 	// Register thread
 	stIMECursorData.hWndObserved = hWndObserved;
 	if (!DrawIMEModeThread->bRegister(DRAWIMEMODETHREADNAME, DRAWIMEMODETHREADID,
@@ -427,6 +460,7 @@ BOOL		CCursor::bRegisterDrawIMEModeThread(HWND hWndObserved)
 //
 BOOL WINAPI	CCursor::_bDrawIMEModeRoutine(LPVOID lpvParam)
 {
+	if (lpvParam == NULL)	return FALSE;
 	LPIMECURSORDATA	lpstCursorData = (LPIMECURSORDATA)lpvParam;
 	CCursor	*This = reinterpret_cast<CCursor*>(lpvParam);
 	BOOL	bRet = TRUE;
@@ -448,6 +482,8 @@ BOOL WINAPI	CCursor::_bDrawIMEModeRoutine(LPVOID lpvParam)
 //
 BOOL		CCursor::bIsIMECursorChanged(LPIMECURSORDATA lpstCursorData)
 {
+	if (lpstCursorData == NULL)	return FALSE;
+	
 	DWORD	dwIMEMode = (DWORD)(-1);
 
 	dwIMEMode = Cime->dwIMEMode(lpstCursorData->hWndObserved, lpstCursorData->bForceHiragana);
@@ -461,11 +497,10 @@ BOOL		CCursor::bIsIMECursorChanged(LPIMECURSORDATA lpstCursorData)
 //
 BOOL		CCursor::bDrawIMEModeOnDisplay(LPIMECURSORDATA lpstCursorData)
 {
+	if (lpstCursorData == NULL)	return FALSE;
+	
 	BOOL	bRet = FALSE;
 	RECT	rc{};
-	if (lpstCursorData->bDrawIMEModeWait) {
-		if (lpstCursorData->dwWaitWaveTime != 0)		Sleep(lpstCursorData->dwWaitWaveTime);
-	}
 	if (_bCalcDispModeRect(lpstCursorData->iModeSize, lpstCursorData->iModeSize, &rc)) {
 		if (EnumDisplayMonitors(NULL, &rc, (MONITORENUMPROC)&_bIconDrawEnumProc, (LPARAM)lpstCursorData) != 0) {
 			bRet = TRUE;
@@ -536,24 +571,33 @@ BOOL		CCursor::_bCalcDispModeRect(int iModeSizeX, int iModeSizeY, LPRECT lpRect)
 //
 // _hGetCaretPosByAccessibleObjectFromWindow()
 // 
-HWND		CCursor::_hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPRECT lpRect)
+HWND		CCursor::_hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPRECT lpRect, BOOL bAttachThreadInput)
 {
 	HWND	hWnd = NULL;
 	POINT	pt{};
 	DWORD	dwPID = 0, dwForeThreadID = 0;
 	if (hForeWnd != NULL) {
-			if ((dwForeThreadID = GetWindowThreadProcessId(hForeWnd, &dwPID)) != 0) {
-				LPGUITHREADINFO	lpGuiThreadInfo = new GUITHREADINFO[sizeof(GUITHREADINFO)];
-				if (lpGuiThreadInfo != NULL) {
-					lpGuiThreadInfo->cbSize = sizeof(GUITHREADINFO);
-					if (GetGUIThreadInfo(dwForeThreadID, lpGuiThreadInfo)) {
-						IAccessible* IAccessible = NULL;
+		if ((dwForeThreadID = GetWindowThreadProcessId(hForeWnd, &dwPID)) != 0) {
+			LPGUITHREADINFO	lpGuiThreadInfo = new GUITHREADINFO[sizeof(GUITHREADINFO)];
+			if (lpGuiThreadInfo != NULL) {
+				lpGuiThreadInfo->cbSize = sizeof(GUITHREADINFO);
+				if (bAttachThreadInput) {
+					if (!AttachThreadInput(dwForeThreadID, GetCurrentThreadId(), TRUE)) {
+					}
+				}
+				if (GetGUIThreadInfo(dwForeThreadID, lpGuiThreadInfo)) {
+					if (bAttachThreadInput) {
+						if (!AttachThreadInput(dwForeThreadID, GetCurrentThreadId(), FALSE)) {
+						}
+					}
+					if (lpGuiThreadInfo->hwndCaret == NULL) {
 						if (lpGuiThreadInfo->hwndFocus != NULL) {
+							IAccessible* IAccessible = NULL;
 							HRESULT hResult = AccessibleObjectFromWindow(lpGuiThreadInfo->hwndFocus, (DWORD)OBJID_CARET, IID_IAccessible, (LPVOID*)&IAccessible);
 							if (hResult == S_OK) {
 								LPVARIANT	lpVariant = new VARIANT[sizeof(VARIANT)];
 								if (lpVariant != NULL) {
-									SIZE		sz{};
+									SIZE	sz{};
 									lpVariant->vt = VT_I4;	lpVariant->lVal = CHILDID_SELF;
 									if ((hResult = IAccessible->accLocation(&pt.x, &pt.y, &sz.cx, &sz.cy, *lpVariant)) == S_OK) {
 										IAccessible->Release();
@@ -566,38 +610,39 @@ HWND		CCursor::_hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPRECT l
 											hWnd = lpGuiThreadInfo->hwndFocus;
 										}
 									}
-									else {
-										if (lpGuiThreadInfo->hwndCaret != NULL) {
-											pt.x = lpGuiThreadInfo->rcCaret.left;	pt.y = lpGuiThreadInfo->rcCaret.top;
-											if (ClientToScreen(lpGuiThreadInfo->hwndCaret, &pt)) {
-												lpRect->left = pt.x;	lpRect->top = pt.y;
-												pt.x = lpGuiThreadInfo->rcCaret.right;	pt.y = lpGuiThreadInfo->rcCaret.bottom;
-												if (ClientToScreen(lpGuiThreadInfo->hwndCaret, &pt)) {
-													lpRect->right = pt.x;	lpRect->bottom = pt.y;
-													RECT	rcFore{}, rcTop{};
-													if (GetWindowRect(lpGuiThreadInfo->hwndCaret, &rcTop)) {
-#define	MARGIN		2
-														if (((pt.x == 0) && (pt.y == 0)) || (pt.x <= rcTop.left + MARGIN) || (pt.y <= rcTop.top + MARGIN) || (pt.x <= rcFore.left) || (pt.y <= rcFore.top)) {
-#undef MARGIN
-															lpRect->left = 0;	lpRect->right = 0;	lpRect->top = 0;	lpRect->bottom = 0;
-															hWnd = NULL;
-														}
-														else {
-															hWnd = lpGuiThreadInfo->hwndCaret;
-														}
-													}
-												}
-											}
-										}
-									}
 									delete[]	lpVariant;
 								}
 							}
 						}
 					}
-					delete []	lpGuiThreadInfo;
+					else {
+						pt.x = lpGuiThreadInfo->rcCaret.left;	pt.y = lpGuiThreadInfo->rcCaret.top;
+						if (ClientToScreen(lpGuiThreadInfo->hwndCaret, &pt)) {
+							lpRect->left = pt.x;	lpRect->top = pt.y;
+							pt.x = lpGuiThreadInfo->rcCaret.right;	pt.y = lpGuiThreadInfo->rcCaret.bottom;
+							if (ClientToScreen(lpGuiThreadInfo->hwndCaret, &pt)) {
+								lpRect->right = pt.x;	lpRect->bottom = pt.y;
+								RECT	rcTop{};
+								if (GetWindowRect(lpGuiThreadInfo->hwndCaret, &rcTop)) {
+#define	MARGIN		2
+									if (((pt.x == 0) && (pt.y == 0)) || (pt.x <= rcTop.left + MARGIN) || (pt.y <= rcTop.top + MARGIN)) {
+#undef MARGIN
+										lpRect->left = 0;	lpRect->right = 0;	lpRect->top = 0;	lpRect->bottom = 0;
+										hWnd = NULL;
+									}
+									else {
+										hWnd = lpGuiThreadInfo->hwndCaret;
+									}
+								}
+							}
+						}
+					}
 				}
+				else {
+				}
+				delete[]	lpGuiThreadInfo;
 			}
+		}
 	}
 	return hWnd;
 }
@@ -607,8 +652,8 @@ HWND		CCursor::_hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPRECT l
 //
 BOOL		CCursor::_bAdjustCaretByMonitorDPI(int iModeSizeX, int iModeSizeY, LPRECT lpRect)
 {
-	POINT	pt{ lpRect->left, lpRect->bottom };
-	HMONITOR hMonitor = NULL;
+	POINT		pt{ lpRect->left, lpRect->bottom };
+	HMONITOR	hMonitor = NULL;
 	if ((hMonitor = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST)) != NULL) {
 		UINT	dpiX = 0, dpiY = 0;
 		if ((GetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY)) == S_OK) {
@@ -638,21 +683,21 @@ BOOL		CCursor::_bAdjustCaretByMonitorDPI(int iModeSizeX, int iModeSizeY, LPRECT 
 //
 BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData)
 {
-	Sleep(300);
+	if (lpstCursorData == NULL)	return FALSE;
 	
 	BOOL	bFoundCaret = FALSE;
 	RECT	rcCursor{}, rcCaret{};
 	int		iCursorSizeX = 0, iCursorSizeY = 0, iCaretSizeX = 0, iCaretSizeY = 0;
 	DWORD	dwIMEModeCursor = IMEOFF, dwIMEModeCaret = IMEOFF;
 	HWND	hCaretWnd = NULL;
+	if (lpstCursorData->bDrawIMEModeWait) {
+		if (lpstCursorData->dwWaitTime != 0)	Sleep(lpstCursorData->dwWaitTime);
+	}
 	if (lpstCursorData->bDrawNearCaret != FALSE) {
-		if (lpstCursorData->hWnd != NULL) {
+		if (lpstCursorData->hWndCaret != NULL) {
 			rcCaret.left = lpstCursorData->rcCaret.left;	rcCaret.top = lpstCursorData->rcCaret.top;
 			rcCaret.right = lpstCursorData->rcCaret.right;	rcCaret.bottom = lpstCursorData->rcCaret.bottom;
-			hCaretWnd = lpstCursorData->hWnd;
-			bFoundCaret = TRUE;
-		}
-		else if ((hCaretWnd = _hGetCaretPosByAccessibleObjectFromWindow(GetForegroundWindow(), &rcCaret)) != NULL) {
+			hCaretWnd = lpstCursorData->hWndCaret;
 			bFoundCaret = TRUE;
 		}
 		if (bFoundCaret && (hCaretWnd != NULL)) {
@@ -673,6 +718,12 @@ BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData)
 					CaretWindow->vSetModeString(lpstCursorData->lpstFlushMouseCursor[iCaret].szMode);
 
 					iCaretSizeX = rcCaret.right - rcCaret.left, iCaretSizeY = rcCaret.bottom - rcCaret.top;
+#define MERGIN_X	1
+#define MERGIN_Y	1
+					rcCaret.left = rcCaret.left - MERGIN_X;
+					rcCaret.top = rcCaret.top -MERGIN_Y;
+#undef MERGIN_X
+#undef MERGIN_Y
 					if ((dwIMEModeCaret == IMEOFF) || (dwIMEModeCaret == HANEISU_IMEON) || (dwIMEModeCaret == HANKANA_IMEON)) {
 						iCaretSizeX = (iCaretSizeX * 2 + 2) / 3;	rcCaret.left = rcCaret.left + iCaretSizeX / 4;	rcCaret.right = rcCaret.left + iCaretSizeX;
 					}
@@ -726,13 +777,17 @@ BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData)
 		Sleep(COUNT);
 		bRet = TRUE;
 	}
-	if (!CursorWindow->bSetWindowPos(HWND_BOTTOM, rcCursor.left, rcCursor.top, iCursorSizeX, iCursorSizeY, (SWP_HIDEWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS))) {
-		bRet = FALSE;
+	try {
+		bRet = CursorWindow->bSetWindowPos(HWND_BOTTOM, rcCursor.left, rcCursor.top, iCursorSizeX, iCursorSizeY, (SWP_HIDEWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS));
+	}
+	catch (...) {
 	}
 	CursorWindow->vSetModeString(lpstCursorData->lpstFlushMouseCursor[0].szMode);
 	if (bFoundCaret) {
-		if (!CaretWindow->bSetWindowPos(HWND_BOTTOM, rcCaret.left, rcCaret.top, iCaretSizeX, iCaretSizeY, (SWP_HIDEWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS))) {
-			bRet = FALSE;
+		try {
+			bRet = CaretWindow->bSetWindowPos(HWND_BOTTOM, rcCaret.left, rcCaret.top, iCaretSizeX, iCaretSizeY, (SWP_HIDEWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS));
+		}	
+		catch (...) {
 		}
 		CaretWindow->vSetModeString(lpstCursorData->lpstFlushMouseCursor[0].szMode);
 	}
@@ -762,6 +817,7 @@ BOOL		CCursor::bGetMouseRegValue(LPCTSTR szValue, LPTSTR szFile)
 //
 BOOL		CCursor::bChangeFlushMouseCursor(UINT uCurID, LPIMECURSORDATA lpstCursorData)
 {
+	if (lpstCursorData == NULL)	return FALSE;
 	int	i = 0;
 	while (uCurID != lpstCursorData->lpstFlushMouseCursor[i].dwIMEMode) {
 		++i;
@@ -781,6 +837,8 @@ BOOL		CCursor::bChangeFlushMouseCursor(UINT uCurID, LPIMECURSORDATA lpstCursorDa
 //
 BOOL		CCursor::bSetSystemCursor(LPMOUSECURSOR lpstMC, int iCursorSizeX, int iCursorSizeY)
 {
+	if (lpstMC == NULL)	return FALSE;
+	
 	HCURSOR	hCur;
 	UINT	fuLoad = 0;
 	if (lpstMC->bReadReg) {
@@ -864,9 +922,7 @@ BOOL		CCursorWindow::bRegister(HINSTANCE hInstance, LPCTSTR szWindowClassName, C
 		ZeroMemory(lpszWindowClass, MAX_LOADSTRING);
 		_tcsncpy_s(lpszWindowClass, MAX_LOADSTRING, szWindowClassName, _TRUNCATE);
 
-		dwTextColor = dwRGB;
-		if (dwRGB & 0x00000100)	dwBackColor = dwRGB & 0xfffffeff;
-		else dwBackColor = dwRGB | 0x00000100;
+		vSetTextColor(dwRGB);
 
 		if (!MyRegisterClass(hInstance)) {
 			return FALSE;
@@ -877,6 +933,16 @@ BOOL		CCursorWindow::bRegister(HINSTANCE hInstance, LPCTSTR szWindowClassName, C
 		return TRUE;
 	}
 	return FALSE;
+}
+
+//
+// vSetTextColor()
+//
+VOID		CCursorWindow::vSetTextColor(COLORREF dwRGB)
+{
+	dwTextColor = dwRGB;
+	if (dwRGB & 0x00000100)	dwBackColor = dwRGB & 0xfffffeff;
+	else dwBackColor = dwRGB | 0x00000100;
 }
 
 //
@@ -1021,44 +1087,46 @@ void		CCursorWindow::Cls_OnPaint(HWND hWnd)
 	PAINTSTRUCT	ps{};
 	HDC hDC = BeginPaint(hWnd, &ps);
 	if (hDC != NULL) {
-		RECT	rc{};
-		if (GetClientRect(hWnd, &rc)) {
-			HBRUSH	hBrush = NULL;
-			if ((hBrush = CreateSolidBrush(dwBackColor & 0x00ffffff)) != NULL) {	
-				if (SelectObject(hDC, hBrush) != HGDI_ERROR) {
-					if (FillRect(hDC, &rc, hBrush) != 0) {
-						if (SetBkMode(hDC, TRANSPARENT) != 0) {
-							COLORREF	dwColorPrev = 0;
-							if ((dwColorPrev = SetTextColor(hDC, dwTextColor & 0x80ffffff)) != CLR_INVALID) {
-								int	iBkModePrev = 0;
-								if ((iBkModePrev = SetBkMode(hDC, TRANSPARENT)) != 0) {
-									if (lpszMode != NULL) {
+		if (SetLayeredWindowAttributes(hCursorWindow, dwBackColor, (dwBackColor >> 24) & 0x000000ff, LWA_COLORKEY | LWA_ALPHA)) {
+			RECT	rc{};
+			if (GetClientRect(hWnd, &rc)) {
+				HBRUSH	hBrush = NULL;
+				if ((hBrush = CreateSolidBrush(dwBackColor & 0x00ffffff)) != NULL) {	
+					if (SelectObject(hDC, hBrush) != HGDI_ERROR) {
+						if (FillRect(hDC, &rc, hBrush) != 0) {
+							if (SetBkMode(hDC, TRANSPARENT) != 0) {
+								COLORREF	dwColorPrev = 0;
+								if ((dwColorPrev = SetTextColor(hDC, dwTextColor & 0x80ffffff)) != CLR_INVALID) {
+									int	iBkModePrev = 0;
+									if ((iBkModePrev = SetBkMode(hDC, TRANSPARENT)) != 0) {
 										HFONT	hFont = NULL;
 										DWORD	dwUnderline = 0;
 										if (GetKeyState(VK_CAPITAL) & 0x0001) dwUnderline = TRUE;	else dwUnderline = FALSE;
 #define	FONT	_T("Yu Gothic UI")
 										if ((hFont = CreateFont((rc.bottom - rc.top), (rc.right - rc.left) / 2, 0, 0, FW_BOLD, FALSE, dwUnderline, FALSE,
-																		SHIFTJIS_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS,
-																					PROOF_QUALITY, FIXED_PITCH, FONT)) != NULL) {
+											SHIFTJIS_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS,
+											PROOF_QUALITY, FIXED_PITCH, FONT)) != NULL) {
 											HFONT	hFontPrev = NULL;
 											if ((hFontPrev = (HFONT)SelectObject(hDC, hFont)) != NULL) {
-												if (DrawTextEx(hDC, lpszMode, -1, &rc, DT_RIGHT | DT_SINGLELINE | DT_VCENTER, NULL) == 0) {
+												if (lpszMode != NULL) {
+													if (DrawTextEx(hDC, lpszMode, -1, &rc, DT_RIGHT | DT_SINGLELINE | DT_VCENTER, NULL) == 0) {
+													}
 												}
 											}
 											DeleteObject(hFont);
 										}
 										SetBkMode(hDC, iBkModePrev);
 									}
+									SetTextColor(hDC, dwColorPrev);
 								}
-								SetTextColor(hDC, dwColorPrev);
 							}
 						}
 					}
+					DeleteObject(hBrush);
 				}
-				DeleteObject(hBrush);
 			}
+			DeleteObject(hDC);
 		}
-		DeleteObject(hDC);
 	}
 	EndPaint(hWnd, &ps);
 	return;

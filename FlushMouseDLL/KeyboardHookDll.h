@@ -22,14 +22,16 @@ typedef struct tagKEYBOARDLL_SHAREDMEM {
 	HWND	hWnd;
 	HHOOK	hHook;
 	BOOL	bEnableEPHelper;
+	BOOL	bIMEModeForced;
 } KEYBOARDLL_SHAREDMEM, * PKEYBOARDLL_SHAREDMEM, * LPKEYBOARDLL_SHAREDMEM;
 
 //
 // Global Prototype Define
 //
-DLLEXPORT BOOL __stdcall bKeyboardHookLLSet(HWND);
-DLLEXPORT BOOL __stdcall bKeyboardHookLLUnset(void);
-DLLEXPORT BOOL __stdcall bSetEnableEPHelperLL64(BOOL bEPHelper);;
+DLLEXPORT BOOL __stdcall bKeyboardHookLLSet(HWND hWnd);
+DLLEXPORT BOOL __stdcall bKeyboardHookLLUnset();
+DLLEXPORT BOOL __stdcall bSetEnableEPHelperLL64(BOOL bEPHelper);
+DLLEXPORT BOOL __stdcall bSetEnableIMEModeForcedLL64(BOOL bIMEModeForced);
 
 
 /* = EOF = */

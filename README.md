@@ -5,21 +5,15 @@
 
 #### リリース情報
 
-* **2023/11/23　　Version 1.2.0.11 をリリースしました**
+* **2024/02/06　　Version 2.1.1.1 をリリースしました**
 
 * **(主な変更点)**
-   * インストーラーを msi から exe 形式に変更しました
-   * Windows11のタスクスケジューラーの仕様が変わったのか、バグなのかわかりませんが、FlushMouseを終了しても再起動してしまうのに対応しました
-   * その他、軽微なバグを修正しました
+   * 本バージョンから、実験的な試みとしてUI3に対応しました
+     * プログラム的な話になりますが、 メイン部分のみデスクトップアプリとC++/WinUI3(WinRT)で分けて、設定などのUI以外は共通になっています
+     * UI版のバージョン情報はC++/WinUI3(WinRT)で記述しましたが、設定画面は C# の DLL として記述しました。これは、まだ、C++/WinRTのサンプルが少なく、C#/WinUI3の方が楽だと判断したためです
+     * なお、デスクトップ版と、UI3版の共存はできません。切り替える場合は、いったんアンインストールしてください
 
-   * 最近(2023/07以降)、[OSDN/FlushMouse](https://osdn.net/users/jeffyts/pf/FlushMouse/wiki/FrontPage) が、不安定なようですので、 [GitHub/FlushMouse](https://github.com/JeffyTS-JP/FlushMouse)の方をチェックしていただいたほうが良いかもしれません(どちらにも同じソースとバイナリを置くようにします)
-   * 上記のような事情で、OSDNの Wikiは簡単な説明に変更して、詳しい内容はREADME.mdで行うようにしました。ビルド方法については下の方に書いてあります
-
-
-   * IMEモードの表示の色指定でαチャネルが有効になるようにしてあります(設定画面は作成していません。レジストリを編集できる方は好みの色にしてみてください  (ただし、レジストリの編集は十分注意して行ってください)
-   * HKEY_CURRENT_USER\Software\JeffyTS\FlushMouse の NearDrawCaretColor と NearDrawMouseColor です。上位バイトから、α B G R の順です
-   * αの値は、通常と違って、大きいほうが透明度が高くなります。これは従来と互換性を持たせるためですのでご了承ください。なお、レジストリを変更した方がいたら、お手数をおかけしますが修正をお願いします
-   * マウスカーソル右下のモード表示の色は、現状では変更できません。ご了承ください
+   * 今回のUI3対応で様々な修正を行うとともに、バグを修正しました。従来と仕様も若干変わっています。本来は下記の説明部分も変更しなければならないのですが、次回にさせてください
 
 * **(今後について)**
    * ~~OSDN上ではここまでの機能で開発は終了としたいと考えています(バグ対応は除く)~~
@@ -29,9 +23,14 @@
 
 #### 対応OS
    * Windows 10 / 11 64bit  (Latest Release Versionで検証しています)
+   * Version 2 以降のUI3対応版では、.NET Framweork 8 のランタイムが必要になります。インストーラーで自動的にインストールされます
+
+#### プライバシーポリシー
+   * デスクトップ版、UI3版共に個人情報の収集などは一切行っていません
+     * UI版から、インストール時のランタイムのダウンロードと、バージョン情報で、GitHUBへのリンクがありますので、念のため記載します
 
 #### インストール / アンインストール
-   * Windows Installer (msi)形式になっています。実行してインストールしてください
+   * Windows Installer (exe)形式になっています。実行してインストールしてください
    * アンインストールは「設定」の「アプリと機能」、または「コントロールパネル」の「プログラムと機能」からできます
      * または、同じバージョンのインストーラーがあればそれをもう一度実行してもアンインストールできます
      * こちらの場合は、本プログラムの設定(レジストリ)を削除するかどうかを選べます(デフォルトでは残すようにしてあります)
@@ -51,7 +50,9 @@
 
 #### 設定ダイアログ画面
    * システムトレイ(タスクトレイ)の中にあるFlushMouseのアイコンをクリックすることで表示します
-   
+   * UI3版
+![SettingDialogUI3](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SettingDlgUI3.png)
+   * デスクトップアプリ版 (下図は古いバージョンのものです。後日差替えます)
 ![SettingDialog](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SettingDlg.png)
 
 #### 設定のヒント
@@ -152,6 +153,6 @@
 * ビルド方法です
   1. Visual Studioを起動して、リポジトリのクローン -> リポジトリの場所に [https://github.com/JeffyTS-JP/FlushMouse.git](https://github.com/JeffyTS-JP/FlushMouse.git)　を入力してクローンします
   2. クローンが終わったら、構成を **MixedPlatform** にしてビルドします
-  3. Releaseでビルドすると、デフォルトでは C:\Users\User\source\repos\FlushMouseにFlushMouse_x64.msiができるのでインストールしてください
+  3. Releaseでビルドすると、デフォルトでは C:\Users\User\source\repos\FlushMouseにFlushMouse_x64.exe (Version 1.2以前は FlushMouse_x64.msi)ができるのでインストールしてください
 
 

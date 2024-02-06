@@ -1,0 +1,25 @@
+
+rem del /F /Q ".\$(BaseOutputPath)$(AppxPackagingArchitecture)\$(Configuration)\$(ProjectName)*.nupkg"
+
+rem dotnet pack ".\$(ProjectName).csproj" --no-build -c $(Configuration) --runtime win-$(AppxPackagingArchitecture) --output ".\$(BaseOutputPath)\$(AppxPackagingArchitecture)\$(Configuration)" -p:Platform=$(AppxPackagingArchitecture) -p:NuspecFile=".\$(ProjectName)_$(Configuration).nuspec" -p:NuspecProperties="User=%USERPROFILE%" | nkf -s 
+
+rem Xcopy /Y "$(BaseOutputPath)$(Platform)\$(Configuration)\$(ProjectName)*.nupkg" "..\..\..\NuGet\$(ProjectName)\"
+
+rem nuget delete $(ProjectName) $(VersionPrefix) -Source "$(MSBuildStartupDirectory)\..\Nuget\" -NonInteractive
+
+rem rd /S /Q "$(MSBuildStartupDirectory)\packages\$(ProjectName).$(VersionPrefix)"
+
+rem nuget install $(ProjectName) -OutputDirectory "$(MSBuildStartupDirectory)\packages"
+
+Xcopy /Y "$(BaseOutputPath)$(Platform)\$(Configuration)\$(TargetFramework)\*.xbf" "$(MSBuildStartupDirectory)\$(Platform)\$(Configuration)\$(SolutionName)\"
+
+Xcopy /Y "$(BaseOutputPath)$(Platform)\$(Configuration)\$(TargetFramework)\$(ProjectName).dll" "$(MSBuildStartupDirectory)\$(Platform)\$(Configuration)\$(SolutionName)\"
+
+Xcopy /Y "$(BaseOutputPath)$(Platform)\$(Configuration)\$(TargetFramework)\$(ProjectName).pdb" "$(MSBuildStartupDirectory)\$(Platform)\$(Configuration)\$(SolutionName)\"
+
+Xcopy /Y "$(BaseIntermediateOutputPath)$(Platform)\$(Configuration)\$(TargetFramework)\Generated Files\CsWinRT\$(ProjectName).winmd" "$(MSBuildStartupDirectory)\$(Platform)\$(Configuration)\$(SolutionName)\"
+
+Xcopy /Y "$(BaseOutputPath)$(Platform)\$(Configuration)\$(TargetFramework)\*.pdb" "$(MSBuildStartupDirectory)\$(Platform)\$(Configuration)\$(SolutionName)\"
+
+touch "$(MSBuildStartupDirectory)\$(SolutionName)\$(SolutionName)\$(SolutionName).xaml.cpp"
+
