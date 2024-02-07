@@ -7,6 +7,8 @@
 // #0000		2022/07/16  JeffyTS  	New edit.
 //
 #include "pch.h"
+#include "WinRT.h"
+
 #pragma push_macro("GetCurrentTime")
 #undef GetCurrentTime
 #include "About.xaml.h"

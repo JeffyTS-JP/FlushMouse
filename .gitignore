@@ -361,3 +361,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+nuget.exe
+!Nuget/FlushMouseUI3DLL/FlushMouseUI3DLL*.nupkg
+
+
+

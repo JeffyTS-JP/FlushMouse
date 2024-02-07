@@ -100,7 +100,7 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 			case 0:
 				bDestroyTaskTrayWindow(hWnd);
 				bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_OFF, POWERNOTIFICATION_CATEGORY);
-				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+				SendMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 				break;
 			case 1:
 				bDestroyTaskTrayWindow(hWnd);

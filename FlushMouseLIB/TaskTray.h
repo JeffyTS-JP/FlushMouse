@@ -23,7 +23,8 @@ extern HWND		hSettingDlg;
 // Global Prototype Define
 //
 extern BOOL 	bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitile);
-extern BOOL		bReCreateTaskTrayWindow(HWND hWnd, UINT message);
+extern BOOL		bCheckTaskTrayMessage(HWND hWnd, UINT message);
+extern BOOL		bReCreateTaskTrayWindow(HWND hWnd);
 extern BOOL		bDestroyTaskTrayWindow(HWND hWnd);
 extern BOOL		bGetTaskTrayWindowRect(HWND hWnd, LPRECT lpRect);
 extern void		Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg);

@@ -170,6 +170,9 @@
     <PostBuildEvent>
       <Command>copy /Y $(OutDir)$(TargetName)$(TargetExt) $(OutDir)$(TargetName).dat
 Xcopy /Y $(OutDir)$(TargetName).dat $(OutDir)FlushMouseUI3\
+Xcopy /Y $(OutDir)$(TargetName).dat $(MSBuildStartupDirectory)\FlushMouse\
+Xcopy /Y $(OutDir)$(TargetName).dat $(MSBuildStartupDirectory)\FlushMouseUI3\FlushMouseUI3\
+
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -200,6 +203,8 @@ Xcopy /Y $(OutDir)$(TargetName).dat $(OutDir)FlushMouseUI3\
       <Command>Start /min /wait cmd /c "$(MSBuildStartupDirectory)\Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
 copy /Y $(OutDir)FlushMouseCursor.dll $(OutDir)$(TargetName).dat
 Xcopy /Y $(OutDir)$(TargetName).dat $(OutDir)FlushMouseUI3\
+Xcopy /Y $(OutDir)$(TargetName).dat $(MSBuildStartupDirectory)\FlushMouse\
+Xcopy /Y $(OutDir)$(TargetName).dat $(MSBuildStartupDirectory)\FlushMouseUI3\FlushMouseUI3\
 
 </Command>
     </PostBuildEvent>

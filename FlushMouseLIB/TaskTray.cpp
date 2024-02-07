@@ -100,40 +100,49 @@ BOOL		bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle)
 	return TRUE;
 }
 
-
 //
-// bReCreateTaskTrayWindow()
+// bCheckTaskTrayMessage()
 //
-BOOL		bReCreateTaskTrayWindow(HWND hWnd, UINT message)
+BOOL		bCheckTaskTrayMessage(HWND hWnd, UINT message)
 {
 	if (message == uTaskbarCreatedMessage) {	
 		if (bDestroyTaskTrayWindow(hWnd)) {
 			bTaskTray = FALSE;
 		}
-		HICON	hIcon = NULL;
-		if ((hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE))) != NULL) {
-			if (bCreateTaskTrayWindow(hWnd, hIcon, szTitle)) {
-				bTaskTray = TRUE;
-				if (!Cursor->bReloadCursor()) {
-					bReportEvent(MSG_THREAD_HOOK_TIMER_RESTART_FAILED, APPLICATION_CATEGORY);
-					PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-				}
-				bReportEvent(MSG_THREAD_HOOK_TIMER_RESTARTED, APPLICATION_CATEGORY);
-				return TRUE;
-			}
-			else {
-				if (bDestroyTaskTrayWindow(hWnd)) {
-					bTaskTray = FALSE;
-				}
-				bReportEvent(MSG_TASKTRAY_REGISTER_FAILD, APPLICATION_CATEGORY);
-				bReportEvent(MSG_START_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+		if (bReCreateTaskTrayWindow(hWnd)) {
+			return TRUE;
+		}
+		else return FALSE;
+	}
+	return TRUE;
+}
+
+//
+// bReCreateTaskTrayWindow()
+//
+BOOL		bReCreateTaskTrayWindow(HWND hWnd)
+{
+	HICON	hIcon = NULL;
+	if ((hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE))) != NULL) {
+		if (bCreateTaskTrayWindow(hWnd, hIcon, szTitle)) {
+			bTaskTray = TRUE;
+			if (!Cursor->bReloadCursor()) {
+				bReportEvent(MSG_THREAD_HOOK_TIMER_RESTART_FAILED, APPLICATION_CATEGORY);
 				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-				return TRUE;
 			}
+			bReportEvent(MSG_THREAD_HOOK_TIMER_RESTARTED, APPLICATION_CATEGORY);
 		}
 		else {
-			return FALSE;
+			if (bDestroyTaskTrayWindow(hWnd)) {
+				bTaskTray = FALSE;
+			}
+			bReportEvent(MSG_TASKTRAY_REGISTER_FAILD, APPLICATION_CATEGORY);
+			bReportEvent(MSG_START_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		}
+	}
+	else {
+		return FALSE;
 	}
 	return TRUE;
 }

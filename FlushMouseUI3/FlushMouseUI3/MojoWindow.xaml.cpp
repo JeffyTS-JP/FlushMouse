@@ -8,6 +8,8 @@
 //
 
 #include "pch.h"
+#include "WinRT.h"
+
 #pragma push_macro("GetCurrentTime")
 #undef GetCurrentTime
 #include "MojoWindow.xaml.h"

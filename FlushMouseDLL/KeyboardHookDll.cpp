@@ -183,7 +183,7 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 				case VK_LWIN:			// Left  Win (0x5b)
 				case VK_RWIN:			// Right Win (0x5c)
 				//case VK_PAUSE:		// Pause (0x13)
-				//case VK_CAPITAL:		// Caps Lock (0x14) CapsLockされてしまうので処理しない 
+				//case VK_CAPITAL:		// Caps Lock (0x14) 
 				case VK_KANA:			// かな (0x15)
 				case VK_IME_ON:			// IME ON (0x16)
 				//case VK_JUNJA:		// (0x17)
@@ -207,9 +207,7 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 				case VK_OEM_BACKTAB:	// OEM Alt+カタカナ/ひらがな (0xf5)
 				case VK_OEM_PA1:		// US(ENG) Non Convert (0xeb)
 					bOnlyCtrlLL = FALSE;
-					if (!bStartConvertingLL) {
-						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (WM_USER + lpstKBH->vkCode), ((0x80000000 | 0xff000000 & (static_cast<LPARAM>(lpstKBH->flags)) << 24)));
-					}
+					PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (WM_USER + lpstKBH->vkCode), ((0x80000000 | 0xff000000 & (static_cast<LPARAM>(lpstKBH->flags)) << 24)));
 					break;
 				case VK_OEM_ATTN:		// OEM 英数/CapsLock (0xf0)
 				case VK_OEM_FINISH:		// OEM カタカナ (0xf1)

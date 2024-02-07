@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\packages\Microsoft.WindowsAppSDK.1.4.231219000\build\native\Microsoft.WindowsAppSDK.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.1.4.231219000\build\native\Microsoft.WindowsAppSDK.props')" />
   <Import Project="..\..\packages\Microsoft.Windows.CppWinRT.2.0.240111.5\build\native\Microsoft.Windows.CppWinRT.props" Condition="Exists('..\..\packages\Microsoft.Windows.CppWinRT.2.0.240111.5\build\native\Microsoft.Windows.CppWinRT.props')" />
-  <Import Project="..\..\packages\Microsoft.WindowsAppSDK.1.4.231115000\build\native\Microsoft.WindowsAppSDK.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.1.4.231115000\build\native\Microsoft.WindowsAppSDK.props')" />
   <Import Project="..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.22621.2428\build\Microsoft.Windows.SDK.BuildTools.props" Condition="Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.22621.2428\build\Microsoft.Windows.SDK.BuildTools.props')" />
   <Import Project="..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.25300-preview\build\Microsoft.Windows.SDK.BuildTools.props" Condition="Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.25300-preview\build\Microsoft.Windows.SDK.BuildTools.props')" />
   <Import Project="..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.25231-preview\build\Microsoft.Windows.SDK.BuildTools.props" Condition="Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.25231-preview\build\Microsoft.Windows.SDK.BuildTools.props')" />
@@ -25,27 +25,21 @@
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformMinVersion>10.0.19041.0</WindowsTargetPlatformMinVersion>
     <UseWinUI>true</UseWinUI>
-    <!-- @@@ https://docs.microsoft.com/ja-JP/windows/apps/winui/winui3/create-your-first-winui3-app#non-msix-packaged-create-a-new-project-for-a-non-msix-packaged-c-or-c-winui-3-desktop-app -->
     <AppxPackage>false</AppxPackage>
     <WindowsPackageType>None</WindowsPackageType>
     <WindowsAppSdkBootstrapInitialize>false</WindowsAppSdkBootstrapInitialize>
     <!--WindowsAppSDKBootstrapAutoInitializeOptions_Default>true</WindowsAppSDKBootstrapAutoInitializeOptions_Default-->
     <!--WindowsAppSDKBootstrapAutoInitializeOptions_None>true</WindowsAppSDKBootstrapAutoInitializeOptions_None-->
     <WindowsAppSDKBootstrapAutoInitializeOptions_OnError_DebugBreak_IfDebuggerAttached>true</WindowsAppSDKBootstrapAutoInitializeOptions_OnError_DebugBreak_IfDebuggerAttached>
-    <!-- @@@ -->
-    <!-- @@@ https://tera1707.com/entry/2022/07/29/043705 -->
     <SelfContained>true</SelfContained>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-    <!-- @@@ -->
   </PropertyGroup>
-  <!-- @@@ -->
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
     </AppxManifest>
   </ItemGroup>
-  <!-- @@@ -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -107,8 +101,6 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
     <ClCompile>
-      <!-- @@@ https://docs.microsoft.com/ja-jp/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/guides/applifecycle-->
-      <!--PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions-->
       <PreprocessorDefinitions>DISABLE_XAML_GENERATED_MAIN;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|arm64'">Default</ConformanceMode>
       <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</ConformanceMode>
@@ -118,7 +110,7 @@
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4002;28112</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nothrownew.obj;Shell32.lib;Gdi32.lib;..\..\$(Platform)\$(Configuration)\FlushMouseLIB.lib;..\..\$(Platform)\$(Configuration)\FlushMouseDLL.lib;..\..\..\MiscLIB\$(Platform)\$(Configuration)\CRegistry.lib;..\..\..\MiscLIB\$(Platform)\$(Configuration)\CSharedMemory.lib;..\..\..\MiscLIB\$(Platform)\$(Configuration)\CThread.lib;..\..\..\MiscLIB\$(Platform)\$(Configuration)\CDebug.lib;windowsapp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">nothrownew.obj;Shell32.lib;Gdi32.lib;..\..\$(Platform)\$(Configuration)\FlushMouseLIB.lib;..\..\$(Platform)\$(Configuration)\FlushMouseDLL.lib;..\..\$(Platform)\$(Configuration)\MiscLIB.lib;windowsapp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </LinkTimeCodeGeneration>
       <DelayLoadDLLs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(DelayLoadDLLs)</DelayLoadDLLs>
@@ -138,6 +130,7 @@ copy /Y "$(OutDir)$(TargetName).pdb" "$(OutDir)FlushMouse.pdb"
 copy /Y "$(OutDir)$(TargetName).pri" "$(OutDir)FlushMouse.pri"
 copy /Y "$(OutDir)$(TargetName).winmd" "$(OutDir)FlushMouse.winmd"
 copy /Y "$(OutDir)$(TargetName).xbf" "$(OutDir)FlushMouse.xbf"
+copy /Y "$(ProjectDir)FlushMouse.ico" "$(OutDir)FlushMouse.ico"
 </Command>
     </PostBuildEvent>
     <Link>
@@ -147,19 +140,17 @@ copy /Y "$(OutDir)$(TargetName).xbf" "$(OutDir)FlushMouse.xbf"
       <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nothrownew.obj;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Xcopy /Y "$(MSBuildStartupDirectory)\FlushMouseUI3\FlushMouseUI3DLL\$(BaseOutputPath)$(Platform)\$(Configuration)\FlushMouseUI3DLL*.nupkg" "$(MSBuildStartupDirectory)\\packages\"
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Xcopy /Y "$(MSBuildStartupDirectory)\$(ProjectName)\FlushMouseUI3DLL\$(BaseOutputPath)$(Platform)\$(Configuration)\FlushMouseUI3DLL*.nupkg" "$(MSBuildStartupDirectory)\NuGet\FlushMouseUI3DLL\"
 
 rd /S /Q "$(MSBuildStartupDirectory)\packages\FlushMouseUI3DLL.1.0.0"
 
-nuget install FlushMouseUI3DLL -ConfigFile "$(MSBuildStartupDirectory)\$(ProjectName)\$(ProjectName)\NuGet.config" -OutputDirectory "$(MSBuildStartupDirectory)\packages"
+"$(MSBuildStartupDirectory)\NuGet\nuget.exe" install FlushMouseUI3DLL -ConfigFile "$(MSBuildStartupDirectory)\$(ProjectName)\$(ProjectName)\NuGet.config" -OutputDirectory "$(MSBuildStartupDirectory)\packages"
 
 </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
     <ClCompile>
-      <!-- @@@ https://docs.microsoft.com/ja-jp/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/guides/applifecycle-->
-      <!--PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions-->
       <PreprocessorDefinitions>DISABLE_XAML_GENERATED_MAIN;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Release|arm64'">Default</ConformanceMode>
       <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Default</ConformanceMode>
@@ -172,7 +163,7 @@ nuget install FlushMouseUI3DLL -ConfigFile "$(MSBuildStartupDirectory)\$(Project
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nothrownew.obj;Shell32.lib;Gdi32.lib;..\..\$(Platform)\$(Configuration)\FlushMouseDLL.lib;..\..\..\MiscLIB\$(Platform)\$(Configuration)\CRegistry.lib;..\..\..\MiscLIB\$(Platform)\$(Configuration)\CSharedMemory.lib;..\..\..\MiscLIB\$(Platform)\$(Configuration)\CThread.lib;..\..\..\MiscLIB\$(Platform)\$(Configuration)\CDebug.lib;windowsapp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">nothrownew.obj;Shell32.lib;Gdi32.lib;..\..\$(Platform)\$(Configuration)\FlushMouseLIB.lib;..\..\$(Platform)\$(Configuration)\FlushMouseDLL.lib;..\..\$(Platform)\$(Configuration)\MiscLIB.lib;windowsapp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateDebugInformation>
       <DelayLoadDLLs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(DelayLoadDLLs)</DelayLoadDLLs>
       <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release|arm64'">nothrownew.obj;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
@@ -193,14 +184,15 @@ copy /Y "$(OutDir)$(TargetName).lib" "$(OutDir)FlushMouse.lib"
 copy /Y "$(OutDir)$(TargetName).pdb" "$(OutDir)FlushMouse.pdb"
 copy /Y "$(OutDir)$(TargetName).pri" "$(OutDir)FlushMouse.pri"
 copy /Y "$(OutDir)$(TargetName).winmd" "$(OutDir)FlushMouse.winmd"
-copy /Y "$(OutDir)$(TargetName).xbf" "$(OutDir)FlushMouse.xbf"</Command>
+copy /Y "$(OutDir)$(TargetName).xbf" "$(OutDir)FlushMouse.xbf"
+copy /Y "$(ProjectDir)FlushMouse.ico" "$(OutDir)FlushMouse.ico"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Xcopy /Y "$(MSBuildStartupDirectory)\FlushMouseUI3\FlushMouseUI3DLL\$(BaseOutputPath)$(Platform)\$(Configuration)\FlushMouseUI3DLL*.nupkg" "$(MSBuildStartupDirectory)\\packages\"
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Xcopy /Y "$(MSBuildStartupDirectory)\$(ProjectName)\FlushMouseUI3DLL\$(BaseOutputPath)$(Platform)\$(Configuration)\FlushMouseUI3DLL*.nupkg" "$(MSBuildStartupDirectory)\NuGet\FlushMouseUI3DLL\"
 
 rd /S /Q "$(MSBuildStartupDirectory)\packages\FlushMouseUI3DLL.1.0.0"
 
-nuget install FlushMouseUI3DLL -ConfigFile "$(MSBuildStartupDirectory)\$(ProjectName)\$(ProjectName)\NuGet.config" -OutputDirectory "$(MSBuildStartupDirectory)\packages"
+"$(MSBuildStartupDirectory)\NuGet\nuget.exe" install FlushMouseUI3DLL -ConfigFile "$(MSBuildStartupDirectory)\$(ProjectName)\$(ProjectName)\NuGet.config" -OutputDirectory "$(MSBuildStartupDirectory)\packages"
 
 </Command>
     </PreBuildEvent>
@@ -228,6 +220,7 @@ nuget install FlushMouseUI3DLL -ConfigFile "$(MSBuildStartupDirectory)\$(Project
     <ClInclude Include="FlushMouseUI3.xaml.h">
       <DependentUpon>FlushMouseUI3.xaml</DependentUpon>
     </ClInclude>
+    <ClInclude Include="WinRT.h" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="FlushMouseUI3.xaml" />
@@ -294,16 +287,14 @@ nuget install FlushMouseUI3DLL -ConfigFile "$(MSBuildStartupDirectory)\$(Project
     <Page Include="About.xaml" />
     <Page Include="MojoWindow.xaml" />
   </ItemGroup>
-  <!--@@@-->
-  <!--@@@-->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.25231-preview\build\Microsoft.Windows.SDK.BuildTools.targets" Condition="Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.25231-preview\build\Microsoft.Windows.SDK.BuildTools.targets')" />
     <Import Project="..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.22621.2428\build\Microsoft.Windows.SDK.BuildTools.targets" Condition="Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.22621.2428\build\Microsoft.Windows.SDK.BuildTools.targets')" />
-    <Import Project="..\..\packages\Microsoft.WindowsAppSDK.1.4.231115000\build\native\Microsoft.WindowsAppSDK.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.1.4.231115000\build\native\Microsoft.WindowsAppSDK.targets')" />
-    <Import Project="..\..\packages\FlushMouseUI3DLL.1.0.0\build\FlushMouseUI3DLL.targets" Condition="Exists('..\..\packages\FlushMouseUI3DLL.1.0.0\build\FlushMouseUI3DLL.targets')" />
     <Import Project="..\..\packages\Microsoft.Windows.CppWinRT.2.0.240111.5\build\native\Microsoft.Windows.CppWinRT.targets" Condition="Exists('..\..\packages\Microsoft.Windows.CppWinRT.2.0.240111.5\build\native\Microsoft.Windows.CppWinRT.targets')" />
     <Import Project="..\..\packages\Microsoft.Windows.ImplementationLibrary.1.0.240122.1\build\native\Microsoft.Windows.ImplementationLibrary.targets" Condition="Exists('..\..\packages\Microsoft.Windows.ImplementationLibrary.1.0.240122.1\build\native\Microsoft.Windows.ImplementationLibrary.targets')" />
+    <Import Project="..\..\packages\FlushMouseUI3DLL.1.0.0\build\FlushMouseUI3DLL.targets" Condition="Exists('..\..\packages\FlushMouseUI3DLL.1.0.0\build\FlushMouseUI3DLL.targets')" />
+    <Import Project="..\..\packages\Microsoft.WindowsAppSDK.1.4.231219000\build\native\Microsoft.WindowsAppSDK.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.1.4.231219000\build\native\Microsoft.WindowsAppSDK.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -311,11 +302,11 @@ nuget install FlushMouseUI3DLL -ConfigFile "$(MSBuildStartupDirectory)\$(Project
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.22621.2428\build\Microsoft.Windows.SDK.BuildTools.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.22621.2428\build\Microsoft.Windows.SDK.BuildTools.props'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.22621.2428\build\Microsoft.Windows.SDK.BuildTools.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.22621.2428\build\Microsoft.Windows.SDK.BuildTools.targets'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.1.4.231115000\build\native\Microsoft.WindowsAppSDK.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.1.4.231115000\build\native\Microsoft.WindowsAppSDK.props'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.1.4.231115000\build\native\Microsoft.WindowsAppSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.1.4.231115000\build\native\Microsoft.WindowsAppSDK.targets'))" />
-    <Error Condition="!Exists('..\..\packages\FlushMouseUI3DLL.1.0.0\build\FlushMouseUI3DLL.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\FlushMouseUI3DLL.1.0.0\build\FlushMouseUI3DLL.targets'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.Windows.CppWinRT.2.0.240111.5\build\native\Microsoft.Windows.CppWinRT.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Windows.CppWinRT.2.0.240111.5\build\native\Microsoft.Windows.CppWinRT.props'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.Windows.CppWinRT.2.0.240111.5\build\native\Microsoft.Windows.CppWinRT.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Windows.CppWinRT.2.0.240111.5\build\native\Microsoft.Windows.CppWinRT.targets'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.Windows.ImplementationLibrary.1.0.240122.1\build\native\Microsoft.Windows.ImplementationLibrary.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Windows.ImplementationLibrary.1.0.240122.1\build\native\Microsoft.Windows.ImplementationLibrary.targets'))" />
+    <Error Condition="!Exists('..\..\packages\FlushMouseUI3DLL.1.0.0\build\FlushMouseUI3DLL.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\FlushMouseUI3DLL.1.0.0\build\FlushMouseUI3DLL.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.1.4.231219000\build\native\Microsoft.WindowsAppSDK.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.1.4.231219000\build\native\Microsoft.WindowsAppSDK.props'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.1.4.231219000\build\native\Microsoft.WindowsAppSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.1.4.231219000\build\native\Microsoft.WindowsAppSDK.targets'))" />
   </Target>
 </Project>

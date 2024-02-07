@@ -7,6 +7,8 @@
 // #0000		2022/07/23  JeffyTS  	New edit.
 //
 #include "pch.h"
+#include "WinRT.h"
+
 #pragma push_macro("GetCurrentTime")
 #undef GetCurrentTime
 #include <WindowsAppSDK-VersionInfo.h>
@@ -34,7 +36,6 @@
 #include "..\..\FlushMouseLIB\FlushMouseLIB.h"
 #include "..\..\FlushMouseLIB\Resource.h"
 
-#include "..\..\..\..\MiscLIB\CDebug\CDebug.h"
 #pragma pop_macro("GetCurrentTime")
 
 using namespace winrt;
