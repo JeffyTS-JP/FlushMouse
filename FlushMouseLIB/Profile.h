@@ -31,11 +31,13 @@ typedef struct tagAppRegData
 	DWORD		dwAdditionalWaitTime;
 	DWORD		dwDisplayModeTime;
 	BOOL		bDisplayIMEModeOnCursor;
+	BOOL		bDisplayIMEModeByWindow;
 	BOOL		bForceHiragana;
 	BOOL		bDenyChangedByApp;
 	BOOL		bUseBigArrow;
 	COLORREF	dwNearDrawMouseColor;
 	COLORREF	dwNearDrawCaretColor;
+	COLORREF	dwNearMouseColor;
 
 	// for FlushMouse & Cursor
 	BOOL		bDisplayFocusWindowIME;

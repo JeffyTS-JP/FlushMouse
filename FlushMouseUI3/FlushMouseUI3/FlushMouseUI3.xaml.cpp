@@ -78,7 +78,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPTSTR 
 
 	HRESULT hre = CoInitializeEx(NULL, (COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE));
 	if (FAILED(hre)) {
-		// Handle the error.
 		return (-1);
 	}
 	else {
@@ -182,16 +181,6 @@ FlusMouseUI3::FlusMouseUI3()
 #endif
 
 	InitializeComponent();
-	
-#if defined _DEBUG && !defined DISABLE_XAML_GENERATED_BREAK_ON_UNHANDLED_EXCEPTION
-	UnhandledException([this](IInspectable const&, UnhandledExceptionEventArgs const& e) {
-		if (IsDebuggerPresent()) {
-			auto errorMessage = e.Message();
-			__debugbreak();
-		}
-	});
-#endif
-
 }
 
 //
@@ -199,7 +188,7 @@ FlusMouseUI3::FlusMouseUI3()
 //
 FlusMouseUI3::~FlusMouseUI3()
 {
-
+	return;
 }
 
 //
@@ -212,9 +201,8 @@ void FlusMouseUI3::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs cons
 	MojoWindowExec();
 	
 	if (!bWinMain((HINSTANCE)_hInstance, NULL, NULL, SW_HIDE)) {
-		if (hFlushMouseUI3DLL)	::FreeLibrary(hFlushMouseUI3DLL);
 		MojoWindowClose();
-		PostQuitMessage(0);
+		if (hFlushMouseUI3DLL)	::FreeLibrary(hFlushMouseUI3DLL);
 		return;
 	}
 

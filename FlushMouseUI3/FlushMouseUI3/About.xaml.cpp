@@ -149,7 +149,7 @@ namespace winrt::FlushMouseUI3::implementation
 		LPTSTR	lpszVersion = new TCHAR[MAX_LOADSTRING];
 		if (lpszVersion) {
 			ZeroMemory(lpszVersion, (sizeof(TCHAR) * MAX_LOADSTRING));
-			_sntprintf_s(lpszVersion, MAX_LOADSTRING, _TRUNCATE, _T("Version : %d.%d.%d.%d"), MAJOR_VERSION, MINOR_VERSION, BUILD_VERSION, REVISION_VERSION);
+			_sntprintf_s(lpszVersion, MAX_LOADSTRING, _TRUNCATE, _T("Version %d.%d.%d.%d"), MAJOR_VERSION, MINOR_VERSION, BUILD_VERSION, REVISION_VERSION);
 			Version().Text(lpszVersion);
 			delete[]	lpszVersion;
 		}

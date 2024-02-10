@@ -69,12 +69,12 @@ void vMessageBox(HWND hWnd, UINT uID, UINT uType)
 				return;
 			}
 			catch (...) {
-				return;					// error
+				return;	
 			}
 		}
 	}
 	catch (...) {
-		return;							// error
+		return;
 	}
 }
 

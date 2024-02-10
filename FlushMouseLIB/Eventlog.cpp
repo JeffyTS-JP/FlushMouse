@@ -33,4 +33,4 @@ BOOL		bReportEvent(DWORD dwEventID, WORD wCategory)
 	return bRet;
 }
 
-/* EOF */
+/* = EOF = */

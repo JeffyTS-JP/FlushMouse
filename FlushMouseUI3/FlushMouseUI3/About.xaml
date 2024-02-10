@@ -10,40 +10,43 @@
 	mc:Ignorable="d"
 	>
 
-	<Grid Loaded="About_Loaded" Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}">
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="80"/>
-			<ColumnDefinition Width="Auto"/>
-		</Grid.ColumnDefinitions>
-		<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Column="0">
-			<Image Margin="0,30,0,0" Source="small.ico" Width="32" Height="32"/>
-		</StackPanel>
-		<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1">
-			<Grid>
-				<Grid.RowDefinitions>
-					<RowDefinition Height="220"/>
-					<RowDefinition Height="Auto"/>
-				</Grid.RowDefinitions>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="0">
-					<TextBlock Margin="14,30,0,0" FontSize="18" Text="FlushMouseUI3"/>
-					<TextBlock Margin="14,14,0,0" Text="Copyright © 2022-  JeffyTS"/>
-					<TextBlock Margin="14,14,0,0" x:Name="Version" Loaded="Version_Loaded" Text=""/>
-					<StackPanel Margin="14,14,0,0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="0">
-						<TextBlock Text="GitHub  :"/>
-						<RichTextBlock Margin="7,0,0,0" FontFamily="Segoe MDL2 Assets">
-							<Paragraph>
-								<Hyperlink xml:space="preserve" NavigateUri="https://github.com/JeffyTS-JP/FlushMouse/">FlushMouse&#xE8AD; </Hyperlink>
-							</Paragraph>
-						</RichTextBlock>
+	<StackPanel  Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}">
+		<Rectangle Fill="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}" />
+		<Grid Loaded="About_Loaded" Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="80"/>
+				<ColumnDefinition Width="Auto"/>
+			</Grid.ColumnDefinitions>
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Column="0">
+				<Image Margin="0,30,0,0" Source="small.ico" Width="32" Height="32"/>
+			</StackPanel>
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="220"/>
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
+					<StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="0">
+						<TextBlock Margin="14,30,0,0" FontSize="18" Text="FlushMouseUI3"/>
+						<TextBlock Margin="14,14,0,0" Text="Copyright © 2022-  JeffyTS"/>
+						<TextBlock Margin="14,14,0,0" x:Name="Version" Loaded="Version_Loaded" Text=""/>
+						<StackPanel Margin="14,14,0,0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="0">
+							<TextBlock Text="GitHub "/>
+							<RichTextBlock Margin="7,0,0,0" FontFamily="Segoe MDL2 Assets">
+								<Paragraph>
+									<Hyperlink xml:space="preserve" NavigateUri="https://github.com/JeffyTS-JP/FlushMouse/">FlushMouse&#xE8AD; </Hyperlink>
+								</Paragraph>
+							</RichTextBlock>
+						</StackPanel>
+						<TextBlock Margin="14,14,0,0" Text="Twitter @JeffyTSonTW"/>
 					</StackPanel>
-					<TextBlock Margin="14,14,0,0" Text="Twitter  : @JeffyTSonTW"/>
-				</StackPanel>
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="1">
-					<Button  Margin="72,0,0,0" Width="75" x:Name="Button1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
-				</StackPanel>
-			</Grid>
-		</StackPanel>
-	</Grid>
+					<StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="1">
+						<Button  Margin="72,0,0,0" Width="75" x:Name="Button1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
+					</StackPanel>
+				</Grid>
+			</StackPanel>
+		</Grid>
+	</StackPanel>
 </Window>
 
 <!-- EOF -->

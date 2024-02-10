@@ -95,7 +95,7 @@ typedef struct tagSIZED
 // Message Handler Define
 // 
 
-#// void Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg);
+// void Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg);
 #define WM_TASKTRAYEX						(WM_USER + 0x0001)
 #define HANDLE_WM_TASKTRAYEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (UINT)(wParam), (UINT)(lParam)), 0L)
 
@@ -103,7 +103,7 @@ typedef struct tagSIZED
 #define WM_EVENT_SYSTEM_FOREGROUNDEX		(WM_USER + 0x0002)
 #define HANDLE_WM_EVENT_SYSTEM_FOREGROUNDEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (DWORD)(wParam), (HWND)(lParam)), 0L)
 
-// void	Cls_OnCheckExistingJPIMEEx(HWND hWnd, BOOL bEnableEPHelper);
+// void	Cls_OnCheckExistingJPIMEEx(HWND hWnd, BOOL bEPHelper);
 #define WM_CHECKEXISTINGJPIMEEX				(WM_USER + 0x0003)
 #define	HANDLE_WM_CHECKEXISTINGJPIMEEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (BOOL)(wParam)), 0L)
 

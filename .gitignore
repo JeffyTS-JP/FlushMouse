@@ -363,7 +363,7 @@ MigrationBackup/
 FodyWeavers.xsd
 
 nuget.exe
-!Nuget/FlushMouseUI3DLL/FlushMouseUI3DLL*.nupkg
-
-
-
+!NuGet/FlushMouseUI3DLL/FlushMouseUI3DLL*.nupkg
+FlushMouseCursor.dat
+FlushMouse_x64.exe
+FlushMouseUI3_x64.exe

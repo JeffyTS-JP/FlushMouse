@@ -117,11 +117,10 @@ void		SettingsExec(HWND hWnd, int msg)
 			}
 
 			if (Profile != nullptr) {
-				// ComboBox
 				settings.bDisplayFocusWindowIME(Profile->lpstAppRegData->bDisplayFocusWindowIME);
 
-				// Check Box
 				settings.bDisplayIMEModeOnCursor(Profile->lpstAppRegData->bDisplayIMEModeOnCursor);
+				settings.bDisplayIMEModeByWindow(Profile->lpstAppRegData->bDisplayIMEModeByWindow);
 				settings.bOffChangedFocus(Profile->lpstAppRegData->bOffChangedFocus);
 				settings.bForceHiragana(Profile->lpstAppRegData->bForceHiragana);
 				settings.bDoModeDispByIMEKeyDown(Profile->lpstAppRegData->bDoModeDispByIMEKeyDown);
@@ -131,16 +130,15 @@ void		SettingsExec(HWND hWnd, int msg)
 				settings.bIMEModeForced(Profile->lpstAppRegData->bIMEModeForced);
 				settings.bEnableEPHelper(Profile->lpstAppRegData->bEnableEPHelper);
 
-				// Slider
 				settings.iCursorSize(Profile->lpstAppRegData->iCursorSize);
 				settings.iModeSize(Profile->lpstAppRegData->iModeSize);
 				settings.dwDisplayModeTime(Profile->lpstAppRegData->dwDisplayModeTime);
 				settings.dwAdditionalWaitTime(Profile->lpstAppRegData->dwAdditionalWaitTime);
 				settings.dwWaitWaveTime(Profile->lpstAppRegData->dwWaitWaveTime);
 
-				// Color
 				settings.dwNearDrawMouseColor(Profile->lpstAppRegData->dwNearDrawMouseColor);
 				settings.dwNearDrawCaretColor(Profile->lpstAppRegData->dwNearDrawCaretColor);
+				settings.dwNearMouseColor(Profile->lpstAppRegData->dwNearMouseColor);
 			}
 		}
 	}
@@ -154,11 +152,10 @@ void		SettingsExec(HWND hWnd, int msg)
 void		SettingsApply()
 {
 	if ((settings != nullptr) && (Profile != nullptr)) {
-		// ComboBox
 		Profile->lpstAppRegData->bDisplayFocusWindowIME = settings.bDisplayFocusWindowIME();
 
-		// Check Box
 		Profile->lpstAppRegData->bDisplayIMEModeOnCursor = settings.bDisplayIMEModeOnCursor();
+		Profile->lpstAppRegData->bDisplayIMEModeByWindow = settings.bDisplayIMEModeByWindow();
 		Profile->lpstAppRegData->bOffChangedFocus = settings.bOffChangedFocus();
 		Profile->lpstAppRegData->bForceHiragana = settings.bForceHiragana();
 		Profile->lpstAppRegData->bDoModeDispByIMEKeyDown = settings.bDoModeDispByIMEKeyDown();
@@ -168,16 +165,15 @@ void		SettingsApply()
 		Profile->lpstAppRegData->bIMEModeForced = settings.bIMEModeForced();
 		Profile->lpstAppRegData->bEnableEPHelper = settings.bEnableEPHelper();
 
-		// Slider
 		Profile->lpstAppRegData->iCursorSize = settings.iCursorSize();
 		Profile->lpstAppRegData->iModeSize = settings.iModeSize();
 		Profile->lpstAppRegData->dwDisplayModeTime = settings.dwDisplayModeTime();
 		Profile->lpstAppRegData->dwAdditionalWaitTime = settings.dwAdditionalWaitTime();
 		Profile->lpstAppRegData->dwWaitWaveTime = settings.dwWaitWaveTime();
-	
-		// Color
+
 		Profile->lpstAppRegData->dwNearDrawMouseColor = settings.dwNearDrawMouseColor();
 		Profile->lpstAppRegData->dwNearDrawCaretColor = settings.dwNearDrawCaretColor();
+		Profile->lpstAppRegData->dwNearMouseColor = settings.dwNearMouseColor();
 	}
 }
 

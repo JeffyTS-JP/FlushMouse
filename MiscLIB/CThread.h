@@ -44,9 +44,11 @@ public:
 public:
 	BOOL 	bRegister(LPCTSTR lpszThreadName, DWORD dwThreadID, LPTHREAD_START_ROUTINE lpbCallbackRoutine, LPVOID lParamOption, DWORD dwSleepTime);
 	BOOL 	bStart();
-	VOID 	vUnregister();
-
+	BOOL	bCheckSentinel();
+	BOOL	bSetSentinel(BOOL bSentinel);
+	
 private:
+	VOID 	vUnregister();
 	static unsigned __stdcall	uThreadProc(void* pArguments);
 
 private:

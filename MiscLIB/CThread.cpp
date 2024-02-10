@@ -80,6 +80,26 @@ BOOL 	CThread::bStart()
 }
 
 //
+// bCheckSentinel
+//
+BOOL	CThread::bCheckSentinel()
+{
+	if ((lpstThreadData == NULL) || (lpstThreadData->lpstSA == NULL) || (lpstThreadData->hEvent == NULL) || (lpstThreadData->hThread == NULL))	return FALSE;		// error
+	return lpstThreadData->bThreadSentinel;
+}
+
+//
+// bSetSentinel()
+//
+BOOL	CThread::bSetSentinel(BOOL bSentinel)
+{
+	if ((lpstThreadData == NULL) || (lpstThreadData->lpstSA == NULL) || (lpstThreadData->hEvent == NULL) || (lpstThreadData->hThread == NULL))	return FALSE;		// error
+	BOOL	bRet = lpstThreadData->bThreadSentinel;
+	lpstThreadData->bThreadSentinel = bSentinel;
+	return bRet;
+}
+
+//
 // vUnregister()
 //
 VOID 	CThread::vUnregister()

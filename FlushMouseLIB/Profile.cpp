@@ -40,15 +40,16 @@ CProfile::CProfile()
 		lpstAppRegData->dwAdditionalWaitTime = 300;					// IME mode displayの 追加待ち時間
 		lpstAppRegData->dwDisplayModeTime = 400;					// IME mode displayの表示時間
 		lpstAppRegData->bForceHiragana = FALSE;						// 「全角ひらがな」へ強制的に変更する
-		lpstAppRegData->dwNearDrawMouseColor = aRGB(48, 255, 0, 0);	// マウスカーソルへのIMEモード表示色 RGB(255, 192, 0) + α (0xf0)
-		lpstAppRegData->dwNearDrawCaretColor = aRGB(48, 0, 0, 255);	// キャレットへのIMEモード表示色 RGB(255, 192, 0) + α (0xf0) / RGB(96, 124, 255)
+		lpstAppRegData->dwNearDrawMouseColor = aRGB(48, 255, 0, 0);	// マウスカーソルへのIMEモード表示色
+		lpstAppRegData->dwNearDrawCaretColor = aRGB(48, 0, 0, 255);	// キャレットへのIMEモード表示色
+		lpstAppRegData->dwNearMouseColor = aRGB(48, 0, 255, 0);		// マウスカーソルへのIMEモード表示色
 
-		// @@@未作成
-		lpstAppRegData->bDenyChangedByApp = FALSE;					// アプリケーションで変更されるのを防ぐか <--今のところ作っていない(難しいので後回し)
-		lpstAppRegData->bUseBigArrow = FALSE;						// 大きいサイズのアイコンを使うか？ <--今のところ作っていない
+		lpstAppRegData->bDenyChangedByApp = FALSE;					// アプリケーションで変更されるのを防ぐか
+		lpstAppRegData->bUseBigArrow = FALSE;						// 大きいサイズのアイコンを使うか
 
 		// for FlushMouse & Cursor
 		lpstAppRegData->bDisplayIMEModeOnCursor = TRUE;				// マウスカーソルへのIMEモード表示
+		lpstAppRegData->bDisplayIMEModeByWindow = FALSE;			// マウスカーソルへのIMEモード表示
 		lpstAppRegData->bDisplayFocusWindowIME = FALSE;				// フォーカスウィンドウのIMEモードを表示する(TRUE)/マウスカーソル下のウィンドウのIMEモードを表示する(FALSE)
 
 		// for FlushMouse
@@ -108,7 +109,9 @@ BOOL		CProfile::bGetProfileData() const
 						if (CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayModeTime"), (LPDWORD)&lpstAppRegData->dwDisplayModeTime, lpstAppRegData->dwDisplayModeTime)) {
 							if (CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseColor, lpstAppRegData->dwNearDrawMouseColor)) {
 								if (CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretColor"), (LPDWORD)&lpstAppRegData->dwNearDrawCaretColor, lpstAppRegData->dwNearDrawCaretColor)) {
-									bRet = TRUE;
+									if (CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearMouseColor"), (LPDWORD)&lpstAppRegData->dwNearMouseColor, lpstAppRegData->dwNearMouseColor)) {
+										bRet = TRUE;
+									}
 								}
 							}
 						}
@@ -121,10 +124,12 @@ BOOL		CProfile::bGetProfileData() const
 	if (bRet) {
 		bRet = FALSE;
 		if (CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeOnCursor"), (LPBOOL)&lpstAppRegData->bDisplayIMEModeOnCursor, lpstAppRegData->bDisplayIMEModeOnCursor)) {
-			if (CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("ForceHiragana"), (LPBOOL) & (lpstAppRegData->bForceHiragana), lpstAppRegData->bForceHiragana)) {
-				if (CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DenyChangedByApp"), (LPBOOL) & (lpstAppRegData->bDenyChangedByApp), lpstAppRegData->bDenyChangedByApp)) {
-					if (CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("UseBigArrow"), (LPBOOL) & (lpstAppRegData->bUseBigArrow), lpstAppRegData->bUseBigArrow)) {
-						bRet = TRUE;
+			if (CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeByWindow"), (LPBOOL)&lpstAppRegData->bDisplayIMEModeByWindow, lpstAppRegData->bDisplayIMEModeByWindow)) {
+				if (CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("ForceHiragana"), (LPBOOL) & (lpstAppRegData->bForceHiragana), lpstAppRegData->bForceHiragana)) {
+					if (CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DenyChangedByApp"), (LPBOOL) & (lpstAppRegData->bDenyChangedByApp), lpstAppRegData->bDenyChangedByApp)) {
+						if (CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("UseBigArrow"), (LPBOOL) & (lpstAppRegData->bUseBigArrow), lpstAppRegData->bUseBigArrow)) {
+							bRet = TRUE;
+						}
 					}
 				}
 			}
@@ -193,7 +198,9 @@ BOOL		CProfile::bSetProfileData() const
 						if (CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayModeTime"), lpstAppRegData->dwDisplayModeTime)) {
 							if (CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseColor"), lpstAppRegData->dwNearDrawMouseColor)) {
 								if (CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretColor"), lpstAppRegData->dwNearDrawCaretColor)) {
-									bRet = TRUE;
+									if (CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearMouseColor"), lpstAppRegData->dwNearMouseColor)) {
+										bRet = TRUE;
+									}
 								}
 							}
 						}
@@ -206,10 +213,12 @@ BOOL		CProfile::bSetProfileData() const
 	if (bRet) {
 		bRet = FALSE;
 		if (CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeOnCursor"), lpstAppRegData->bDisplayIMEModeOnCursor)) {
-			if (CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("ForceHiragana"), lpstAppRegData->bForceHiragana)) {
-				if (CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DenyChangedByApp"), lpstAppRegData->bDenyChangedByApp)) {
-					if (CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("UseBigArrow"), lpstAppRegData->bUseBigArrow)) {
-						bRet = TRUE;
+			if (CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeByWindow"), lpstAppRegData->bDisplayIMEModeByWindow)) {
+				if (CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("ForceHiragana"), lpstAppRegData->bForceHiragana)) {
+					if (CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DenyChangedByApp"), lpstAppRegData->bDenyChangedByApp)) {
+						if (CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("UseBigArrow"), lpstAppRegData->bUseBigArrow)) {
+							bRet = TRUE;
+						}
 					}
 				}
 			}

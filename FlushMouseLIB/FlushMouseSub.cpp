@@ -93,24 +93,35 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 		bReportEvent(MSG_PBT_POWERSETTINGCHANGE, POWERNOTIFICATION_CATEGORY);
 		break;
 	case PBT_APMPOWERSTATUSCHANGE:
-		bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE, POWERNOTIFICATION_CATEGORY);	
-		SYSTEM_POWER_STATUS	PowerStatus{};
-		if (GetSystemPowerStatus(&PowerStatus)) {
-			switch (PowerStatus.ACLineStatus) {
-			case 0:
-				bDestroyTaskTrayWindow(hWnd);
-				bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_OFF, POWERNOTIFICATION_CATEGORY);
-				SendMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-				break;
-			case 1:
-				bDestroyTaskTrayWindow(hWnd);
-				bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_ON, POWERNOTIFICATION_CATEGORY);
-				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-				break;
-			default:
-				break;
+			SYSTEM_POWER_STATUS	PowerStatus{};
+			if (GetSystemPowerStatus(&PowerStatus)) {
+				switch (PowerStatus.ACLineStatus) {
+				case 0:
+					try {
+						throw bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_OFF, POWERNOTIFICATION_CATEGORY);
+					}
+					catch (...) {
+					}
+					try {
+						throw bDestroyTaskTrayWindow(hWnd);
+					}
+					catch (...) {
+					}
+					try {
+						throw SendMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+					}
+					catch (...) {
+					}
+					return TRUE;
+				case 1:
+					bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_ON, POWERNOTIFICATION_CATEGORY);
+					bDestroyTaskTrayWindow(hWnd);
+					PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+					return TRUE;
+				default:
+					break;
+				}
 			}
-		}
 		if (lpSetting != NULL) {
 			PPOWERBROADCAST_SETTING	lpPwrSetting = (POWERBROADCAST_SETTING*)lpSetting;
 			if ((lpPwrSetting->PowerSetting == GUID_CONSOLE_DISPLAY_STATE)
@@ -199,8 +210,6 @@ BOOL		CEventHook::bEventUnset()
 void CALLBACK CEventHook::vHandleEvent(HWINEVENTHOOK hook, DWORD dwEvent, HWND hWnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
 {
 	UNREFERENCED_PARAMETER(hook);
-	UNREFERENCED_PARAMETER(dwEvent);
-	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(idObject);
 	UNREFERENCED_PARAMETER(idChild);
 	UNREFERENCED_PARAMETER(dwEventThread);
@@ -274,9 +283,9 @@ BOOL			CFlushMouseHook::bHookSet(HWND hWnd, LPCTSTR lpszDll64Name, LPCTSTR lpszE
 	if ((bGlobalHook64 = bGlobalHookSet(hWnd)) != FALSE) {
 		if ((bKeyboardHookLL64 = bKeyboardHookLLSet(hWnd)) != FALSE) {
 			if ((bShellHook64 = bShellHookSet(hWnd)) != FALSE) {
-					if ((bHook32Dll = bHook32DllStart(hWnd, lpszExec32Name)) != FALSE) {
-						return TRUE;
-					}
+				if ((bHook32Dll = bHook32DllStart(hWnd, lpszExec32Name)) != FALSE) {
+					return TRUE;
+				}
 			}
 		}
 	}
@@ -334,7 +343,7 @@ BOOL	 	CFlushMouseHook::bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name)
 			}
 			delete[]	lpszCommandLine;
 		}
-		delete[]		lpszBuffer;
+		delete[]	lpszBuffer;
 	}
 	return bRet;
 }
