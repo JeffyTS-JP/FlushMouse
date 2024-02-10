@@ -27,7 +27,7 @@
 
 #### 対応OS
    * Windows 10 / 11 64bit  (Latest Release Versionで検証しています)
-   * Version 2 以降のUI3対応版では、.NET Framweork 8 のランタイムが必要になります。インストーラーで自動的にインストール画面が出ます
+   * Version 2 以降のUI3対応版では、.NET Framework 8 のランタイムが必要になります。インストーラーで自動的にインストール画面が出ます
 
 #### プライバシーポリシー
    * デスクトップ版、UI3版共に個人情報の収集などは一切行っていません
@@ -40,8 +40,7 @@
      * こちらの場合は、本プログラムの設定(レジストリ)を削除するかどうかを選べます(デフォルトでは残すようにしてあります)
 
 #### 使い方
-   * スタートメニュー、デスクトップのアイコンをクリックするか、PCを起動するとシステムトレイ(タスクトレイ)に常駐します(ただし、PC再起動で起動しないと、一部のアプリでモード表示されない現象が発生します)
-   * PC起動時に、タスクスケジューラーからFlushMouseを自動的に起動するようになっています
+   * スタートメニュー、デスクトップのアイコンをクリックするか、PCを起動するとシステムトレイ(タスクトレイ)に常駐します
      * (これにより、以前の制限事項であった「一部のアプリ、例えば「タスクマネージャー」などがフォーカスを持っているときは、モード表示ができません」は解消されました)
    * 不要であればデスクトップのショートカットアイコンは、削除してしまっても問題ありません
 
@@ -81,7 +80,7 @@
    * **モード表示の時間**
      * マウスカーソルの左に「あ」「ア」「Ａ」「_ｱ」「_A」を表示をしている時間を調整できます
    * **モード表示までの時間**
-     * マウスカーソルの左に「あ」「ア」「Ａ」「_ｱ」「_A」を表示するまでの時間を調整できます (一部のアプリケーションでは、モードが切り替わるまで時間がかかる場合がありますので、ご判定が発生する場合があります。お好みで調整してください)
+     * マウスカーソルの左に「あ」「ア」「Ａ」「_ｱ」「_A」を表示するまでの時間を調整できます (一部のアプリケーションでは、モードが切り替わるまで時間がかかる場合がありますので、誤判定が発生する場合があります。お好みで調整してください)
    * **Ctrlキーを離してからモードを表示するまでの時間**
      * 設定の「マウスのプロパティ」にある、「Ctrlキーを押すとポインターの位置を表示する」をONにしているとき、この表示と重なるのを避けるためにモードを表示するまでの時間を調整できます
    * 本FlushMouseでは、「矢印」「Ｉビーム」「ハンド」を 「aero_」から抽出したものを表示しています(これは固定になります。ご了承ください)
@@ -157,17 +156,17 @@
   6. Tools -> Options -> Environment -> International Settings をクリックして、Languageを日本語にします
   7. 拡張機能 -> 検索で　WiXと入力し「 WiX v3 - Visual Studio 2022 Extension」を選択して、Visual Studioを終了するとインストールが始まります
 
-  以下はUI3のために必要な作業です
-  8. .NET Framework SDK v8 を[https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-8.0.101-windows-x64-installer](https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-8.0.101-windows-x64-installer)からダウンロードしてインストールします
-  9. NuGet CLI(nuget.exe)を[https://dist.nuget.org/win-x86-commandline/latest/nuget.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)からダウンロードして、FlushMouseをクローンしたフォルダの直下の「NuGet」フォルダ(デフォルトでは C:\Users\User\source\repos\FlushMouse\NuGet です)に入れます
-  10. Windowsの 設定 -> システム -> 開発者向け で 開発者モードを ON にします
+ * 以下はUI3のために必要な作業です
+  1. .NET Framework SDK v8 を[https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-8.0.101-windows-x64-installer](https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-8.0.101-windows-x64-installer)からダウンロードしてインストールします
+  2. NuGet CLI(nuget.exe)を[https://dist.nuget.org/win-x86-commandline/latest/nuget.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)からダウンロードして、FlushMouseをクローンしたフォルダの直下の「NuGet」フォルダ(デフォルトでは C:\Users\User\source\repos\FlushMouse\NuGet です)に入れます
+  3. Windowsの 設定 -> システム -> 開発者向け で 開発者モードを ON にします
+  4. Visual Studioを起動して、リポジトリのクローン -> リポジトリの場所に [https://github.com/JeffyTS-JP/FlushMouse.git](https://github.com/JeffyTS-JP/FlushMouse.git)　を入力してクローンします
+  5. UI3のために、クローンが終わったら、ツール -> NuGet パッケージマネージャー -> ソリューションの NuGet パッケージの管理 (Altキーを押しながら続けて T N N) を開き、右側にある歯車(⚙)を選択して、ダイアログを開きます
+  6. まず、右上のプラス(＋)を押してから、下にある「ソース」欄には、nuget.exeを入れた「NuGet」フォルダ(デフォルトでは C:\Users\User\source\repos\FlushMouse\NuGet)を選択して「更新」を押します(名前については適当で構いません)
+  7. その後 OK を押してダイアログを閉じ、上の歯車の左にある「パッケージソース」を「すべて」に変更します。次に「復元」選択します
 
 * ビルド方法です
-  1. Visual Studioを起動して、リポジトリのクローン -> リポジトリの場所に [https://github.com/JeffyTS-JP/FlushMouse.git](https://github.com/JeffyTS-JP/FlushMouse.git)　を入力してクローンします
-  2. UI3のために、クローンが終わったら、ツール -> NuGet パッケージマネージャー -> ソリューションの NuGet パッケージの管理 (Altキーを押しながら続けて T N N) を開き、右側にある歯車(⚙)を選択して、ダイアログを開きます
-  3. まず、右上のプラス(＋)を押してから、下にあるソースには、先ほど作成した「NuGet」フォルダ(デフォルトでは C:\Users\User\source\repos\FlushMouse\NuGet)を選択して「更新」を押します(名前については適当で構いません)
-  4. その後 OK を押してダイアログを閉じ、上の歯車の左にある「パッケージソース」を「すべて」に変更します。次に「復元」選択します
-  5. 構成を「**MixedPlatform**」にしてビルドします
-  6. 「Release」でビルドすると、デフォルトでは C:\Users\User\source\repos\FlushMouseにFlushMouse_x64.exe (Version 1.2以前は FlushMouse_x64.msi)と、FlushMouseUI3_x64.exeができるのでインストールしてご利用ください
+  1. 構成を「**MixedPlatform**」にしてビルドします (Ctrl + Shift + B)
+  2. 「Release」でビルドすると、デフォルトでは C:\Users\User\source\repos\FlushMouseにFlushMouse_x64.exe (Version 1.2以前は FlushMouse_x64.msi)と、FlushMouseUI3_x64.exeができるのでインストールしてご利用ください
 
 
