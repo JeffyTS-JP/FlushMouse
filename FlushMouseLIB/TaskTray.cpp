@@ -175,6 +175,7 @@ BOOL		bDestroyTaskTrayWindow(HWND hWnd)
 			return FALSE;
 		}
 	}
+	bTaskTray = FALSE;
 	return TRUE;
 }
 

@@ -10,7 +10,7 @@
 	mc:Ignorable="d"
 	>
 
-	<StackPanel  Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}">
+	<StackPanel  Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}" FocusVisualPrimaryBrush="{x:Null}">
 		<Rectangle Fill="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}" />
 		<Grid Loaded="About_Loaded" Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}">
 			<Grid.ColumnDefinitions>
@@ -38,7 +38,7 @@
 								</Paragraph>
 							</RichTextBlock>
 						</StackPanel>
-						<TextBlock Margin="14,14,0,0" Text="Twitter @JeffyTSonTW"/>
+						<TextBlock Margin="14,14,0,0" Text="X (Twitter)  @JeffyTSonTW"/>
 					</StackPanel>
 					<StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="1">
 						<Button  Margin="72,0,0,0" Width="75" x:Name="Button1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />

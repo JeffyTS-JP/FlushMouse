@@ -81,17 +81,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPTSTR 
 		return (-1);
 	}
 	else {
-		Application::Start([](auto&&) {windowApp = make<FlusMouseUI3>(); });
+		try {
+			Application::Start([](auto&&) {windowApp = make<FlusMouseUI3>(); });
+		}
+		catch (const std::exception&) {
+		}
+		catch (...) {
+		}
 
 		try {
 			CoUninitialize();
 		}
 		catch (...) {
 		}
-
 	}
-
-	return 0;
+	return iRet;
 }
 
 // 
@@ -210,7 +214,6 @@ void FlusMouseUI3::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs cons
 
 	if (hFlushMouseUI3DLL)	::FreeLibrary(hFlushMouseUI3DLL);
 
-	PostQuitMessage(0);
 	return;
 }
 

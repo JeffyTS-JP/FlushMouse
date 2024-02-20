@@ -103,6 +103,7 @@ typedef struct tagIMECursorData
 	BOOL		bUseBigArrow;
 	BOOL		bDisplayFocusWindowIME;
 
+	BOOL		bIMEModeByWindowThreadSentinel;
 	BOOL		bIMECursorChangeThreadSentinel;
 
 	HWND		hWndCaret;
@@ -172,7 +173,7 @@ private:
 	VOID		vUnRegisterIMECursorChangeThread();
 	static BOOL WINAPI		bIMECursorChangeRoutine(LPVOID lpvParam);
 
-	BOOL		bRegisterDrawIMEModeMouseThread(HWND hWnd);	//@@@@
+	BOOL		bRegisterDrawIMEModeMouseThread(HWND hWnd);
 	BOOL		bStartDrawIMEModeMouseThread(HWND hWndObserved);
 	VOID		vStopDrawIMEModeMouseThread();
 	VOID		vUnRegisterDrawIMEModeMouseThread();
@@ -182,11 +183,11 @@ private:
 	BOOL		bIsIMECursorChanged(LPIMECURSORDATA lpstCursorData);
 	BOOL		bDrawIMEModeOnDisplay(LPIMECURSORDATA lpstCursorData);
 	BOOL		bCalcDisplayModeRect(int iModeSizeX, int iModeSizeY, LPRECT lpRect);
-	HWND		hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPRECT lprcCaret, BOOL bAttachThreadInput);
+	HWND		hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPIMECURSORDATA lpstCursorData, BOOL bAttachThreadInput);
 	BOOL		bAdjustModeSizeByMonitorDPI(int iModeSizeX, int iModeSizeY, LPRECT lprcCaret);
 	BOOL		bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData);
-	static BOOL CALLBACK	_bIconDrawEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam);
-	static BOOL WINAPI		_bDrawIMEModeRoutine(LPVOID lpvParam);
+	static BOOL	CALLBACK	bIconDrawEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam);
+	static BOOL WINAPI		bDrawIMEModeRoutine(LPVOID lpvParam);
 	int			iGetCurosrID(DWORD dwIMEMode, LPIMECURSORDATA lpstCursorData);
 
 	BOOL		bGetMouseRegValue(LPCTSTR szValue, LPTSTR szFile);

@@ -32,7 +32,11 @@ namespace winrt::FlushMouseUI3::implementation
 	void		MojoWindowExec()
 	{
 		if (wMojoWnd == nullptr) {
-			wMojoWnd = make<MojoWindow>();
+			try {
+				wMojoWnd = make<MojoWindow>();
+			}
+			catch (const std::exception&) {
+			}
 			if (wMojoWnd != nullptr) {
 				auto windowNative{ wMojoWnd.try_as<::IWindowNative>() };
 				winrt::check_bool(windowNative);

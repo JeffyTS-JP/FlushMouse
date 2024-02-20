@@ -38,7 +38,6 @@ namespace winrt::FlushMouseUI3::implementation
 	private:
 		Microsoft::UI::Xaml::Window windowMain{ nullptr };
 		HMODULE		hFlushMouseUI3DLL{ nullptr };
-
 	};
 }
 

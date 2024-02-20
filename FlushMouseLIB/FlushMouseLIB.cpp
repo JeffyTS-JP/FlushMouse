@@ -70,8 +70,8 @@ static CFlushMouseHook		*FlushMouseHook = NULL;
 // Event Handler	
 static CEventHook			*EventHook = NULL;
 
-// for PowerNotification
-static CPowerNotification	*PowerNotification = NULL;
+// RawInput Mouse
+static CRawInput			*RawInputMouse = NULL;
 
 //
 // Global Prototype Define
@@ -90,11 +90,9 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 static BOOL		Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct);
 static void		Cls_OnDestroy(HWND hWnd);
 static void		Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify);
-static LRESULT	Cls_OnPowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting);
+static void		Cls_OnInput(HWND hWnd, DWORD dwFlags, HRAWINPUT hRawInput);
 
 // EX Message Handler
-static void		Cls_OnLButtonDownEx(HWND hWnd, int x, int y, HWND hForeground);
-static void		Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground);
 static void		Cls_OnSettingsEx(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void		Cls_OnInputLangChangeEx(HWND hWnd, UINT CodePage, HKL hkl);
 static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd);
@@ -105,7 +103,8 @@ static void		Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, U
 // Sub
 static BOOL		bSendInputSub(UINT cInputs, LPINPUT pInputs);
 static BOOL		bKBisEP();
-static BOOL		bChangeHKLbySendInput(HKL hNewHKL, HKL hPreviousHKL);
+static BOOL		bChangeHKLbySendInput(HKL hNewHKL, HKL hPreviousHKL, BOOL bForce);
+static BOOL		bChromium_Helper(HWND hForeWnd);
 static VOID CALLBACK		vCheckFocusTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
 static VOID CALLBACK		vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
 static BOOL CALLBACK		bEnumChildProcChangeHKL(HWND hWnd, LPARAM lParam);
@@ -162,6 +161,17 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_o
 	ShowWindow(hWnd, SW_HIDE);
 	UpdateWindow(hWnd);
 	hMainWnd = hWnd;
+
+#define	uiNumDevices	1
+	RAWINPUTDEVICE	RawInputDevice[uiNumDevices]{};
+	RawInputDevice[0].usUsagePage = 0x0001; RawInputDevice[0].usUsage = 0x0002; RawInputDevice[0].dwFlags = RIDEV_INPUTSINK; RawInputDevice[0].hwndTarget = hWnd;
+	if (!RegisterRawInputDevices(RawInputDevice, uiNumDevices, sizeof(RAWINPUTDEVICE))) {
+		bReportEvent(MSG_STOPPED_FLUSHMOUSE, APPLICATION_CATEGORY);		// Eventlog
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK)        // MessageBox style
+		vMessageBox(hWnd, IDS_NOTREGISTERHOOK, MessageBoxTYPE);			// Hook‚ð“o˜^‚Å‚«‚È‚©‚Á‚½‚½‚ßƒGƒ‰[‚ð•\Ž¦
+		return FALSE;
+	}
+#undef uiNumDevices
 
 	MSG		msg{};
 	BOOL	bRet = FALSE;
@@ -308,18 +318,16 @@ static HWND InitInstance(HINSTANCE hInstance, int nCmdShow)
 static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 #define HANDLE_WM_POWERBROADCAST(hWnd, wParam, lParam, fn) (LRESULT)(DWORD)(BOOL)((fn)((hWnd), (ULONG)(wParam), (POWERBROADCAST_SETTING *)(lParam)))
-//#define HANDLE_WM_INPUTLANGCHANGE(hWnd, wParam, lParam, fn) ((fn)((hWnd), (UINT)(wParam), (HKL)(lParam)), 0L)
+#define HANDLE_WM_INPUT(hWnd, wParam, lParam, fn) ((fn)((hWnd), (DWORD)(GET_RAWINPUT_CODE_WPARAM(wParam)), (HRAWINPUT)(lParam)), 0L)
 
 	switch (message) {
 		HANDLE_MSG(hWnd, WM_CREATE, Cls_OnCreate);
 		HANDLE_MSG(hWnd, WM_DESTROY, Cls_OnDestroy);
-		HANDLE_MSG(hWnd, WM_POWERBROADCAST, Cls_OnPowerBroadcast);
 		HANDLE_MSG(hWnd, WM_COMMAND, Cls_OnCommand);
+		HANDLE_MSG(hWnd, WM_INPUT, Cls_OnInput);
 
 		HANDLE_MSG(hWnd, WM_SETTINGSEX, Cls_OnSettingsEx);
 		HANDLE_MSG(hWnd, WM_INPUTLANGCHANGEEX, Cls_OnInputLangChangeEx);
-		HANDLE_MSG(hWnd, WM_LBUTTONDOWNEX, Cls_OnLButtonDownEx);
-		HANDLE_MSG(hWnd, WM_LBUTTONUPEX, Cls_OnLButtonUpEx);
 		HANDLE_MSG(hWnd, WM_EVENT_SYSTEM_FOREGROUNDEX, Cls_OnEventForegroundEx);
 		HANDLE_MSG(hWnd, WM_CHECKIMESTARTCONVEX, Cls_OnCheckIMEStartConvertingEx);
 		HANDLE_MSG(hWnd, WM_CHECKEXISTINGJPIMEEX, Cls_OnCheckExistingJPIMEEx);
@@ -384,13 +392,14 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		return FALSE;
 	}
 
-	PowerNotification = new CPowerNotification(hWnd);
-	if (PowerNotification == NULL) {
-		vMessageBox(hWnd, IDS_NOTRREGISTEVH, MessageBoxTYPE);
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-		return FALSE;
+	RawInputMouse = new CRawInput(hWnd);
+	if (RawInputMouse != NULL) {
+		if (!RawInputMouse->bRegisterRawInputDevices(0x0001, 0x0002, RIDEV_INPUTSINK)) {
+			vMessageBox(hWnd, IDS_NOTREGISTERMS, MessageBoxTYPE);		// Mouse Hook‚ð“o˜^‚Å‚«‚È‚©‚Á‚½‚½‚ßƒGƒ‰[‚ð•\Ž¦
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);	// Quit
+			return FALSE;
+		}
 	}
-
 	if (!bStartThreadHookTimer(hWnd)) {
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		return FALSE;
@@ -444,6 +453,10 @@ void		vDestroyWindow(HWND hWnd)
 			uCheckFocusTimer = NULL;
 		}
 	}
+	if (RawInputMouse != NULL) {
+		delete RawInputMouse;
+		RawInputMouse = NULL;
+	}
 	if (EventHook != NULL) {
 		delete EventHook;
 		EventHook = NULL;
@@ -455,10 +468,6 @@ void		vDestroyWindow(HWND hWnd)
 	if (Cursor != NULL) {
 		delete Cursor;	
 		Cursor = NULL;
-	}
-	if (PowerNotification != NULL) {
-		delete PowerNotification;
-		PowerNotification = NULL;
 	}
 	if (Cime != NULL) {
 		delete Cime;
@@ -492,13 +501,15 @@ static void Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 	}
 }
 
+// 
+// WM_INPUT
+// Cls_OnInput()
 //
-// WM_POWERBROADCAST
-// Cls_OnPowerBroadcastEx()
-//
-static LRESULT		Cls_OnPowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting)
+static void		Cls_OnInput(HWND hWnd, DWORD dwFlags, HRAWINPUT hRawInput)
 {
-	return PowerNotification->PowerBroadcast(hWnd, Type, lpSetting);
+	if (RawInputMouse != NULL) {
+		RawInputMouse->vRawInputDevicesHandler(hWnd, dwFlags, hRawInput);
+	}
 }
 
 //
@@ -510,33 +521,26 @@ static void		Cls_OnInputLangChangeEx(HWND hWnd, UINT CodePage, HKL hkl)
 	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(CodePage);
 	HWND	hForeWnd = NULL;
+	HKL		hNewHKL = NULL;
+	HKL		hPreviousHKL = NULL;
 	if ((hForeWnd = GetForegroundWindow()) != NULL) {
 		if (((Profile != NULL) && bCheckExistingJPIME() && Profile->lpstAppRegData->bEnableEPHelper)) {
 			if (hkl == US_ENG) {
-				HKL		hNewHKL = NULL;
-				HKL		hPreviousHKL = NULL;
 				bForExplorerPatcherSWS(hForeWnd, TRUE, TRUE, &hNewHKL, &hPreviousHKL);
 			}
 		}
-	}
-	HWND	hWndObserved = NULL;
-	POINT	pt{};
-	if (GetCursorPos(&pt)) {
-		if ((Profile != NULL) && Profile->lpstAppRegData->bDisplayFocusWindowIME) {
-			if ((hWndObserved = GetForegroundWindow()) == NULL)	return;
-		}
-		else {
+		HWND	hWndObserved = NULL;
+		POINT	pt{};
+		if (GetCursorPos(&pt)) {
 			if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return;
-		}
-		if (Cursor->bStartIMECursorChangeThread(hWndObserved)) {
-			if ((Profile != NULL) && Profile->lpstAppRegData->bDoModeDispByIMEKeyDown) {
-				RECT	rc{};
-				HWND	hShellWnd = FindWindow(L"Shell_TrayWnd", NULL);
-				if ((hShellWnd== hForeWnd) || (hForeWnd == hWnd)) {
-					if (bGetTaskTrayWindowRect(hWnd, &rc) == FALSE)	return;
-					if (((pt.x >= rc.left) && (pt.x <= rc.right)) || ((pt.y <= rc.top) && (pt.y >= rc.bottom)))	return;
+			if ((Profile != NULL) && Profile->lpstAppRegData->bDisplayFocusWindowIME) {
+				hWndObserved = hForeWnd;
+			}
+			if (Cursor->bStartIMECursorChangeThread(hWndObserved)) {
+				if ((Profile != NULL) && Profile->lpstAppRegData->bDoModeDispByIMEKeyDown) {
+					if (!bCheckDrawIMEModeArea(hWndObserved))	return;
+					if (!Cursor->bStartDrawIMEModeThread(hWndObserved))	return;	
 				}
-				if (!Cursor->bStartDrawIMEModeThread(hWndObserved))	return;
 			}
 		}
 	}
@@ -546,14 +550,22 @@ static void		Cls_OnInputLangChangeEx(HWND hWnd, UINT CodePage, HKL hkl)
 // WM_LBUTTONDOWNEX
 // Cls_OnLButtonDownEx()
 //
-static void Cls_OnLButtonDownEx(HWND hWnd, int x, int y, HWND hForeground)
+void Cls_OnLButtonDownEx(HWND hWnd, int x, int y, HWND hForeground)
 {
 	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(x);
 	UNREFERENCED_PARAMETER(y);
 	UNREFERENCED_PARAMETER(hForeground);
-	if (((Profile != NULL) && bCheckExistingJPIME() && Profile->lpstAppRegData->bEnableEPHelper)) {
-		bForExplorerPatcherSWS(hForeground, FALSE, FALSE, NULL, NULL);
+	TCHAR	szBuffer[_MAX_PATH]{};
+	if (GetClassName(hForeground, szBuffer, _MAX_PATH) != 0) {
+		if ((Profile != NULL) && bCheckExistingJPIME() && (Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
+			if (Profile->lpstAppRegData->bEnableEPHelper) {
+				bForExplorerPatcherSWS(hForeground, FALSE, FALSE, NULL, NULL);
+			}
+			if (Profile->lpstAppRegData->bIMEModeForced) {
+				if (!bChromium_Helper(hForeground))	return;
+			}
+		}
 	}
 	return;
 }
@@ -562,7 +574,7 @@ static void Cls_OnLButtonDownEx(HWND hWnd, int x, int y, HWND hForeground)
 // WM_LBUTTONUPEX
 // Cls_OnLButtonUpEx()
 //
-static void Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground)
+void Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground)
 {
 	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(x);
@@ -572,12 +584,8 @@ static void Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground)
 		HWND	hWndObserved = NULL;
 		POINT	pt{};
 		if (GetCursorPos(&pt)) {
-			RECT	rc{};
 			if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return;
-			if (FindWindow(L"Shell_TrayWnd", NULL) == GetForegroundWindow()) {
-				if (bGetTaskTrayWindowRect(hWnd, &rc) == FALSE)	return;
-				if (((pt.x >= rc.left) && (pt.x <= rc.right)) || ((pt.y <= rc.top) && (pt.y >= rc.bottom)))	return;
-			}
+			if (!bCheckDrawIMEModeArea(hWndObserved))	return;
 			if (!Cursor->bStartDrawIMEModeThreadWaitDblClk(hWndObserved))	return;
 		}
 	}
@@ -638,11 +646,7 @@ static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd)
 					if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return;
 				}
 				if (!Cursor->bStartIMECursorChangeThread(hWndObserved))	return;
-				RECT		rc{};
-				if (FindWindow(L"Shell_TrayWnd", NULL) == hWndObserved) {
-					if (bGetTaskTrayWindowRect(hWnd, &rc) == FALSE)	return;
-					if (((pt.x >= rc.left) && (pt.x <= rc.right)) || ((pt.y <= rc.top) && (pt.y >= rc.bottom)))	return;
-				}
+				if (!bCheckDrawIMEModeArea(hWndObserved))	return;
 				if (!Cursor->bStartDrawIMEModeThreadWaitEventForeGround(hWndObserved))	return;
 			}
 		}
@@ -817,6 +821,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 								Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 								Sleep(50);
 								Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
+								if (!bChromium_Helper(hForeWnd))	return;
 							}
 						}
 						else {
@@ -825,6 +830,8 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 							}
 							else {
 								Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
+								Sleep(50);
+								if (!bChromium_Helper(hForeWnd))	return;
 							}
 						}
 					}
@@ -841,7 +848,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 				Sleep(50);
 				HWND	hWndHidemaru = FindWindow(_T("Hidemaru32Class"), NULL);
 				if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
-					Sleep(50);
+					Sleep(200);
 					break;
 				}
 				if (bForExplorerPatcherSWS(hForeWnd, TRUE, Profile->lpstAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL)) {
@@ -854,11 +861,16 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 								Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 								Sleep(50);
 								Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
+								Sleep(50);
+								if (!bChromium_Helper(hForeWnd))	return;
 							}
 						}
 						else {
 							if (dwBeforeIMEMode != IMEOFF) {
 								Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+							}
+							else {
+								if (!bChromium_Helper(hForeWnd))	return;
 							}
 						}
 					}
@@ -981,11 +993,13 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 							Sleep(50);
 							Cime->vIMEConvertModeChangeForced(hForeWnd, ZENKANA_IMEON);
+							if (!bChromium_Helper(hForeWnd))	return;
 						}
 						else {
 							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 							Sleep(50);
 							Cime->vIMEConvertModeChangeForced(hForeWnd, ZENKANA_IMEON);
+							if (!bChromium_Helper(hForeWnd))	return;
 						}
 					}
 				}
@@ -1005,9 +1019,11 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 							Sleep(50);
 							Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
+							if (!bChromium_Helper(hForeWnd))	return;
 						}
 						else {
 							Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
+							if (!bChromium_Helper(hForeWnd))	return;
 						}
 					}
 				}
@@ -1103,7 +1119,7 @@ BOOL		bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, BOOL bIMEModeForc
 					if (ActivateKeyboardLayout(hkl, (KLF_SETFORPROCESS | KLF_REORDER)) != 0) {
 						if ((hkl = GetKeyboardLayout(dwThreadID)) != NULL) {
 							if (hkl != JP_IME) {
-								if (bChangeHKLbySendInput(JP_IME, hkl)) {
+								if (bChangeHKLbySendInput(JP_IME, hkl, FALSE)) {
 									hkl = JP_IME;
 									if (ActivateKeyboardLayout(hkl, (KLF_SETFORPROCESS | KLF_REORDER)) != 0) {
 										bRet = TRUE;
@@ -1128,6 +1144,12 @@ BOOL		bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, BOOL bIMEModeForc
 		EnumChildWindows(hForeWnd, &bEnumChildProcChangeHKL, (LPARAM)hkl);
 		Cime->vActivateIME(hForeWnd);
 	}
+	HWND	hWnd = FindWindow(_T("Hidemaru32Class"), NULL);
+	if ((hWnd != NULL) && (hForeWnd == hWnd)) {
+		if (!bChangeHKLbySendInput(hkl, hPreviousHKL, FALSE)) {
+		}
+	}
+
 	if (lpNewHKL != NULL)		*lpNewHKL = hkl;
 	if (lpPreviousHKL != NULL)	*lpPreviousHKL = hPreviousHKL;
 	return bRet;
@@ -1136,7 +1158,7 @@ BOOL		bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, BOOL bIMEModeForc
 //
 // bChangeHKLbySendInput();
 //
-BOOL	bChangeHKLbySendInput(HKL hNewHKL, HKL hPreviousHKL)
+BOOL	bChangeHKLbySendInput(HKL hNewHKL, HKL hPreviousHKL, BOOL bForce)
 {
 	BOOL	bRet = FALSE;
 	int		iKBList = 0;
@@ -1152,7 +1174,7 @@ BOOL	bChangeHKLbySendInput(HKL hNewHKL, HKL hPreviousHKL)
 				}
 				int iKB = iKBList - iPreviousKB + iNewKB;
 				if ((GetAsyncKeyState(VK_SHIFT) & 0x8000)) iKB = iKBList - iKB;
-				if (iNewKB != iPreviousKB) {
+				if ((iNewKB != iPreviousKB) || bForce) {
 					LPINPUT lpInputs = NULL;
 					if ((lpInputs = new INPUT[sizeof(INPUT) * (iKB * 2 + 2)]) != NULL) {
 						ZeroMemory(lpInputs, sizeof(INPUT) * (iKB * 2 + 2));
@@ -1235,6 +1257,40 @@ static BOOL		bSendInputSub(UINT cInputs, LPINPUT pInputs)
 {
 	if (SendInput(cInputs, pInputs, sizeof(INPUT)) == cInputs) {
 		Sleep(10);
+		return TRUE;
+	}
+	return FALSE;
+}
+
+//
+// bChromium_Helper()
+//
+static BOOL	bChromium_Helper(HWND hForeWnd)
+{
+	TCHAR	szBuffer[_MAX_PATH]{};
+	if (GetClassName(hForeWnd, szBuffer, _MAX_PATH) != 0) {
+		if ((szBuffer[0] != _T('\0')) && ((CompareStringOrdinal(szBuffer, -1, L"Chrome_RenderWidgetHostHWND", -1, TRUE) == CSTR_EQUAL)
+										|| (CompareStringOrdinal(szBuffer, -1, L"Chrome_WidgetWin_1", -1, TRUE) == CSTR_EQUAL))) {
+			DWORD	dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
+			if (dwBeforeIMEMode != IMEOFF) {
+				HWND    hIMWnd = NULL;
+				if ((hIMWnd = ImmGetDefaultIMEWnd(hForeWnd)) != NULL) {
+					DWORD	dwSentenceMode = 0;
+					if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETOPENSTATUS, NULL) != 0) {
+						if ((dwSentenceMode = (DWORD)SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETSENTENCEMODE, NULL)) == 0) {
+							if (!SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETSENTENCEMODE, (LPARAM)IME_SMODE_PHRASEPREDICT) != 0) {
+								return TRUE;
+							}
+							else return FALSE;
+						}
+						else return FALSE;
+					}
+					else return FALSE;
+				}
+				else return FALSE;
+			}
+			else return TRUE;
+		}
 		return TRUE;
 	}
 	return FALSE;

@@ -13,7 +13,7 @@
 	Closed="Window_Closed"
 	>
 
-	<StackPanel  Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}">
+	<StackPanel  Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}" FocusVisualPrimaryBrush="{x:Null}">
 		<Rectangle Fill="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}" />
 		<Grid Loading="Settings_Loading" Loaded="Settings_Loaded" Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}">
 			<Grid.RowDefinitions>
@@ -41,6 +41,20 @@
 			<StackPanel Margin="0,6,0,0" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1">
 				<Grid>
 					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="530"/>
+						<ColumnDefinition Width="120"/>
+					</Grid.ColumnDefinitions>
+					<StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0">
+						<TextBlock Margin="42,0,0,0" Text="マウスカーソルの右下に IME モードを表示する"/>
+					</StackPanel>
+					<StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="1">
+						<ToggleSwitch Margin="42,0,0,0" x:Name="ts1" Toggled="HandleToggleSwitch" OffContent="オフ" OnContent="オン" IsOn="True"/>
+					</StackPanel>
+				</Grid>
+			</StackPanel>
+			<StackPanel Margin="0,6,0,0" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="2">
+				<Grid>
+					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="230"/>
 						<ColumnDefinition Width="420"/>
 					</Grid.ColumnDefinitions>
@@ -55,8 +69,8 @@
 					</StackPanel>
 				</Grid>
 			</StackPanel>
-			<StackPanel Margin="0,6,0,0" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="2">
-				<Grid>
+			<StackPanel Margin="0,6,0,0" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="4">
+				<Grid x:Name="grid4_1">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="230"/>
 						<ColumnDefinition Width="420"/>
@@ -65,26 +79,10 @@
 						<TextBlock Margin="42,0,0,0" Text="マウスカーソルのサイズ"/>
 					</StackPanel>
 					<StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="1">
-						<Slider Margin="10,0,10,0" Width="400" x:Name="sl1" ValueChanged="Slider_ValueChanged"
+						<Slider Margin="10,0,10,0" Width="400" x:Name="sl1_1" ValueChanged="Slider_ValueChanged"
 						Minimum="8" Maximum="80" StepFrequency="1" SmallChange="1" Value="32" TickFrequency="8" TickPlacement="Outside" SnapsTo="StepValues"/>
 					</StackPanel>
 				</Grid>
-			</StackPanel>
-			<StackPanel Margin="0,6,0,0" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="3">
-				<Grid>
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="530"/>
-						<ColumnDefinition Width="120"/>
-					</Grid.ColumnDefinitions>
-					<StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0">
-						<TextBlock Margin="42,0,0,0" Text="マウスカーソルの右下に IME モードを表示する"/>
-					</StackPanel>
-					<StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="1">
-						<ToggleSwitch Margin="42,0,0,0" x:Name="ts1" Toggled="HandleToggleSwitch" OffContent="オフ" OnContent="オン" IsOn="True"/>
-					</StackPanel>
-				</Grid>
-			</StackPanel>
-			<StackPanel Margin="0,6,0,0" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="4">
 			</StackPanel>
 			<StackPanel Margin="0,6,0,0" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="5">
 				<Grid>
@@ -262,7 +260,7 @@
 			<StackPanel Margin="0,6,0,0" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="17">
 				<StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
 					<TextBlock Margin="42,12,0,0" Text="マウスカーソルの左の表示色"/>
-					<Button Margin="10,7,0,0" x:Name="NearMouse" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="あ" Click="ColorButton_Click">
+					<Button Margin="10,7,0,0" x:Name="Button4" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="あ" Click="ColorButton_Click">
 						<FlyoutBase.AttachedFlyout>
 							<Flyout x:Name="Flyout1">
 								<StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -277,7 +275,7 @@
 						</FlyoutBase.AttachedFlyout>
 					</Button>
 					<TextBlock Margin="100,12,0,0" Text="キャレットの左の表示色"/>
-					<Button Margin="10,7,0,0" x:Name="NearCaret" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="あ" Click="ColorButton_Click">
+					<Button Margin="10,7,0,0" x:Name="Button5" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="あ" Click="ColorButton_Click">
 						<FlyoutBase.AttachedFlyout>
 							<Flyout x:Name="Flyout2">
 								<StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">

@@ -24,5 +24,23 @@
 // Global Data
 //
 
+//
+// class CPowerNotification
+//
+class CPowerNotification
+{
+public:
+	CPowerNotification(HWND hWnd);
+	~CPowerNotification();
+
+	BOOL		PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting);
+
+private:
+	HPOWERNOTIFY	hSuspendResumeNotification;
+	HPOWERNOTIFY	hPowerSettingNotification;
+	GUID			guidPowerSettingNotification;
+};
+
+
 
 /* = EOF = */

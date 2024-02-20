@@ -35,9 +35,11 @@
   <ItemGroup>
     <Content Include="banner.bmp" />
     <Content Include="dialog.bmp" />
+    <Content Include="Register_Eventlog.reg" />
     <Content Include="Register_TaskScheduler.xml" />
     <Content Include="License.rtf" />
     <Content Include="Readme.txt" />
+    <Content Include="Register_TaskScheduler1.xml" />
     <Content Include="Register_TaskScheduler2.xml" />
   </ItemGroup>
   <ItemGroup>

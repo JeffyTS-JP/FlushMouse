@@ -40,6 +40,106 @@
 //
 
 //
+// bCheckDrawIMEModeArea()
+//
+BOOL		bCheckDrawIMEModeArea(HWND hWndObserved)
+{
+	if (hMainWnd == hWndObserved)	return FALSE;
+	if (FindWindow(L"Shell_TrayWnd", NULL) == hWndObserved)	return FALSE;
+	POINT	pt{};
+	if (GetCursorPos(&pt)) {
+		if (WindowFromPoint(pt) != NULL) {
+			RECT	rc{};
+			if (bGetTaskTrayWindowRect(hMainWnd, &rc) != FALSE) {
+				if (((pt.x >= rc.left) && (pt.x <= rc.right)) || ((pt.y <= rc.top) && (pt.y >= rc.bottom)))	return FALSE;	// Clicked on Notify Icon
+			}
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
+
+//
+// class CRawInput
+//
+CRawInput::CRawInput(HWND hwndTarget)
+{
+	_hwndTarget = hwndTarget;
+	lpRawInputDevice = NULL;
+
+	if (_hwndTarget == NULL)	return;
+	if (lpRawInputDevice == NULL)	lpRawInputDevice = new RAWINPUTDEVICE[sizeof(RAWINPUTDEVICE)];
+}
+
+CRawInput::~CRawInput()
+{
+	if (lpRawInputDevice != NULL)	delete [] lpRawInputDevice;
+	lpRawInputDevice = NULL;
+	_hwndTarget = NULL;
+}
+
+//
+// bRegisterRawInputDevices()
+//
+BOOL		CRawInput::bRegisterRawInputDevices(USHORT usUsagePage, USHORT usUsage, DWORD  dwFlags)
+{
+	if ((_hwndTarget == NULL) || (lpRawInputDevice == NULL))	return FALSE;
+	lpRawInputDevice->hwndTarget = _hwndTarget;	lpRawInputDevice->usUsagePage = usUsagePage;
+	lpRawInputDevice->usUsage = usUsage;		lpRawInputDevice->dwFlags = dwFlags;
+#define	uiNumDevices	1
+	if (!RegisterRawInputDevices(lpRawInputDevice, uiNumDevices, sizeof(RAWINPUTDEVICE))) {
+		return FALSE;
+	}
+#undef uiNumDevices
+	return TRUE;
+}
+
+//
+// vRawInputDevicesHandler()
+//
+void		CRawInput::vRawInputDevicesHandler(HWND hWnd, DWORD dwFlags, HRAWINPUT hRawInput)
+{
+	UINT	uBufferSize = 0;
+	UINT	cbSize = 0;
+	if ((uBufferSize = GetRawInputData(hRawInput, RID_INPUT, NULL, &cbSize, sizeof(RAWINPUTHEADER))) != (-1)) {
+		LPUINT	lpuBuffer = new UINT[cbSize];
+		if (lpuBuffer != NULL) {
+			if ((uBufferSize = GetRawInputData(hRawInput, RID_INPUT, lpuBuffer, &cbSize, sizeof(RAWINPUTHEADER))) != (-1)) {
+				LPRAWINPUT	lpRawInput = (LPRAWINPUT)lpuBuffer;
+				switch (lpRawInput->header.dwType) {
+				case RIM_TYPEMOUSE:
+					vRawInputMouseHandler(hWnd, dwFlags, lpRawInput);
+					break;
+				default:
+					break;
+				}
+
+			}
+			if (lpuBuffer != NULL) delete [] lpuBuffer;
+		}
+	}
+}
+
+//
+// vRawInputMouseHandler()
+//
+void	CRawInput::vRawInputMouseHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawInput)
+{
+	UNREFERENCED_PARAMETER(dwFlags);
+
+	RAWMOUSE RawMouse = (RAWMOUSE)(lpRawInput->data.mouse);
+	POINT	pt{};
+	if (RawMouse.ulButtons & RI_MOUSE_LEFT_BUTTON_DOWN) {
+		GetCursorPos(&pt);
+		Cls_OnLButtonDownEx(hWnd, pt.x, pt.y, GetForegroundWindow());
+	}
+	else if (RawMouse.ulButtons & RI_MOUSE_LEFT_BUTTON_UP) {
+		GetCursorPos(&pt);
+		Cls_OnLButtonUpEx(hWnd, pt.x, pt.y, GetForegroundWindow());
+	}
+}
+
+//
 // class CPowerNotification
 // CPowerNotification()
 //
@@ -79,45 +179,24 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 	UNREFERENCED_PARAMETER(lpSetting);
 	switch (Type) {
 	case PBT_APMSUSPEND:
-		bReportEvent(MSG_PBT_APMSUSPEND, POWERNOTIFICATION_CATEGORY);
 		break;
 	case PBT_APMRESUMEAUTOMATIC:
-		bReportEvent(MSG_PBT_APMRESUMEAUTOMATIC, POWERNOTIFICATION_CATEGORY);
 		break;
 	case PBT_APMRESUMESUSPEND:
 		bDestroyTaskTrayWindow(hWnd);
-		bReportEvent(MSG_PBT_APMRESUMESUSPEND, POWERNOTIFICATION_CATEGORY);
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		break;
 	case PBT_POWERSETTINGCHANGE:
-		bReportEvent(MSG_PBT_POWERSETTINGCHANGE, POWERNOTIFICATION_CATEGORY);
 		break;
 	case PBT_APMPOWERSTATUSCHANGE:
 			SYSTEM_POWER_STATUS	PowerStatus{};
 			if (GetSystemPowerStatus(&PowerStatus)) {
 				switch (PowerStatus.ACLineStatus) {
 				case 0:
-					try {
-						throw bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_OFF, POWERNOTIFICATION_CATEGORY);
-					}
-					catch (...) {
-					}
-					try {
-						throw bDestroyTaskTrayWindow(hWnd);
-					}
-					catch (...) {
-					}
-					try {
-						throw SendMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-					}
-					catch (...) {
-					}
-					return TRUE;
-				case 1:
-					bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_ON, POWERNOTIFICATION_CATEGORY);
 					bDestroyTaskTrayWindow(hWnd);
-					PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-					return TRUE;
+					break;
+				case 1:
+					bDestroyTaskTrayWindow(hWnd);
+					break;
 				default:
 					break;
 				}
@@ -128,10 +207,8 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 				|| (lpPwrSetting->PowerSetting == GUID_MONITOR_POWER_ON)
 				|| (lpPwrSetting->PowerSetting == GUID_SESSION_DISPLAY_STATUS)) {
 				if (lpPwrSetting->Data[0] == 0) {
-					bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_OFF, POWERNOTIFICATION_CATEGORY);
 				}
 				else {
-					bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_ON, POWERNOTIFICATION_CATEGORY);
 				}
 			}
 		}

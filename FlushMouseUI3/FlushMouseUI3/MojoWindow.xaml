@@ -9,7 +9,7 @@
 	mc:Ignorable="d"
 	>
 
-	<Grid>
+	<Grid FocusVisualPrimaryBrush="{x:Null}">
 	</Grid>
 </Window>
 

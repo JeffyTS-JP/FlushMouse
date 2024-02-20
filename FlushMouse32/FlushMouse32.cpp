@@ -45,12 +45,6 @@ static UINT     nCheckProcTimerTickValue = PROCINITTIMERVALUE;		// Timer tick
 static UINT_PTR nCheckProcTimerID = CHECKPROCTIMERID;				// Timer ID
 static UINT_PTR	uCheckProcTimer = NULL;
 
-#define HOOKINITTIMERVALUE		300000
-#define CHECKHOOKIMERID		3
-static UINT     nCheckHookTimerTickValue = HOOKINITTIMERVALUE;		// Timer tick
-static UINT_PTR nCheckHookTimerID = CHECKHOOKIMERID;				// Timer ID
-static UINT_PTR	uCheckHookTimer = NULL;
-
 //
 // Struct Define
 //
@@ -80,12 +74,16 @@ static LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 // Handler
 static BOOL				Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct);
 static void				Cls_OnDestroy(HWND hWnd);
+static LRESULT			Cls_OnPowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting);
 
 // Sub
 static VOID CALLBACK	vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
-static VOID CALLBACK	vCheckHookTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
 static BOOL				bReportEvent(DWORD dwEventID, WORD wCategory);
+static BOOL				bDestroyTaskTrayWindow(HWND hWnd);
 static void				vMessageBox(HWND hWnd, UINT uID, UINT uType);
+
+// for PowerNotification
+static CPowerNotification	*PowerNotification = NULL;
 
 //
 // wWinMain()
@@ -233,9 +231,12 @@ static BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+#define HANDLE_WM_POWERBROADCAST(hWnd, wParam, lParam, fn) (LRESULT)(DWORD)(BOOL)((fn)((hWnd), (ULONG)(wParam), (POWERBROADCAST_SETTING *)(lParam)))
+	
 	switch (message) {
 		HANDLE_MSG(hWnd, WM_CREATE, Cls_OnCreate);
 		HANDLE_MSG(hWnd, WM_DESTROY, Cls_OnDestroy);
+		HANDLE_MSG(hWnd, WM_POWERBROADCAST, Cls_OnPowerBroadcast);
 	default:
 			break;
 	}
@@ -251,23 +252,10 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 	UNREFERENCED_PARAMETER(lpCreateStruct);
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK)
 	
-	if (!bMouseHookSet32(hParentWnd)) {
-		vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE);
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-		return FALSE;
-	}
-
 	BOOL	bBool = FALSE;
 	if (SetUserObjectInformation(GetCurrentProcess(), UOI_TIMERPROC_EXCEPTION_SUPPRESSION, &bBool, sizeof(BOOL)) != FALSE) {
 		if (uCheckProcTimer == NULL) {
 			if ((uCheckProcTimer = SetTimer(hWnd, nCheckProcTimerID, nCheckProcTimerTickValue, (TIMERPROC)&vCheckProcTimerProc)) == 0) {
-				vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE);
-				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-				return FALSE;
-			}
-		}
-		if (uCheckHookTimer == NULL) {
-			if ((uCheckHookTimer = SetTimer(hWnd, nCheckHookTimerID, nCheckHookTimerTickValue, (TIMERPROC)&vCheckHookTimerProc)) == 0) {
 				vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE);
 				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 				return FALSE;
@@ -280,6 +268,13 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		return FALSE;
 	}
 
+	PowerNotification = new CPowerNotification(hWnd);
+	if (PowerNotification == NULL) {
+		vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE);
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+		return FALSE;
+	}
+	
 	bReportEvent(MSG_STARTED_FLUSHMOUSE, APPLICATION32_CATEGORY);
 	return TRUE;
 }
@@ -292,21 +287,27 @@ static void Cls_OnDestroy(HWND hWnd)
 {
 	bReportEvent(MSG_QUIT_FLUSHMOUSE, APPLICATION32_CATEGORY);
 
-	if (uCheckHookTimer != NULL) {
-		if (KillTimer(hWnd, nCheckHookTimerID)) {
-			uCheckHookTimer = NULL;
-		}
-	}
-	
 	if (uCheckProcTimer != NULL) {
 		if (KillTimer(hWnd, nCheckProcTimerID)) {
 			uCheckProcTimer = NULL;
 		}
 	}
 
-	bMouseHookUnset32();
+	if (PowerNotification != NULL) {
+		delete PowerNotification;
+		PowerNotification = NULL;
+	}
 
 	PostQuitMessage(0);
+}
+
+//
+// WM_POWERBROADCAST
+// Cls_OnPowerBroadcastEx()
+//
+static LRESULT		Cls_OnPowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting)
+{
+	return PowerNotification->PowerBroadcast(hWnd, Type, lpSetting);
 }
 
 //
@@ -326,43 +327,37 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 					uCheckProcTimer = NULL;
 				}
 			}
-			NOTIFYICONDATA nIco{};
-			nIco.cbSize = sizeof(NOTIFYICONDATA);
-			nIco.hWnd = hParentWnd;
-			nIco.uID = NOTIFYICONDATA_ID;
-			nIco.guidItem = GUID_NULL;
-			nIco.uFlags = 0;
-			try {
-				throw Shell_NotifyIcon(NIM_DELETE, &nIco);
-			}
-			catch (BOOL bRet) {
-				if (!bRet) {
-				}
-			}
-			catch (...) {
-			}
-			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			bDestroyTaskTrayWindow(hWnd);
 			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION32_CATEGORY);
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		}
 	}
 	return;
 }
 
 //
-// vCheckHookTimerProc()
-//
-static VOID CALLBACK vCheckHookTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime)
+// bDestroyTaskTrayWindow()
+// 
+BOOL		bDestroyTaskTrayWindow(HWND hWnd)
 {
 	UNREFERENCED_PARAMETER(hWnd);
-	UNREFERENCED_PARAMETER(uMsg);
-	UNREFERENCED_PARAMETER(dwTime);
 
-	if (uTimerID == nCheckHookTimerID) {
-		bMouseHookUnset32();
-		Sleep(100);
-		bMouseHookSet32(hParentWnd);
+	NOTIFYICONDATA nIco{};
+	nIco.cbSize = sizeof(NOTIFYICONDATA);
+	nIco.hWnd = hParentWnd;
+	nIco.uID = NOTIFYICONDATA_ID;
+	nIco.guidItem = GUID_NULL;
+	nIco.uFlags = 0;
+	try {
+		throw Shell_NotifyIcon(NIM_DELETE, &nIco);
 	}
-	return;
+	catch (BOOL bRet) {
+		if (!bRet) {
+		}
+	}
+	catch (...) {
+	}
+	return TRUE;
 }
 
 //
@@ -411,5 +406,91 @@ static void vMessageBox(HWND hWnd, UINT uID, UINT uType)
 		return;
 	}
 }
+
+//
+// class CPowerNotification
+// CPowerNotification()
+//
+CPowerNotification::CPowerNotification(HWND hWnd)
+{
+	guidPowerSettingNotification = GUID_NULL;
+	if ((hSuspendResumeNotification = RegisterSuspendResumeNotification(hWnd, DEVICE_NOTIFY_WINDOW_HANDLE)) == NULL) {
+	}
+	if ((hPowerSettingNotification = RegisterPowerSettingNotification(hWnd, &guidPowerSettingNotification, DEVICE_NOTIFY_WINDOW_HANDLE)) == NULL) {
+	}
+}
+
+//
+// ~CPowerNotification()
+//
+CPowerNotification::~CPowerNotification()
+{
+	if (hPowerSettingNotification != NULL) {
+		if (UnregisterPowerSettingNotification(hPowerSettingNotification) == 0) {
+		}
+	}
+	hPowerSettingNotification = NULL;
+	if (hSuspendResumeNotification != NULL) {
+		if (UnregisterSuspendResumeNotification(hSuspendResumeNotification) == 0) {
+		}
+	}
+	hSuspendResumeNotification = NULL;
+}
+
+//
+// PowerBroadcast()
+//
+BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting)
+{
+	UNREFERENCED_PARAMETER(hWnd);
+	UNREFERENCED_PARAMETER(Type);
+	UNREFERENCED_PARAMETER(lpSetting);
+	switch (Type) {
+	case PBT_APMSUSPEND:
+		break;
+	case PBT_APMRESUMEAUTOMATIC:
+		break;
+	case PBT_APMRESUMESUSPEND:
+		bReportEvent(MSG_PBT_APMRESUMESUSPEND, POWERNOTIFICATION_CATEGORY);
+		bDestroyTaskTrayWindow(hWnd);
+		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, POWERNOTIFICATION_CATEGORY);
+		break;
+	case PBT_POWERSETTINGCHANGE:
+		break;
+	case PBT_APMPOWERSTATUSCHANGE:
+		SYSTEM_POWER_STATUS	PowerStatus{};
+		if (GetSystemPowerStatus(&PowerStatus)) {
+			switch (PowerStatus.ACLineStatus) {
+			case 0:
+				bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_OFF, POWERNOTIFICATION_CATEGORY);
+				bDestroyTaskTrayWindow(hWnd);
+				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, POWERNOTIFICATION_CATEGORY);
+				return TRUE;
+			case 1:
+				bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_ON, POWERNOTIFICATION_CATEGORY);
+				bDestroyTaskTrayWindow(hWnd);
+				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, POWERNOTIFICATION_CATEGORY);
+				return TRUE;
+			default:
+				break;
+			}
+		}
+		if (lpSetting != NULL) {
+			PPOWERBROADCAST_SETTING	lpPwrSetting = (POWERBROADCAST_SETTING*)lpSetting;
+			if ((lpPwrSetting->PowerSetting == GUID_CONSOLE_DISPLAY_STATE)
+				|| (lpPwrSetting->PowerSetting == GUID_MONITOR_POWER_ON)
+				|| (lpPwrSetting->PowerSetting == GUID_SESSION_DISPLAY_STATUS)) {
+				if (lpPwrSetting->Data[0] == 0) {
+					bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_OFF, POWERNOTIFICATION_CATEGORY);
+				}
+				else {
+					bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_ON, POWERNOTIFICATION_CATEGORY);
+				}
+			}
+		}
+	}
+	return TRUE;
+}
+
 
 /* = EOF = */

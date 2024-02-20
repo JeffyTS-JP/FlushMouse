@@ -588,9 +588,6 @@
 			<Component Id="WinUI3_DLLs_38" Guid="{4439D615-B81B-413D-9C7C-8C94E0AC6737}">
 				<File Id="WinUI3_DLLs_38" Name="Microsoft.Windows.Widgets.dll" Source="$(var.TargetDir01)Microsoft.Windows.Widgets.dll" />
 			</Component>
-			<Component Id="WinUI3_DLLs_39" Guid="{71AA72E3-3090-472C-89E6-B737C18128E7}">
-				<File Id="WinUI3_DLLs_39" Name="Microsoft.Windows.Widgets.Providers.Projection.dll" Source="$(var.TargetDir01)Microsoft.Windows.Widgets.Providers.Projection.dll" />
-			</Component>
 			<Component Id="WinUI3_DLLs_40" Guid="{0A887DDE-2A11-40DF-8297-5AA24CD6B81E}">
 				<File Id="WinUI3_DLLs_40" Name="Microsoft.WindowsAppRuntime.Bootstrap.dll" Source="$(var.TargetDir01)Microsoft.WindowsAppRuntime.Bootstrap.dll" />
 			</Component>

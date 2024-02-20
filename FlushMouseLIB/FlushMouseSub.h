@@ -28,6 +28,26 @@
 //
 // Global Prototype Define
 //
+extern BOOL		bCheckDrawIMEModeArea(HWND hWndObserved);
+
+//
+// class CRawInput
+//
+class CRawInput
+{
+	public:
+		CRawInput(HWND hwndTarget);
+		virtual	~CRawInput();
+
+		BOOL			bRegisterRawInputDevices(USHORT usUsagePage, USHORT usUsage, DWORD  dwFlags);
+		void			vRawInputDevicesHandler(HWND hWnd, DWORD dwFlags, HRAWINPUT hRawInput);
+		virtual void	vRawInputMouseHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT	lpRawInput);
+
+	private:
+		HWND				_hwndTarget;
+		LPRAWINPUTDEVICE	lpRawInputDevice;
+};
+
 
 //
 // class CEventHook

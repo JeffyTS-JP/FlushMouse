@@ -49,6 +49,10 @@ extern int			iCheckCmdLine(LPTSTR lpCmdLine);
 extern VOID			vDestroyWindow(HWND hWnd);
 extern BOOL			bStartThreadHookTimer(HWND hWnd);
 extern BOOL	 		bCreateProcess(LPCTSTR lpszExecName);
+
+extern void			Cls_OnLButtonDownEx(HWND hWnd, int x, int y, HWND hForeground);
+extern void			Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground);
+
 extern BOOL			bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, BOOL bIMEModeForcedChange, LPHKL lpNewHKL, LPHKL lpPreviousHKL);
 extern BOOL			bCheckExistingJPIME();
 
