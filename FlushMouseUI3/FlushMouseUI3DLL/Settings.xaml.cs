@@ -355,7 +355,7 @@ namespace FlushMouseUI3DLL
 		{
 			if (sender == null) { }
 			if (args == null) { }
-			SendMessageW(hMainWnd, msg, 2, 0);
+			SendMessageW(hMainWnd, msg, 1, 0);
 			if (wSettings != null) {
 				wSettings = null;
 				hSettingsWnd = 0;
