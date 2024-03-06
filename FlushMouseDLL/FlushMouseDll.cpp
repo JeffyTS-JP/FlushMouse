@@ -19,7 +19,6 @@
 //
 // Global Data
 //
-UINT				WM_HOOKEX = 0;
 
 //
 // Local Data
@@ -38,7 +37,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 		case DLL_PROCESS_ATTACH:
 			hDLLInstance = hModule;
 			DisableThreadLibraryCalls(hDLLInstance);
-			if (WM_HOOKEX == 0)	WM_HOOKEX = RegisterWindowMessage(_T("FlushMouseDLL"));
 			break;
 		case DLL_THREAD_ATTACH:
 			break;

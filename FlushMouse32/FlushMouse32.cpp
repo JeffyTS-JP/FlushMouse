@@ -56,9 +56,12 @@ static UINT_PTR	uCheckProcTimer = NULL;
 //
 // Local Data
 //
-static TCHAR			szTitle[MAX_LOADSTRING]{};
+static TCHAR			szTitle[MAX_LOADSTRING] = FLUSHMOUSE;
 static HINSTANCE		hInst = NULL;
 static HWND				hParentWnd = NULL;
+
+// for PowerNotification
+static CPowerNotification	*PowerNotification = NULL;
 
 //
 // Global Prototype Define
@@ -81,9 +84,6 @@ static VOID CALLBACK	vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 static BOOL				bReportEvent(DWORD dwEventID, WORD wCategory);
 static BOOL				bDestroyTaskTrayWindow(HWND hWnd);
 static void				vMessageBox(HWND hWnd, UINT uID, UINT uType);
-
-// for PowerNotification
-static CPowerNotification	*PowerNotification = NULL;
 
 //
 // wWinMain()
@@ -329,7 +329,6 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 			}
 			bDestroyTaskTrayWindow(hWnd);
 			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION32_CATEGORY);
-			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		}
 	}
 	return;

@@ -2,7 +2,7 @@
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0000		2024/02/13  JeffyTS  	New edit.
+// #0000	2024/02/13  JeffyTS  	New edit.
 //
 
 //
@@ -30,8 +30,6 @@ CWindow::CWindow()
 
 CWindow::~CWindow()
 {
-	PostQuitMessage(0);
-
 	if (_lpWndClassEx)	delete [] _lpWndClassEx;
 	_lpWndClassEx = NULL;
 	if (_lpWndClass)	delete [] _lpWndClass;

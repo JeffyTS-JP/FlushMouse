@@ -33,6 +33,9 @@
     <ClInclude Include="CWindow.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="CRawInput.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CRegistry.cpp">
@@ -48,6 +51,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="CWindow.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="CRawInput.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

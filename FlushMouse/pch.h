@@ -14,6 +14,7 @@
 #include <windowsx.h>
 #include <tchar.h>
 #include <commctrl.h>
-#pragma comment(lib, "comctl32.lib")
+#pragma comment(lib, "Comctl32.lib")
+#include <stdio.h>
 
 #endif //PCH_H

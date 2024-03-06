@@ -18,6 +18,8 @@
 //
 // Define
 //
+#define	INJECT_HOOK		((LPARAM)1)
+#define	REMOVE_HOOK		((LPARAM)0)
 
 //
 // Local Prototype Define
@@ -29,13 +31,14 @@ static LRESULT CALLBACK lpGlobalHookProc(int, WPARAM, LPARAM);
 //
 #pragma comment(linker, "/SECTION:FLUSHMOUSEDLL_SEG,RWS")
 #pragma data_seg("FLUSHMOUSEDLL_SEG")
-static HINSTANCE	hGLInstance = NULL;
-static HWND			hWndGLParent = NULL;
-static HHOOK		hHookGL = NULL;
-static LPGLOBAL_SHAREDMEM  lpDatGlobal = NULL;
-static HWND			hPrevWnd = NULL;
-static BOOL			bSubclassed = FALSE;
-static CSharedMemory* CSharedMem = NULL;
+static UINT					WM_HOOKEX = 0;
+static HINSTANCE			hGLInstance = NULL;
+static HWND					hWndGLParent = NULL;
+static HHOOK				hHookGL = NULL;
+static LPGLOBAL_SHAREDMEM	lpDatGlobal = NULL;
+static HWND					hPrevWnd = NULL;
+static BOOL					bSubclassed = FALSE;
+static CSharedMemory*		CSharedMem = NULL;
 #pragma data_seg()
 
 //
@@ -44,15 +47,18 @@ static CSharedMemory* CSharedMem = NULL;
 DLLEXPORT BOOL  __stdcall bGlobalHookSet(HWND hWnd)
 {
 	hWndGLParent = hWnd;
-	if ((CSharedMem = new CSharedMemory(GLOBALHOOKMEM, sizeof(GLOBAL_SHAREDMEM))) != NULL) {
+	if ((hGLInstance = hGetInstance()) == NULL)	return FALSE;
+	if (WM_HOOKEX == 0)	WM_HOOKEX = RegisterWindowMessage(L"FlushMouseDLL_GlobalHook");
+	if (WM_HOOKEX == 0) return FALSE;
+		if ((CSharedMem = new CSharedMemory(GLOBALHOOKMEM, sizeof(GLOBAL_SHAREDMEM))) != NULL) {
 		if ((lpDatGlobal = (LPGLOBAL_SHAREDMEM)CSharedMem->lpvSharedMemoryRead()) != NULL) {
-			lpDatGlobal->hWnd = hWnd;	lpDatGlobal->hInstance = hGetInstance();
+			lpDatGlobal->hWnd = hWnd;	lpDatGlobal->hInstance = hGLInstance;
 			if (CSharedMem->bSharedMemoryWrite(lpDatGlobal)) {
-				HHOOK	hHook = SetWindowsHookEx(WH_CALLWNDPROCRET, (HOOKPROC)lpGlobalHookProc, hGetInstance(), 0);
+				HHOOK	hHook = SetWindowsHookEx(WH_CALLWNDPROCRET, (HOOKPROC)lpGlobalHookProc, hGLInstance, 0);
 				if (hHook) {
 					lpDatGlobal->hHook = hHook;	hHookGL = hHook;
 					if (CSharedMem->bSharedMemoryWrite(lpDatGlobal)) {
-						SendMessage(hWnd, WM_HOOKEX, 0, 1);
+						SendMessage(hWnd, WM_HOOKEX, 0, INJECT_HOOK);
 						return TRUE;
 					}
 					UnhookWindowsHookEx(hHook);
@@ -82,7 +88,7 @@ DLLEXPORT BOOL __stdcall bGlobalHookUnset()
 			if (lpDatGlobal->hWnd) {
 				hHookGL = SetWindowsHookEx(WH_CALLWNDPROCRET, (HOOKPROC)lpGlobalHookProc, hGLInstance, GetWindowThreadProcessId(lpDatGlobal->hWnd, NULL));
 				if (hHookGL) {
-					SendMessage(lpDatGlobal->hWnd, WM_HOOKEX, 0, 0);
+					SendMessage(lpDatGlobal->hWnd, WM_HOOKEX, 0, REMOVE_HOOK);
 					if (lpDatGlobal->hHook) {
 						if ((bSubclassed == FALSE))	bRet = TRUE;
 					}
@@ -127,7 +133,7 @@ static LRESULT CALLBACK lpGlobalHookProc(int nCode, WPARAM wParam, LPARAM lParam
 			return CallNextHookEx(NULL, nCode, wParam, lParam);
 		default:
 			if (lpCW->message == WM_HOOKEX) {
-				if (lpCW->lParam) {
+				if (lpCW->lParam == INJECT_HOOK) {
 					if (!bSubclassed) {
 						if (hHookGL == NULL)	break;
 						if (UnhookWindowsHookEx(hHookGL) != FALSE) {
@@ -141,7 +147,11 @@ static LRESULT CALLBACK lpGlobalHookProc(int nCode, WPARAM wParam, LPARAM lParam
 				else {
 					if (bSubclassed) {
 						if (hHookGL == NULL)	break;
-						bSubclassed = FALSE;
+						if (UnhookWindowsHookEx(hHookGL) != FALSE) {
+							if (FreeLibrary(hGLInstance)) {
+								bSubclassed = FALSE;
+							}
+						}
 					}
 				}
 			}

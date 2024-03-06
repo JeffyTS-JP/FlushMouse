@@ -27,8 +27,10 @@ CThread::CThread()
 CThread::~CThread()
 {
 	vUnregister();
-	if (lpstThreadData->lpstSA != NULL)	delete[]	lpstThreadData->lpstSA;
-	if (lpstThreadData != NULL)			delete[]	lpstThreadData;
+	if (lpstThreadData) {
+		if (lpstThreadData->lpstSA != NULL)	delete[]	lpstThreadData->lpstSA;
+		delete[]	lpstThreadData;
+	}
 	lpstThreadData = NULL;
 }
 
@@ -82,7 +84,7 @@ BOOL 	CThread::bStart()
 //
 // bCheckSentinel
 //
-BOOL	CThread::bCheckSentinel()
+BOOL	CThread::bCheckSentinel() const
 {
 	if ((lpstThreadData == NULL) || (lpstThreadData->lpstSA == NULL) || (lpstThreadData->hEvent == NULL) || (lpstThreadData->hThread == NULL))	return FALSE;		// error
 	return lpstThreadData->bThreadSentinel;

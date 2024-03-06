@@ -13,6 +13,7 @@
 #include "Profile.h"
 #include "Cursor.h"
 #include "FlushMouseSub.h"
+#include "SynTP.h"
 
 //
 // Define
@@ -56,8 +57,9 @@ extern void			Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground);
 extern BOOL			bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, BOOL bIMEModeForcedChange, LPHKL lpNewHKL, LPHKL lpPreviousHKL);
 extern BOOL			bCheckExistingJPIME();
 
-extern void			vMessageBox(HWND hWnd, UINT uID, UINT uType);
+extern VOID			vMessageBox(HWND hWnd, UINT uID, UINT uType);
 extern VOID			vAboutDialog(HWND hWnd);
+extern VOID			vSynTPHelperDialog(HWND hWnd);
 extern VOID			vSettingDialog(HWND hWnd);
 extern VOID			vSettingDialogApply();
 extern VOID			vSettingDialogClose();
@@ -75,6 +77,7 @@ extern CProfile		*Profile;
 extern CCursor		*Cursor;
 extern CResource	*Resource;
 extern CIME			*Cime;
+extern CSynTP		*SynTP;
 
 extern BOOL			bIMEInConverting;
 

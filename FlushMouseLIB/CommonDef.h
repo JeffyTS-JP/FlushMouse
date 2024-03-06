@@ -147,6 +147,14 @@ typedef struct tagSIZED
 #define WM_INPUTLANGCHANGEEX				(WM_USER + WM_INPUTLANGCHANGE)
 #define HANDLE_WM_INPUTLANGCHANGEEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (UINT)(wParam), (HKL)(lParam)), 0L)
 
+//void Cls_OnMouseWheel(HWND hwnd, int xPos, int yPos, int zDelta, UINT fwKeys)
+#define	WM_MOUSEWHEELEX						(WM_USER + WM_MOUSEWHEEL)
+#define HANDLE_WM_MOUSEWHEELEX(hwnd, wParam, lParam, fn) ((fn)((hwnd), (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (int)(short)HIWORD(wParam), (UINT)(short)LOWORD(wParam)), 0L)
+
+//void Cls_OnMouseWheel(HWND hwnd, int xPos, int yPos, int zDelta, UINT fwKeys)
+#define	WM_MOUSEHWHEELEX					(WM_USER + WM_MOUSEHWHEEL)
+#define HANDLE_WM_MOUSEHWHEELEX(hwnd, wParam, lParam, fn) ((fn)((hwnd), (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (int)(short)HIWORD(wParam), (UINT)(short)LOWORD(wParam)), 0L)
+
 // void Cls_OnSettings(HWND hWnd, WPARAM wParam, LPARAM lParam);
 #define WM_SETTINGSEX						(WM_USER + 0xfe)
 #define HANDLE_WM_SETTINGSEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (WPARAM)(wParam), (LPARAM)(lParam)), 0L)

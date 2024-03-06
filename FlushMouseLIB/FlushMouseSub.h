@@ -11,8 +11,7 @@
 // Include
 //
 #pragma once
-#include "pch.h"
-
+#include "..\MiscLIB\CRawInput.h"
 //
 // Define
 // 
@@ -31,23 +30,17 @@
 extern BOOL		bCheckDrawIMEModeArea(HWND hWndObserved);
 
 //
-// class CRawInput
+// class CMouseRawInput
 //
-class CRawInput
+class CMouseRawInput	:	public CRawInput
 {
-	public:
-		CRawInput(HWND hwndTarget);
-		virtual	~CRawInput();
+public:
+	CMouseRawInput();
+	~CMouseRawInput();
 
-		BOOL			bRegisterRawInputDevices(USHORT usUsagePage, USHORT usUsage, DWORD  dwFlags);
-		void			vRawInputDevicesHandler(HWND hWnd, DWORD dwFlags, HRAWINPUT hRawInput);
-		virtual void	vRawInputMouseHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT	lpRawInput);
-
-	private:
-		HWND				_hwndTarget;
-		LPRAWINPUTDEVICE	lpRawInputDevice;
+private:
+	void	vRawInputMouseHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawInput);
 };
-
 
 //
 // class CEventHook
@@ -111,7 +104,6 @@ private:
 	BOOL		bShellHook64;
 	BOOL		bGlobalHook64;
 	BOOL		bKeyboardHookLL64;
-	BOOL		bMouseHook64;
 	BOOL		bHook32Dll;
 
 private:

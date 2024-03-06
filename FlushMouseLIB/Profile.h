@@ -12,6 +12,7 @@
 //
 #pragma once
 #include "pch.h"
+#include "CommonDef.h"
 
 //
 // Define
@@ -24,36 +25,39 @@
 typedef struct tagAppRegData
 {
 	// for Cursor
-	int			iCursorSize;
-	int			iModeSize;
-	DWORD		dwInThreadSleepTime;
-	DWORD		dwWaitWaveTime;
-	DWORD		dwAdditionalWaitTime;
-	DWORD		dwDisplayModeTime;
-	BOOL		bDisplayIMEModeOnCursor;
-	BOOL		bDisplayIMEModeByWindow;
-	BOOL		bForceHiragana;
-	BOOL		bDenyChangedByApp;
-	BOOL		bUseBigArrow;
-	COLORREF	dwNearDrawMouseColor;
-	COLORREF	dwNearDrawCaretColor;
-	COLORREF	dwNearMouseColor;
+	int			iCursorSize = 32;
+	int			iModeSize = 24;
+	DWORD		dwInThreadSleepTime = 0;
+	DWORD		dwWaitWaveTime = 400;
+	DWORD		dwAdditionalWaitTime = 300;
+	DWORD		dwDisplayModeTime = 400;
+	BOOL		bDisplayIMEModeOnCursor = FALSE;
+	BOOL		bDisplayIMEModeByWindow = FALSE;
+	BOOL		bForceHiragana = FALSE;
+	BOOL		bDenyChangedByApp = FALSE;
+	BOOL		bUseBigArrow = FALSE;
+	COLORREF	dwNearDrawMouseColor = aRGB(48, 255, 0, 0);;
+	COLORREF	dwNearDrawCaretColor= aRGB(48, 0, 0, 255);
+	COLORREF	dwNearMouseColor = aRGB(48, 0, 255, 0);
 
 	// for FlushMouse & Cursor
-	BOOL		bDisplayFocusWindowIME;
+	BOOL		bDisplayFocusWindowIME = FALSE;
 
 	// for FlushMouse
-	BOOL		bDoModeDispByIMEKeyDown;
-	BOOL		bDoModeDispByMouseBttnUp;
-	BOOL		bDoModeDispByCtrlUp;
-	BOOL		bIMEModeForced;
-	BOOL		bMoveIMEToolbar;
+	BOOL		bDoModeDispByIMEKeyDown = TRUE;
+	BOOL		bDoModeDispByMouseBttnUp = TRUE;
+	BOOL		bDoModeDispByCtrlUp = TRUE;
+	BOOL		bIMEModeForced = FALSE;
+	BOOL		bMoveIMEToolbar = FALSE;
 
 	// for FlushMouse & FlushMouseSub
-	BOOL		bOffChangedFocus;
-	BOOL		bDrawNearCaret;
-	BOOL		bEnableEPHelper;
+	BOOL		bOffChangedFocus = FALSE;
+	BOOL		bDrawNearCaret = FALSE;
+	BOOL		bEnableEPHelper = FALSE;
 
+	DWORD		dwSynTPHelper1 = 0;
+	TCHAR		szSynTPSendIPAddr1[MAX_LOADSTRING]{};
+	DWORD		dwSynTPPortNo1 = 50008;
 } APPREGDATA, *PAPPREGDATA, *LPAPPREGDATA;
 
 //

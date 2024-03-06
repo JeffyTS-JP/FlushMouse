@@ -63,6 +63,11 @@ CProfile::CProfile()
 		lpstAppRegData->bOffChangedFocus = FALSE;					// アプリケーションが切り替わったときIMEをOFFにする(bDisplayFocusWindowIMEとは排他的動作になる)
 		lpstAppRegData->bDrawNearCaret = FALSE;						// Caretの横にIMEモードを表示
 		lpstAppRegData->bMoveIMEToolbar = FALSE;					// New IMEのToolbarを移動する 
+		
+		// for SynTP Helper
+		lpstAppRegData->dwSynTPHelper1 = 0;							// SynTP Helper 1 (0 = disable 1 = sender / 2 = sender (always start) / 3 = receiver 4 =receiver (always start)
+		_tcsncpy_s(lpstAppRegData->szSynTPSendIPAddr1, MAX_LOADSTRING, L"", _TRUNCATE);	// SynTP Helper Send IP Addr 1
+		lpstAppRegData->dwSynTPPortNo1 = 50008;						// SynTP Helper Port Number 1
 	}
 }
 
@@ -168,6 +173,14 @@ BOOL		CProfile::bGetProfileData() const
 			}
 		}
 	}
+	// Registry in Use SynTP
+	if (CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPHelper1"), (LPDWORD) & (lpstAppRegData->dwSynTPHelper1), lpstAppRegData->dwSynTPHelper1)) {
+		if (CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPSendIPAddr1"), lpstAppRegData->szSynTPSendIPAddr1, sizeof(lpstAppRegData->szSynTPSendIPAddr1))) {
+			if (CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPPortNo1"), (LPDWORD) & lpstAppRegData->dwSynTPPortNo1, lpstAppRegData->dwSynTPPortNo1)) {
+				bRet = TRUE;
+			}
+		}
+	}
 	delete	CReg;
 	return bRet;
 #undef	PROFILE_HKEY
@@ -254,6 +267,14 @@ BOOL		CProfile::bSetProfileData() const
 				if (CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("EnableEPHelper"), lpstAppRegData->bEnableEPHelper)) {
 					bRet = TRUE;
 				}
+			}
+		}
+	}
+	// Registry in Use SynTP
+	if (CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPHelper1"), lpstAppRegData->dwSynTPHelper1)) {
+		if (CReg->bReadRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPSendIPAddr1"), lpstAppRegData->szSynTPSendIPAddr1, sizeof(lpstAppRegData->szSynTPSendIPAddr1))) {
+			if (CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPPortNo1"), lpstAppRegData->dwSynTPPortNo1)) {
+				bRet = TRUE;
 			}
 		}
 	}

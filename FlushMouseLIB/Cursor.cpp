@@ -1092,7 +1092,6 @@ BOOL		CCursor::bSetSystemCursor(LPMOUSECURSOR lpstMC, int iCursorSizeX, int iCur
 				_Post_equals_last_error_ DWORD err = GetLastError();
 				if (err == ERROR_MOD_NOT_FOUND) {
 					bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
-					PostMessage(hMainWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 				}
 				if (!bCursorDllUnload()) return FALSE;
 				return FALSE;
@@ -1207,7 +1206,6 @@ BOOL		CCursorWindow::Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 void		CCursorWindow::Cls_OnDestroy(HWND hWnd)
 {
 	UNREFERENCED_PARAMETER(hWnd);
-	PostQuitMessage(0);
 }
 
 //

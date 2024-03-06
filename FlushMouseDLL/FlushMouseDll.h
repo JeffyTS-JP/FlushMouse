@@ -16,7 +16,6 @@
 //
 // Global Data
 //
-extern UINT			WM_HOOKEX;
 
 //
 // Global Prototype Define

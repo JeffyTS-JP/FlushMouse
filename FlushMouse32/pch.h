@@ -15,5 +15,8 @@
 #include <tchar.h>
 #include <shellapi.h>
 #include <cguid.h>
+#ifndef USHORT
+typedef unsigned short USHORT;
+#endif
 
 #endif //PCH_H

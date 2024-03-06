@@ -18,6 +18,7 @@
 //
 extern HWND		hAboutDlg;
 extern HWND		hSettingDlg;
+extern HWND		hSynTPHelperDlg;
 
 //
 // Global Prototype Define

@@ -24,10 +24,12 @@
 		<AppxPackage>false</AppxPackage>
 		<DisableXbfLineInfo>False</DisableXbfLineInfo>
 		<GenerateLibraryLayout>true</GenerateLibraryLayout>
-<PublishReadyToRun>false</PublishReadyToRun>
-<IsPublishable>False</IsPublishable>
+		<PublishReadyToRun>false</PublishReadyToRun>
+		<IsPublishable>False</IsPublishable>
+		<ShouldComputeInputPris>true</ShouldComputeInputPris>
 	</PropertyGroup>
 	<PropertyGroup Label="Configuration">
+		<ShouldComputeInputPris>true</ShouldComputeInputPris>
 		<DesktopCompatible>true</DesktopCompatible>
 		<SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
 		<ApplicationIcon>FlushMouse.ico</ApplicationIcon>
@@ -42,10 +44,10 @@
 		<Company>JeffyTS</Company>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-	  <NoWarn>NU5100;CS8785;NETSDK1206;IDE1006</NoWarn>
+	  <NoWarn>NU5100;CS8785;NETSDK1206;IDE1006;CS0103</NoWarn>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-	  <NoWarn>NU5100;CS8785;NETSDK1206;IDE1006</NoWarn>
+	  <NoWarn>NU5100;CS8785;NETSDK1206;IDE1006;CS0103</NoWarn>
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="readme.md" />
@@ -63,7 +65,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.0.7" />
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240227000" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240311000" />
 	</ItemGroup>
 
 	<ItemGroup>

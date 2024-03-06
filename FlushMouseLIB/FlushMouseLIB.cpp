@@ -38,40 +38,35 @@
 // Global Data
 //
 // Hook
-TCHAR		szTitle[MAX_LOADSTRING]{};
+TCHAR		szTitle[MAX_LOADSTRING] = FLUSHMOUSE;
 HWND		hMainWnd = NULL;
 
 CProfile	*Profile = NULL;
 CCursor		*Cursor = NULL;	
 CResource	*Resource = NULL;
 CIME		*Cime = NULL;
+CSynTP		*SynTP = NULL;
 
 BOOL		bIMEInConverting = FALSE;
 
 //
 // Local Data
 //
-// Timer for Cursor
 #define FOCUSINITTIMERVALUE		200
 #define CHECKFOCUSTIMERID		1
 static UINT     nCheckFocusTimerTickValue = FOCUSINITTIMERVALUE;
 static UINT_PTR nCheckFocusTimerID = CHECKFOCUSTIMERID;
 static UINT_PTR	uCheckFocusTimer = NULL;
-// Timer for Poc
+
 #define PROCINITTIMERVALUE		3000
 #define CHECKPROCTIMERID		2
 static UINT     nCheckProcTimerTickValue = PROCINITTIMERVALUE;
 static UINT_PTR nCheckProcTimerID = CHECKPROCTIMERID;
 static UINT_PTR	uCheckProcTimer = NULL;
 
-// Hook
 static CFlushMouseHook		*FlushMouseHook = NULL;
-
-// Event Handler	
 static CEventHook			*EventHook = NULL;
-
-// RawInput Mouse
-static CRawInput			*RawInputMouse = NULL;
+static CMouseRawInput		*MouseRawInput = NULL;
 
 //
 // Global Prototype Define
@@ -162,17 +157,6 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_o
 	UpdateWindow(hWnd);
 	hMainWnd = hWnd;
 
-#define	uiNumDevices	1
-	RAWINPUTDEVICE	RawInputDevice[uiNumDevices]{};
-	RawInputDevice[0].usUsagePage = 0x0001; RawInputDevice[0].usUsage = 0x0002; RawInputDevice[0].dwFlags = RIDEV_INPUTSINK; RawInputDevice[0].hwndTarget = hWnd;
-	if (!RegisterRawInputDevices(RawInputDevice, uiNumDevices, sizeof(RAWINPUTDEVICE))) {
-		bReportEvent(MSG_STOPPED_FLUSHMOUSE, APPLICATION_CATEGORY);		// Eventlog
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK)        // MessageBox style
-		vMessageBox(hWnd, IDS_NOTREGISTERHOOK, MessageBoxTYPE);			// Hook‚ð“o˜^‚Å‚«‚È‚©‚Á‚½‚½‚ßƒGƒ‰[‚ð•\Ž¦
-		return FALSE;
-	}
-#undef uiNumDevices
-
 	MSG		msg{};
 	BOOL	bRet = FALSE;
 	while (TRUE) {
@@ -205,7 +189,7 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_o
 int			iCheckCmdLine(LPTSTR lpCmdLine)
 {
 	if ((*lpCmdLine != _T('\0')) && (CompareStringOrdinal(lpCmdLine, -1, L"/Start", -1, TRUE) == CSTR_EQUAL)) {
-		bReportEvent(MSG_START_FLUSHMOUSE_EVENT, Shortcut_CATEGORY);	// Eventlog
+		bReportEvent(MSG_START_FLUSHMOUSE_EVENT, Shortcut_CATEGORY);
 		return (0);
 	}
 	HWND	hWnd = NULL;
@@ -317,7 +301,6 @@ static HWND InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-#define HANDLE_WM_POWERBROADCAST(hWnd, wParam, lParam, fn) (LRESULT)(DWORD)(BOOL)((fn)((hWnd), (ULONG)(wParam), (POWERBROADCAST_SETTING *)(lParam)))
 #define HANDLE_WM_INPUT(hWnd, wParam, lParam, fn) ((fn)((hWnd), (DWORD)(GET_RAWINPUT_CODE_WPARAM(wParam)), (HRAWINPUT)(lParam)), 0L)
 
 	switch (message) {
@@ -392,14 +375,20 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		return FALSE;
 	}
 
-	RawInputMouse = new CRawInput(hWnd);
-	if (RawInputMouse != NULL) {
-		if (!RawInputMouse->bRegisterRawInputDevices(0x0001, 0x0002, RIDEV_INPUTSINK)) {
-			vMessageBox(hWnd, IDS_NOTREGISTERMS, MessageBoxTYPE);		// Mouse Hook‚ð“o˜^‚Å‚«‚È‚©‚Á‚½‚½‚ßƒGƒ‰[‚ð•\Ž¦
+#define	uiNumDevices	1
+	RAWINPUTDEVICE	RawInputDevice[uiNumDevices]{};
+	RawInputDevice[0].hwndTarget = hWnd;	RawInputDevice[0].dwFlags = (RIDEV_INPUTSINK | RIDEV_DEVNOTIFY);
+	RawInputDevice[0].usUsagePage =  HID_USAGE_PAGE_GENERIC;	RawInputDevice[0].usUsage = HID_USAGE_GENERIC_MOUSE;
+	MouseRawInput = new CMouseRawInput();
+	if (MouseRawInput != NULL) {
+		if (!MouseRawInput->bRegisterRawInputDevices(RawInputDevice, uiNumDevices)) {
+			vMessageBox(hWnd, IDS_NOTREGISTERMS, MessageBoxTYPE);
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);	// Quit
 			return FALSE;
 		}
 	}
+#undef uiNumDevices
+
 	if (!bStartThreadHookTimer(hWnd)) {
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		return FALSE;
@@ -407,6 +396,21 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 
 	if (((Profile != NULL) && bCheckExistingJPIME() && Profile->lpstAppRegData->bEnableEPHelper)) {
 		bForExplorerPatcherSWS(GetForegroundWindow(), TRUE, TRUE, NULL, NULL);
+	}
+
+	if (Profile != NULL) {
+		if (Profile->lpstAppRegData->dwSynTPHelper1 == 2) {
+			SynTP = new CSynTP;
+			if (SynTP) {
+				if (!SynTP->bStartSender(hMainWnd, Profile->lpstAppRegData->szSynTPSendIPAddr1, Profile->lpstAppRegData->dwSynTPPortNo1))	return FALSE;	// VMnet1
+			}
+		}
+		else if (Profile->lpstAppRegData->dwSynTPHelper1 == 4) {
+			SynTP = new CSynTP;
+			if (SynTP) {
+				if (!SynTP->bStartReceiver(hMainWnd, Profile->lpstAppRegData->szSynTPSendIPAddr1, Profile->lpstAppRegData->dwSynTPPortNo1))	return FALSE;
+			}
+		}
 	}
 
 	bReportEvent(MSG_STARTED_FLUSHMOUSE, APPLICATION_CATEGORY);
@@ -420,8 +424,6 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 //
 static void Cls_OnDestroy(HWND hWnd)
 {
-	bReportEvent(MSG_QUIT_FLUSHMOUSE, APPLICATION_CATEGORY);
-
 	vDestroyWindow(hWnd);
 
 	if (Profile != NULL) {
@@ -429,6 +431,8 @@ static void Cls_OnDestroy(HWND hWnd)
 		Profile = NULL;
 	}
 
+	bReportEvent(MSG_QUIT_FLUSHMOUSE, APPLICATION_CATEGORY);
+	
 	PostQuitMessage(0);
 }
 
@@ -443,6 +447,14 @@ void		vDestroyWindow(HWND hWnd)
 		Profile->lpstAppRegData->bDoModeDispByMouseBttnUp = FALSE;
 		Profile->lpstAppRegData->bDrawNearCaret = FALSE;
 	}
+	if (SynTP) {
+		delete SynTP;
+		SynTP = NULL;
+	}
+	if (MouseRawInput != NULL) {
+		delete MouseRawInput;
+		MouseRawInput = NULL;
+	}
 	if (uCheckProcTimer != NULL) {
 		if (KillTimer(hWnd, nCheckProcTimerID)) {
 			uCheckProcTimer = NULL;
@@ -452,10 +464,6 @@ void		vDestroyWindow(HWND hWnd)
 		if (KillTimer(hWnd, nCheckFocusTimerID)) {
 			uCheckFocusTimer = NULL;
 		}
-	}
-	if (RawInputMouse != NULL) {
-		delete RawInputMouse;
-		RawInputMouse = NULL;
 	}
 	if (EventHook != NULL) {
 		delete EventHook;
@@ -487,12 +495,18 @@ static void Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 	UNREFERENCED_PARAMETER(hWndCtl);
 	UNREFERENCED_PARAMETER(codeNotify);
 	switch (id) {
-	case IDM_ABOUT:
-	case IDR_TT_ABOUT:
-		vAboutDialog(hWnd);
+	case IDR_TT_MENU:
 		break;
 	case IDR_TT_SETTING:
 		vSettingDialog(hWnd);
+		break;
+	case IDR_TT_SYNTPHELPER:
+		Profile->bGetProfileData();
+		vSynTPHelperDialog(hWnd);
+		break;
+	case IDM_ABOUT:
+	case IDR_TT_ABOUT:
+		vAboutDialog(hWnd);
 		break;
 	case IDM_EXIT:
 	case IDR_TT_QUIT:
@@ -507,9 +521,7 @@ static void Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 //
 static void		Cls_OnInput(HWND hWnd, DWORD dwFlags, HRAWINPUT hRawInput)
 {
-	if (RawInputMouse != NULL) {
-		RawInputMouse->vRawInputDevicesHandler(hWnd, dwFlags, hRawInput);
-	}
+	if (MouseRawInput)	MouseRawInput->vRawInputDevicesHandler(hWnd, dwFlags, hRawInput);
 }
 
 //
@@ -609,7 +621,7 @@ static void		Cls_OnSettingsEx(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		if ((wParam == 0) || (wParam == 2)) {
 			if (!Cursor->bReloadCursor()) {
 				vSettingDialogClose();
-				PostMessage(hMainWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
 				return;
 			}
 		}
@@ -674,7 +686,7 @@ void		Cls_OnCheckExistingJPIMEEx(HWND hWnd, BOOL bEPHelper)
 	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(bEPHelper);
 	if (!bSetEnableEPHelperLL64(bEPHelper)) {
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
+		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
 	}
 }
 
@@ -1412,7 +1424,7 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 		if (FindWindow(CLASS_FLUSHMOUSE32, NULL) == NULL) {
 			vDestroyWindow(hWnd);
 			bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION_CATEGORY);
-			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			//PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
 		}
 	}

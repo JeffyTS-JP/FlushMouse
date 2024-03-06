@@ -33,8 +33,9 @@
 //
 // Global Data
 //
-HWND		hAboutDlg = NULL;
-HWND		hSettingDlg = NULL;
+HWND			hAboutDlg = NULL;
+HWND			hSettingDlg = NULL;
+HWND			hSynTPHelperDlg = NULL;
 
 //
 // Local Data
@@ -128,7 +129,6 @@ BOOL		bReCreateTaskTrayWindow(HWND hWnd)
 			bTaskTray = TRUE;
 			if (!Cursor->bReloadCursor()) {
 				bReportEvent(MSG_THREAD_HOOK_TIMER_RESTART_FAILED, APPLICATION_CATEGORY);
-				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			}
 			bReportEvent(MSG_THREAD_HOOK_TIMER_RESTARTED, APPLICATION_CATEGORY);
 		}
@@ -137,8 +137,7 @@ BOOL		bReCreateTaskTrayWindow(HWND hWnd)
 				bTaskTray = FALSE;
 			}
 			bReportEvent(MSG_TASKTRAY_REGISTER_FAILD, APPLICATION_CATEGORY);
-			bReportEvent(MSG_START_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
-			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
 		}
 	}
 	else {

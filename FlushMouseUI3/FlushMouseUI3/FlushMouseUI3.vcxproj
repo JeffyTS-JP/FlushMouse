@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\Microsoft.WindowsAppSDK.1.5.240227000\build\native\Microsoft.WindowsAppSDK.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.1.5.240227000\build\native\Microsoft.WindowsAppSDK.props')" />
+  <Import Project="..\..\packages\Microsoft.WindowsAppSDK.1.5.240311000\build\native\Microsoft.WindowsAppSDK.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.1.5.240311000\build\native\Microsoft.WindowsAppSDK.props')" />
   <Import Project="..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.22621.3233\build\Microsoft.Windows.SDK.BuildTools.props" Condition="Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.22621.3233\build\Microsoft.Windows.SDK.BuildTools.props')" />
   <Import Project="..\..\packages\Microsoft.Windows.CppWinRT.2.0.240111.5\build\native\Microsoft.Windows.CppWinRT.props" Condition="Exists('..\..\packages\Microsoft.Windows.CppWinRT.2.0.240111.5\build\native\Microsoft.Windows.CppWinRT.props')" />
   <Import Project="..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.25300-preview\build\Microsoft.Windows.SDK.BuildTools.props" Condition="Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.25300-preview\build\Microsoft.Windows.SDK.BuildTools.props')" />
@@ -12,10 +12,6 @@
     <ProjectGuid>{580B9738-824A-4C7A-ABBF-6F9343A95A50}</ProjectGuid>
     <ProjectName>FlushMouseUI3</ProjectName>
     <RootNamespace>FlushMouseUI3</RootNamespace>
-    <!--
-	  $(TargetName) should be same as $(RootNamespace) so that the produced binaries (.exe/.pri/etc.)
-	  have a name that matches the .winmd
-	-->
     <TargetName>$(RootNamespace)</TargetName>
     <DefaultLanguage>ja-JP</DefaultLanguage>
     <MinimumVisualStudioVersion>16.0</MinimumVisualStudioVersion>
@@ -28,11 +24,10 @@
     <AppxPackage>false</AppxPackage>
     <WindowsPackageType>None</WindowsPackageType>
     <WindowsAppSdkBootstrapInitialize>false</WindowsAppSdkBootstrapInitialize>
-    <!--WindowsAppSDKBootstrapAutoInitializeOptions_Default>true</WindowsAppSDKBootstrapAutoInitializeOptions_Default-->
-    <!--WindowsAppSDKBootstrapAutoInitializeOptions_None>true</WindowsAppSDKBootstrapAutoInitializeOptions_None-->
     <WindowsAppSDKBootstrapAutoInitializeOptions_OnError_DebugBreak_IfDebuggerAttached>true</WindowsAppSDKBootstrapAutoInitializeOptions_OnError_DebugBreak_IfDebuggerAttached>
     <SelfContained>true</SelfContained>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <ShouldComputeInputPris>true</ShouldComputeInputPris>
   </PropertyGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -294,7 +289,7 @@ rd /S /Q "$(MSBuildStartupDirectory)\packages\FlushMouseUI3DLL.1.0.0"
     <Import Project="..\..\packages\Microsoft.Windows.ImplementationLibrary.1.0.240122.1\build\native\Microsoft.Windows.ImplementationLibrary.targets" Condition="Exists('..\..\packages\Microsoft.Windows.ImplementationLibrary.1.0.240122.1\build\native\Microsoft.Windows.ImplementationLibrary.targets')" />
     <Import Project="..\..\packages\FlushMouseUI3DLL.1.0.0\build\FlushMouseUI3DLL.targets" Condition="Exists('..\..\packages\FlushMouseUI3DLL.1.0.0\build\FlushMouseUI3DLL.targets')" />
     <Import Project="..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.22621.3233\build\Microsoft.Windows.SDK.BuildTools.targets" Condition="Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.22621.3233\build\Microsoft.Windows.SDK.BuildTools.targets')" />
-    <Import Project="..\..\packages\Microsoft.WindowsAppSDK.1.5.240227000\build\native\Microsoft.WindowsAppSDK.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.1.5.240227000\build\native\Microsoft.WindowsAppSDK.targets')" />
+    <Import Project="..\..\packages\Microsoft.WindowsAppSDK.1.5.240311000\build\native\Microsoft.WindowsAppSDK.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.1.5.240311000\build\native\Microsoft.WindowsAppSDK.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -306,7 +301,7 @@ rd /S /Q "$(MSBuildStartupDirectory)\packages\FlushMouseUI3DLL.1.0.0"
     <Error Condition="!Exists('..\..\packages\FlushMouseUI3DLL.1.0.0\build\FlushMouseUI3DLL.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\FlushMouseUI3DLL.1.0.0\build\FlushMouseUI3DLL.targets'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.22621.3233\build\Microsoft.Windows.SDK.BuildTools.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.22621.3233\build\Microsoft.Windows.SDK.BuildTools.props'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.22621.3233\build\Microsoft.Windows.SDK.BuildTools.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.22621.3233\build\Microsoft.Windows.SDK.BuildTools.targets'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.1.5.240227000\build\native\Microsoft.WindowsAppSDK.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.1.5.240227000\build\native\Microsoft.WindowsAppSDK.props'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.1.5.240227000\build\native\Microsoft.WindowsAppSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.1.5.240227000\build\native\Microsoft.WindowsAppSDK.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.1.5.240311000\build\native\Microsoft.WindowsAppSDK.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.1.5.240311000\build\native\Microsoft.WindowsAppSDK.props'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.1.5.240311000\build\native\Microsoft.WindowsAppSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.1.5.240311000\build\native\Microsoft.WindowsAppSDK.targets'))" />
   </Target>
 </Project>

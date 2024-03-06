@@ -2,7 +2,7 @@
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0000		2024/02/13  JeffyTS  	New edit.
+// #0000	2024/02/13  JeffyTS  	New edit.
 //
 
 //
@@ -29,7 +29,7 @@ public:
 		_In_ int nWidth, _In_ int nHeight, _In_opt_ HWND hWndParent, _In_opt_ HMENU hMenu);
 	virtual LRESULT WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);		
 
-	HWND		hGetHWND() { return _hWnd; }
+	HWND		hGetHWND() const { return _hWnd; }
 	BOOL		bUpdateWindow();
 	BOOL		bShowWindow(_In_ int nCmdShow);
 	BOOL		bSetWindowText(_In_opt_ LPCTSTR szTitle);

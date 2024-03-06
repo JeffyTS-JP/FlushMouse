@@ -18,7 +18,7 @@
 				<ColumnDefinition Width="Auto"/>
 			</Grid.ColumnDefinitions>
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Column="0">
-				<Image Margin="0,30,0,0" Source="small.ico" Width="32" Height="32"/>
+				<Image Margin="0,30,0,0" Source="FlushMouse.ico" Width="32" Height="32"/>
 			</StackPanel>
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1">
 				<Grid>

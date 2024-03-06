@@ -5,31 +5,16 @@
 
 #### リリース情報
 
-* **2024/03/02　　Version 2.1.4.17 をリリースしました**
+* **2024/03/30　　Version 2.2.1.7 をリリースしました**
 
 * **(主な変更点)**
-   * Ver. 2.1.4.16 の UI3の設定ダイアログの処理に誤りがありましたので、取り下げてリリースしなおします。申し訳ありませんでした
-   * IME モード表示のレスポンスを改善しました
-   * Mouse HookをRawInputに変更しました
-   * 設定のレイアウトを変更しました
-   * Edge と Chromeで、変換モードが「一般」から「無変換」に時々変わってしまうのに対応しました(IME 関連キーのサポートを ONにした時のみ動作します)
+   * 今回のバージョンでは、β機能として Synaptics社製タッチパッドで、VMware Playerの Guest (Windows 10/11のみ)での、Two Finger Scroll に対応しました (といっても、かなり限定的です。詳しくは下記をご覧ください)
+   * UI3の時、ノートPCなどで、電源をACからDC(バッテリー)に切り替えたときMicrosoft.UI.Xaml.dllで例外が発生し、イベントビューアーに記録されることがあった問題は Microsoft.WindowsAppSDK を1.5.240311000にアップデートしたところ修正されました
    * 細かなバグを修正しました
    
-   
    * Version 2 から、Windows UI3に対応しました (といっても、設定画面などだけですし、あえて従来と似せたので、あまりそれらしくありませんが…)
-   * 今回のUI3では、従来と仕様も若干変わっています
-     * マウスカーソル左とキャレット左の表示の色をColor Pickerで変更できるようにしました
-     * プログラム的な話になりますが、 メインと設定などのUI部分をデスクトップアプリとC++/WinRT(WinUI3)で分けて、それ以外の本質的な機能部分は共通になっています
-     * UI版のバージョン情報はC++/WinRT(WinUI3)で記述しましたが、設定画面は C# の DLL として記述しました。これは、まだ、C++/WinRT(WinUI3)のサンプルが少なく、C#/WinUI3の方が楽だと判断したためです
      * なお、デスクトップ版と、UI3版の共存はできません。切り替える場合は、いったんアンインストールしてください
 
-
-* 既知の問題
-   * UI3の時、ノートPCなどで、電源をACからDC(バッテリー)に切り替えたときMicrosoft.UI.Xaml.dllで例外が発生し、イベントビューアーに記録されることがあります
-     * 今のところ原因がわかっていませんが、全体の動作に問題はないようです
-     * 気になる方は、UI3版で設定を変えてから、デスクトップ版をインストールしなおしてください (設定以外の動作は同じです) 
-
-   * 
 
 * **(今後について)**
    * ~~OSDN上ではここまでの機能で開発は終了としたいと考えています(バグ対応は除く)~~
@@ -43,7 +28,8 @@
 
 #### プライバシーポリシー
    * デスクトップ版、UI3版共に個人情報の収集などは一切行っていません
-     * UI3版から、ネットワークへのアクセスとして、インストール時のランタイムのダウンロードと、バージョン情報にGitHubへのリンクがありますので、念のため記載します
+     * UI3版から、ネットワークへのアクセスとして、インストール時のランタイムのダウンロードと、バージョン情報にGitHubへのリンクがあります
+     * また、Version 2.2から Synaptics社製タッチパッドと、VMware Playerへの対応として、ネットワークにアクセスします (詳しくは下記をご覧ください)
 
 #### インストール / アンインストール
    * Windows Installer (exe)形式になっています。実行してインストールしてください
@@ -53,7 +39,6 @@
 
 #### 使い方
    * スタートメニュー、デスクトップのアイコンをクリックするか、PCを起動するとシステムトレイ(タスクトレイ)に常駐します
-     * (これにより、以前の制限事項であった「一部のアプリ、例えば「タスクマネージャー」などがフォーカスを持っているときは、モード表示ができません」は解消されました)
    * 不要であればデスクトップのショートカットアイコンは、削除してしまっても問題ありません
 
 #### マウスカーソル
@@ -110,7 +95,7 @@
 
   * IME関連キーのサポートの動作は下記のようになります(IMEの設定でキーマップを変更している場合は異なることがあります)
     * 動作としては、キーボード標記の動作になるようにする機能です
-    * Edge と Chromeで、変換モードが「一般」から「無変換」に時々変わってしまうのに対応しました
+    *  * 検索をすると良く出てくる、Edge と Chromeで、漢字変換ができない問題(変換モードが「一般」から「無変換」に時々変わってしまう)に対して、FlushMouse内で軽減できますので対応しました(IME 関連キーのサポートを ONにした時のみ動作します)
     * 「JA / ENG」 の時、キーボードロケールを返さないアプリがあります。この場合は、前のIMEの状態に戻すことができません。これは制限事項となります。ご了承ください
     * 一部のアプリでは「漢字(半角/全角)」などのIME関連キーで「JA / ENG」から切り替わらないことがあります。現時点では制限事項となります。ご了承ください
     * ★**EP Helper、IME関連キーのサポート のどちらも、Windowsに付属されているMicrosoft IMEでしか検証していません**
@@ -135,6 +120,36 @@
 |ひらがな                   |　　   あ   　　|　　　 －　　　　|　　　 －　　　　|
 |カタカナ (Shift + ひらがな)|　　   ア   　　|　　　 －　　　　|　　　 －　　　　|
 |英数                       |　　 あ / A　　　|　　　 －　　　　|　　　 －　　　　|
+
+
+#### SynTP_Helper機能 (Synaptics社製タッチパッドと、VMware Playerでの Two Finger Scroll) について
+  * 動作環境 (検証環境)
+    * Panasonic社製 Let's note CF-SV1 搭載の Synaptics社製 Wheel Pad (Touch Pad) および Windows 11 Pro (Version 23H2  Build 22631.3296)
+    * VMware社製 VMware(R) Workstation 17 Player (Version 17.5.1 build-23298084)
+    * Player の Guest OS は、主に Windows 11 Pro (Version 23H2  Build 22635.2552)
+    
+  * 機能概要
+    * 上記環境で、Wheel Padの　Two Finger Scroll、および Wheel Pad 沿いを回転するようになぞることでの scroll(右端が起点)を可能にしました
+
+  * 仕組み (内部動作)
+    * Host OS で、Wheel Padの動作を RawInputを使用して受取り、UDPを使用して、Gues OSに送ります。Guest OS では送られてきたデータを SendInputで出力しています
+ 
+  * 使用方法
+    * Host / Guest ともに、FlushMouseをインストールしてください 
+    * タスクトレイにある、FlushMouse のアイコンをクリックすると出てくるメニューから、SynTP Helperを選び設定画面を出します
+      * Host 側では、Senderとして登録します。IP Address の欄には、Guest OSの IPv4 アドレスを入力します (一般的には Ethernet1のアドレスでよいと思います)。また、UDP Portには、空いている番号を入れてください
+      ![SenderDialog](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SenderDlg.png)
+      * Guest 側では、Receiverとして登録します。UDP Portには、Host と同じ番号を入れてください (Guest 側では、UDPを Anyで受けますので、IP Addressは必要ありません)
+      ![RecieverDialog](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/ReciverDlg.png)
+    * 両方ともスタートを押すと、(初回のみ)ネットワークへのアクセス許可のダイアログが出ますので、許可してください (一般的にはローカルだけで十分だと思います)
+
+  * その他 (制限事項、今後など)
+    * いろいろと調べると、他社製はもちろん、Synaptics社の Touch Padでさえも、仕様がいろいろとあるようです。このため、Panasonic社製 Let's note CF-SV1に限定しています (特にプログラム内で制限はしていませんので、動いたらラッキーと思ってください。実機を貸していただければ、対応できるかもしれませんが)
+    * スクロールの量や方向などは、私の好みにしています。設定できるようにするのは、今後の課題です
+    * Guest OS で、UNIX系については、私は詳しくありませんので、どなたか受信側を書いていただければ。。。
+    * 現状では、受信側にも FlushMouse のインストールが必要ですが、今、インストール不要なコマンドのようなものを作成しています。今しばらくお待ちください
+    * 実は、Windowsの Remote Desktop Protocol (RDP)などでも動作することを確認はしているのですが、誰のせいだかわからないバグらしきもの(FlushMouseに関係なく、Touch Padが動作しなくなる。画面ロックをして、戻ると直るなど)があるようなので、現状では、プログラム的にVMware Playerに限定しています。今後調べてみます
+    * 設定画面は、手を抜いてUI3でも従来のやり方にしています。今後考えます
 
 
 #### ビルド方法
@@ -168,18 +183,18 @@
   5. Visual Studioを起動して 右下の「コードなし」で起動します
   6. Tools -> Options -> Environment -> International Settings をクリックして、Languageを日本語にします
   7. 拡張機能 -> 検索で　WiXと入力し「 WiX v3 - Visual Studio 2022 Extension」を選択して、Visual Studioを終了するとインストールが始まります
+  8. Visual Studioを再起動して、リポジトリのクローン -> リポジトリの場所に [https://github.com/JeffyTS-JP/FlushMouse.git](https://github.com/JeffyTS-JP/FlushMouse.git)　を入力してクローンします
 
 * 以下はUI3のために必要な作業です
   1. .NET Framework SDK 8 を[https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-8.0.101-windows-x64-installer](https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-8.0.101-windows-x64-installer)からダウンロードしてインストールします
   2. NuGet CLI(nuget.exe)を[https://dist.nuget.org/win-x86-commandline/latest/nuget.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)からダウンロードして、FlushMouseをクローンしたフォルダの直下の「NuGet」フォルダ(デフォルトでは C:\Users\User\source\repos\FlushMouse\NuGet です)に入れます
   3. Windowsの 設定 -> システム -> 開発者向け で 開発者モードを ON にします
-  4. Visual Studioを起動して、リポジトリのクローン -> リポジトリの場所に [https://github.com/JeffyTS-JP/FlushMouse.git](https://github.com/JeffyTS-JP/FlushMouse.git)　を入力してクローンします
-  5. UI3のために、クローンが終わったら、ツール -> NuGet パッケージマネージャー -> ソリューションの NuGet パッケージの管理 (Altキーを押しながら続けて T N N) を開き、右側にある歯車(⚙)を選択して、ダイアログを開きます
+  5. 次に、ツール -> NuGet パッケージマネージャー -> ソリューションの NuGet パッケージの管理 (Altキーを押しながら続けて T N N) を開き、右側にある歯車(⚙)を選択して、ダイアログを開きます
   6. まず、右上のプラス(＋)を押してから、下にある「ソース」欄には、nuget.exeを入れた「NuGet」フォルダ(デフォルトでは C:\Users\User\source\repos\FlushMouse\NuGet)を選択して「更新」を押します(名前については適当で構いません)
   7. その後 OK を押してダイアログを閉じ、上の歯車の左にある「パッケージソース」を「すべて」に変更します。次に「復元」選択します
 
 * ビルド方法です
-  1. 構成を「**MixedPlatform**」にしてビルドします (Ctrl + Shift + B)
-  2. 「Release」でビルドすると、デフォルトでは C:\Users\User\source\repos\FlushMouseにFlushMouse_x64.exe (Version 1.2以前は FlushMouse_x64.msi)と、FlushMouseUI3_x64.exeができるのでインストールしてご利用ください
+  1. ソリューションプラットフォームを「**MixedPlatform**」にしてビルドします (Ctrl + Shift + B)
+  2. ソリューション構成を「Release」でビルドすると、デフォルトでは C:\Users\User\source\repos\FlushMouseにFlushMouse_x64.exe (Version 1.2以前は FlushMouse_x64.msi)と、FlushMouseUI3_x64.exeができるのでインストールしてご利用ください
 
 

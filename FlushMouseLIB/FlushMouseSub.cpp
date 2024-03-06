@@ -60,71 +60,22 @@ BOOL		bCheckDrawIMEModeArea(HWND hWndObserved)
 }
 
 //
-// class CRawInput
+// class CMouseRawInput
 //
-CRawInput::CRawInput(HWND hwndTarget)
+CMouseRawInput::CMouseRawInput()
 {
-	_hwndTarget = hwndTarget;
-	lpRawInputDevice = NULL;
-
-	if (_hwndTarget == NULL)	return;
-	if (lpRawInputDevice == NULL)	lpRawInputDevice = new RAWINPUTDEVICE[sizeof(RAWINPUTDEVICE)];
 }
 
-CRawInput::~CRawInput()
+CMouseRawInput::~CMouseRawInput()
 {
-	if (lpRawInputDevice != NULL)	delete [] lpRawInputDevice;
-	lpRawInputDevice = NULL;
-	_hwndTarget = NULL;
-}
-
-//
-// bRegisterRawInputDevices()
-//
-BOOL		CRawInput::bRegisterRawInputDevices(USHORT usUsagePage, USHORT usUsage, DWORD  dwFlags)
-{
-	if ((_hwndTarget == NULL) || (lpRawInputDevice == NULL))	return FALSE;
-	lpRawInputDevice->hwndTarget = _hwndTarget;	lpRawInputDevice->usUsagePage = usUsagePage;
-	lpRawInputDevice->usUsage = usUsage;		lpRawInputDevice->dwFlags = dwFlags;
-#define	uiNumDevices	1
-	if (!RegisterRawInputDevices(lpRawInputDevice, uiNumDevices, sizeof(RAWINPUTDEVICE))) {
-		return FALSE;
-	}
-#undef uiNumDevices
-	return TRUE;
-}
-
-//
-// vRawInputDevicesHandler()
-//
-void		CRawInput::vRawInputDevicesHandler(HWND hWnd, DWORD dwFlags, HRAWINPUT hRawInput)
-{
-	UINT	uBufferSize = 0;
-	UINT	cbSize = 0;
-	if ((uBufferSize = GetRawInputData(hRawInput, RID_INPUT, NULL, &cbSize, sizeof(RAWINPUTHEADER))) != (-1)) {
-		LPUINT	lpuBuffer = new UINT[cbSize];
-		if (lpuBuffer != NULL) {
-			if ((uBufferSize = GetRawInputData(hRawInput, RID_INPUT, lpuBuffer, &cbSize, sizeof(RAWINPUTHEADER))) != (-1)) {
-				LPRAWINPUT	lpRawInput = (LPRAWINPUT)lpuBuffer;
-				switch (lpRawInput->header.dwType) {
-				case RIM_TYPEMOUSE:
-					vRawInputMouseHandler(hWnd, dwFlags, lpRawInput);
-					break;
-				default:
-					break;
-				}
-
-			}
-			if (lpuBuffer != NULL) delete [] lpuBuffer;
-		}
-	}
 }
 
 //
 // vRawInputMouseHandler()
 //
-void	CRawInput::vRawInputMouseHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawInput)
+void	CMouseRawInput::vRawInputMouseHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawInput)
 {
+	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(dwFlags);
 
 	RAWMOUSE RawMouse = (RAWMOUSE)(lpRawInput->data.mouse);
@@ -337,7 +288,6 @@ CFlushMouseHook::CFlushMouseHook()
 	bShellHook64 = FALSE;
 	bGlobalHook64 = FALSE;
 	bKeyboardHookLL64 = FALSE;
-	bMouseHook64 = FALSE;
 	bHook32Dll = FALSE;
 	lpstProcessInfomation = new PROCESS_INFORMATION[sizeof(PROCESS_INFORMATION)];
 	if (lpstProcessInfomation)	ZeroMemory(lpstProcessInfomation, sizeof(PROCESS_INFORMATION));

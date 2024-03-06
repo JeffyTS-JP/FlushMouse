@@ -139,6 +139,7 @@
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <AdditionalOptions>/Zc:throwingNew- %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -186,8 +187,10 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Profile.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="SynTP.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TaskTray.h" />
+    <ClInclude Include="TCPIP.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Cursor.cpp" />
@@ -202,7 +205,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Profile.cpp" />
+    <ClCompile Include="SynTP.cpp" />
     <ClCompile Include="TaskTray.cpp" />
+    <ClCompile Include="TCPIP.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="FlushMouse.ico" />

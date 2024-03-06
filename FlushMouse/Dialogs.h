@@ -11,7 +11,6 @@
 // Include
 //
 #pragma once
-#include "pch.h"
 
 //
 // Global Data

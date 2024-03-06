@@ -44,7 +44,7 @@ public:
 public:
 	BOOL 	bRegister(LPCTSTR lpszThreadName, DWORD dwThreadID, LPTHREAD_START_ROUTINE lpbCallbackRoutine, LPVOID lParamOption, DWORD dwSleepTime);
 	BOOL 	bStart();
-	BOOL	bCheckSentinel();
+	BOOL	bCheckSentinel() const;
 	BOOL	bSetSentinel(BOOL bSentinel);
 	
 private:
