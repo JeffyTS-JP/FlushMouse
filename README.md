@@ -140,7 +140,7 @@
       * Host 側では、Senderとして登録します。IP Address の欄には、Guest OSの IPv4 アドレスを入力します (一般的には Ethernet1のアドレスでよいと思います)。また、UDP Portには、空いている番号を入れてください
       ![SenderDialog](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SenderDlg.png)
       * Guest 側では、Receiverとして登録します。UDP Portには、Host と同じ番号を入れてください (Guest 側では、UDPを Anyで受けますので、IP Addressは必要ありません)
-      ![RecieverDialog](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/ReciverDlg.png)
+      ![ReceiverDialog](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/ReceiverDlg.png)
     * 両方ともスタートを押すと、(初回のみ)ネットワークへのアクセス許可のダイアログが出ますので、許可してください (一般的にはローカルだけで十分だと思います)
 
   * その他 (制限事項、今後など)
