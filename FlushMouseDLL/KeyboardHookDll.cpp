@@ -26,14 +26,13 @@
 //
 #pragma comment(linker, "/SECTION:FLUSHMOUSEDLL_SEG,RWS")
 #pragma data_seg("FLUSHMOUSEDLL_SEG")
+static HHOOK	hHookLL = NULL;
 static BOOL		bOnlyCtrlLL = FALSE;
 static DWORD	dwPreviousVKLL = 0;
 static HWND		hWndKBParentLL = NULL;
-static LPKEYBOARDLL_SHAREDMEM	lpDatKeyboardLL = NULL;
 static BOOL		bEnableEPHelperLL = FALSE;
 static BOOL		bIMEModeForcedLL = FALSE;
 static BOOL		bStartConvertingLL = FALSE;
-static CSharedMemory	*CSharedMemLL = NULL;
 #pragma data_seg()
 
 //
@@ -47,78 +46,43 @@ static BOOL	bKBisEP();
 //
 DLLEXPORT BOOL  __stdcall bKeyboardHookLLSet(HWND hWnd)
 {
+	if (!hWnd || hWndKBParentLL)	return FALSE;
 	hWndKBParentLL = hWnd;
-	if((CSharedMemLL = new CSharedMemory(KEYBOARDHOOKLLMEM, sizeof(KEYBOARDLL_SHAREDMEM))) != NULL) {
-		if ((lpDatKeyboardLL = (LPKEYBOARDLL_SHAREDMEM)CSharedMemLL->lpvSharedMemoryRead()) != NULL) {
-			lpDatKeyboardLL->hWnd = hWnd;
-			lpDatKeyboardLL->bEnableEPHelper = FALSE;
-			lpDatKeyboardLL->bIMEModeForced = FALSE;
-			if (CSharedMemLL->bSharedMemoryWrite(lpDatKeyboardLL)) {
-				HHOOK	hHook = SetWindowsHookEx(WH_KEYBOARD_LL, (HOOKPROC)lpKeyboardHookLLProc, hGetInstance(), 0);
-				if (hHook) {
-					lpDatKeyboardLL->hHook = hHook;
-					if (CSharedMemLL->bSharedMemoryWrite(lpDatKeyboardLL)) {
-						return TRUE;
-					}
-					UnhookWindowsHookEx(hHook);
-				}
-			}
-		}
-		delete CSharedMemLL;
-		CSharedMemLL = NULL;
+	if (!hHookLL)	hHookLL = SetWindowsHookEx(WH_KEYBOARD_LL, (HOOKPROC)lpKeyboardHookLLProc, hGetInstance(), 0);
+	if (!hHookLL) {
 		bOnlyCtrlLL = FALSE;
 		dwPreviousVKLL = 0;
 		hWndKBParentLL = NULL;
-		lpDatKeyboardLL = NULL;
 		bEnableEPHelperLL = FALSE;
 		bIMEModeForcedLL = FALSE;
 		bStartConvertingLL = FALSE;
+		return FALSE;
 	}
-	return FALSE;
+	return TRUE;
 }
 
 //
-// bKeyboardHookLLUnset()
+// vKeyboardHookLLUnset()
 //
-DLLEXPORT BOOL __stdcall bKeyboardHookLLUnset()
+DLLEXPORT VOID __stdcall vKeyboardHookLLUnset()
 {
-	BOOL		bRet = FALSE;
-	if (CSharedMemLL != NULL) {
-		if ((lpDatKeyboardLL = (LPKEYBOARDLL_SHAREDMEM)CSharedMemLL->lpvSharedMemoryRead()) != NULL) {
-			if (lpDatKeyboardLL->hHook) {
-				if (UnhookWindowsHookEx(lpDatKeyboardLL->hHook)) {
-					bRet = TRUE;
-				}
-			}
-		}
-		delete CSharedMemLL;
-		CSharedMemLL = NULL;
-		bOnlyCtrlLL = FALSE;
-		dwPreviousVKLL = 0;
-		hWndKBParentLL = NULL;
-		lpDatKeyboardLL = NULL;
-		bEnableEPHelperLL = FALSE;
-		bIMEModeForcedLL = FALSE;
-		bStartConvertingLL = FALSE;
-	}
-	return bRet;
+	if (hHookLL)	UnhookWindowsHookEx(hHookLL);
+	hHookLL = NULL;
+	bOnlyCtrlLL = FALSE;
+	dwPreviousVKLL = 0;
+	hWndKBParentLL = NULL;
+	bEnableEPHelperLL = FALSE;
+	bIMEModeForcedLL = FALSE;
+	bStartConvertingLL = FALSE;
 }
+
 //
 // bSetEnableEPHelperLL64()
 //
 DLLEXPORT BOOL __stdcall bSetEnableEPHelperLL64(BOOL bEPHelper)
 {
-	BOOL	bRet = FALSE;
 	bEnableEPHelperLL = bEPHelper;
-	if (CSharedMemLL != NULL) {
-		if ((lpDatKeyboardLL = (LPKEYBOARDLL_SHAREDMEM)CSharedMemLL->lpvSharedMemoryRead()) != NULL) {
-			lpDatKeyboardLL->bEnableEPHelper = bEPHelper;
-			if (CSharedMemLL->bSharedMemoryWrite(lpDatKeyboardLL)) {
-				bRet = TRUE;
-			}
-		}
-	}
-	return bRet;
+	return TRUE;
 }
 
 //
@@ -126,17 +90,8 @@ DLLEXPORT BOOL __stdcall bSetEnableEPHelperLL64(BOOL bEPHelper)
 //
 DLLEXPORT BOOL __stdcall bSetEnableIMEModeForcedLL64(BOOL bIMEModeForced)
 {
-	BOOL	bRet = FALSE;
 	bIMEModeForcedLL = bIMEModeForced;
-	if (CSharedMemLL != NULL) {
-		if ((lpDatKeyboardLL = (LPKEYBOARDLL_SHAREDMEM)CSharedMemLL->lpvSharedMemoryRead()) != NULL) {
-			lpDatKeyboardLL->bIMEModeForced = bIMEModeForced;
-			if (CSharedMemLL->bSharedMemoryWrite(lpDatKeyboardLL)) {
-				bRet = TRUE;
-			}
-		}
-	}
-	return bRet;
+	return TRUE;
 }
 
 //

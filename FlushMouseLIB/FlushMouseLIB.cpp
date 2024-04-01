@@ -84,7 +84,6 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 // Handler
 static BOOL		Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct);
 static void		Cls_OnDestroy(HWND hWnd);
-static void		Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify);
 static void		Cls_OnInput(HWND hWnd, DWORD dwFlags, HRAWINPUT hRawInput);
 
 // EX Message Handler
@@ -115,7 +114,6 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_o
 	if (hHandle != NULL) {
 		if (!SetPriorityClass(hHandle, NORMAL_PRIORITY_CLASS)) {
 			CloseHandle(hHandle);
-			bReportEvent(MSG_STOPPED_FLUSHMOUSE, APPLICATION_CATEGORY);
 			return FALSE;
 		}
 		CloseHandle(hHandle);
@@ -137,11 +135,8 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_o
 	SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 	SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 
-	bReportEvent(MSG_STARTING_FLUSHMOUSE, APPLICATION_CATEGORY);
-	
 	if (!hPrevInstance) {
 		if (!MyRegisterClass(hInstance)) {
-			bReportEvent(MSG_STOPPED_FLUSHMOUSE, APPLICATION_CATEGORY);
 			if (Resource)	delete	Resource;
 			return FALSE;
 		}
@@ -149,7 +144,6 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_o
 
 	HWND	hWnd = NULL;
 	if ((hWnd = InitInstance(hInstance, nCmdShow)) == NULL) {
-		bReportEvent(MSG_STOPPED_FLUSHMOUSE, APPLICATION_CATEGORY);
 		if (Resource)	delete	Resource;
 		return FALSE;
 	}
@@ -178,7 +172,6 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_o
 		}
 	}
 
-	bReportEvent(MSG_STOPPED_FLUSHMOUSE, APPLICATION_CATEGORY);
 	if (Resource)	delete	Resource;
 	return TRUE;
 }
@@ -186,7 +179,7 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_o
 //
 // iCheckCmdLine()
 //
-int			iCheckCmdLine(LPTSTR lpCmdLine)
+int			iCheckCmdLine(LPCTSTR lpCmdLine)
 {
 	if ((*lpCmdLine != _T('\0')) && (CompareStringOrdinal(lpCmdLine, -1, L"/Start", -1, TRUE) == CSTR_EQUAL)) {
 		bReportEvent(MSG_START_FLUSHMOUSE_EVENT, Shortcut_CATEGORY);
@@ -196,7 +189,7 @@ int			iCheckCmdLine(LPTSTR lpCmdLine)
 	if ((hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL)) != NULL) {
 		SetFocus(GetLastActivePopup(hWnd));
 		PostMessage(hWnd, WM_DESTROY, NULL, NULL);
-		for (int i = 5; i > 0; i--) {
+		for (int i = 10; i > 0; i--) {
 			Sleep(500);
 			if ((hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL)) != NULL) {
 				SetFocus(GetLastActivePopup(hWnd));
@@ -216,7 +209,6 @@ int			iCheckCmdLine(LPTSTR lpCmdLine)
 				}
 			}
 		}
-		bReportEvent(MSG_STOPPED_FLUSHMOUSE, APPLICATION_CATEGORY);
 		return (0);
 	}
 	if ((*lpCmdLine != _T('\0')) && (CompareStringOrdinal(lpCmdLine, -1, L"/Quit", -1, TRUE) == CSTR_EQUAL)) {
@@ -337,6 +329,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 {
 	UNREFERENCED_PARAMETER(lpCreateStruct);
+
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK)
 
 	hMainWnd = hWnd;
@@ -398,22 +391,38 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		bForExplorerPatcherSWS(GetForegroundWindow(), TRUE, TRUE, NULL, NULL);
 	}
 
-	if (Profile != NULL) {
-		if (Profile->lpstAppRegData->dwSynTPHelper1 == 2) {
-			SynTP = new CSynTP;
-			if (SynTP) {
-				if (!SynTP->bStartSender(hMainWnd, Profile->lpstAppRegData->szSynTPSendIPAddr1, Profile->lpstAppRegData->dwSynTPPortNo1))	return FALSE;	// VMnet1
-			}
-		}
-		else if (Profile->lpstAppRegData->dwSynTPHelper1 == 4) {
-			SynTP = new CSynTP;
-			if (SynTP) {
-				if (!SynTP->bStartReceiver(hMainWnd, Profile->lpstAppRegData->szSynTPSendIPAddr1, Profile->lpstAppRegData->dwSynTPPortNo1))	return FALSE;
+	if (Profile->lpstAppRegData->dwSynTPHelper1 == 0x02) {
+		SynTP = new CSynTP;
+		if (SynTP) {
+			if (!SynTP->bStartSender(hMainWnd, Profile->lpstAppRegData->szSynTPSendIPAddr1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
+				vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
+				delete SynTP;
+				SynTP = NULL;
 			}
 		}
 	}
-
-	bReportEvent(MSG_STARTED_FLUSHMOUSE, APPLICATION_CATEGORY);
+	else if (Profile->lpstAppRegData->dwSynTPHelper1 == 0x12) {
+		if (bCheckExistHostnameIPv4(Profile->lpstAppRegData->szSynTPSendHostname1)) {
+			SynTP = new CSynTP;
+			if (SynTP) {
+				if (!SynTP->bStartSender(hMainWnd, Profile->lpstAppRegData->szSynTPSendHostname1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
+					vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
+					delete SynTP;
+					SynTP = NULL;
+				}
+			}
+		}
+	}
+	else if (Profile->lpstAppRegData->dwSynTPHelper1 == 0x04) {
+		SynTP = new CSynTP;
+		if (SynTP) {
+			if (!SynTP->bStartReceiver(hMainWnd, Profile->lpstAppRegData->dwSynTPPortNo1)) {
+				vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
+				delete SynTP;
+				SynTP = NULL;
+			}
+		}
+	}
 
 	return TRUE;
 }
@@ -430,8 +439,6 @@ static void Cls_OnDestroy(HWND hWnd)
 		delete	Profile;
 		Profile = NULL;
 	}
-
-	bReportEvent(MSG_QUIT_FLUSHMOUSE, APPLICATION_CATEGORY);
 	
 	PostQuitMessage(0);
 }
@@ -447,6 +454,11 @@ void		vDestroyWindow(HWND hWnd)
 		Profile->lpstAppRegData->bDoModeDispByMouseBttnUp = FALSE;
 		Profile->lpstAppRegData->bDrawNearCaret = FALSE;
 	}
+	if (uCheckProcTimer != NULL) {
+		if (KillTimer(hWnd, nCheckProcTimerID)) {
+			uCheckProcTimer = NULL;
+		}
+	}
 	if (SynTP) {
 		delete SynTP;
 		SynTP = NULL;
@@ -454,11 +466,6 @@ void		vDestroyWindow(HWND hWnd)
 	if (MouseRawInput != NULL) {
 		delete MouseRawInput;
 		MouseRawInput = NULL;
-	}
-	if (uCheckProcTimer != NULL) {
-		if (KillTimer(hWnd, nCheckProcTimerID)) {
-			uCheckProcTimer = NULL;
-		}
 	}
 	if (uCheckFocusTimer != NULL) {
 		if (KillTimer(hWnd, nCheckFocusTimerID)) {
@@ -483,35 +490,6 @@ void		vDestroyWindow(HWND hWnd)
 	}
 	SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
 	if (!bDestroyTaskTrayWindow(hWnd)) {
-	}
-}
-
-//
-// WM_COMMAND
-// Cls_OnCommand()
-//
-static void Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
-{
-	UNREFERENCED_PARAMETER(hWndCtl);
-	UNREFERENCED_PARAMETER(codeNotify);
-	switch (id) {
-	case IDR_TT_MENU:
-		break;
-	case IDR_TT_SETTING:
-		vSettingDialog(hWnd);
-		break;
-	case IDR_TT_SYNTPHELPER:
-		Profile->bGetProfileData();
-		vSynTPHelperDialog(hWnd);
-		break;
-	case IDM_ABOUT:
-	case IDR_TT_ABOUT:
-		vAboutDialog(hWnd);
-		break;
-	case IDM_EXIT:
-	case IDR_TT_QUIT:
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
-		break;
 	}
 }
 
@@ -642,6 +620,7 @@ static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd)
 {
 	UNREFERENCED_PARAMETER(dwEvent);
 
+	if(!EventHook)	return;
 	if (EventHook->hFormerWnd != hForeWnd) {
 		EventHook->hFormerWnd = hForeWnd;
 		if (hWnd != hForeWnd) {
@@ -1423,8 +1402,6 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 	if (uTimerID == nCheckProcTimerID) {
 		if (FindWindow(CLASS_FLUSHMOUSE32, NULL) == NULL) {
 			vDestroyWindow(hWnd);
-			bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION_CATEGORY);
-			//PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
 		}
 	}

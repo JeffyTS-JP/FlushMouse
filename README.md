@@ -5,11 +5,10 @@
 
 #### リリース情報
 
-* **2024/03/31　　Version 2.2.1.7 をリリースしました**
+* **2024/05/16　　Version 2.2.2.13 をリリースしました**
 
 * **(主な変更点)**
-   * 今回のバージョンでは、β機能として Synaptics社製タッチパッドで、VMware Playerの Guest (Windows 10/11のみ)での、Two Finger Scroll に対応しました (といっても、かなり限定的です。詳しくは下記をご覧ください)
-   * UI3の時、ノートPCなどで、電源をACからDC(バッテリー)に切り替えたときMicrosoft.UI.Xaml.dllで例外が発生し、イベントビューアーに記録されることがあった問題は Microsoft.WindowsAppSDK を1.5.240311000にアップデートしたところ修正されました
+   * β機能 SynTP Helperの動作を改善しました。また、Guest 側用にインストール不要の SynTP_Receiver を作成しました。詳しくは[下記](#SynTP_Helper)を参照してください
    * 細かなバグを修正しました
    
    * Version 2 から、Windows UI3に対応しました (といっても、設定画面などだけですし、あえて従来と似せたので、あまりそれらしくありませんが…)
@@ -122,34 +121,40 @@
 |英数                       |　　 あ / A　　　|　　　 －　　　　|　　　 －　　　　|
 
 
+<a id="SynTP_Helper”></a>
 #### SynTP_Helper機能 (Synaptics社製タッチパッドと、VMware Playerでの Two Finger Scroll) について
   * 動作環境 (検証環境)
     * Panasonic社製 Let's note CF-SV1 搭載の Synaptics社製 Wheel Pad (Touch Pad) および Windows 11 Pro (Version 23H2  Build 22631.3296)
-    * VMware社製 VMware(R) Workstation 17 Player (Version 17.5.1 build-23298084)
+    * Broadcom (VMware)社製 VMware(R) Workstation 17 Player (Version 17.5.1 build-23298084)
     * Player の Guest OS は、主に Windows 11 Pro (Version 23H2  Build 22635.2552)
     
   * 機能概要
-    * 上記環境で、Wheel Padの　Two Finger Scroll、および Wheel Pad 沿いを回転するようになぞることでの scroll(右端が起点)を可能にしました
+    * 上記環境で、Wheel Padの　Two Finger Scroll、および Wheel Pad 沿いを回転するようになぞることでのスクロール(右端が起点)を可能にしました
 
   * 仕組み (内部動作)
-    * Host OS で、Wheel Padの動作を RawInputを使用して受取り、UDPを使用して、Gues OSに送ります。Guest OS では送られてきたデータを SendInputで出力しています
+    * Host OS で、Wheel Padの動作を RawInputを使用して受取り、UDPを使用して、Guest OSに送ります。Guest OS では送られてきたデータを SendInputで出力しています
  
   * 使用方法
-    * Host / Guest ともに、FlushMouseをインストールしてください 
+    * Host には、FlushMouse をインストールしてください
+    * Guest には、FlushMouse をインストールするか、SynTP_Receiver_vx.x.x.x.zip を展開し、SynTP_Receiver.exe をコピーしてください
     * タスクトレイにある、FlushMouse のアイコンをクリックすると出てくるメニューから、SynTP Helperを選び設定画面を出します
+      ![SynTPHelperDlg](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SynTPHelperDlg.png)
       * Host 側では、Senderとして登録します。IP Address の欄には、Guest OSの IPv4 アドレスを入力します (一般的には Ethernet1のアドレスでよいと思います)。また、UDP Portには、空いている番号を入れてください
-      ![SenderDialog](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SenderDlg.png)
       * Guest 側では、Receiverとして登録します。UDP Portには、Host と同じ番号を入れてください (Guest 側では、UDPを Anyで受けますので、IP Addressは必要ありません)
-      ![ReceiverDialog](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/ReceiverDlg.png)
-    * 両方ともスタートを押すと、(初回のみ)ネットワークへのアクセス許可のダイアログが出ますので、許可してください (一般的にはローカルだけで十分だと思います)
-
+      * 設定 -> ネットワークとインターネット -> ネットワークの詳細設定 -> 共有の詳細設定 -> プライベートネットワークのネットワーク探索を ON にしてください
+    * 両方ともスタートを押すと、(初回のみ)ネットワークへのアクセス許可のダイアログが出ますので、許可してください
+      * Host 側で Hostname を使用して、FlushMouse 起動時からスタートする場合、名前解決ができるようにネットワークが構成されている必要が有ります。名前解決ができない場合はストップ状態となります
+    * SynTP_Receiver の場合は、ショートカットを作成し、プロパティを開いて「Your folder path\SynTP_Receiver.exe /Port 50008」 のように UDP Portを指定します
+      * 管理者権限で起動しない場合、タスクマネージャーなど一部のアプリでスクロールしません。ショートカットのプロパティの詳細設定で「管理者権限で実行する」にチェックをしてください
+      * SynTP_Receiverを終了するためには、タスクマネージャーからタスクの終了を行います
+   
   * その他 (制限事項、今後など)
     * いろいろと調べると、他社製はもちろん、Synaptics社の Touch Padでさえも、仕様がいろいろとあるようです。このため、Panasonic社製 Let's note CF-SV1に限定しています (特にプログラム内で制限はしていませんので、動いたらラッキーと思ってください。実機を貸していただければ、対応できるかもしれませんが)
     * スクロールの量や方向などは、私の好みにしています。設定できるようにするのは、今後の課題です
     * Guest OS で、UNIX系については、私は詳しくありませんので、どなたか受信側を書いていただければ。。。
-    * 現状では、受信側にも FlushMouse のインストールが必要ですが、今、インストール不要なコマンドのようなものを作成しています。今しばらくお待ちください
-    * 実は、Windowsの Remote Desktop Protocol (RDP)などでも動作することを確認はしているのですが、誰のせいだかわからないバグらしきもの(FlushMouseに関係なく、Touch Padが動作しなくなる。画面ロックをして、戻ると直るなど)があるようなので、現状では、プログラム的にVMware Playerに限定しています。今後調べてみます
     * 設定画面は、手を抜いてUI3でも従来のやり方にしています。今後考えます
+    * VMware社が Broadcom社に買収され、先日、Player をやめて Workstation Proに移行するとのアナウンスがありました。個人利用(たぶん商用利用ではない場合)では、無償とのことです。今後、開発環境を整えて、こちらも移行を考えたいと思います
+    
 
 
 #### ビルド方法

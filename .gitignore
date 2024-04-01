@@ -365,5 +365,7 @@ FodyWeavers.xsd
 nuget.exe
 !NuGet/FlushMouseUI3DLL/FlushMouseUI3DLL*.nupkg
 FlushMouseCursor.dat
-FlushMouse_x64.exe
-FlushMouseUI3_x64.exe
+FlushMouse_x64*.exe
+FlushMouseUI3_x64*.exe
+SynTP_Receiver*.exe
+SynTP_Receiver*.zip

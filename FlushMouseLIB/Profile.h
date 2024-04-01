@@ -13,6 +13,7 @@
 #pragma once
 #include "pch.h"
 #include "CommonDef.h"
+#include "TCPIP.h"
 
 //
 // Define
@@ -56,9 +57,12 @@ typedef struct tagAppRegData
 	BOOL		bEnableEPHelper = FALSE;
 
 	DWORD		dwSynTPHelper1 = 0;
-	TCHAR		szSynTPSendIPAddr1[MAX_LOADSTRING]{};
+	TCHAR		szSynTPSendIPAddr1[MAX_IPV4_ADDRESS]{};
+	TCHAR		szSynTPSendHostname1[MAX_FQDN]{};
+	
 	DWORD		dwSynTPPortNo1 = 50008;
-} APPREGDATA, *PAPPREGDATA, *LPAPPREGDATA;
+
+} APPREGDATA, * PAPPREGDATA, * LPAPPREGDATA;
 
 //
 // Global Data
@@ -82,6 +86,5 @@ public:
 public:
 	LPAPPREGDATA	lpstAppRegData;
 };
-
 
 /* = EOF = */

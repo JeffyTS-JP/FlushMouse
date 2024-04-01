@@ -327,7 +327,7 @@ BOOL		CFlushMouseHook::bHookUnset()
 {
 	if (bHook32Dll)			bHook32DllStop();
 	if (bShellHook64)		bShellHookUnset();
-	if (bKeyboardHookLL64)	bKeyboardHookLLUnset();
+	if (bKeyboardHookLL64)	vKeyboardHookLLUnset();
 	if (bGlobalHook64)		bGlobalHookUnset();
 	return TRUE;
 }

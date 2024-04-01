@@ -65,8 +65,10 @@ CProfile::CProfile()
 		lpstAppRegData->bMoveIMEToolbar = FALSE;					// New IMEのToolbarを移動する 
 		
 		// for SynTP Helper
-		lpstAppRegData->dwSynTPHelper1 = 0;							// SynTP Helper 1 (0 = disable 1 = sender / 2 = sender (always start) / 3 = receiver 4 =receiver (always start)
-		_tcsncpy_s(lpstAppRegData->szSynTPSendIPAddr1, MAX_LOADSTRING, L"", _TRUNCATE);	// SynTP Helper Send IP Addr 1
+		lpstAppRegData->dwSynTPHelper1 = 0;							// SynTP Helper 1 (0x00 = disable 0x01 = sender (IPv4)           / 0x02 = sender (always start IPV4)           / 0x03 = receiver (IPv4) / 0x04 =receiver (always start IPv4)
+																	//                                0x11 = sender (Hosstname IPV4) / 0x12 = sender (always start Hosstname IPV4)
+		_tcsncpy_s(lpstAppRegData->szSynTPSendIPAddr1, MAX_IPV4_ADDRESS, L"", _TRUNCATE);	// SynTP Helper Send IP Addr 1
+		_tcsncpy_s(lpstAppRegData->szSynTPSendHostname1, MAX_FQDN, L"", _TRUNCATE);	// SynTP Helper Hostname 1
 		lpstAppRegData->dwSynTPPortNo1 = 50008;						// SynTP Helper Port Number 1
 	}
 }
@@ -176,8 +178,10 @@ BOOL		CProfile::bGetProfileData() const
 	// Registry in Use SynTP
 	if (CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPHelper1"), (LPDWORD) & (lpstAppRegData->dwSynTPHelper1), lpstAppRegData->dwSynTPHelper1)) {
 		if (CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPSendIPAddr1"), lpstAppRegData->szSynTPSendIPAddr1, sizeof(lpstAppRegData->szSynTPSendIPAddr1))) {
-			if (CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPPortNo1"), (LPDWORD) & lpstAppRegData->dwSynTPPortNo1, lpstAppRegData->dwSynTPPortNo1)) {
-				bRet = TRUE;
+			if (CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPSendHostname1"), lpstAppRegData->szSynTPSendHostname1, sizeof(lpstAppRegData->szSynTPSendHostname1))) {
+				if (CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPPortNo1"), (LPDWORD) & lpstAppRegData->dwSynTPPortNo1, lpstAppRegData->dwSynTPPortNo1)) {
+					bRet = TRUE;
+				}
 			}
 		}
 	}
@@ -272,9 +276,11 @@ BOOL		CProfile::bSetProfileData() const
 	}
 	// Registry in Use SynTP
 	if (CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPHelper1"), lpstAppRegData->dwSynTPHelper1)) {
-		if (CReg->bReadRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPSendIPAddr1"), lpstAppRegData->szSynTPSendIPAddr1, sizeof(lpstAppRegData->szSynTPSendIPAddr1))) {
-			if (CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPPortNo1"), lpstAppRegData->dwSynTPPortNo1)) {
-				bRet = TRUE;
+		if (CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPSendIPAddr1"), lpstAppRegData->szSynTPSendIPAddr1, sizeof(lpstAppRegData->szSynTPSendIPAddr1))) {
+			if (CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPSendHostname1"), lpstAppRegData->szSynTPSendHostname1, sizeof(lpstAppRegData->szSynTPSendHostname1))) {
+				if (CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPPortNo1"), lpstAppRegData->dwSynTPPortNo1)) {
+					bRet = TRUE;
+				}
 			}
 		}
 	}

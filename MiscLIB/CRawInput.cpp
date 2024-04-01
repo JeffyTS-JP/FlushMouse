@@ -1,4 +1,5 @@
-﻿// CRawInput.cpp
+﻿//
+// CRawInput.cpp
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
@@ -21,9 +22,6 @@
 //
 CRawInput::CRawInput()
 {
-#ifdef _DEBUG
-	vGetRawInputDeviceList();
-#endif // _DEBUG
 }
 
 CRawInput::~CRawInput()
@@ -173,4 +171,6 @@ void	CRawInput::vRawInputHIDHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawIn
 	UNREFERENCED_PARAMETER(dwFlags);
 	UNREFERENCED_PARAMETER(lpRawInput);
 }
+
+
 /* = EOF = */

@@ -67,6 +67,8 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "SetupProjectUI3", "FlushMou
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "SetupProjectUI3-exe", "FlushMouseUI3\SetupProjectUI3-exe\SetupProjectUI3-exe.wixproj", "{7304FD00-D114-45BC-9AF9-B36C1B1B23F5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SynTP_Receiver", "SynTP_Receiver\SynTP_Receiver.vcxproj", "{BF5287E9-EF56-42DE-ACF6-7CF0543E1314}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|arm64 = Debug|arm64
@@ -285,6 +287,22 @@ Global
 		{7304FD00-D114-45BC-9AF9-B36C1B1B23F5}.Release|x64.Build.0 = Release|x86
 		{7304FD00-D114-45BC-9AF9-B36C1B1B23F5}.Release|x86.ActiveCfg = Release|x86
 		{7304FD00-D114-45BC-9AF9-B36C1B1B23F5}.Release|x86.Build.0 = Release|x86
+		{BF5287E9-EF56-42DE-ACF6-7CF0543E1314}.Debug|arm64.ActiveCfg = Debug|x64
+		{BF5287E9-EF56-42DE-ACF6-7CF0543E1314}.Debug|arm64.Build.0 = Debug|x64
+		{BF5287E9-EF56-42DE-ACF6-7CF0543E1314}.Debug|Mixed Platform for FlushMouse.ActiveCfg = Debug|x64
+		{BF5287E9-EF56-42DE-ACF6-7CF0543E1314}.Debug|Mixed Platform for FlushMouse.Build.0 = Debug|x64
+		{BF5287E9-EF56-42DE-ACF6-7CF0543E1314}.Debug|x64.ActiveCfg = Debug|x64
+		{BF5287E9-EF56-42DE-ACF6-7CF0543E1314}.Debug|x64.Build.0 = Debug|x64
+		{BF5287E9-EF56-42DE-ACF6-7CF0543E1314}.Debug|x86.ActiveCfg = Debug|Win32
+		{BF5287E9-EF56-42DE-ACF6-7CF0543E1314}.Debug|x86.Build.0 = Debug|Win32
+		{BF5287E9-EF56-42DE-ACF6-7CF0543E1314}.Release|arm64.ActiveCfg = Release|x64
+		{BF5287E9-EF56-42DE-ACF6-7CF0543E1314}.Release|arm64.Build.0 = Release|x64
+		{BF5287E9-EF56-42DE-ACF6-7CF0543E1314}.Release|Mixed Platform for FlushMouse.ActiveCfg = Release|x64
+		{BF5287E9-EF56-42DE-ACF6-7CF0543E1314}.Release|Mixed Platform for FlushMouse.Build.0 = Release|x64
+		{BF5287E9-EF56-42DE-ACF6-7CF0543E1314}.Release|x64.ActiveCfg = Release|x64
+		{BF5287E9-EF56-42DE-ACF6-7CF0543E1314}.Release|x64.Build.0 = Release|x64
+		{BF5287E9-EF56-42DE-ACF6-7CF0543E1314}.Release|x86.ActiveCfg = Release|Win32
+		{BF5287E9-EF56-42DE-ACF6-7CF0543E1314}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

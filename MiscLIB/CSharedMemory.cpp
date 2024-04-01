@@ -55,6 +55,7 @@ CSharedMemory::CSharedMemory(LPCTSTR szSharedMemoryName, DWORD dwDataSize)
 			return;
 		}
 		CloseHandle(hSharedMem);
+		hSharedMem = NULL;
 	}
 	return;
 }
@@ -66,6 +67,7 @@ CSharedMemory::~CSharedMemory()
 			hSharedMem = NULL;
 		}
 	}
+	hSharedMem = NULL;
 	if (lpszSharedMemoryName != NULL)	delete[]	lpszSharedMemoryName;
 	lpszSharedMemoryName = NULL;
 	dwDataByteSize = 0;
@@ -83,6 +85,7 @@ LPVOID	CSharedMemory::lpvSharedMemoryRead()
 			return lpvSharedMem;
 		}
 		CloseHandle(hSharedMem);
+		hSharedMem = NULL;
 	}
 	return NULL;
 }
@@ -113,6 +116,7 @@ BOOL	CSharedMemory::bSharedMemoryWrite(LPVOID lpSharedData)
 			}
 		}
 		CloseHandle(hSharedMem);
+		hSharedMem = NULL;
 	}
 	return FALSE;
 }

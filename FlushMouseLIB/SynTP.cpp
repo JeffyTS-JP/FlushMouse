@@ -20,7 +20,7 @@
 // Define
 //
 #define	RECIEVEPACKETTHREADID		5
-#define	RECIEVEPACKETTHREADNAME		_T("ReceivePacketThead")
+#define	RECIEVEPACKETTHREADNAME		_T("ReceivePacketThread")
 #define	WINDOWCLASS					_T("FlushMouseSynTPWindow-{B61BCEB9-5EB4-4835-9882-BDDE47E425E3}")
 
 //
@@ -39,7 +39,7 @@
 //class CSynTP : private CWindow, private CRawInput
 //
 CSynTP::CSynTP()
-	:	uuTickCount64(), Sender(), Receiver(), ReceivePacketThead()
+	:	uuTickCount64(), Sender(), Receiver(), ReceivePacketThread()
 {
 	HIDRawInput = NULL;
 	lpSynTPData = new SYNTPDATA[sizeof(SYNTPDATA)];
@@ -51,8 +51,16 @@ CSynTP::~CSynTP()
 	if (hGetHWND()) {
 		SendMessage(hGetHWND(), WM_DESTROY, 0, 0);
 	}
-	if (Sender)		vStoptSender();
-	if (Receiver)	vStopReceiver();
+	if (Sender)	delete Sender;
+	Sender = NULL;
+	if (ReceivePacketThread != NULL) {
+		ReceivePacketThread->bSetSentinel(FALSE);
+		Sleep(10);
+		delete	ReceivePacketThread;
+		ReceivePacketThread = NULL;
+	}
+	if (Receiver)	delete Receiver;
+	Receiver = NULL;
 	if (lpSynTPData)	delete [] lpSynTPData;
 	lpSynTPData = NULL;
 	if (HIDRawInput)	delete HIDRawInput;
@@ -62,29 +70,30 @@ CSynTP::~CSynTP()
 //
 // bStartReceiver()
 //
-BOOL		CSynTP::bStartReceiver(HWND hWnd, LPCTSTR szIPAddress, int iPort)
+BOOL		CSynTP::bStartReceiver(HWND hWnd, int iPort)
 {
+	if ((hWnd == NULL) || (iPort == 0))	return FALSE;
 	if (hGetHWND() == NULL) {
 		if (!bRegister((HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE), WINDOWCLASS)) {
 			return FALSE;
 		}
 	}
 	if (Receiver == NULL)	Receiver = new CTCPIP;
-	if (ReceivePacketThead == NULL)	ReceivePacketThead = new CThread;
-	if (Receiver && ReceivePacketThead) {
-		if (!Receiver->bOpenPortForReceiveUDPv4(szIPAddress, iPort)) return FALSE;
-		if (ReceivePacketThead) {
-			if (ReceivePacketThead->bRegister(RECIEVEPACKETTHREADNAME, RECIEVEPACKETTHREADID,
-				(LPTHREAD_START_ROUTINE)&bReceivePacketTheadRoutine, this, 0)) {
-				ReceivePacketThead->bSetSentinel(TRUE);
-				if (!ReceivePacketThead->bStart()) {
-					if (ReceivePacketThead != NULL) {
-						delete	ReceivePacketThead;
-						ReceivePacketThead = NULL;
+	if (ReceivePacketThread == NULL)	ReceivePacketThread = new CThread;
+	if (Receiver && ReceivePacketThread) {
+		if (!Receiver->bOpenPortForReceiveUDPv4(iPort)) return FALSE;
+		if (ReceivePacketThread) {
+			if (ReceivePacketThread->bRegister(RECIEVEPACKETTHREADNAME, RECIEVEPACKETTHREADID,
+				(LPTHREAD_START_ROUTINE)&bReceivePacketThreadRoutine, this, 0)) {
+				ReceivePacketThread->bSetSentinel(TRUE);
+				if (!ReceivePacketThread->bStart()) {
+					if (ReceivePacketThread != NULL) {
+						delete	ReceivePacketThread;
+						ReceivePacketThread = NULL;
 					}
-					ReceivePacketThead = new CThread;
-					if (!ReceivePacketThead->bRegister(RECIEVEPACKETTHREADNAME, RECIEVEPACKETTHREADID,
-						(LPTHREAD_START_ROUTINE)&bReceivePacketTheadRoutine, this, 0)) {
+					ReceivePacketThread = new CThread;
+					if (!ReceivePacketThread->bRegister(RECIEVEPACKETTHREADNAME, RECIEVEPACKETTHREADID,
+						(LPTHREAD_START_ROUTINE)&bReceivePacketThreadRoutine, this, 0)) {
 						return FALSE;
 					}
 				}
@@ -96,7 +105,6 @@ BOOL		CSynTP::bStartReceiver(HWND hWnd, LPCTSTR szIPAddress, int iPort)
 
 	}
 	return TRUE;
-
 }
 
 //
@@ -107,11 +115,11 @@ void		CSynTP::vStopReceiver()
 	if (hGetHWND()) {
 		SendMessage(hGetHWND(), WM_DESTROY, 0, 0);
 	}
-	if (ReceivePacketThead != NULL) {
-		ReceivePacketThead->bSetSentinel(FALSE);
+	if (ReceivePacketThread != NULL) {
+		ReceivePacketThread->bSetSentinel(FALSE);
 		Sleep(10);
-		delete	ReceivePacketThead;
-		ReceivePacketThead = NULL;
+		delete	ReceivePacketThread;
+		ReceivePacketThread = NULL;
 	}
 	if (Receiver)	delete Receiver;
 	Receiver = NULL;
@@ -122,6 +130,7 @@ void		CSynTP::vStopReceiver()
 //
 BOOL		CSynTP::bStartSender(HWND hWnd, LPCTSTR szIPAddress, int iPort)
 {
+	if ((hWnd == NULL) || (szIPAddress == NULL) || (iPort == 0))	return FALSE;
 	if (lpSynTPData) {
 		if (!bGetSetSynTPSpecFromReg())	return FALSE;
 	}
@@ -130,7 +139,7 @@ BOOL		CSynTP::bStartSender(HWND hWnd, LPCTSTR szIPAddress, int iPort)
 	if (Sender) {
 		if (!Sender->bOpenPortForSendUDPv4(szIPAddress, iPort)) return FALSE;
 	}
-	
+
 	if (hGetHWND() == NULL) {
 		if (!bRegister((HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE), WINDOWCLASS)) {
 			return FALSE;
@@ -149,7 +158,6 @@ void		CSynTP::vStoptSender()
 	}
 	if (Sender)	delete Sender;
 	Sender = NULL;
-
 }
 
 //
@@ -179,13 +187,13 @@ BOOL		CSynTP::bRegister(HINSTANCE hInstance, LPCTSTR szWindowClassName)
 #define		EX_WINDOWSTYLE	(WS_EX_LAYERED | WS_EX_NOACTIVATE)
 #define		WINDOWSTYLE		(WS_POPUP)
 	if (!bCreateWindowEx(
-						EX_WINDOWSTYLE,
-						NULL,
-						WINDOWSTYLE,
-						0, 0,
-						0, 0,
-						NULL,
-						NULL)
+		EX_WINDOWSTYLE,
+		NULL,
+		WINDOWSTYLE,
+		0, 0,
+		0, 0,
+		NULL,
+		NULL)
 		)	return FALSE;
 
 
@@ -251,10 +259,7 @@ Cleanup:
 //
 LRESULT CALLBACK CSynTP::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	// void		Cls_OnInput(HWND hWnd, DWORD dwFlags, HRAWINPUT hRawInput);
 #define HANDLE_WM_INPUT(hWnd, wParam, lParam, fn) ((fn)((hWnd), (DWORD)(GET_RAWINPUT_CODE_WPARAM(wParam)), (HRAWINPUT)(lParam)), 0L)
-
-	// void		Cls_OnInputDeviceChange(HWND hWnd, WPARAM wParam, HANDLE hDevice);
 #define HANDLE_WM_INPUT_DEVICE_CHANGE(hWnd, wParam, lParam, fn) ((fn)((hWnd), (WPARAM)(wParam), (HANDLE)(lParam)), 0L)
 
 
@@ -263,8 +268,6 @@ LRESULT CALLBACK CSynTP::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 		HANDLE_MSG(hWnd, WM_DESTROY, Cls_OnDestroy);
 		HANDLE_MSG(hWnd, WM_INPUT, Cls_OnInput);
 		HANDLE_MSG(hWnd, WM_INPUT_DEVICE_CHANGE, Cls_OnInputDeviceChange);
-		HANDLE_MSG(hWnd, WM_MOUSEWHEELEX, Cls_OnMouseWheelEx);
-		HANDLE_MSG(hWnd, WM_MOUSEHWHEELEX, Cls_OnMouseHWheelEx);
 	default:
 		break;
 	}
@@ -305,43 +308,17 @@ void		CSynTP::Cls_OnDestroy(HWND hWnd)
 {
 	UNREFERENCED_PARAMETER(hWnd);
 
-	if (ReceivePacketThead != NULL) {
-		ReceivePacketThead->bSetSentinel(FALSE);
+	if (ReceivePacketThread != NULL) {
+		ReceivePacketThread->bSetSentinel(FALSE);
 		Sleep(10);
-		delete	ReceivePacketThead;
-		ReceivePacketThead = NULL;
+		delete	ReceivePacketThread;
+		ReceivePacketThread = NULL;
 	}
 
 	if (HIDRawInput != NULL) {
 		delete HIDRawInput;
 		HIDRawInput = NULL;
 	}
-}
-
-//
-// Cls_OnMouseWheelEx()
-//
-void		CSynTP::Cls_OnMouseWheelEx(HWND hWnd, int xPos, int yPos, int zDelta, UINT fwKeys)
-{
-	UNREFERENCED_PARAMETER(hWnd);
-	UNREFERENCED_PARAMETER(fwKeys);
-
-	if (zDelta == 0)	return;
-	bSendInput(MOUSEEVENTF_WHEEL, xPos, yPos, zDelta);
-	return;
-}
-
-//
-// Cls_OnMouseWheelEx()
-//
-void		CSynTP::Cls_OnMouseHWheelEx(HWND hWnd, int xPos, int yPos, int zDelta, UINT fwKeys)
-{
-	UNREFERENCED_PARAMETER(hWnd);
-	UNREFERENCED_PARAMETER(fwKeys);
-
-	if (zDelta == 0)	return;
-	bSendInput(MOUSEEVENTF_HWHEEL, xPos, yPos, zDelta);
-	return;
 }
 
 //
@@ -369,9 +346,9 @@ BOOL		CSynTP::bSendInput(DWORD dwFlags, int xPos, int yPos, int zDelta)
 //
 void		CSynTP::Cls_OnInput(HWND hWnd, DWORD dwFlags, HRAWINPUT hRawInput)
 {
-	HWND	hPlayerWnd = FindWindowEx(NULL, NULL, L"VMPlayerFrame", NULL);	
-	if (hPlayerWnd == NULL)	return;
-
+	if (!FindWindowEx(NULL, NULL, L"VMPlayerFrame", NULL) && !FindWindowEx(NULL, NULL, L"TscShellContainerClass", NULL)) {
+		return;
+	}
 	if (HIDRawInput)	vRawInputDevicesHandler(hWnd, dwFlags, hRawInput);
 }
 
@@ -439,109 +416,129 @@ void	CSynTP::vRawInputHIDHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawInput
 //
 void		CSynTP::vSynTPMouseData(PCHAR Report)
 {
-#define	makeAxis(hi, lo)	(((DWORD)hi << 8) & 0xff00) | (((DWORD)lo & 0x00ff))
-#define STOP	0
-#define UP		1
-#define DOWN	(-1)
-#define LEFT	1
-#define RIGHT	(-1)
+#define	makeAxis(hi, lo)	((SHORT)(((DWORD)hi << 8) & 0xff00) | (((DWORD)lo & 0x00ff)))
+#define STOP			0
+#define UP				1
+#define DOWN			(-1)
+#define LEFT			1
+#define RIGHT			(-1)
 
 	if (lpSynTPData && Report) {
 		LPSYNTPRAWDATA	lpSynTPRawData = (LPSYNTPRAWDATA)Report;
 
-		SHORT oldX = makeAxis(lpSynTPData->stSynRawData.stFinger1.hiX, lpSynTPData->stSynRawData.stFinger1.loX);
-		SHORT oldY = makeAxis(lpSynTPData->stSynRawData.stFinger1.hiY, lpSynTPData->stSynRawData.stFinger1.loY);
-		SHORT newX = makeAxis(lpSynTPRawData->stFinger1.hiX, lpSynTPRawData->stFinger1.loX);
-		SHORT newY = makeAxis(lpSynTPRawData->stFinger1.hiY, lpSynTPRawData->stFinger1.loY);
+		SHORT	newX = makeAxis(lpSynTPRawData->stFinger1.hiX, lpSynTPRawData->stFinger1.loX);
+		SHORT	newY = makeAxis(lpSynTPRawData->stFinger1.hiY, lpSynTPRawData->stFinger1.loY);
+		SHORT	deltaX = newX - makeAxis(lpSynTPData->stSynRawData.stFinger1.hiX, lpSynTPData->stSynRawData.stFinger1.loX);
+		SHORT	deltaY = newY - makeAxis(lpSynTPData->stSynRawData.stFinger1.hiY, lpSynTPData->stSynRawData.stFinger1.loY);
 
 		if (lpSynTPRawData->stFinger1.bTouched == 0) {
 			ZeroMemory(&(lpSynTPData->stSynRawData), sizeof(SYNTPRAWDATA));
-			lpSynTPData->iYStart = STOP;	lpSynTPData->iYStart = STOP;
-			lpSynTPData->iXStart = STOP;	lpSynTPData->iXStart = STOP;
+			lpSynTPData->iYStart = STOP;
+			lpSynTPData->iXStart = STOP;
 			lpSynTPData->iWheelStart = STOP;
 		}
-		else if (lpSynTPData->iYStart == UP) {
-			if (newY < (lpSynTPData->rcSynTP.bottom + lpSynTPData->sTouchZoneY)) {
-				vSynTPSendMouseData(WM_MOUSEWHEEL, (-20));
-			}
-			else if ((newY - oldY) != 0) {
-				if ((newY - oldY) < 0) {
-					vSynTPSendMouseData(WM_MOUSEWHEEL, (newY - oldY) * 5);
-				}
-				else if ((newY - oldY) > 0) {
-					lpSynTPData->iYStart = DOWN;
-				}
-			}
-		}
-		else if (lpSynTPData->iYStart == DOWN) {
-			if (newY > (lpSynTPData->rcSynTP.top - lpSynTPData->sTouchZoneY)) {
-				vSynTPSendMouseData(WM_MOUSEWHEEL, (20));
-			}
-			else if ((newY - oldY) != 0) {
-				if ((newY - oldY) < 0) {
-					lpSynTPData->iYStart = UP;
-				}
-				else if ((newY - oldY) > 0) {
-					vSynTPSendMouseData(WM_MOUSEWHEEL, (newY - oldY) * 5);
-				}
-			}
-		}
-		else if (lpSynTPData->iXStart == LEFT) {
-			if (newX < (lpSynTPData->rcSynTP.left + lpSynTPData->sTouchZoneX)) {
-				vSynTPSendMouseData(WM_MOUSEHWHEEL, (-3));
-			}
-			else if ((newX - oldX) != 0) {
-				if ((newX - oldX) < 0) {
-					vSynTPSendMouseData(WM_MOUSEHWHEEL, (newX - oldX));
-				}
-				else if ((newX - oldX) > 0) {
-					lpSynTPData->iXStart = RIGHT;
-				}
-			}
-		}
-		else if (lpSynTPData->iXStart == RIGHT) {
-			if (newX > (lpSynTPData->rcSynTP.right - lpSynTPData->sTouchZoneX)) {
-				vSynTPSendMouseData(WM_MOUSEHWHEEL, (3));
-			}
-			else if ((newX - oldX) != 0) {
-				if ((newX - oldX) < 0) {
-					lpSynTPData->iXStart = LEFT;
-				}
-				else if ((newX - oldX) > 0) {
-					vSynTPSendMouseData(WM_MOUSEHWHEEL, (newX - oldX));
-				}
-			}
-		}
-		else if (lpSynTPData->iWheelStart == UP) {
-			SHORT	centerX = (SHORT)(lpSynTPData->rcSynTP.right - lpSynTPData->rcSynTP.left) / 2;
-			if ((centerX > newX) && ((newY - oldY) < 0))	lpSynTPData->iWheelStart = DOWN;
-			else if ((centerX < newX) && ((newY - oldY) > 0))	lpSynTPData->iWheelStart = DOWN;
-			else vSynTPSendMouseData(WM_MOUSEWHEEL, (10));
-		}
-		else if (lpSynTPData->iWheelStart == DOWN) {
-			SHORT	centerX = (SHORT)(lpSynTPData->rcSynTP.right - lpSynTPData->rcSynTP.left) / 2;
-			if ((centerX < newX) && ((newY - oldY) < 0))	lpSynTPData->iWheelStart = UP;
-			else if ((centerX > newX) && ((newY - oldY) > 0))	lpSynTPData->iWheelStart = UP;
-			else vSynTPSendMouseData(WM_MOUSEWHEEL, (-10));
-		}
 		else if ((lpSynTPRawData->stFinger1.bTouched != 0) && ((lpSynTPRawData->stFinger2.bTouched != 0) || (lpSynTPRawData->stFinger3.bTouched != 0))) {
-			if ((newY - oldY) < 0) {
-				lpSynTPData->iYStart = UP;
-			}
-			else if ((newY - oldY) > 0) {
-				lpSynTPData->iYStart = DOWN;
+			if ((lpSynTPData->iYStart == STOP) && (lpSynTPData->iXStart == STOP)) {
+#define	TOUCH_MARGIN	2
+				if ((abs(deltaY) + TOUCH_MARGIN) >= abs(deltaX)) {
+					if (deltaY < 0) {
+						lpSynTPData->iYStart = UP;
+						vSynTPSendMouseData(WM_MOUSEWHEEL, (+WHEEL_DELTA));
+					}
+					else if (deltaY > 0) {
+						lpSynTPData->iYStart = DOWN;
+						vSynTPSendMouseData(WM_MOUSEWHEEL, (-WHEEL_DELTA));
+					}
+				}
+				else {
+					if (deltaX < 0) {
+						lpSynTPData->iXStart = LEFT;
+						vSynTPSendMouseData(WM_MOUSEHWHEEL, (+WHEEL_DELTA));
+					}
+					else if (deltaX > 0) {
+						lpSynTPData->iXStart = RIGHT;
+						vSynTPSendMouseData(WM_MOUSEHWHEEL, (-WHEEL_DELTA));
+					}	
+				}
+				return;
 			}
 		}
-		else if ((lpSynTPRawData->stFinger1.bTouched != 0) && ((lpSynTPRawData->stFinger2.bTouched == 0) && (lpSynTPRawData->stFinger3.bTouched == 0))) {
-#define	TOUCH_AREA_MARGIN	5
-			if (((lpSynTPData->rcSynTP.right - lpSynTPData->sTouchZoneX) < newX)
+		if (lpSynTPRawData->stFinger1.bTouched != 0) {
+			if (lpSynTPData->iYStart == UP) {
+				if (newY < (lpSynTPData->rcSynTP.bottom + lpSynTPData->sTouchZoneY)) {
+					vSynTPSendMouseData(WM_MOUSEWHEEL, (+WHEEL_DELTA) / 3);
+				}
+				else if (deltaY != 0) {
+					if (deltaY < 0) {
+						vSynTPSendMouseData(WM_MOUSEWHEEL, (+WHEEL_DELTA));
+					}
+					else if (deltaY > 0) {
+						lpSynTPData->iYStart = DOWN;
+					}
+				}
+			}
+			else if (lpSynTPData->iYStart == DOWN) {
+				if (newY > (lpSynTPData->rcSynTP.top - lpSynTPData->sTouchZoneY)) {
+					vSynTPSendMouseData(WM_MOUSEWHEEL, (-WHEEL_DELTA) / 3);
+				}
+				else if (deltaY != 0) {
+					if (deltaY < 0) {
+						lpSynTPData->iYStart = UP;
+					}
+					else if (deltaY > 0) {
+						vSynTPSendMouseData(WM_MOUSEWHEEL, (-WHEEL_DELTA));
+					}
+				}
+			}
+			else if (lpSynTPData->iXStart == LEFT) {
+				if (newX < (lpSynTPData->rcSynTP.left + lpSynTPData->sTouchZoneX)) {
+					vSynTPSendMouseData(WM_MOUSEHWHEEL, (+WHEEL_DELTA) / 3);
+				}
+				else if (deltaX != 0) {
+					if (deltaX < 0) {
+						vSynTPSendMouseData(WM_MOUSEHWHEEL, (+WHEEL_DELTA));
+					}
+					else if (deltaX > 0) {
+						lpSynTPData->iXStart = RIGHT;
+					}
+				}
+			}
+			else if (lpSynTPData->iXStart == RIGHT) {
+				if (newX > (lpSynTPData->rcSynTP.right - lpSynTPData->sTouchZoneX)) {
+					vSynTPSendMouseData(WM_MOUSEHWHEEL, (-WHEEL_DELTA) / 3);
+				}
+				else if (deltaX != 0) {
+					if (deltaX < 0) {
+						lpSynTPData->iXStart = LEFT;
+					}
+					else if (deltaX > 0) {
+						vSynTPSendMouseData(WM_MOUSEHWHEEL, (-WHEEL_DELTA));
+					}
+				}
+			}
+			else if (lpSynTPData->iWheelStart == UP) {
+				SHORT	centerX = (SHORT)(lpSynTPData->rcSynTP.right - lpSynTPData->rcSynTP.left) / 2;
+				if ((centerX >= newX) && (deltaY < 0))		lpSynTPData->iWheelStart = DOWN;
+				else if ((centerX < newX) && (deltaY > 0))	lpSynTPData->iWheelStart = DOWN;
+				else vSynTPSendMouseData(WM_MOUSEWHEEL, (-WHEEL_DELTA));
+			}
+			else if (lpSynTPData->iWheelStart == DOWN) {
+				SHORT	centerX = (SHORT)(lpSynTPData->rcSynTP.right - lpSynTPData->rcSynTP.left) / 2;
+				if ((centerX <= newX) && (deltaY < 0))		lpSynTPData->iWheelStart = UP;
+				else if ((centerX > newX) && (deltaY > 0))	lpSynTPData->iWheelStart = UP;
+				else vSynTPSendMouseData(WM_MOUSEWHEEL, (+WHEEL_DELTA));
+			}
+			else if ((lpSynTPRawData->stFinger1.bTouched != 0) && ((lpSynTPRawData->stFinger2.bTouched == 0) && (lpSynTPRawData->stFinger3.bTouched == 0))) {
+#define		TOUCH_AREA_MARGIN	5
+				if (((lpSynTPData->rcSynTP.right - lpSynTPData->sTouchZoneX) < newX)
 					&& ((((lpSynTPData->rcSynTP.top - lpSynTPData->rcSynTP.bottom) / 2) - TOUCH_AREA_MARGIN) < newY)
 					&& ((((lpSynTPData->rcSynTP.top - lpSynTPData->rcSynTP.bottom) / 2) + TOUCH_AREA_MARGIN) > newY)) {
-				if ((newY - oldY) < 0) {
-					lpSynTPData->iWheelStart = UP;
-				}
-				else if ((newY - oldY) > 0) {
-					lpSynTPData->iWheelStart = DOWN;
+					if (deltaY < 0) {
+						lpSynTPData->iWheelStart = DOWN;
+					}
+					else if (deltaY > 0) {
+						lpSynTPData->iWheelStart = UP;
+					}
 				}
 			}
 		}
@@ -552,62 +549,68 @@ void		CSynTP::vSynTPMouseData(PCHAR Report)
 }
 
 //
-// bReceivePacketTheadRoutine()
+// bReceivePacketThreadRoutine()
 //
-BOOL		CSynTP::bReceivePacketTheadRoutine(LPVOID lpvParam)
+BOOL		CSynTP::bReceivePacketThreadRoutine(LPVOID lpvParam)
 {
 	if (lpvParam == NULL)	return FALSE;
 	CSynTP	*This = reinterpret_cast<CSynTP*>(lpvParam);
 
-	CHAR	szRecieveData[DATA_BUFFER_SIZE]{};
+#define RECEIVE_LAP_TIME	1
+	ULONGLONG	uuTickCount64 = 0, _uuTickCount64 = 0;
+	CHAR	szRecieveData[SYNTP_DATA_BUFFER_SIZE]{};
+
+	if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST)) {
+		return FALSE;
+	}
 	do {
 		if (This == NULL)	return FALSE;
 		ZeroMemory(szRecieveData, sizeof(szRecieveData));
 		if (This->Receiver)	This->Receiver->bReceivePackaet(szRecieveData, sizeof(szRecieveData));
 		if (szRecieveData[0] == '\0')	continue;
-		size_t	size = strnlen_s(szRecieveData, DATA_BUFFER_SIZE);
-		if (size < DATA_BUFFER_SIZE)	szRecieveData[(size + 1)] = NULL;
-		POINT	pt{};
-		GetCursorPos(&pt);
-		int	iMouseData = atoi(&szRecieveData[2]);
-		if (iMouseData == 0)	continue;
-		if (szRecieveData[0] == 'Y') {
-			PostMessage(This->hGetHWND(), WM_MOUSEWHEELEX, MAKEWPARAM((0), (iMouseData)), MAKELPARAM((pt.x), (pt.y)));
+		_uuTickCount64 = GetTickCount64();
+		if ((_uuTickCount64 - uuTickCount64) > RECEIVE_LAP_TIME) {
+			uuTickCount64 = _uuTickCount64;
+			size_t	size = strnlen_s(szRecieveData, SYNTP_DATA_BUFFER_SIZE);
+			if (size < SYNTP_DATA_BUFFER_SIZE)	szRecieveData[size] = NULL;
+			POINT	pt{};
+			GetCursorPos(&pt);
+			int	iMouseData = atoi(&szRecieveData[2]);
+			if (iMouseData == 0)	continue;
+			if (szRecieveData[0] == 'Y') {
+				This->bSendInput(MOUSEEVENTF_WHEEL, pt.x, pt.y, iMouseData);
+			}
+			else if (szRecieveData[0] == 'X') {
+				This->bSendInput(MOUSEEVENTF_HWHEEL, pt.x, pt.y, iMouseData);
+			}
+			else continue;
 		}
-		else if (szRecieveData[0] == 'X') {
-			PostMessage(This->hGetHWND(), WM_MOUSEHWHEELEX, MAKEWPARAM((0), (iMouseData)), MAKELPARAM((pt.x), (pt.y)));
-		}
-		else continue;
-	} while (This->ReceivePacketThead->bCheckSentinel());
+	} while (This->ReceivePacketThread->bCheckSentinel());
 	return TRUE;
 }
 
 //
 // vSynTPSendMouseData()
 //
-void		CSynTP::vSynTPSendMouseData(UINT message, int iDelta)
+void		CSynTP::vSynTPSendMouseData(UINT message, SHORT zDelta)
 {
 	UNREFERENCED_PARAMETER(message);
-	UNREFERENCED_PARAMETER(iDelta);
 
-#define SEND_LAP_TIME	50
-
-	ULONGLONG	_uuTickCount64 = GetTickCount64();
+#define SEND_LAP_TIME	150
+	ULONGLONG	_uuTickCount64= GetTickCount64();
 	if ((_uuTickCount64 - uuTickCount64) > SEND_LAP_TIME) {
 		uuTickCount64 = _uuTickCount64;
-		int	_zDelta = (0 - iDelta);
-
-		CHAR	szSendData[DATA_BUFFER_SIZE]{};
+		CHAR	szSendData[SYNTP_DATA_BUFFER_SIZE]{};
 		if (message == WM_MOUSEWHEEL) {
-			_snprintf_s(szSendData, sizeof(szSendData), "Y %+05d", (SHORT)_zDelta);
+			_snprintf_s(szSendData, sizeof(szSendData), "Y %+05d", (SHORT)zDelta);
 		}
 		else if (message == WM_MOUSEHWHEEL) {
-			_snprintf_s(szSendData, sizeof(szSendData), "X %+05d", (SHORT)_zDelta);
+			_snprintf_s(szSendData, sizeof(szSendData), "X %+05d", (SHORT)zDelta);
 		}
 		else return;
 
-		size_t	size = strnlen_s(szSendData, DATA_BUFFER_SIZE);
-		if (Sender)	Sender->bSendPacket((LPCSTR)szSendData, (int)((size + 1) * sizeof(CHAR)));
+		size_t	cbSize = strnlen_s(szSendData, SYNTP_DATA_BUFFER_SIZE);
+		if (Sender)	Sender->bSendPacket((LPCSTR)szSendData, (int)((cbSize + 1) * sizeof(CHAR)));
 	}
 }
 

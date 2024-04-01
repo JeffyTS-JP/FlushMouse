@@ -429,22 +429,22 @@
 				<File Id="$(var.ProductName)DLL32.dll" Name="$(var.ProductName)DLL32.dll" Source="$(var.TargetDir02)$(var.ProductName)DLL32.dll" />
 			</Component>
 			<Component Id="Register_TaskScheduler.xml" Guid="{3FA0C6AB-6E9C-4B55-BE44-A02A3B6A0C3E}">
-				<File Id="Register_TaskScheduler.xml" Name="Register_TaskScheduler.xml" Source="$(var.TargetDir04)Register_TaskScheduler.xml" />
+				<File Id="Register_TaskScheduler.xml" Name="Register_TaskScheduler.xml" Source="$(var.TargetDir04)..\..\SetupProject\Register_TaskScheduler.xml" />
 			</Component>
 			<Component Id="Register_TaskScheduler1.xml" Guid="{FCA13B82-211A-4716-B6F0-C8AECCE4C72B}">
-				<File Id="Register_TaskScheduler1.xml" Name="Register_TaskScheduler1.xml" Source="$(var.TargetDir04)Register_TaskScheduler1.xml" />
+				<File Id="Register_TaskScheduler1.xml" Name="Register_TaskScheduler1.xml" Source="$(var.TargetDir04)..\..\SetupProject\Register_TaskScheduler1.xml" />
 			</Component>
 			<Component Id="Register_TaskScheduler2.xml" Guid="{17BD4844-87C4-4A06-BBF3-86C94D22C5DC}">
-				<File Id="Register_TaskScheduler2.xml" Name="Register_TaskScheduler2.xml" Source="$(var.TargetDir04)Register_TaskScheduler2.xml" />
+				<File Id="Register_TaskScheduler2.xml" Name="Register_TaskScheduler2.xml" Source="$(var.TargetDir04)..\..\SetupProject\Register_TaskScheduler2.xml" />
 			</Component>
 			<Component Id="License.rtf" Guid="{E6E55A92-6BE8-4612-8172-0BC04811D6E1}">
 				<File Id="License.rtf" Name="License.rtf" Source="$(var.TargetDir04)License.rtf" />
 			</Component>
 			<Component Id="Readme.txt" Guid="{061E1F61-3726-49AC-A504-2A4D115635F3}">
-				<File Id="Readme.txt" Name="Readme.txt" Source="$(var.TargetDir04)Readme.txt" />
+				<File Id="Readme.txt" Name="Readme.txt" Source="$(var.TargetDir04)..\..\SetupProject\Readme.txt" />
 			</Component>
 			<Component Id="Register_Eventlog.reg" Guid="{FBC3FF68-EF97-43F1-BE86-5F5CFC3AE4F1}">
-				<File Id="Register_Eventlog.reg" Name="Register_Eventlog.reg" Source="$(var.TargetDir04)Register_Eventlog.reg" />
+				<File Id="Register_Eventlog.reg" Name="Register_Eventlog.reg" Source="$(var.TargetDir04)..\..\SetupProject\Register_Eventlog.reg" />
 			</Component>
 			<!-- For WinUI3 -->
 			<!-- DLL -->

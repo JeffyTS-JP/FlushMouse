@@ -57,7 +57,7 @@ DLLEXPORT BOOL  __stdcall bGlobalHookSet(HWND hWnd)
 				HHOOK	hHook = SetWindowsHookEx(WH_CALLWNDPROCRET, (HOOKPROC)lpGlobalHookProc, hGLInstance, 0);
 				if (hHook) {
 					lpDatGlobal->hHook = hHook;	hHookGL = hHook;
-					if (CSharedMem->bSharedMemoryWrite(lpDatGlobal)) {
+					if (CSharedMem && lpDatGlobal && hWnd && CSharedMem->bSharedMemoryWrite(lpDatGlobal)) {
 						SendMessage(hWnd, WM_HOOKEX, 0, INJECT_HOOK);
 						return TRUE;
 					}

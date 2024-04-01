@@ -20,7 +20,7 @@
 //
 // Define
 // 
-#define	DATA_BUFFER_SIZE		16					// "X -0000 0000" + α
+#define	SYNTP_DATA_BUFFER_SIZE		8					// "X/Y -/+0000"
 
 //
 // Struct Define
@@ -66,7 +66,6 @@ typedef struct SynTPData
 	int		iXStart;
 	int		iYStart;
 	int		iWheelStart;
-
 	RECT	rcSynTP;
 	SHORT	sTouchZoneX;
 	SHORT	sTouchZoneY;
@@ -80,7 +79,7 @@ public:
 	~CSynTP();
 
 public:
-	BOOL		bStartReceiver(HWND hWnd, LPCTSTR szIPAddress, int iPort);
+	BOOL		bStartReceiver(HWND hWnd, int iPort);
 	void		vStopReceiver();
 	BOOL		bStartSender(HWND hWnd, LPCTSTR szIPAddress, int iPort);
 	void		vStoptSender();
@@ -94,14 +93,12 @@ private:
 	void		Cls_OnDestroy(HWND hWnd);
 	void		Cls_OnInput(HWND hWnd, DWORD dwFlags, HRAWINPUT hRawInput);
 	void		Cls_OnInputDeviceChange(HWND hWnd, WPARAM wParam, HANDLE hDevice);
-	void		Cls_OnMouseWheelEx(HWND hWnd, int xPos, int yPos, int zDelta, UINT fwKeys);
-	void		Cls_OnMouseHWheelEx(HWND hWnd, int xPos, int yPos, int zDelta, UINT fwKeys);
 
 	BOOL		bSendInput(DWORD dwFlags, int xPos, int yPos, int zDelta);
 	void		vRawInputHIDHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawInput);
 	void		vSynTPMouseData(PCHAR Report);
-	void		vSynTPSendMouseData(UINT message, int iDelta);
-	static BOOL WINAPI	bReceivePacketTheadRoutine(LPVOID lpvParam);
+	void		vSynTPSendMouseData(UINT message, SHORT zDelta);
+	static BOOL WINAPI	bReceivePacketThreadRoutine(LPVOID lpvParam);
 
 public:
 
@@ -114,7 +111,7 @@ private:
 	CTCPIP			*Sender;
 	CTCPIP			*Receiver;
 
-	CThread			*ReceivePacketThead;
+	CThread			*ReceivePacketThread;
 };
 
 

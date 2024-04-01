@@ -28,6 +28,7 @@ extern BOOL		bCheckTaskTrayMessage(HWND hWnd, UINT message);
 extern BOOL		bReCreateTaskTrayWindow(HWND hWnd);
 extern BOOL		bDestroyTaskTrayWindow(HWND hWnd);
 extern BOOL		bGetTaskTrayWindowRect(HWND hWnd, LPRECT lpRect);
+extern void		Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify);
 extern void		Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg);
 
 

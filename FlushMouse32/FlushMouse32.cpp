@@ -107,8 +107,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		CloseHandle(hHandle);
 	}
 
-	bReportEvent(MSG_STARTING_FLUSHMOUSE, APPLICATION32_CATEGORY);
-
 	if (*lpCmdLine == _T('\0')) {
 		if ((hParentWnd = FindWindow(CLASS_FLUSHMOUSE, NULL)) == NULL) {
 			vMessageBox(NULL, IDS_NOTFORKBY64, MessageBoxTYPE);
@@ -171,7 +169,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		}
 	}
 
-	bReportEvent(MSG_STOPPED_FLUSHMOUSE, APPLICATION32_CATEGORY);
 	return (int)msg.wParam;
 }
 
@@ -252,6 +249,13 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 	UNREFERENCED_PARAMETER(lpCreateStruct);
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK)
 	
+	PowerNotification = new CPowerNotification(hWnd);
+	if (PowerNotification == NULL) {
+		vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE);
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+		return FALSE;
+	}
+
 	BOOL	bBool = FALSE;
 	if (SetUserObjectInformation(GetCurrentProcess(), UOI_TIMERPROC_EXCEPTION_SUPPRESSION, &bBool, sizeof(BOOL)) != FALSE) {
 		if (uCheckProcTimer == NULL) {
@@ -268,14 +272,6 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		return FALSE;
 	}
 
-	PowerNotification = new CPowerNotification(hWnd);
-	if (PowerNotification == NULL) {
-		vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE);
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-		return FALSE;
-	}
-	
-	bReportEvent(MSG_STARTED_FLUSHMOUSE, APPLICATION32_CATEGORY);
 	return TRUE;
 }
 
@@ -285,8 +281,6 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 //
 static void Cls_OnDestroy(HWND hWnd)
 {
-	bReportEvent(MSG_QUIT_FLUSHMOUSE, APPLICATION32_CATEGORY);
-
 	if (uCheckProcTimer != NULL) {
 		if (KillTimer(hWnd, nCheckProcTimerID)) {
 			uCheckProcTimer = NULL;
@@ -321,7 +315,6 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 
 	if (uTimerID == nCheckProcTimerID) {
 		if (FindWindow(CLASS_FLUSHMOUSE, NULL) == NULL) {
-			bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION32_CATEGORY);
 			if (uCheckProcTimer != NULL) {
 				if (KillTimer(hWnd, nCheckProcTimerID)) {
 					uCheckProcTimer = NULL;
@@ -451,8 +444,6 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 		break;
 	case PBT_APMRESUMESUSPEND:
 		bReportEvent(MSG_PBT_APMRESUMESUSPEND, POWERNOTIFICATION_CATEGORY);
-		bDestroyTaskTrayWindow(hWnd);
-		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, POWERNOTIFICATION_CATEGORY);
 		break;
 	case PBT_POWERSETTINGCHANGE:
 		break;
@@ -462,14 +453,10 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 			switch (PowerStatus.ACLineStatus) {
 			case 0:
 				bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_OFF, POWERNOTIFICATION_CATEGORY);
-				bDestroyTaskTrayWindow(hWnd);
-				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, POWERNOTIFICATION_CATEGORY);
-				return TRUE;
+				break;
 			case 1:
 				bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_ON, POWERNOTIFICATION_CATEGORY);
-				bDestroyTaskTrayWindow(hWnd);
-				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, POWERNOTIFICATION_CATEGORY);
-				return TRUE;
+				break;
 			default:
 				break;
 			}
@@ -480,10 +467,8 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 				|| (lpPwrSetting->PowerSetting == GUID_MONITOR_POWER_ON)
 				|| (lpPwrSetting->PowerSetting == GUID_SESSION_DISPLAY_STATUS)) {
 				if (lpPwrSetting->Data[0] == 0) {
-					bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_OFF, POWERNOTIFICATION_CATEGORY);
 				}
 				else {
-					bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_ON, POWERNOTIFICATION_CATEGORY);
 				}
 			}
 		}

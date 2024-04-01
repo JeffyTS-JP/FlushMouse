@@ -174,18 +174,21 @@ BOOL		CRegistry::bReadRegValueString(HKEY hKey, LPCTSTR lpszSubKey, LPCTSTR szVa
 	LSTATUS	lStatus = 0;
 	HKEY	hKeySub = NULL;
 	BOOL	bRet = FALSE;
-	if ((lStatus = RegOpenKeyEx(hKey, lpszSubKey, 0, KEY_READ | KEY_WOW64_64KEY, &hKeySub)) == ERROR_SUCCESS) {
-		DWORD	dwLen = 0;
-		if ((lStatus = RegQueryValueEx(hKeySub, szValue, NULL, NULL, NULL, &dwLen)) == ERROR_SUCCESS) {
-			if ((dwLen <= (_MAX_PATH * sizeof(TCHAR)) && (dwLen <= dwDataSize))) {
-				if ((lStatus = RegQueryValueEx(hKeySub, szValue, NULL, NULL, (LPBYTE)szData, &dwLen)) == ERROR_SUCCESS) {
-					bRet = TRUE;
+	if (dwDataSize <= 1024) {
+		if ((lStatus = RegOpenKeyEx(hKey, lpszSubKey, 0, KEY_READ | KEY_WOW64_64KEY, &hKeySub)) == ERROR_SUCCESS) {
+			DWORD	dwLen = 0;
+			if ((lStatus = RegQueryValueEx(hKeySub, szValue, NULL, NULL, NULL, &dwLen)) == ERROR_SUCCESS) {
+				if ((dwLen <= 1024) && (dwLen <= dwDataSize)) {
+					ZeroMemory(szData, dwDataSize);
+					if ((lStatus = RegQueryValueEx(hKeySub, szValue, NULL, NULL, (LPBYTE)szData, &dwLen)) == ERROR_SUCCESS) {
+						bRet = TRUE;
+					}
 				}
 			}
+			RegCloseKey(hKeySub);
 		}
-		RegCloseKey(hKeySub);
+		if (lStatus == ERROR_FILE_NOT_FOUND)	bRet = TRUE;
 	}
-	if (lStatus == ERROR_FILE_NOT_FOUND)	bRet = TRUE;
 	return	bRet;
 }
 
@@ -197,18 +200,21 @@ BOOL		CRegistry::bGetSetRegValueString(HKEY hKey, LPCTSTR lpszSubKey, LPCTSTR sz
 	LSTATUS	lStatus = 0;
 	HKEY	hKeySub = NULL;
 	BOOL	bRet = FALSE;
-	if ((lStatus = RegOpenKeyEx(hKey, lpszSubKey, 0, KEY_READ | KEY_WOW64_64KEY, &hKeySub)) == ERROR_SUCCESS) {
-		DWORD	dwLen = 0;
-		if ((lStatus = RegQueryValueEx(hKeySub, szValue, NULL, NULL, NULL, &dwLen)) == ERROR_SUCCESS) {
-			if ((dwLen <= (_MAX_PATH * sizeof(TCHAR)) && (dwLen <= dwDataSize))) {
-				if ((lStatus = RegQueryValueEx(hKeySub, szValue, NULL, NULL, (LPBYTE)szData, &dwLen)) == ERROR_SUCCESS) {
-					bRet = TRUE;
+	if (dwDataSize <= 1024) {
+		if ((lStatus = RegOpenKeyEx(hKey, lpszSubKey, 0, KEY_READ | KEY_WOW64_64KEY, &hKeySub)) == ERROR_SUCCESS) {
+			DWORD	dwLen = 0;
+			if ((lStatus = RegQueryValueEx(hKeySub, szValue, NULL, NULL, NULL, &dwLen)) == ERROR_SUCCESS) {
+				if ((dwLen <= 1024) && (dwLen <= dwDataSize)) {
+					ZeroMemory(szData, dwDataSize);
+					if ((lStatus = RegQueryValueEx(hKeySub, szValue, NULL, NULL, (LPBYTE)szData, &dwLen)) == ERROR_SUCCESS) {
+						bRet = TRUE;
+					}
 				}
 			}
+			RegCloseKey(hKeySub);
 		}
-		RegCloseKey(hKeySub);
+		if (lStatus == ERROR_FILE_NOT_FOUND)	bRet = TRUE;
 	}
-	if (lStatus == ERROR_FILE_NOT_FOUND)	bRet = TRUE;
 	return	bRet;
 }
 
@@ -221,13 +227,14 @@ BOOL		CRegistry::bSetRegValueString(HKEY hKey, LPCTSTR lpszSubKey, LPCTSTR szVal
 	HKEY	hKeySub = NULL;
 	BOOL	bRet = FALSE;
 	DWORD	dwDisposition = 0;
-	if ((lStatus = RegCreateKeyEx(hKey, lpszSubKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS | KEY_WOW64_64KEY, NULL, &hKeySub, &dwDisposition)) == ERROR_SUCCESS) {
-		if (dwDataSize <= _MAX_PATH) {
-			if ((lStatus = RegSetValueEx(hKeySub, szValue, NULL, REG_SZ, (LPBYTE)&szData, dwDataSize)) == ERROR_SUCCESS) {
+	DWORD	_dwDataSize = (DWORD)wcsnlen_s(szData, dwDataSize) * sizeof(TCHAR);
+	if (_dwDataSize <= 1024) {
+		if ((lStatus = RegCreateKeyEx(hKey, lpszSubKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS | KEY_WOW64_64KEY, NULL, &hKeySub, &dwDisposition)) == ERROR_SUCCESS) {
+			if ((lStatus = RegSetValueEx(hKeySub, szValue, NULL, REG_SZ, (LPBYTE)szData, _dwDataSize)) == ERROR_SUCCESS) {
 				bRet = TRUE;
 			}
+			RegCloseKey(hKeySub);
 		}
-		RegCloseKey(hKeySub);
 	}
 	return	bRet;
 }

@@ -11,14 +11,15 @@
 // Include
 //
 #pragma once
-#include <WinSock2.h>				// for Winsoc2.h
+#include <WinSock2.h>
 #include <ws2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
 
 //
 // Define
 // 
-#define MAX_LOADSTRING 100
+#define MAX_FQDN					253
+#define MAX_IPV4_ADDRESS			16
 
 // ICMP types and codes
 #define ICMPV4_ECHO_REQUEST_TYPE	8
@@ -30,14 +31,16 @@
 //
 // Struct Define
 //
+#pragma pack(push,1)
 typedef struct icmp_hdr
 {
-	unsigned char	icmp_type;
-	unsigned char	icmp_code;
-	unsigned short	icmp_checksum;
-	unsigned short	icmp_id;
-	unsigned short	icmp_sequence;
+	unsigned char	type;
+	unsigned char	code;
+	unsigned short	checksum;
+	unsigned short	id;
+	unsigned short	sequence;
 } ICMP_HDR, *PICMP_HDR, FAR *LPICMP_HDR;
+#pragma pack(pop)
 
 //
 // Global Data
@@ -46,7 +49,8 @@ typedef struct icmp_hdr
 //
 // Global Prototype Define
 //
-extern	DWORD		dwGetString2IPv4Addr(LPCTSTR szIPAddr);
+extern DWORD		dwGetString2IPv4Addr(LPCTSTR szIPAddr);
+extern BOOL			bCheckExistHostnameIPv4(LPCTSTR lpszHostname);
 
 //
 // class CTCPIP
@@ -57,14 +61,18 @@ class CTCPIP
 		CTCPIP();
 		~CTCPIP();
 
-		BOOL		bOpenPortForReceiveUDPv4(LPCTSTR lpszIPAddress, int Port);
+		BOOL		bOpenPortForReceiveUDPv4(int Port);
 		BOOL		bReceivePackaet(LPVOID lpData, int cbSize);
 		BOOL		bOpenPortForSendUDPv4(LPCTSTR lpszIPAddress, int Port);
 		BOOL		bSendPacket(LPCSTR lpszSendData, int cbSize);
 
-		//BOOL		bCheckHostByICMPv4(LPCTSTR lpszIPAddress);
+		BOOL		bCheckHostByICMPv4(LPCTSTR lpszIPAddress);
 
 	private:
+		PADDRINFOA	ResolveAddress(PCSTR addr, PCSTR port, int af, int type, int proto);
+		USHORT		CalcChecksum(PUSHORT message, size_t size);
+		BOOL		bSetTTL(SOCKET socket, int iAddressFamily, int ttl);
+		void		InitIcmpHeader(char *buf, int datasize);
 
 	public:
 

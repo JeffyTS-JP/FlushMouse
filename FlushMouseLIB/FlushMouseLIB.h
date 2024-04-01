@@ -46,7 +46,7 @@ private:
 // Global Prototype Define
 //
 extern BOOL			bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_opt_ LPWSTR lpCmdLine, _In_ int nCmdShow);
-extern int			iCheckCmdLine(LPTSTR lpCmdLine);
+extern int			iCheckCmdLine(LPCTSTR lpCmdLine);
 extern VOID			vDestroyWindow(HWND hWnd);
 extern BOOL			bStartThreadHookTimer(HWND hWnd);
 extern BOOL	 		bCreateProcess(LPCTSTR lpszExecName);

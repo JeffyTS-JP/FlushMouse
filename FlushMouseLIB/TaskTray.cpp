@@ -130,7 +130,6 @@ BOOL		bReCreateTaskTrayWindow(HWND hWnd)
 			if (!Cursor->bReloadCursor()) {
 				bReportEvent(MSG_THREAD_HOOK_TIMER_RESTART_FAILED, APPLICATION_CATEGORY);
 			}
-			bReportEvent(MSG_THREAD_HOOK_TIMER_RESTARTED, APPLICATION_CATEGORY);
 		}
 		else {
 			if (bDestroyTaskTrayWindow(hWnd)) {
@@ -213,6 +212,36 @@ BOOL		bGetTaskTrayWindowRect(HWND hWnd, LPRECT lpRect)
 	}
 #endif // _DEBUG
 	return FALSE;
+}
+
+//
+// WM_COMMAND
+// Cls_OnCommand()
+//
+void		Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
+{
+	UNREFERENCED_PARAMETER(hWndCtl);
+	UNREFERENCED_PARAMETER(codeNotify);
+	switch (id) {
+	case IDR_TT_MENU:
+		break;
+	case IDR_TT_SETTING:
+		Profile->bGetProfileData();
+		vSettingDialog(hWnd);
+		break;
+	case IDR_TT_SYNTPHELPER:
+		Profile->bGetProfileData();
+		vSynTPHelperDialog(hWnd);
+		break;
+	case IDM_ABOUT:
+	case IDR_TT_ABOUT:
+		vAboutDialog(hWnd);
+		break;
+	case IDM_EXIT:
+	case IDR_TT_QUIT:
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
+		break;
+	}
 }
 
 //
