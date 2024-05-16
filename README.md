@@ -8,7 +8,7 @@
 * **2024/05/16　　Version 2.2.2.13 をリリースしました**
 
 * **(主な変更点)**
-   * β機能 SynTP Helperの動作を改善しました。また、Guest 側用にインストール不要の SynTP_Receiver を作成しました。詳しくは[下記](https://github.com/JeffyTS-JP/FlushMouse/tree/master?tab=readme-ov-file#syntp_helper%E6%A9%9F%E8%83%BD-synaptics%E7%A4%BE%E8%A3%BD%E3%82%BF%E3%83%83%E3%83%81%E3%83%91%E3%83%83%E3%83%89%E3%81%A8vmware-player%E3%81%A7%E3%81%AE-two-finger-scroll-%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6) について)を参照してください
+   * β機能 SynTP Helperの動作を改善しました。また、Guest 側用にインストール不要の SynTP_Receiver を作成しました。詳しくは[下記](https://github.com/JeffyTS-JP/FlushMouse/tree/master?tab=readme-ov-file#syntp_helper%E6%A9%9F%E8%83%BD-synaptics%E7%A4%BE%E8%A3%BD%E3%82%BF%E3%83%83%E3%83%81%E3%83%91%E3%83%83%E3%83%89%E3%81%A8vmware-player%E3%81%A7%E3%81%AE-two-finger-scroll-%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)を参照してください
    * 細かなバグを修正しました
    
    * Version 2 から、Windows UI3に対応しました (といっても、設定画面などだけですし、あえて従来と似せたので、あまりそれらしくありませんが…)
@@ -28,7 +28,7 @@
 #### プライバシーポリシー
    * デスクトップ版、UI3版共に個人情報の収集などは一切行っていません
      * UI3版から、ネットワークへのアクセスとして、インストール時のランタイムのダウンロードと、バージョン情報にGitHubへのリンクがあります
-     * また、Version 2.2から Synaptics社製タッチパッドと、VMware Playerへの対応として、ネットワークにアクセスします (詳しくは下記をご覧ください)
+     * また、Version 2.2から Synaptics社製タッチパッドと、VMware Playerへの対応として、ネットワークにアクセスします (詳しくは[下記](https://github.com/JeffyTS-JP/FlushMouse/tree/master?tab=readme-ov-file#syntp_helper%E6%A9%9F%E8%83%BD-synaptics%E7%A4%BE%E8%A3%BD%E3%82%BF%E3%83%83%E3%83%81%E3%83%91%E3%83%83%E3%83%89%E3%81%A8vmware-player%E3%81%A7%E3%81%AE-two-finger-scroll-%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)をご覧ください)
 
 #### インストール / アンインストール
    * Windows Installer (exe)形式になっています。実行してインストールしてください
@@ -72,7 +72,7 @@
      * アプリによってはキャレットの位置が取得できなかったり、表示位置がおかしくなることがあります(これは制限事項となります)。ただし、位置が取得できない場合は、マウスカーソルの左に表示します
    * **IME 関連キーのサポートを有効にする**
    * **ExplorerPatcher Simple Window Switcher Helperを有効にする**
-     * 下記説明をご覧ください
+     * [下記](https://github.com/JeffyTS-JP/FlushMouse/tree/master?tab=readme-ov-file#ime-%E9%96%A2%E9%80%A3%E3%82%AD%E3%83%BC%E3%81%AE%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88-%E3%81%A8-explorerpatcher-simple-window-switcher-helper-%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)説明をご覧ください
    * **モード表示の時間**
      * マウスカーソルの左に「あ」「ア」「Ａ」「_ｱ」「_A」を表示をしている時間を調整できます
    * **モード表示までの時間**
@@ -152,7 +152,7 @@
     * スクロールの量や方向などは、私の好みにしています。設定できるようにするのは、今後の課題です
     * Guest OS で、UNIX系については、私は詳しくありませんので、どなたか受信側を書いていただければ。。。
     * 設定画面は、手を抜いてUI3でも従来のやり方にしています。今後考えます
-    * VMware社が Broadcom社に買収され、先日、Player をやめて Workstation Proに移行するとのアナウンスがありました。個人利用(たぶん商用利用ではない場合)では、無償とのことです。今後、開発環境を整えて、こちらも移行を考えたいと思います
+    * VMware社が Broadcom社に買収され、先日、Player をやめて Workstation Proに移行するとのアナウンスがありました。個人利用(たぶん商用利用ではない場合)では、無償とのことです。今後、開発環境を整えて、移行を考えたいと思います
     
 
 
