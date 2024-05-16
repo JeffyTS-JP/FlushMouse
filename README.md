@@ -8,7 +8,7 @@
 * **2024/05/16　　Version 2.2.2.13 をリリースしました**
 
 * **(主な変更点)**
-   * β機能 SynTP Helperの動作を改善しました。また、Guest 側用にインストール不要の SynTP_Receiver を作成しました。詳しくは[下記](#SynTP_Helper機能 (Synaptics社製タッチパッドと、VMware Playerでの Two Finger Scroll) について)を参照してください
+   * β機能 SynTP Helperの動作を改善しました。また、Guest 側用にインストール不要の SynTP_Receiver を作成しました。詳しくは[下記](https://github.com/JeffyTS-JP/FlushMouse/tree/master?tab=readme-ov-file#syntp_helper%E6%A9%9F%E8%83%BD-synaptics%E7%A4%BE%E8%A3%BD%E3%82%BF%E3%83%83%E3%83%81%E3%83%91%E3%83%83%E3%83%89%E3%81%A8vmware-player%E3%81%A7%E3%81%AE-two-finger-scroll-%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6) について)を参照してください
    * 細かなバグを修正しました
    
    * Version 2 から、Windows UI3に対応しました (といっても、設定画面などだけですし、あえて従来と似せたので、あまりそれらしくありませんが…)
