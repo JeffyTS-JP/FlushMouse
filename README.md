@@ -8,7 +8,7 @@
 * **2024/05/16　　Version 2.2.2.13 をリリースしました**
 
 * **(主な変更点)**
-   * β機能 SynTP Helperの動作を改善しました。また、Guest 側用にインストール不要の SynTP_Receiver を作成しました。詳しくは[下記](#SynTP_Helper)を参照してください
+   * β機能 SynTP Helperの動作を改善しました。また、Guest 側用にインストール不要の SynTP_Receiver を作成しました。詳しくは[下記](#SynTP_Helper機能 (Synaptics社製タッチパッドと、VMware Playerでの Two Finger Scroll) について)を参照してください
    * 細かなバグを修正しました
    
    * Version 2 から、Windows UI3に対応しました (といっても、設定画面などだけですし、あえて従来と似せたので、あまりそれらしくありませんが…)
@@ -121,7 +121,6 @@
 |英数                       |　　 あ / A　　　|　　　 －　　　　|　　　 －　　　　|
 
 
-<a id="SynTP_Helper”></a>
 #### SynTP_Helper機能 (Synaptics社製タッチパッドと、VMware Playerでの Two Finger Scroll) について
   * 動作環境 (検証環境)
     * Panasonic社製 Let's note CF-SV1 搭載の Synaptics社製 Wheel Pad (Touch Pad) および Windows 11 Pro (Version 23H2  Build 22631.3296)
