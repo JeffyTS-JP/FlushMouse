@@ -346,7 +346,7 @@ BOOL		CSynTP::bSendInput(DWORD dwFlags, int xPos, int yPos, int zDelta)
 //
 void		CSynTP::Cls_OnInput(HWND hWnd, DWORD dwFlags, HRAWINPUT hRawInput)
 {
-	if (!FindWindowEx(NULL, NULL, L"VMPlayerFrame", NULL) && !FindWindowEx(NULL, NULL, L"TscShellContainerClass", NULL)) {
+	if (!FindWindowEx(NULL, NULL, L"VMUIFrame", NULL) && !FindWindowEx(NULL, NULL, L"VMPlayerFrame", NULL) && !FindWindowEx(NULL, NULL, L"TscShellContainerClass", NULL)) {
 		return;
 	}
 	if (HIDRawInput)	vRawInputDevicesHandler(hWnd, dwFlags, hRawInput);
