@@ -179,6 +179,7 @@ typedef struct tagSIZED
 #define KEY_IME_OFF			(WM_USER + VK_IME_OFF)					// IME OFF(0x1a)
 #define KEY_CONVERT			(WM_USER + VK_CONVERT)					// IME convert    (0x1c)
 #define KEY_NONCONVERT		(WM_USER + VK_NONCONVERT)				// IME nonconvert (0x1d)
+#define KEY_F5				(WM_USER + VK_F5)						// F5  (0x74) 
 #define KEY_F6				(WM_USER + VK_F6)						// F6  (0x75) 
 #define KEY_F7				(WM_USER + VK_F7)						// F7  (0x76)
 #define KEY_F8				(WM_USER + VK_F8)						// F8  (0x77)

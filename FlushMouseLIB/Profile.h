@@ -56,6 +56,11 @@ typedef struct tagAppRegData
 	BOOL		bDrawNearCaret = FALSE;
 	BOOL		bEnableEPHelper = FALSE;
 
+	// for SynTP Helper
+	DWORD		dwSynTPPadX = 528;
+	DWORD		dwSynTPPadY = 528;
+	DWORD		dwSynTPEdgeX = 88;
+	DWORD		dwSynTPEdgeY = 88;
 	DWORD		dwSynTPHelper1 = 0;
 	TCHAR		szSynTPSendIPAddr1[MAX_IPV4_ADDRESS]{};
 	TCHAR		szSynTPSendHostname1[MAX_FQDN]{};

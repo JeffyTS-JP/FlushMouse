@@ -392,7 +392,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 	}
 
 	if (Profile->lpstAppRegData->dwSynTPHelper1 == 0x02) {
-		SynTP = new CSynTP;
+		SynTP = new CSynTP(Profile->lpstAppRegData->dwSynTPPadX, Profile->lpstAppRegData->dwSynTPPadY, Profile->lpstAppRegData->dwSynTPEdgeX, Profile->lpstAppRegData->dwSynTPEdgeY);
 		if (SynTP) {
 			if (!SynTP->bStartSender(hMainWnd, Profile->lpstAppRegData->szSynTPSendIPAddr1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
 				vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
@@ -403,7 +403,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 	}
 	else if (Profile->lpstAppRegData->dwSynTPHelper1 == 0x12) {
 		if (bCheckExistHostnameIPv4(Profile->lpstAppRegData->szSynTPSendHostname1)) {
-			SynTP = new CSynTP;
+			SynTP = new CSynTP(Profile->lpstAppRegData->dwSynTPPadX, Profile->lpstAppRegData->dwSynTPPadY, Profile->lpstAppRegData->dwSynTPEdgeX, Profile->lpstAppRegData->dwSynTPEdgeY);
 			if (SynTP) {
 				if (!SynTP->bStartSender(hMainWnd, Profile->lpstAppRegData->szSynTPSendHostname1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
 					vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
@@ -414,7 +414,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		}
 	}
 	else if (Profile->lpstAppRegData->dwSynTPHelper1 == 0x04) {
-		SynTP = new CSynTP;
+		SynTP = new CSynTP(Profile->lpstAppRegData->dwSynTPPadX, Profile->lpstAppRegData->dwSynTPPadY, Profile->lpstAppRegData->dwSynTPEdgeX, Profile->lpstAppRegData->dwSynTPEdgeY);
 		if (SynTP) {
 			if (!SynTP->bStartReceiver(hMainWnd, Profile->lpstAppRegData->dwSynTPPortNo1)) {
 				vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
@@ -708,6 +708,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 		case KEY_LALT:
 		case KEY_RALT:
 			return;
+		case KEY_F5:				// F5				(0x74)
 		case KEY_F6:				// F6				(0x75)
 		case KEY_F7:				// F7				(0x76)
 		case KEY_F8:				// F8				(0x77)

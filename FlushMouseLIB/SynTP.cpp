@@ -46,6 +46,22 @@ CSynTP::CSynTP()
 	if (lpSynTPData)	ZeroMemory(lpSynTPData, sizeof(SYNTPDATA));
 }
 
+CSynTP::CSynTP(DWORD dwSynTPPadX, DWORD dwSynTPPadY, DWORD dwSynTPEdgeX, DWORD dwSynTPEdgeY)
+	:	uuTickCount64(), Sender(), Receiver(), ReceivePacketThread()
+{
+	HIDRawInput = NULL;
+	lpSynTPData = new SYNTPDATA[sizeof(SYNTPDATA)];
+	if (lpSynTPData) {
+		ZeroMemory(lpSynTPData, sizeof(SYNTPDATA));
+		lpSynTPData->rcSynTP.left = 0;
+		lpSynTPData->rcSynTP.top = dwSynTPPadY;
+		lpSynTPData->rcSynTP.right = dwSynTPPadX;
+		lpSynTPData->rcSynTP.bottom = 0;
+		lpSynTPData->sTouchZoneX = (SHORT)dwSynTPEdgeX;
+		lpSynTPData->sTouchZoneY = (SHORT)dwSynTPEdgeY;
+	}
+}
+
 CSynTP::~CSynTP()
 {
 	if (hGetHWND()) {
@@ -131,10 +147,6 @@ void		CSynTP::vStopReceiver()
 BOOL		CSynTP::bStartSender(HWND hWnd, LPCTSTR szIPAddress, int iPort)
 {
 	if ((hWnd == NULL) || (szIPAddress == NULL) || (iPort == 0))	return FALSE;
-	if (lpSynTPData) {
-		if (!bGetSetSynTPSpecFromReg())	return FALSE;
-	}
-
 	if (Sender == NULL)	Sender = new CTCPIP;
 	if (Sender) {
 		if (!Sender->bOpenPortForSendUDPv4(szIPAddress, iPort)) return FALSE;
@@ -201,57 +213,6 @@ BOOL		CSynTP::bRegister(HINSTANCE hInstance, LPCTSTR szWindowClassName)
 	if (!bShowWindow(SW_HIDE))	return FALSE;
 	if (!bUpdateWindow())	return FALSE;
 	return TRUE;
-}
-
-//
-// bGetSetSynTPSpecFromReg()
-//
-BOOL		CSynTP::bGetSetSynTPSpecFromReg()
-{
-#define SUBKEY		L"SOFTWARE\\Synaptics\\OEM\\TouchPad"
-#define VALUE_X		L"MaxLogicalX"
-#define VALUE_Y		L"MaxLogicalY"
-#define VALUE_LX	L"MaxPhysicalX"
-#define VALUE_LY	L"MaxPhysicalY"
-
-	CRegistry	*CReg = new CRegistry;
-	BOOL		bRet = TRUE;
-	DWORD		dwLogicalX = 0, dwLogicalY = 0;
-	DWORD		dwPhysicalX = 0, dwPhysicalY = 0;
-	if (CReg) {
-		if (!CReg->bReadSystemRegValueDWORD(HKEY_LOCAL_MACHINE, SUBKEY, VALUE_X, &dwLogicalX)) {
-			bRet = FALSE;
-			goto Cleanup;
-		}
-		if (!CReg->bReadSystemRegValueDWORD(HKEY_LOCAL_MACHINE, SUBKEY, VALUE_Y, &dwLogicalY)) {
-			bRet = FALSE;
-			goto Cleanup;
-		}
-		if (!CReg->bReadSystemRegValueDWORD(HKEY_LOCAL_MACHINE, SUBKEY, VALUE_LX, &dwPhysicalX)) {
-			bRet = FALSE;
-			goto Cleanup;
-		}
-		if (!CReg->bReadSystemRegValueDWORD(HKEY_LOCAL_MACHINE, SUBKEY, VALUE_LY, &dwPhysicalY)) {
-			bRet = FALSE;
-			goto Cleanup;
-		}
-	}
-Cleanup:
-	if (CReg)	delete	CReg;
-	if (bRet) {
-		lpSynTPData->rcSynTP.left = 0;
-		lpSynTPData->rcSynTP.top = dwLogicalY;
-		lpSynTPData->rcSynTP.right = dwLogicalX;
-		lpSynTPData->rcSynTP.bottom = 0;
-		lpSynTPData->sTouchZoneX = (SHORT)(dwLogicalX - dwPhysicalX);
-		lpSynTPData->sTouchZoneY = (SHORT)(dwLogicalY - dwPhysicalY);
-	}
-	return bRet;
-#undef SUBKEY
-#undef VALUE_X
-#undef VALUE_Y
-#undef VALUE_LX
-#undef VALUE_LY
 }
 
 //
@@ -428,6 +389,9 @@ void		CSynTP::vSynTPMouseData(PCHAR Report)
 
 		SHORT	newX = makeAxis(lpSynTPRawData->stFinger1.hiX, lpSynTPRawData->stFinger1.loX);
 		SHORT	newY = makeAxis(lpSynTPRawData->stFinger1.hiY, lpSynTPRawData->stFinger1.loY);
+		if ((lpSynTPData->rcSynTP.top < newY) || (lpSynTPData->rcSynTP.bottom > newY)
+			|| (lpSynTPData->rcSynTP.left > newX) || (lpSynTPData->rcSynTP.right < newX))	return;
+
 		SHORT	deltaX = newX - makeAxis(lpSynTPData->stSynRawData.stFinger1.hiX, lpSynTPData->stSynRawData.stFinger1.loX);
 		SHORT	deltaY = newY - makeAxis(lpSynTPData->stSynRawData.stFinger1.hiY, lpSynTPData->stSynRawData.stFinger1.loY);
 

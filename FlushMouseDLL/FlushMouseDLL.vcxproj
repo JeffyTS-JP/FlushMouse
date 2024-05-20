@@ -161,8 +161,8 @@
       </Message>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>Xcopy /Y $(OutDir)$(TargetName)$(TargetExt) $(OutDir)FlushMouseUI3\
-Xcopy /Y $(OutDir)$(TargetName).pdb $(OutDir)FlushMouseUI3\
+      <Command>Xcopy /Y "$(OutDir)$(TargetName)$(TargetExt)" "$(OutDir)FlushMouseUI3\"
+Xcopy /Y "$(OutDir)$(TargetName).pdb" "$(OutDir)FlushMouseUI3\"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -200,9 +200,9 @@ Xcopy /Y $(OutDir)$(TargetName).pdb $(OutDir)FlushMouseUI3\
       </Message>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>Start /min /wait cmd /c "$(MSBuildStartupDirectory)\Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
-Xcopy /Y $(OutDir)$(TargetName)$(TargetExt) $(OutDir)FlushMouseUI3\
-Xcopy /Y $(OutDir)$(TargetName).pdb $(OutDir)FlushMouseUI3\</Command>
+      <Command>Start /min /wait cmd /c "$(SolutionDir)Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
+Xcopy /Y "$(OutDir)$(TargetName)$(TargetExt)" "$(OutDir)FlushMouseUI3\"
+Xcopy /Y "$(OutDir)$(TargetName).pdb" "$(OutDir)FlushMouseUI3\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

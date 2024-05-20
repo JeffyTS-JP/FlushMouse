@@ -62,6 +62,10 @@
 #define IDC_IPADDRESS1                  1071
 #define IDC_EDIT1                       1081
 #define IDC_EDIT2                       1082
+#define IDC_EDIT3                       1083
+#define IDC_EDIT4                       1084
+#define IDC_EDIT5                       1085
+#define IDC_EDIT6                       1086
 #define IDC_START                       1100
 #define IDC_STOP                        1101
 #define ID_POPUPMENU_ABOUT              30000

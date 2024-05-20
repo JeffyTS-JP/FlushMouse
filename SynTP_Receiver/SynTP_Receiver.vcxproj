@@ -168,8 +168,9 @@
       </AddModuleNamesToAssembly>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y $(TargetDir)$(TargetFileName) $(SolutionDir)$(TargetFileName)
-Start /wait /min cmd /c "$(MSBuildStartupDirectory)\Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
+      <Command>copy /Y "$(TargetDir)$(TargetFileName)" "$(SolutionDir)$(TargetFileName)"
+Start /wait /min cmd /c "$(SolutionDir)Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
+
 </Command>
     </PostBuildEvent>
     <Manifest>

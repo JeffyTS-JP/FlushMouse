@@ -76,6 +76,7 @@ class CSynTP : private CWindow, private CRawInput
 {
 public:
 	CSynTP();
+	CSynTP(DWORD dwSynTPPadX, DWORD dwSynTPPadY, DWORD dwSynTPEdgeX, DWORD dwSynTPEdgeY);
 	~CSynTP();
 
 public:
@@ -86,7 +87,6 @@ public:
 
 private:
 	BOOL		bRegister(HINSTANCE hInstance, LPCTSTR szWindowClass);
-	BOOL		bGetSetSynTPSpecFromReg();
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	BOOL		Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct);

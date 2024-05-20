@@ -121,10 +121,11 @@
       <UACUIAccess>false</UACUIAccess>
     </Link>
     <PostBuildEvent>
-      <Command>Xcopy /Y $(OutDir)$(TargetName)$(TargetExt) ..\x64\$(Configuration)\
-Xcopy /Y $(OutDir)$(TargetName).pdb $(MSBuildStartupDirectory)\x64\$(Configuration)\
-Xcopy /Y $(OutDir)$(TargetName)$(TargetExt) $(MSBuildStartupDirectory)\x64\$(Configuration)\FlushMouseUI3\
-Xcopy /Y $(OutDir)$(TargetName).pdb $(MSBuildStartupDirectory)\x64\$(Configuration)\FlushMouseUI3\</Command>
+      <Command>Xcopy /Y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)x64\$(Configuration)\"
+Xcopy /Y "$(OutDir)$(TargetName).pdb" "$(SolutionDir)x64\$(Configuration)\"
+Xcopy /Y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)x64\$(Configuration)\FlushMouseUI3\"
+Xcopy /Y "$(OutDir)$(TargetName).pdb" "$(SolutionDir)x64\$(Configuration)\FlushMouseUI3\"
+</Command>
     </PostBuildEvent>
     <Manifest>
       <InputResourceManifests>
@@ -156,11 +157,11 @@ Xcopy /Y $(OutDir)$(TargetName).pdb $(MSBuildStartupDirectory)\x64\$(Configurati
       <UACUIAccess>false</UACUIAccess>
     </Link>
     <PostBuildEvent>
-      <Command>Start /min /wait cmd /c "$(MSBuildStartupDirectory)\Sign_Modules.bat" "$(OutDir)$(TargetName)$(TargetExt)"
-Xcopy /Y "$(OutDir)$(TargetName)$(TargetExt)" "$(MSBuildStartupDirectory)\x64\$(Configuration)\"
-Xcopy /Y "$(OutDir)$(TargetName).pdb" "$(MSBuildStartupDirectory)\x64\$(Configuration)\"
-Xcopy /Y $(OutDir)$(TargetName)$(TargetExt) $(MSBuildStartupDirectory)\x64\$(Configuration)\FlushMouseUI3\
-Xcopy /Y $(OutDir)$(TargetName).pdb $(MSBuildStartupDirectory)\x64\$(Configuration)\FlushMouseUI3\
+      <Command>Start /min /wait cmd /c "$(SolutionDir)\Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
+Xcopy /Y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)x64\$(Configuration)\"
+Xcopy /Y "$(OutDir)$(TargetName).pdb" "$(SolutionDir)x64\$(Configuration)\"
+Xcopy /Y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)x64\$(Configuration)\FlushMouseUI3\"
+Xcopy /Y "$(OutDir)$(TargetName).pdb" "$(SolutionDir)x64\$(Configuration)\FlushMouseUI3\"
 </Command>
     </PostBuildEvent>
     <Manifest>
