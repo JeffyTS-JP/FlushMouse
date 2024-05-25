@@ -148,7 +148,7 @@
       * Version 2.2.4.7 から、TouchPadのサイズと Edge motion の幅を、Synaptics のレジストリ (HKEY_LOCAL_MACHINE\SOFTWARE\Synaptics\OEM\TouchPad) を参照するのではなく、独自に諸元を設定できるようにしました。これにより、多少機種依存の部分が緩和され、Touch Pad のデータ出力方法が同じであれば、動く可能性があると思います
         * Let's note CF-SV1 の場合、TouchPad Width = 528, Height = 528, Edge Area Width = 88, Height = 88 (デフォルト値)です
         * TouchPad Width, Height は、左下を原点とした、Touch Pad のサイズです
-        * Edge Area Width, Height は、スクロールが始まって、指を置いているとスクロールが継続する幅です。お好みで聴視してみてください。この値を 0 にすると Edge motion は動作しません。
+        * Edge Area Width, Height は、スクロールが始まって、指を置いているとスクロールが継続するエリアの幅です。お好みで調整してみてください。この値を 0 にすると Edge motion は動作しません。
     * SynTP_Receiver の場合は、ショートカットを作成し、プロパティを開いて「Your folder path\SynTP_Receiver.exe /Port 50008」 のように UDP Portを指定します
       * 管理者権限で起動しない場合、タスクマネージャーなど一部のアプリでスクロールしません。ショートカットのプロパティの詳細設定で「管理者権限で実行する」にチェックをするか、タスクスケジューラに、例えば「任意のユーザーのログオン時」に「最上位の特権で実行する」ように登録するのもよいかもしれません
       * SynTP_Receiverを終了するためには、タスクマネージャーからタスクの終了を行います
