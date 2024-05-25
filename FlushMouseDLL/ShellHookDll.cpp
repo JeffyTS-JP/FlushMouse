@@ -29,11 +29,8 @@ static LRESULT CALLBACK lpShellHookProc(int, WPARAM, LPARAM);
 //
 #pragma comment(linker, "/SECTION:FLUSHMOUSEDLL_SEG,RWS")
 #pragma data_seg("FLUSHMOUSEDLL_SEG")
-static HINSTANCE		hShellInstance = NULL;
 static HWND				hWndShellParent = NULL;
 static HHOOK			hHookShell = NULL;
-static LPSHELL_SHAREDMEM	lpDatShell = NULL;
-static CSharedMemory	*CSharedMem = NULL;
 
 #pragma data_seg()
 
@@ -47,27 +44,12 @@ DLLEXPORT BOOL  __stdcall bShellHookSet(HWND hWnd)
 	if (ChangeWindowMessageFilterEx(hWnd, WM_INPUTLANGCHANGEEX, MSGFLT_ALLOW, &cf)) {
 		MINIMIZEDMETRICS	mm{};	mm.cbSize = sizeof(MINIMIZEDMETRICS);	mm.iArrange = ARW_HIDE;
 		if (SystemParametersInfo(SPI_SETMINIMIZEDMETRICS, sizeof(MINIMIZEDMETRICS), (PVOID)&mm, SPIF_SENDCHANGE)) {
-			if ((CSharedMem = new CSharedMemory(SHELLHOOKMEM, sizeof(SHELL_SHAREDMEM))) != NULL) {
-				if ((lpDatShell = (LPSHELL_SHAREDMEM)CSharedMem->lpvSharedMemoryRead()) != NULL) {
-					lpDatShell->hWnd = hWnd;	lpDatShell->hInstance = hGetInstance();
-					if (CSharedMem->bSharedMemoryWrite(lpDatShell)) {
-						HHOOK	hHook = SetWindowsHookEx(WH_SHELL, (HOOKPROC)lpShellHookProc, hGetInstance(), 0);
-						if (hHook) {
-							lpDatShell->hHook = hHook;	hHookShell = hHook;
-							if (CSharedMem->bSharedMemoryWrite(lpDatShell)) {
-								return TRUE;
-							}
-							UnhookWindowsHookEx(hHook);
-						}
-					}
-				}
-				delete CSharedMem;
-				CSharedMem = NULL;
-				hShellInstance = NULL;
-				hWndShellParent = NULL;
-				hHookShell = NULL;
-				lpDatShell = NULL;
+			hHookShell = SetWindowsHookEx(WH_SHELL, (HOOKPROC)lpShellHookProc, hGetInstance(), 0);
+			if (hHookShell) {
+				return TRUE;
 			}
+			hWndShellParent = NULL;
+			hHookShell = NULL;
 		}
 	}
 	return FALSE;
@@ -79,21 +61,13 @@ DLLEXPORT BOOL  __stdcall bShellHookSet(HWND hWnd)
 DLLEXPORT BOOL __stdcall bShellHookUnset()
 {
 	BOOL	bRet = FALSE;
-	if (CSharedMem != NULL) {
-		if ((lpDatShell = (LPSHELL_SHAREDMEM)CSharedMem->lpvSharedMemoryRead()) != NULL) {
-			if (lpDatShell->hHook) {
-				if (UnhookWindowsHookEx(lpDatShell->hHook)) {
-					bRet = TRUE;
-				}
-			}
+	if (hHookShell) {
+		if (UnhookWindowsHookEx(hHookShell)) {
+			bRet = TRUE;
 		}
-		delete CSharedMem;
-		CSharedMem = NULL;
-		hShellInstance = NULL;
-		hWndShellParent = NULL;
-		hHookShell = NULL;
-		lpDatShell = NULL;
 	}
+	hWndShellParent = NULL;
+	hHookShell = NULL;
 	return bRet;
 }
 

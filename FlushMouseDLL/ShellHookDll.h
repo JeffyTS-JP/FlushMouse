@@ -13,17 +13,10 @@
 #pragma once
 #include "pch.h"
 #include "FlushMouseDll.h"
-#include "..\MiscLIB\CSharedMemory.h"
 
 //
 // Define
 // 
-#define SHELLHOOKMEM _T("ShellHookSharedMem")
-typedef struct tagSHELL_SHAREDMEM {
-	HINSTANCE	hInstance;
-	HWND		hWnd;
-	HHOOK		hHook;
-} SHELL_SHAREDMEM, * PSHELL_SHAREDMEM, * LPSHELL_SHAREDMEM;
 
 //
 // Global Prototype Define

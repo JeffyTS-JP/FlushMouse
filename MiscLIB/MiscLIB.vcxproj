@@ -157,7 +157,6 @@
   <ItemGroup>
     <ClInclude Include="CRawInput.h" />
     <ClInclude Include="CRegistry.h" />
-    <ClInclude Include="CSharedMemory.h" />
     <ClInclude Include="CThread.h" />
     <ClInclude Include="CWindow.h" />
     <ClInclude Include="DLLDefs.h" />
@@ -166,7 +165,6 @@
   <ItemGroup>
     <ClCompile Include="CRawInput.cpp" />
     <ClCompile Include="CRegistry.cpp" />
-    <ClCompile Include="CSharedMemory.cpp" />
     <ClCompile Include="CThread.cpp" />
     <ClCompile Include="CWindow.cpp" />
     <ClCompile Include="pch.cpp" />

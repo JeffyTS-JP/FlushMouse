@@ -179,8 +179,8 @@ static INT_PTR CALLBACK SynTPHelperDlg(HWND hDlg, UINT message, WPARAM wParam, L
 					case 0x02:
 						SynTP->vStoptSender();
 						if (!SynTP->bStartSender(hMainWnd, Profile->lpstAppRegData->szSynTPSendIPAddr1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK)
-							vMessageBox(hMainWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_SYSTEMMODAL)
+							vMessageBox(hDlg, IDS_CANTSYTPHELPER, MessageBoxTYPE);
 							delete SynTP;
 							SynTP = NULL;
 						}
@@ -189,15 +189,17 @@ static INT_PTR CALLBACK SynTPHelperDlg(HWND hDlg, UINT message, WPARAM wParam, L
 					case 0x12:
 					case 0x31:
 					case 0x32:
+						EnableWindow(GetDlgItem(hDlg, IDC_START), FALSE);
 						SynTP->vStoptSender();
 						if (bCheckExistHostnameIPv4(Profile->lpstAppRegData->szSynTPSendHostname1)) {
 							if (SynTP->bStartSender(hMainWnd, Profile->lpstAppRegData->szSynTPSendHostname1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
 								break;
 							}
 						}
-						vMessageBox(hMainWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
+						vMessageBox(hDlg, IDS_CANTSYTPHELPER, MessageBoxTYPE);
 						delete SynTP;
 						SynTP = NULL;
+						EnableWindow(GetDlgItem(hDlg, IDC_START), TRUE);
 						break;
 					case 0x03:
 					case 0x04:
@@ -205,7 +207,7 @@ static INT_PTR CALLBACK SynTPHelperDlg(HWND hDlg, UINT message, WPARAM wParam, L
 					case 0x34:
 						SynTP->vStopReceiver();
 						if (!SynTP->bStartReceiver(hMainWnd, Profile->lpstAppRegData->dwSynTPPortNo1)) {
-							vMessageBox(hMainWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
+							vMessageBox(hDlg, IDS_CANTSYTPHELPER, MessageBoxTYPE);
 							delete SynTP;
 							SynTP = NULL;
 						}
@@ -249,7 +251,15 @@ static INT_PTR CALLBACK SynTPHelperDlg(HWND hDlg, UINT message, WPARAM wParam, L
 								return (INT_PTR)FALSE;
 							}
 							else {
-								if (_wcsnicmp(Profile->lpstAppRegData->szSynTPSendIPAddr1, lpszIPAddr, MAX_IPV4_ADDRESS) == 0) break;
+								if((bIsPrivateAddress(lpszIPAddr))) {
+									if (_wcsnicmp(Profile->lpstAppRegData->szSynTPSendIPAddr1, lpszIPAddr, MAX_IPV4_ADDRESS) == 0) break;
+								}
+								else {
+									if (lpszIPAddr)	delete [] lpszIPAddr;
+									vMessageBox(hDlg, IDS_NOTPRIVATEADDR, MessageBoxTYPE);
+									SetFocus(GetDlgItem(hDlg, IDC_IPADDRESS1));
+									return (INT_PTR)FALSE;
+								}
 							}
 							if (lpszIPAddr)	delete [] lpszIPAddr;
 						}
@@ -264,7 +274,6 @@ static INT_PTR CALLBACK SynTPHelperDlg(HWND hDlg, UINT message, WPARAM wParam, L
 						iNum = _wtoi(szBuff);
 						if ((0 <= iNum) && (iNum < 9999)) {
 							if (Profile->lpstAppRegData->dwSynTPPadX != (DWORD)iNum) {
-								//Profile->lpstAppRegData->dwSynTPPadX = (DWORD)iNum;
 								EnableWindow(GetDlgItem(hDlg, IDC_BUTTON1), TRUE);
 							}
 						}
@@ -277,7 +286,6 @@ static INT_PTR CALLBACK SynTPHelperDlg(HWND hDlg, UINT message, WPARAM wParam, L
 						iNum = _wtoi(szBuff);
 						if ((0 <= iNum) && (iNum < 9999)) {
 							if (Profile->lpstAppRegData->dwSynTPPadY != (DWORD)iNum) {
-								//Profile->lpstAppRegData->dwSynTPPadY = (DWORD)iNum;
 								EnableWindow(GetDlgItem(hDlg, IDC_BUTTON1), TRUE);
 							}
 						}
@@ -290,7 +298,6 @@ static INT_PTR CALLBACK SynTPHelperDlg(HWND hDlg, UINT message, WPARAM wParam, L
 						iNum = _wtoi(szBuff);
 						if ((0 <= iNum) && (iNum < 9999)) {
 							if (Profile->lpstAppRegData->dwSynTPEdgeX != (DWORD)iNum) {
-								//Profile->lpstAppRegData->dwSynTPEdgeX = (DWORD)iNum;
 								EnableWindow(GetDlgItem(hDlg, IDC_BUTTON1), TRUE);
 							}
 						}
@@ -303,7 +310,6 @@ static INT_PTR CALLBACK SynTPHelperDlg(HWND hDlg, UINT message, WPARAM wParam, L
 						iNum = _wtoi(szBuff);
 						if ((0 <= iNum) && (iNum < 9999)) {
 							if (Profile->lpstAppRegData->dwSynTPEdgeY != (DWORD)iNum) {
-								//Profile->lpstAppRegData->dwSynTPEdgeY = (DWORD)iNum;
 								EnableWindow(GetDlgItem(hDlg, IDC_BUTTON1), TRUE);
 							}
 						}
@@ -340,7 +346,6 @@ static INT_PTR CALLBACK SynTPHelperDlg(HWND hDlg, UINT message, WPARAM wParam, L
 						iNum = _wtoi(szBuff);
 						if ((50000 <= iNum) && (iNum < 60000)) {
 							if (Profile->lpstAppRegData->dwSynTPPortNo1 != (DWORD)iNum) {
-								//Profile->lpstAppRegData->dwSynTPPortNo1 = (DWORD)iNum;
 								EnableWindow(GetDlgItem(hDlg, IDC_BUTTON1), TRUE);
 							}
 						}
@@ -364,7 +369,9 @@ static BOOL		bInitSynTPHelperDlg(HWND hDlg, DWORD dwSynTPHelper)
 	DWORD	dwAddr = 0;
 	TCHAR	szBuff[6]{};
 	if ((Profile->lpstAppRegData->szSynTPSendIPAddr1[0] != '\0')) {
-		if((dwAddr = dwGetString2IPv4Addr(Profile->lpstAppRegData->szSynTPSendIPAddr1)) == (-1)) dwAddr = 0;
+		if((bIsPrivateAddress(Profile->lpstAppRegData->szSynTPSendIPAddr1))) {
+			if((dwAddr = dwGetString2IPv4Addr(Profile->lpstAppRegData->szSynTPSendIPAddr1)) == (-1)) dwAddr = 0x0a006480;
+		}
 		SendMessage(GetDlgItem(hDlg, IDC_IPADDRESS1), IPM_SETADDRESS, 0, (LPARAM)dwAddr);
 	}
 	if (_snwprintf_s(szBuff, (sizeof(szBuff) / sizeof(TCHAR)), _TRUNCATE, L"%4d", (WORD)Profile->lpstAppRegData->dwSynTPPadX) < 0) {

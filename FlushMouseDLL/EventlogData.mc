@@ -141,6 +141,18 @@ FlushMouseを再起動します。
 MessageId=0x0102
 Severity=Informational
 Facility=Application
+SymbolicName=MSG_DELAYED_RESTART_FLUSHMOUSE_EVENT
+Language=English
+Restart FlushMouse(Delayed Start).
+.
+
+Language=Japanese
+FlushMouseを再起動します(遅延起動)。
+.
+
+MessageId=0x0103
+Severity=Informational
+Facility=Application
 SymbolicName=MSG_STARTED_FLUSHMOUSE
 Language=English
 Started FlushMouse.
@@ -150,7 +162,7 @@ Language=Japanese
 FlushMouseを起動しました。
 .
 
-MessageId=0x0103
+MessageId=0x0104
 Severity=Success
 Facility=Application
 SymbolicName=MSG_QUIT_FLUSHMOUSE
@@ -162,7 +174,7 @@ Language=Japanese
 FlushMouseを終了します。
 .
 
-MessageId=0x0104
+MessageId=0x0105
 Severity=Success
 Facility=Application
 SymbolicName=MSG_STOPPED_FLUSHMOUSE
@@ -174,7 +186,7 @@ Language=Japanese
 FlushMouseを終了しました。
 .
 
-MessageId=0x0105
+MessageId=0x0106
 Severity=Success
 Facility=Application
 SymbolicName=MSG_START_FLUSHMOUSE_EVENT
@@ -186,7 +198,7 @@ Language=Japanese
 FlushMouseを起動します。
 .
 
-MessageId=0x0106
+MessageId=0x0107
 Severity=Success
 Facility=Application
 SymbolicName=MSG_QUIT_FLUSHMOUSE_EVENT
@@ -198,7 +210,7 @@ Language=Japanese
 FlushMouseを終了します。
 .
 
-MessageId=0x00107
+MessageId=0x00108
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_THREAD_HOOK_TIMER_STARTED
@@ -210,7 +222,7 @@ Language=Japanese
 Thread, Hook and Timer Started.
 .
 
-MessageId=0x8108
+MessageId=0x8109
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_THREAD_HOOK_TIMER_START_FAILED
@@ -222,7 +234,7 @@ Language=Japanese
 Thread, Hook and Timer Start Failed.
 .
 
-MessageId=0x0109
+MessageId=0x010A
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_THREAD_HOOK_TIMER_STOPPED
@@ -234,7 +246,7 @@ Language=Japanese
 Thread, Hook and Timer Stopped.
 .
 
-MessageId=0x010A
+MessageId=0x010B
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_THREAD_HOOK_TIMER_RESTARTED
@@ -246,7 +258,7 @@ Language=Japanese
 Thread, Hook and Timer Restarted.
 .
 
-MessageId=0x810A
+MessageId=0x8100
 Severity=Informational
 Facility=Application
 SymbolicName=MSG_THREAD_HOOK_TIMER_RESTART_FAILED
@@ -258,7 +270,7 @@ Language=Japanese
 Thread, Hook and Timer Restart Failed.
 .
 
-MessageId=0x010B
+MessageId=0x8101
 Severity=Success
 Facility=Application
 SymbolicName=MSG_TASKTRAY_REGISTERED
@@ -270,7 +282,7 @@ Language=Japanese
 Registered TaskTray.
 .
 
-MessageId=0x810B
+MessageId=0x8102
 Severity=Success
 Facility=Application
 SymbolicName=MSG_TASKTRAY_REGISTER_FAILD
@@ -286,7 +298,7 @@ Language=Japanese
 Registered TaskTray.
 .
 
-MessageId=0x810C
+MessageId=0x8103
 Severity=Success
 Facility=Application
 SymbolicName=MSG_DETECT_FLUSHMOUSE_STOP

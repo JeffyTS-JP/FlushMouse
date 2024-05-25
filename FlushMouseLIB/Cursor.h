@@ -127,7 +127,7 @@ public:
 private:
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-	BOOL		Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct);
+	BOOL		Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct) const;
 	void		Cls_OnDestroy(HWND hWnd);
 	void		Cls_OnPaint(HWND hWnd);
 

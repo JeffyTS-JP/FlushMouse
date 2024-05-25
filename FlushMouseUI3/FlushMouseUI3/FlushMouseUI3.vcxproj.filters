@@ -25,7 +25,6 @@
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="FlushMouseUI3.exe.manifest" />
-    <Manifest Include="FlushMouseUI3.manifest" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

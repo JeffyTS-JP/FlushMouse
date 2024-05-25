@@ -35,10 +35,8 @@ static UINT					WM_HOOKEX = 0;
 static HINSTANCE			hGLInstance = NULL;
 static HWND					hWndGLParent = NULL;
 static HHOOK				hHookGL = NULL;
-static LPGLOBAL_SHAREDMEM	lpDatGlobal = NULL;
 static HWND					hPrevWnd = NULL;
 static BOOL					bSubclassed = FALSE;
-static CSharedMemory*		CSharedMem = NULL;
 #pragma data_seg()
 
 //
@@ -50,30 +48,20 @@ DLLEXPORT BOOL  __stdcall bGlobalHookSet(HWND hWnd)
 	if ((hGLInstance = hGetInstance()) == NULL)	return FALSE;
 	if (WM_HOOKEX == 0)	WM_HOOKEX = RegisterWindowMessage(L"FlushMouseDLL_GlobalHook");
 	if (WM_HOOKEX == 0) return FALSE;
-		if ((CSharedMem = new CSharedMemory(GLOBALHOOKMEM, sizeof(GLOBAL_SHAREDMEM))) != NULL) {
-		if ((lpDatGlobal = (LPGLOBAL_SHAREDMEM)CSharedMem->lpvSharedMemoryRead()) != NULL) {
-			lpDatGlobal->hWnd = hWnd;	lpDatGlobal->hInstance = hGLInstance;
-			if (CSharedMem->bSharedMemoryWrite(lpDatGlobal)) {
-				HHOOK	hHook = SetWindowsHookEx(WH_CALLWNDPROCRET, (HOOKPROC)lpGlobalHookProc, hGLInstance, 0);
-				if (hHook) {
-					lpDatGlobal->hHook = hHook;	hHookGL = hHook;
-					if (CSharedMem && lpDatGlobal && hWnd && CSharedMem->bSharedMemoryWrite(lpDatGlobal)) {
-						SendMessage(hWnd, WM_HOOKEX, 0, INJECT_HOOK);
-						return TRUE;
-					}
-					UnhookWindowsHookEx(hHook);
-				}
-			}
+	HHOOK	hHook = SetWindowsHookEx(WH_CALLWNDPROCRET, (HOOKPROC)lpGlobalHookProc, hGLInstance, 0);
+	if (hHook) {
+		hHookGL = hHook;
+		if (hWnd) {
+			SendMessage(hWnd, WM_HOOKEX, 0, INJECT_HOOK);
+			return TRUE;
 		}
-		delete CSharedMem;
-		CSharedMem = NULL;
-		hGLInstance = NULL;
-		hWndGLParent = NULL;
-		hHookGL = NULL;
-		lpDatGlobal = NULL;
-		hPrevWnd = NULL;
-		bSubclassed = FALSE;
+		UnhookWindowsHookEx(hHook);
 	}
+	hGLInstance = NULL;
+	hWndGLParent = NULL;
+	hHookGL = NULL;
+	hPrevWnd = NULL;
+	bSubclassed = FALSE;
 	return FALSE;
 }
 
@@ -83,27 +71,18 @@ DLLEXPORT BOOL  __stdcall bGlobalHookSet(HWND hWnd)
 DLLEXPORT BOOL __stdcall bGlobalHookUnset()
 {
 	BOOL		bRet = FALSE;
-	if (CSharedMem != NULL) {
-		if ((lpDatGlobal = (LPGLOBAL_SHAREDMEM)CSharedMem->lpvSharedMemoryRead()) != NULL) {
-			if (lpDatGlobal->hWnd) {
-				hHookGL = SetWindowsHookEx(WH_CALLWNDPROCRET, (HOOKPROC)lpGlobalHookProc, hGLInstance, GetWindowThreadProcessId(lpDatGlobal->hWnd, NULL));
-				if (hHookGL) {
-					SendMessage(lpDatGlobal->hWnd, WM_HOOKEX, 0, REMOVE_HOOK);
-					if (lpDatGlobal->hHook) {
-						if ((bSubclassed == FALSE))	bRet = TRUE;
-					}
-				}
-			}
+	hHookGL = SetWindowsHookEx(WH_CALLWNDPROCRET, (HOOKPROC)lpGlobalHookProc, hGLInstance, GetWindowThreadProcessId(hWndGLParent, NULL));
+	if (hHookGL) {
+		SendMessage(hWndGLParent, WM_HOOKEX, 0, REMOVE_HOOK);
+		if (hHookGL) {
+			if ((bSubclassed == FALSE))	bRet = TRUE;
 		}
-		delete CSharedMem;
-		CSharedMem = NULL;
-		hGLInstance = NULL;
-		hWndGLParent = NULL;
-		hHookGL = NULL;
-		lpDatGlobal = NULL;
-		hPrevWnd = NULL;
-		bSubclassed = FALSE;
 	}
+	hGLInstance = NULL;
+	hWndGLParent = NULL;
+	hHookGL = NULL;
+	hPrevWnd = NULL;
+	bSubclassed = FALSE;
 	return bRet;
 }
 

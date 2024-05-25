@@ -35,6 +35,7 @@
 #define IDS_CANTSAVEREG                 212
 #define IDS_NOTRREGISTEVH               213
 #define IDS_CANTSYTPHELPER              214
+#define IDS_NOTPRIVATEADDR              215
 #define IDS_CMBX_LIST01                 300
 #define IDS_CMBX_LIST02                 301
 #define IDC_VERSION                     1000

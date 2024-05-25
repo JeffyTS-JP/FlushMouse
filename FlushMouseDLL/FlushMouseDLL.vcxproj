@@ -211,8 +211,6 @@ Xcopy /Y "$(OutDir)$(TargetName).pdb" "$(OutDir)FlushMouseUI3\"</Command>
     <ClInclude Include="FlushMouseDll.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GlobalHookDll.h" />
-    <ClInclude Include="KeyboardHookDll.h" />
-    <ClInclude Include="MouseHookDll.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ShellHookDll.h" />
@@ -221,8 +219,6 @@ Xcopy /Y "$(OutDir)$(TargetName).pdb" "$(OutDir)FlushMouseUI3\"</Command>
   <ItemGroup>
     <ClCompile Include="FlushMouseDll.cpp" />
     <ClCompile Include="GlobalHookDll.cpp" />
-    <ClCompile Include="KeyboardHookDll.cpp" />
-    <ClCompile Include="MouseHookDll.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

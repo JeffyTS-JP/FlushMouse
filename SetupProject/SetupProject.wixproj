@@ -50,6 +50,7 @@
     <Content Include="Register_TaskScheduler.xml" />
     <Content Include="Register_TaskScheduler1.xml" />
     <Content Include="Register_TaskScheduler2.xml" />
+    <Content Include="Register_TaskScheduler3.xml" />
     <Content Include="version.wxi" />
   </ItemGroup>
   <ItemGroup>

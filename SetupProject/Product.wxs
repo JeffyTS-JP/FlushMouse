@@ -178,7 +178,6 @@
 				</Control>
 				<Control Id="PreviousFoundDlgIcon" Type="Icon" X="15" Y="15" Width="24" Height="24" ToolTip="!(loc.ErrorDlgErrorIconTooltip)" FixedSize="yes" IconSize="32" Text="!(loc.ErrorDlgErrorIcon)" />
 			</Dialog>
-			
 			<Publish Dialog="_ExitDialog" Control="Finish" Event="DoAction" Value="RemoveAppReg">Installed and ((WIXUI_VERIFYDIALOGOPTIONALCHECKBOX4 = 1) or (REMOVEAPPREGISTRY = 1))</Publish>
 		</UI>
 		
@@ -212,7 +211,7 @@
 		</InstallExecuteSequence>
 		<CustomAction Id='AlreadyUpdated' Error='[ProductName] は既に、このバージョンに更新されています。' />
 		<CustomAction Id='NoDowngrade'    Error='[ProductName] の新しいバージョンが既にインストールされています。' />
-
+		
 		<Property Id="WixUI_InstallMode" Value="Remove"/>
 		<Property Id="REBOOT" Secure="yes" Value="ReallySuppress" />
 		<Property Id="MSIRESTARTMANAGERCONTROL" Secure="yes" Value="Disable" />
@@ -259,6 +258,8 @@
 			<Custom Action='RegisterTaskScheduler1' After='SetRegisterTaskScheduler1'>(NOT Installed) or REINSTALL</Custom>
 			<Custom Action='SetRegisterTaskScheduler2' Before='InstallFinalize'>(NOT Installed) or REINSTALL</Custom>
 			<Custom Action='RegisterTaskScheduler2' After='SetRegisterTaskScheduler2'>(NOT Installed) or REINSTALL</Custom>
+			<Custom Action='SetRegisterTaskScheduler3' Before='InstallFinalize'>(NOT Installed) or REINSTALL</Custom>
+			<Custom Action='RegisterTaskScheduler3' After='SetRegisterTaskScheduler3'>(NOT Installed) or REINSTALL</Custom>
 		</InstallExecuteSequence>
 		<Property Id="RegisterTaskScheduler" Value=" "/>
 		<CustomAction Id="SetRegisterTaskScheduler" Property="RegisterTaskScheduler"
@@ -270,9 +271,13 @@
 		<CustomAction Id="RegisterTaskScheduler1" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
 		<Property Id="RegisterTaskScheduler2" Value=" "/>
 		<CustomAction Id="SetRegisterTaskScheduler2" Property="RegisterTaskScheduler2"
-			Value="&quot;[System64Folder]schtasks.exe&quot; /Create /F /TN &quot;$(var.ProductName)_Quit&quot; /XML &quot;[INSTALLFOLDER]Register_TaskScheduler2.xml&quot;"/>
+			Value="&quot;[System64Folder]schtasks.exe&quot; /Create /F /TN &quot;$(var.ProductName)_StartDelay&quot; /XML &quot;[INSTALLFOLDER]Register_TaskScheduler2.xml&quot;"/>
 		<CustomAction Id="RegisterTaskScheduler2" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
-		
+		<Property Id="RegisterTaskScheduler3" Value=" "/>
+		<CustomAction Id="SetRegisterTaskScheduler3" Property="RegisterTaskScheduler3"
+			Value="&quot;[System64Folder]schtasks.exe&quot; /Create /F /TN &quot;$(var.ProductName)_Quit&quot; /XML &quot;[INSTALLFOLDER]Register_TaskScheduler3.xml&quot;"/>
+		<CustomAction Id="RegisterTaskScheduler3" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+
 		<!-- Unregister TaskScheduler on Uninstall -->
 		<InstallExecuteSequence>
 			<Custom Action='SetUnregisterTaskScheduler' After='InstallInitialize'>Installed or REINSTALL</Custom>
@@ -281,6 +286,8 @@
 			<Custom Action='UnregisterTaskScheduler1' After='SetUnregisterTaskScheduler1'>Installed or REINSTALL</Custom>
 			<Custom Action='SetUnregisterTaskScheduler2' After='InstallInitialize'>Installed or REINSTALL</Custom>
 			<Custom Action='UnregisterTaskScheduler2' After='SetUnregisterTaskScheduler2'>Installed or REINSTALL</Custom>
+			<Custom Action='SetUnregisterTaskScheduler3' After='InstallInitialize'>Installed or REINSTALL</Custom>
+			<Custom Action='UnregisterTaskScheduler3' After='SetUnregisterTaskScheduler3'>Installed or REINSTALL</Custom>
 		</InstallExecuteSequence>
 		<Property Id="UnregisterTaskScheduler" Value=" "/>
 		<CustomAction Id="SetUnregisterTaskScheduler" Property="UnregisterTaskScheduler"
@@ -292,9 +299,12 @@
 		<CustomAction Id="UnregisterTaskScheduler1" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
 		<Property Id="UnregisterTaskScheduler2" Value=" "/>
 		<CustomAction Id="SetUnregisterTaskScheduler2" Property="UnregisterTaskScheduler2"
-			Value="&quot;[System64Folder]schtasks.exe&quot; /Delete /F /TN &quot;$(var.ProductName)_Quit&quot;"/>
+			Value="&quot;[System64Folder]schtasks.exe&quot; /Delete /F /TN &quot;$(var.ProductName)_StartDelay&quot;"/>
 		<CustomAction Id="UnregisterTaskScheduler2" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
-		
+		<CustomAction Id="SetUnregisterTaskScheduler3" Property="UnregisterTaskScheduler3"
+			Value="&quot;[System64Folder]schtasks.exe&quot; /Delete /F /TN &quot;$(var.ProductName)_Quit&quot;"/>
+		<CustomAction Id="UnregisterTaskScheduler3" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+
 		<!-- Remove App Registry on Uninstall -->
 		<UI>
 			<Publish Dialog="_ExitDialog" Control="Finish" Event="DoAction" Value="RemoveAppRegMSI">Installed and (WIXUI_VERIFYDIALOGOPTIONALCHECKBOX4 = 1)</Publish>
@@ -351,7 +361,7 @@
 		<InstallExecuteSequence>
 			<Custom Action='RemoveBundledCache' After='InstallInitialize'>(Installed or REINSTALL) and BUNDLED_ID</Custom>
 			<Custom Action='RemoveBundleCache' Before='InstallFinalize'>Installed and (NOT REINSTALL) and BUNDLE_ID and (NOT (BUNDLE = 1))</Custom>
-			<Custom Action='RemoveProductedCache' Before='InstallFinalize'>(Installed or REINSTALL) and BUNDLED_VERSION</Custom>		
+			<Custom Action='RemoveProductedCache' Before='InstallFinalize'>(Installed or REINSTALL) and BUNDLED_VERSION</Custom>			
 		</InstallExecuteSequence>
 		<Property Id="CMD" Value="cmd.exe"/>
 		<CustomAction Id="RemoveBundledCache" Property="CMD" Execute="deferred" Return="ignore" Impersonate="no"
@@ -454,6 +464,9 @@
 			<Component Id="Register_TaskScheduler2.xml" Guid="{17BD4844-87C4-4A06-BBF3-86C94D22C5DC}">
 				<File Id="Register_TaskScheduler2.xml" Name="Register_TaskScheduler2.xml" Source="$(var.TargetDir04)Register_TaskScheduler2.xml" />
 			</Component>
+			<Component Id="Register_TaskScheduler3.xml" Guid="{8B32494B-0472-4399-8360-B34CA076A36F}">
+				<File Id="Register_TaskScheduler3.xml" Name="Register_TaskScheduler3.xml" Source="$(var.TargetDir04)Register_TaskScheduler3.xml" />
+			</Component>
 			<Component Id="License.rtf" Guid="{E6E55A92-6BE8-4612-8172-0BC04811D6E1}">
 				<File Id="License.rtf" Name="License.rtf" Source="$(var.TargetDir04)License.rtf" />
 			</Component>
@@ -463,7 +476,7 @@
 			<Component Id="Register_Eventlog.reg" Guid="{FBC3FF68-EF97-43F1-BE86-5F5CFC3AE4F1}">
 				<File Id="Register_Eventlog.reg" Name="Register_Eventlog.reg" Source="$(var.TargetDir04)Register_Eventlog.reg" />
 			</Component>
-			<!-- Registries -->
+			<!-- Application registry -->
 			<Component Id="EventLogRegistry" Guid="{B5A28410-C07F-43BD-BA17-D15F0331986B}">
 				<RegistryKey Root="HKLM" Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\$(var.ProductName)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
 					<RegistryValue Type="integer" Name="CustomSource" Value="00000001" KeyPath="yes" />

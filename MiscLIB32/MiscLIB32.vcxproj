@@ -157,7 +157,6 @@
   <ItemGroup>
     <ClCompile Include="..\MiscLIB\CRawInput.cpp" />
     <ClCompile Include="..\MiscLIB\CRegistry.cpp" />
-    <ClCompile Include="..\MiscLIB\CSharedMemory.cpp" />
     <ClCompile Include="..\MiscLIB\CThread.cpp" />
     <ClCompile Include="..\MiscLIB\CWindow.cpp" />
     <ClCompile Include="..\MiscLIB\pch.cpp" />
@@ -166,7 +165,6 @@
   <ItemGroup>
     <ClInclude Include="..\MiscLIB\CRawInput.h" />
     <ClInclude Include="..\MiscLIB\CRegistry.h" />
-    <ClInclude Include="..\MiscLIB\CSharedMemory.h" />
     <ClInclude Include="..\MiscLIB\CThread.h" />
     <ClInclude Include="..\MiscLIB\CWindow.h" />
     <ClInclude Include="..\MiscLIB\DLLDefs.h" />

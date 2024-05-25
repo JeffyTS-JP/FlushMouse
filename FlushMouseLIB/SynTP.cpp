@@ -94,33 +94,37 @@ BOOL		CSynTP::bStartReceiver(HWND hWnd, int iPort)
 			return FALSE;
 		}
 	}
+	BOOL	bRet = FALSE;
 	if (Receiver == NULL)	Receiver = new CTCPIP;
 	if (ReceivePacketThread == NULL)	ReceivePacketThread = new CThread;
 	if (Receiver && ReceivePacketThread) {
-		if (!Receiver->bOpenPortForReceiveUDPv4(iPort)) return FALSE;
+		if (!Receiver->bOpenPortForReceiveUDPv4(iPort)) goto Cleanup;
 		if (ReceivePacketThread) {
-			if (ReceivePacketThread->bRegister(RECIEVEPACKETTHREADNAME, RECIEVEPACKETTHREADID,
-				(LPTHREAD_START_ROUTINE)&bReceivePacketThreadRoutine, this, 0)) {
-				ReceivePacketThread->bSetSentinel(TRUE);
-				if (!ReceivePacketThread->bStart()) {
-					if (ReceivePacketThread != NULL) {
-						delete	ReceivePacketThread;
-						ReceivePacketThread = NULL;
-					}
-					ReceivePacketThread = new CThread;
-					if (!ReceivePacketThread->bRegister(RECIEVEPACKETTHREADNAME, RECIEVEPACKETTHREADID,
-						(LPTHREAD_START_ROUTINE)&bReceivePacketThreadRoutine, this, 0)) {
-						return FALSE;
-					}
-				}
+			if (!ReceivePacketThread->bRegister(RECIEVEPACKETTHREADNAME, RECIEVEPACKETTHREADID,
+				(LPTHREAD_START_ROUTINE)&bReceivePacketThreadRoutine, this, 0))	{
+				goto Cleanup;
 			}
-			else {
-				return FALSE;
+			ReceivePacketThread->bSetSentinel(TRUE);
+			if (!ReceivePacketThread->bStart()) {
+				goto Cleanup;
 			}
+			bRet = TRUE;
 		}
-
 	}
-	return TRUE;
+
+Cleanup:
+	if (!bRet) {
+		if (ReceivePacketThread != NULL) {
+			ReceivePacketThread->bSetSentinel(FALSE);
+			delete	ReceivePacketThread;
+			ReceivePacketThread = NULL;
+		}
+		if (Receiver != NULL) {
+			delete Receiver;
+			Receiver = NULL;
+		}
+	}
+	return bRet;
 }
 
 //
@@ -149,12 +153,18 @@ BOOL		CSynTP::bStartSender(HWND hWnd, LPCTSTR szIPAddress, int iPort)
 	if ((hWnd == NULL) || (szIPAddress == NULL) || (iPort == 0))	return FALSE;
 	if (Sender == NULL)	Sender = new CTCPIP;
 	if (Sender) {
-		if (!Sender->bOpenPortForSendUDPv4(szIPAddress, iPort)) return FALSE;
-	}
-
-	if (hGetHWND() == NULL) {
-		if (!bRegister((HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE), WINDOWCLASS)) {
+		if (!Sender->bOpenPortForSendUDPv4(szIPAddress, iPort)) {
+			if (Sender)	delete Sender;
+			Sender = NULL;
 			return FALSE;
+		}
+
+		if (hGetHWND() == NULL) {
+			if (!bRegister((HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE), WINDOWCLASS)) {
+				if (Sender)	delete Sender;
+				Sender = NULL;
+				return FALSE;
+			}
 		}
 	}
 	return TRUE;

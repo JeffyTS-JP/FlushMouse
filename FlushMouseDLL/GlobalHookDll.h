@@ -12,7 +12,6 @@
 //
 #pragma once
 #include "FlushMouseDll.h"
-#include "..\MiscLIB\CSharedMemory.h"
 
 //
 // Message Handler Define
@@ -21,12 +20,6 @@
 //
 // Define
 //
-#define GLOBALHOOKMEM _T("GlobalHookSharedMem")
-typedef struct tagGLOBAL_SHAREDMEM {
-    HINSTANCE	hInstance;
-    HWND	    hWnd;
-    HHOOK	    hHook;
-} GLOBAL_SHAREDMEM, * PGLOBAL_SHAREDMEM, * LPGLOBAL_SHAREDMEM;
 
 //
 // Global Prototype Define

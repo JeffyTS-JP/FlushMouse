@@ -31,8 +31,7 @@ static BOOL	bReportEvent(DWORD dwEventID, WORD wCategory);
 #pragma comment( linker, "/SECTION:FLUSHMOUSEDLL_SEG32,RWS" )
 #pragma data_seg("FLUSHMOUSEDLL_SEG32")
 static HWND		hWndMSParent = NULL;
-static LPMOUSE_SHAREDMEM32  lpDatMouse = NULL;
-static CSharedMemory* CSharedMem = NULL;
+static HHOOK	hHookMS = NULL;
 #pragma data_seg()
 
 //
@@ -41,25 +40,12 @@ static CSharedMemory* CSharedMem = NULL;
 DLLEXPORT BOOL  __stdcall bMouseHookSet32(HWND hWnd)
 {
 	hWndMSParent = hWnd;
-	if ((CSharedMem = new CSharedMemory(MOUSEHOOKMEM32, sizeof(MOUSE_SHAREDMEM32))) != NULL) {
-		if ((lpDatMouse = (LPMOUSE_SHAREDMEM32)CSharedMem->lpvSharedMemoryRead()) != NULL) {
-			lpDatMouse->hWnd = hWnd;
-			if (CSharedMem->bSharedMemoryWrite(lpDatMouse)) {
-				HHOOK	hHook = SetWindowsHookEx(WH_MOUSE, (HOOKPROC)lpMouseHookProc, hGetInstance(), 0);
-				if (hHook) {
-					lpDatMouse->hHook = hHook;
-					if (CSharedMem->bSharedMemoryWrite(lpDatMouse)) {
-						return TRUE;
-					}
-					UnhookWindowsHookEx(hHook);
-				}
-			}
-		}
-		delete CSharedMem;
-		CSharedMem = NULL;
-		hWndMSParent = NULL;
-		lpDatMouse = NULL;
+	hHookMS = SetWindowsHookEx(WH_MOUSE, (HOOKPROC)lpMouseHookProc, hGetInstance(), 0);
+	if (hHookMS) {
+		return TRUE;
 	}
+	hWndMSParent = NULL;
+	hHookMS = NULL;
 	return FALSE;
 }
 
@@ -69,18 +55,12 @@ DLLEXPORT BOOL  __stdcall bMouseHookSet32(HWND hWnd)
 DLLEXPORT BOOL __stdcall bMouseHookUnset32()
 {
 	BOOL		bRet = FALSE;
-	if (CSharedMem != NULL) {
-		if ((lpDatMouse = (LPMOUSE_SHAREDMEM32)CSharedMem->lpvSharedMemoryRead()) != NULL) {
-			if (lpDatMouse->hHook) {
-				if (UnhookWindowsHookEx(lpDatMouse->hHook)) {
-					bRet = TRUE;
-				}
-			}
+	if (hHookMS) {
+		if (UnhookWindowsHookEx(hHookMS)) {
+			bRet = TRUE;
 		}
-		delete CSharedMem;
-		CSharedMem = NULL;
 		hWndMSParent = NULL;
-		lpDatMouse = NULL;
+		hHookMS = NULL;
 	}
 	return bRet;
 }

@@ -49,7 +49,8 @@ typedef struct icmp_hdr
 //
 // Global Prototype Define
 //
-extern DWORD		dwGetString2IPv4Addr(LPCTSTR szIPAddr);
+extern DWORD		dwGetString2IPv4Addr(LPCTSTR lpszIPAddress);
+extern BOOL			bIsPrivateAddress(LPCTSTR lpszIPAddress);
 extern BOOL			bCheckExistHostnameIPv4(LPCTSTR lpszHostname);
 
 //
@@ -62,9 +63,9 @@ class CTCPIP
 		~CTCPIP();
 
 		BOOL		bOpenPortForReceiveUDPv4(int Port);
-		BOOL		bReceivePackaet(LPVOID lpData, int cbSize);
+		BOOL		bReceivePackaet(LPVOID lpData, int cbSize) const;
 		BOOL		bOpenPortForSendUDPv4(LPCTSTR lpszIPAddress, int Port);
-		BOOL		bSendPacket(LPCSTR lpszSendData, int cbSize);
+		BOOL		bSendPacket(LPCSTR lpszSendData, int cbSize) const;
 
 		BOOL		bCheckHostByICMPv4(LPCTSTR lpszIPAddress);
 

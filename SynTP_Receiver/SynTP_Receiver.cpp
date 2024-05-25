@@ -82,7 +82,7 @@ int APIENTRY	wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	_ASSERTE(_CrtCheckMemory());
 #endif
 
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK)
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_SYSTEMMODAL)
 
 	int	iRet = 0;
 	if ((iRet = iCheckCmdLine(lpCmdLine)) != 1) {
@@ -106,7 +106,7 @@ int APIENTRY	wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 				PostMessage(hWnd, WM_DESTROY, NULL, NULL);
 				if (i == 1) {
 					if (hInstance) {
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK)
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_SYSTEMMODAL)
 						vMessageBox(hInstance, NULL, IDS_ALREADYRUN, MessageBoxTYPE);
 					}
 					return (-1);
@@ -268,8 +268,8 @@ BOOL		CSynTP_Receiver::Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(lpCreateStruct);
 
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK)
-	
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_SYSTEMMODAL)
+
 	if (SynTP == NULL) {
 		SynTP = new CSynTP;
 		if (SynTP) {

@@ -19,10 +19,9 @@
 #include "Profile.h"
 #include "Resource.h"
 #include "Eventlog.h"
+#include "KeyboardHook.h"
 #include "CommonDef.h"
 #include "..\FlushMouseDLL\GlobalHookDll.h"
-#include "..\FlushMouseDLL\KeyboardHookDll.h"
-#include "..\FlushMouseDLL32\MouseHookDll32.h"
 #include "..\MiscLIB\CThread.h"
 #include "..\MiscLIB\CRegistry.h"
 
@@ -58,7 +57,7 @@ static UINT     nCheckFocusTimerTickValue = FOCUSINITTIMERVALUE;
 static UINT_PTR nCheckFocusTimerID = CHECKFOCUSTIMERID;
 static UINT_PTR	uCheckFocusTimer = NULL;
 
-#define PROCINITTIMERVALUE		3000
+#define PROCINITTIMERVALUE		2000
 #define CHECKPROCTIMERID		2
 static UINT     nCheckProcTimerTickValue = PROCINITTIMERVALUE;
 static UINT_PTR nCheckProcTimerID = CHECKPROCTIMERID;
@@ -201,7 +200,7 @@ int			iCheckCmdLine(LPCTSTR lpCmdLine)
 					}
 					Resource = new CResource(FLUSHMOUSE_EXE);
 					if (Resource->hLoad() != NULL) {
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK)
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_SYSTEMMODAL)
 						vMessageBox(NULL, IDS_ALREADYRUN, MessageBoxTYPE);
 						if (Resource)	delete	Resource;
 					}
@@ -313,6 +312,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 		default:
 			if (!bCheckTaskTrayMessage(hWnd, message)) {
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_SYSTEMMODAL)
 				vMessageBox(hWnd, IDS_NOTREGISTERTT, MessageBoxTYPE);
 				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 				break;
@@ -330,7 +330,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 {
 	UNREFERENCED_PARAMETER(lpCreateStruct);
 
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK)
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_SYSTEMMODAL)
 
 	hMainWnd = hWnd;
 
@@ -688,6 +688,8 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 	if ((fDown == FALSE)) {											// Key up
 		switch (vk) {
 		case KEY_TAB:
+			if (bIMEInConverting)	return;
+			break;
 		case KEY_RETURN:
 			bIMEInConverting = FALSE;
 			break;
@@ -1293,7 +1295,7 @@ static BOOL	bChromium_Helper(HWND hForeWnd)
 //
 BOOL		bStartThreadHookTimer(HWND hWnd)
 {
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK)
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_SYSTEMMODAL)
 	
 	if (Cursor == NULL) {
 		Cursor = new CCursor;
@@ -1402,9 +1404,19 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 
 	if (uTimerID == nCheckProcTimerID) {
 		if (FindWindow(CLASS_FLUSHMOUSE32, NULL) == NULL) {
-			vDestroyWindow(hWnd);
-			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+			if (FlushMouseHook != NULL) {
+				delete	FlushMouseHook;
+				FlushMouseHook = NULL;
+			}
+			Sleep(1000);
+			if (FlushMouseHook == NULL) {
+				FlushMouseHook = new CFlushMouseHook;
+				if (!FlushMouseHook->bHookSet(hWnd, FLUSHMOUSE_DLL, FLUSHMOUSE32_EXE)) {
+					PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+				}
+			}
 		}
+
 	}
 }
 

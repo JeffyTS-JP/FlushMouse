@@ -11,16 +11,11 @@
 //
 #pragma once
 #include "FlushMouseDll32.h"
-#include "..\MiscLIB\CSharedMemory.h"
 
 //
 // Define
 //
 #define MOUSEHOOKMEM32 _T("MouseHookSharedMem32")
-typedef struct tagMOUSE_SHAREDMEM32 {
-	HWND    hWnd;
-	HHOOK	hHook;
-} MOUSE_SHAREDMEM32, * PMOUSE_SHAREDMEM32, * LPMOUSE_SHAREDMEM32;
 
 //
 // Global Prototype Define

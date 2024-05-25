@@ -19,6 +19,7 @@
 #define MAX_LOADSTRING 100
 
 #define FLUSHMOUSE				L"FlushMouse"
+#define FLUSHMOUSE32			L"FlushMouse32"
 
 // Files
 #define	FULL_FLUSHMOUSE_EXE		L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouse.exe"

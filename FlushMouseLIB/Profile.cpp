@@ -57,7 +57,7 @@ CProfile::CProfile()
 		lpstAppRegData->bDoModeDispByMouseBttnUp = TRUE;			// Mouse L/Rボタンが離されたときにIMEモードを表示する
 		lpstAppRegData->bDoModeDispByCtrlUp = TRUE;					// Ctrlが離されたときにIMEモードを表示する
 		lpstAppRegData->bIMEModeForced = FALSE;						// Change IME Mode Forced
-		lpstAppRegData->bEnableEPHelper = FALSE;					// @@@ for Explorer Patcher Simple Window Switcher Helper
+		lpstAppRegData->bEnableEPHelper = FALSE;					// for Explorer Patcher Simple Window Switcher Helper
 
 		// for FlushMouse & FlushMouseSub
 		lpstAppRegData->bOffChangedFocus = FALSE;					// アプリケーションが切り替わったときIMEをOFFにする(bDisplayFocusWindowIMEとは排他的動作になる)
@@ -73,7 +73,7 @@ CProfile::CProfile()
 																	//                               0x11 = sender (Hosstname IPV4) / 0x12 = sender (always start Hosstname IPV4)
 																	//                               0x31 = sender (Hosstname IPV6) / 0x32 = sender (always start Hosstname IPV6) / 0x33 = receiver (IPv6) / 0x34 =receiver (always start IPv6)
 		_tcsncpy_s(lpstAppRegData->szSynTPSendIPAddr1, MAX_IPV4_ADDRESS, L"", _TRUNCATE);	// SynTP Helper Send IP Addr 1
-		_tcsncpy_s(lpstAppRegData->szSynTPSendHostname1, MAX_FQDN, L"", _TRUNCATE);			// SynTP Helper Hostname 1
+		_tcsncpy_s(lpstAppRegData->szSynTPSendIPAddr1, MAX_IPV4_ADDRESS, L"10.0.100.128", _TRUNCATE);	// SynTP Helper Send IP Addr 1
 		lpstAppRegData->dwSynTPPortNo1 = 50008;						// SynTP Helper Port Number 1
 	}
 }

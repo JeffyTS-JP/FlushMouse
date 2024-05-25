@@ -14,7 +14,6 @@
 #include "pch.h"
 #include "FlushMouse32.h"
 #include "Resource.h"
-#include "..\FlushMouseDLL32\MouseHookDLL32.h"
 #include "..\FlushMouseLIB\CommonDef.h"
 #include "..\FlushMouseDLL\EventlogData.h"
 
@@ -39,7 +38,7 @@
 // Define
 //
 // Timer
-#define PROCINITTIMERVALUE		5000
+#define PROCINITTIMERVALUE		2000
 #define CHECKPROCTIMERID		2
 static UINT     nCheckProcTimerTickValue = PROCINITTIMERVALUE;		// Timer tick
 static UINT_PTR nCheckProcTimerID = CHECKPROCTIMERID;				// Timer ID
@@ -56,7 +55,7 @@ static UINT_PTR	uCheckProcTimer = NULL;
 //
 // Local Data
 //
-static TCHAR			szTitle[MAX_LOADSTRING] = FLUSHMOUSE;
+static TCHAR			szTitle[MAX_LOADSTRING] = FLUSHMOUSE32;
 static HINSTANCE		hInst = NULL;
 static HWND				hParentWnd = NULL;
 
@@ -90,7 +89,7 @@ static void				vMessageBox(HWND hWnd, UINT uID, UINT uType);
 //
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK)					// MessageBox style
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_SYSTEMMODAL)					// MessageBox style
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
@@ -105,6 +104,24 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 			return (-1);
 		}
 		CloseHandle(hHandle);
+	}
+
+	HWND	hWnd = NULL;
+	if ((hWnd = FindWindow(CLASS_FLUSHMOUSE32, NULL)) != NULL) {
+		SetFocus(GetLastActivePopup(hWnd));
+		PostMessage(hWnd, WM_DESTROY, NULL, NULL);
+		for (int i = 3; i > 0; i--) {
+			Sleep(500);
+			if ((hWnd = FindWindow(CLASS_FLUSHMOUSE32, NULL)) != NULL) {
+				SetFocus(GetLastActivePopup(hWnd));
+				PostMessage(hWnd, WM_DESTROY, NULL, NULL);
+				if (i == 1) {
+					vMessageBox(NULL, IDS_ALREADYRUN, MessageBoxTYPE);
+					return (-1);
+				}
+			}
+			else break;
+		}
 	}
 
 	if (*lpCmdLine == _T('\0')) {
@@ -129,24 +146,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	if (!hPrevInstance) {
 		if (!MyRegisterClass(hInstance)) {
 			return (-1);
-		}
-	}
-
-	HWND	hWnd = NULL;
-	if ((hWnd = FindWindow(CLASS_FLUSHMOUSE32, NULL)) != NULL) {
-		SetFocus(GetLastActivePopup(hWnd));
-		PostMessage(hWnd, WM_DESTROY, NULL, NULL);
-		for (int i = 3; i > 0; i--) {
-			Sleep(500);
-			if ((hWnd = FindWindow(CLASS_FLUSHMOUSE32, NULL)) != NULL) {
-				SetFocus(GetLastActivePopup(hWnd));
-				PostMessage(hWnd, WM_DESTROY, NULL, NULL);
-				if (i == 1) {
-					vMessageBox(NULL, IDS_ALREADYRUN, MessageBoxTYPE);
-					return (-1);
-				}
-			}
-			else break;
 		}
 	}
 
@@ -247,7 +246,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 {
 	UNREFERENCED_PARAMETER(lpCreateStruct);
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK)
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_SYSTEMMODAL)
 	
 	PowerNotification = new CPowerNotification(hWnd);
 	if (PowerNotification == NULL) {
@@ -320,8 +319,13 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 					uCheckProcTimer = NULL;
 				}
 			}
-			bDestroyTaskTrayWindow(hWnd);
-			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION32_CATEGORY);
+			if (PowerNotification != NULL) {
+				delete PowerNotification;
+				PowerNotification = NULL;
+			}
+			if (hParentWnd)	bDestroyTaskTrayWindow(hParentWnd);
+			bReportEvent(MSG_DELAYED_RESTART_FLUSHMOUSE_EVENT, APPLICATION32_CATEGORY);
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		}
 	}
 	return;
@@ -452,6 +456,7 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 		if (GetSystemPowerStatus(&PowerStatus)) {
 			switch (PowerStatus.ACLineStatus) {
 			case 0:
+				if (hParentWnd)	bDestroyTaskTrayWindow(hParentWnd);
 				bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_OFF, POWERNOTIFICATION_CATEGORY);
 				break;
 			case 1:

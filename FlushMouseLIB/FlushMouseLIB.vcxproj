@@ -184,6 +184,7 @@
     <ClInclude Include="FlushMouseSub.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Ime.h" />
+    <ClInclude Include="KeyboardHook.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Profile.h" />
     <ClInclude Include="Resource.h" />
@@ -199,6 +200,7 @@
     <ClCompile Include="FlushMouseLIB.cpp" />
     <ClCompile Include="FlushMouseSub.cpp" />
     <ClCompile Include="Ime.cpp" />
+    <ClCompile Include="KeyboardHook.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

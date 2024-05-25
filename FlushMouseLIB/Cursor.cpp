@@ -127,6 +127,10 @@ BOOL			CCursor::bReloadCursor()
 {
 	vSetParamFromRegistry();
 
+	if (hCursorData != NULL) {
+		bCursorDllUnload();
+	}
+	
 	if (stIMECursorData.lpszLoadDatName == NULL) {
 		if ((stIMECursorData.lpszLoadDatName = lpszGetCursorDataName()) == NULL)	return FALSE;
 	}
@@ -268,7 +272,6 @@ LPTSTR		CCursor::lpszGetCursorDataName()
 //
 BOOL		CCursor::bStartIMECursorChangeThread(HWND hWndObserved)
 {
-	if (&stIMECursorData == NULL)	return FALSE;
 	vSetParamFromRegistry();
 	stIMECursorData.hWndObserved = hWndObserved;
 	if ((Profile != NULL) && Profile->lpstAppRegData->bDisplayIMEModeByWindow) {
@@ -345,7 +348,8 @@ BOOL		CCursor::bStartDrawIMEModeThreadWaitDblClk(HWND hWndObserved)
 	vSetParamFromRegistry();
 	stIMECursorData.bDrawIMEModeWait = TRUE;
 	if (Profile == NULL)	return FALSE;
-	stIMECursorData.dwWaitTime = GetDoubleClickTime() +  Profile->lpstAppRegData->dwAdditionalWaitTime;
+	if (GetDoubleClickTime() >  Profile->lpstAppRegData->dwAdditionalWaitTime)	stIMECursorData.dwWaitTime = GetDoubleClickTime();
+	else stIMECursorData.dwWaitTime = Profile->lpstAppRegData->dwAdditionalWaitTime;
 	return bStartDrawIMEModeThreadSub(hWndObserved);
 }
 
@@ -354,7 +358,7 @@ BOOL		CCursor::bStartDrawIMEModeThreadWaitDblClk(HWND hWndObserved)
 //
 BOOL		CCursor::bStartDrawIMEModeThreadSub(HWND hWndObserved)
 {
-	if ((Cursor == NULL) || (DrawIMEModeThread == NULL) || (&stIMECursorData == NULL))	return FALSE;
+	if ((Cursor == NULL) || (DrawIMEModeThread == NULL))	return FALSE;
 	stIMECursorData.hWndObserved = hWndObserved;
 	stIMECursorData.bIMECursorChangeThreadSentinel = FALSE;
 	DrawIMEModeThread->bSetSentinel(FALSE);
@@ -410,6 +414,7 @@ BOOL		CCursor::bCursorDllUnload()
 		}
 	}
 	--iCursorDataLoadCount;
+	if (iCursorDataLoadCount == 0)	hCursorData = NULL;
 	return TRUE;
 }
 
@@ -418,7 +423,6 @@ BOOL		CCursor::bCursorDllUnload()
 //
 BOOL		CCursor::bSystemCursorLoad()
 {
-	if (&stIMECursorData == NULL)	return FALSE;
 	if (!bChangeFlushMouseCursor(IMEOFF, &stIMECursorData))		return FALSE;
 	
 	int	i = 0;
@@ -436,7 +440,6 @@ BOOL		CCursor::bSystemCursorLoad()
 //
 BOOL		CCursor::bRegisterIMECursorChangeThread(HWND hWnd)
 {
-	if (&stIMECursorData == NULL)	return FALSE;
 	if (IMECursorChangeThread == NULL) {
 		IMECursorChangeThread = new CThread;
 		if (!bChangeFlushMouseCursor(IMEOFF, &stIMECursorData)) return FALSE;
@@ -538,7 +541,6 @@ VOID		CCursor::vUnRegisterDrawIMEModeMouseThread()
 BOOL		CCursor::bStartDrawIMEModeMouseThread(HWND hWndObserved)
 {
 	if ((Cursor == NULL) || (DrawIMEModeMouseThread == NULL))	return FALSE;
-	if (&stIMECursorData == NULL)	return FALSE;
 	if (stIMECursorData.bIMEModeByWindowThreadSentinel != FALSE)	return TRUE;
 	stIMECursorData.hWndObserved = hWndObserved;
 	if (!DrawIMEModeMouseThread->bStart()) {
@@ -558,7 +560,7 @@ BOOL		CCursor::bStartDrawIMEModeMouseThread(HWND hWndObserved)
 VOID		CCursor::vStopDrawIMEModeMouseThread()
 {
 	if (MouseWindow != NULL)		MouseWindow->bShowWindow(SW_HIDE);
-	if (&stIMECursorData != NULL)	stIMECursorData.bIMEModeByWindowThreadSentinel = FALSE;
+	stIMECursorData.bIMEModeByWindowThreadSentinel = FALSE;
 }
 
 //
@@ -621,8 +623,6 @@ BOOL		CCursor::bIMEModeMouseThreadRoutine(LPVOID lpvParam)
 //
 BOOL		CCursor::bRegisterDrawIMEModeThread(HWND hWndObserved)
 {
-	if (&stIMECursorData == NULL)	return FALSE;
-	// Register thread
 	stIMECursorData.hWndObserved = hWndObserved;
 	if (!DrawIMEModeThread->bRegister(DRAWIMEMODETHREADNAME, DRAWIMEMODETHREADID,
 							(LPTHREAD_START_ROUTINE)&bDrawIMEModeRoutine, &stIMECursorData, 0)) {
@@ -1192,7 +1192,7 @@ LRESULT CALLBACK CCursorWindow::WndProc(HWND hWnd, UINT message, WPARAM wParam, 
 // WM_CREATE
 // Cls_OnCreate()
 //
-BOOL		CCursorWindow::Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
+BOOL		CCursorWindow::Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct) const
 {
 	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(lpCreateStruct);

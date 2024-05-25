@@ -33,18 +33,46 @@
 //
 // Local Prototype Define
 //
+static BOOL	bIsPrivateIPv4Addr(DWORD dwIPv4Addr);
 
 //
 // dwGetString2IPAddr()
 // 
-DWORD		dwGetString2IPv4Addr(LPCTSTR szIPAddr)
+DWORD		dwGetString2IPv4Addr(LPCTSTR lpszIPAddress)
 {
+	if (lpszIPAddress == NULL)	return (DWORD)(-1);
 	LPCTSTR	Terminator = NULL;
 	IN_ADDR	Addr{};
-	if (RtlIpv4StringToAddress(szIPAddr, FALSE, &Terminator, &Addr) == 0) {
+	if (RtlIpv4StringToAddress(lpszIPAddress, FALSE, &Terminator, &Addr) == 0) {
 		return (DWORD)MAKEIPADDRESS(Addr.S_un.S_un_b.s_b1, Addr.S_un.S_un_b.s_b2, Addr.S_un.S_un_b.s_b3, Addr.S_un.S_un_b.s_b4);
 	}
 	return (DWORD)(-1);
+}
+
+//
+// bIsPrivateAddress()
+//
+BOOL		bIsPrivateAddress(LPCTSTR lpszIPAddress)
+{
+	if (lpszIPAddress == NULL)	return FALSE;
+	DWORD	dwAddr = 0;
+	if ((dwAddr = dwGetString2IPv4Addr(lpszIPAddress)) != (DWORD)(-1)) {
+		return bIsPrivateIPv4Addr(dwAddr);
+	}
+	return FALSE;
+}
+
+//
+// bIsPrivateIPv4Addr()
+//
+static BOOL	bIsPrivateIPv4Addr(DWORD dwIPv4Addr)
+{
+	if (((0x0a000000 <= dwIPv4Addr) && (dwIPv4Addr <=0x0affffff))		// Class A
+		|| ((0xac100000 <= dwIPv4Addr) && (dwIPv4Addr <=0xac1fffff))	// Class B
+		|| ((0xc0a80000 <= dwIPv4Addr) && (dwIPv4Addr <=0xc0a8ffff))) {	// Class C
+		return TRUE;
+	}
+	return FALSE;
 }
 
 //
@@ -54,30 +82,28 @@ BOOL		bCheckExistHostnameIPv4(LPCTSTR lpszHostname)
 {
 	BOOL		bRet = FALSE;
 	LPWSADATA	_lpWSAData = new WSADATA[sizeof(WSADATA)];
-	PSTR		_lpszIPAddress = new CHAR[MAX_FQDN];
+	PADDRINFOW	ppResult = NULL;
 
 	if (_lpWSAData) {
 		ZeroMemory(_lpWSAData, sizeof(WSADATA));
 		if (WSAStartup(MAKEWORD(2, 2), _lpWSAData) != 0)	goto Cleanup;
-		if (_lpszIPAddress) {
-			ZeroMemory(_lpszIPAddress, MAX_FQDN);
-			if (WideCharToMultiByte(CP_ACP, 0, lpszHostname, -1, _lpszIPAddress, MAX_FQDN, NULL, NULL) == 0) {
-				goto Cleanup;
+		ADDRINFOW	pHints{};
+		SecureZeroMemory(&pHints, sizeof(ADDRINFOW));
+		pHints.ai_flags  = AI_V4MAPPED;
+		pHints.ai_family = AF_INET;
+		pHints.ai_socktype = SOCK_DGRAM;
+		pHints.ai_protocol = IPPROTO_UDP;
+		if (GetAddrInfo(lpszHostname, NULL, &pHints, &ppResult) != 0) {
+			goto Cleanup;
+		}
+		else {
+			if (ppResult && ppResult->ai_addr && (ppResult->ai_addr->sa_family == AF_INET) && (ppResult->ai_addrlen >= 10)) {
+				bRet = bIsPrivateIPv4Addr((DWORD)MAKEIPADDRESS(ppResult->ai_addr->sa_data[2], ppResult->ai_addr->sa_data[3], ppResult->ai_addr->sa_data[4], ppResult->ai_addr->sa_data[5]));
 			}
-			ADDRINFOA	Hints{};
-			Hints.ai_flags  = ((_lpszIPAddress) ? 0 : AI_PASSIVE);
-			Hints.ai_family = AF_INET;
-			Hints.ai_socktype = 0;
-			Hints.ai_protocol = 0;
-			PADDRINFOA	pResult = NULL;
-			if (getaddrinfo(_lpszIPAddress, "0", &Hints, &pResult) != 0) {
-				goto Cleanup;
-			}
-			else bRet = TRUE;
 		}
 	}
 Cleanup:
-	if (_lpszIPAddress)	delete [] _lpszIPAddress;
+	if (ppResult)	FreeAddrInfo(ppResult);
 	if (_lpWSAData)	delete [] _lpWSAData;
 	WSACleanup();
 
@@ -151,7 +177,7 @@ BOOL		CTCPIP::bOpenPortForReceiveUDPv4(int Port)
 //
 // bReceivePackaet()
 //
-BOOL		CTCPIP::bReceivePackaet(LPVOID lpData, int cbSize)
+BOOL		CTCPIP::bReceivePackaet(LPVOID lpData, int cbSize) const
 {
 	if ((pSocket == NULL) || (lpData == NULL) || (cbSize == 0))	return FALSE;
 
@@ -175,52 +201,66 @@ BOOL		CTCPIP::bOpenPortForSendUDPv4(LPCTSTR lpszIPAddress, int Port)
 {
 	if ((lpszIPAddress == NULL) || (Port == 0))	return FALSE;
 
+	int		iRet = 0;
+	BOOL	bRet = FALSE;
+	PADDRINFOW	ppResult = NULL;
+	
 	if (lpszIPAddr == NULL)	lpszIPAddr = new TCHAR[MAX_FQDN];
 	if (lpszIPAddr) {
 		ZeroMemory(lpszIPAddr, (MAX_FQDN * sizeof(TCHAR)));
 		if (lpszIPAddress)	wcsncpy_s(lpszIPAddr, MAX_FQDN, lpszIPAddress, MAX_FQDN);
 	}
+	else goto Cleanup;
 
 	if (lpWSAData == NULL)	lpWSAData = new WSADATA[sizeof(WSADATA)];
 	if (lpWSAData)	ZeroMemory(lpWSAData, sizeof(WSADATA));
-	else return FALSE;
-	
-	if (WSAStartup(MAKEWORD(2, 2), lpWSAData) != 0)	return FALSE;
+	else goto Cleanup;
+
+	if (WSAStartup(MAKEWORD(2, 2), lpWSAData) != 0)	goto Cleanup;
+
 	if ((pSocket = WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, NULL, 0, WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET) {
-		WSACleanup();
-		return FALSE;
+		goto Cleanup;
 	}
-	int	iRet = 0;
+
 	iPortNo = Port;
 	SockAddr_IN.sin_port = htons((USHORT)iPortNo);
 	SockAddr_IN.sin_family = AF_INET;
 	iRet = InetPton(SockAddr_IN.sin_family, lpszIPAddr, &SockAddr_IN.sin_addr.S_un.S_addr);
 	if (iRet == 0) {
 		ADDRINFOW	pHints{};	
-		PADDRINFOW	ppResult = NULL;
 		SecureZeroMemory(&pHints, sizeof(ADDRINFOW));
+		pHints.ai_flags  = AI_V4MAPPED;
 		pHints.ai_family = PF_INET;
 		pHints.ai_socktype = SOCK_STREAM;
+		pHints.ai_protocol = IPPROTO_UDP;
 		iRet = GetAddrInfo(lpszIPAddr, NULL, &pHints, &ppResult);
 		if (iRet != 0) {
-			FreeAddrInfo(ppResult);
 			WSACleanup();
-			return FALSE;
+			goto Cleanup;
 		}
-		SockAddr_IN.sin_addr.S_un = ((LPSOCKADDR_IN)(ppResult->ai_addr))->sin_addr.S_un;
-		FreeAddrInfo(ppResult);
+		if (ppResult && ppResult->ai_addr && (ppResult->ai_addr->sa_family == AF_INET) && (ppResult->ai_addrlen >= 10)) {
+			SockAddr_IN.sin_addr.S_un = ((LPSOCKADDR_IN)(ppResult->ai_addr))->sin_addr.S_un;
+			bRet = bIsPrivateIPv4Addr((DWORD)MAKEIPADDRESS(ppResult->ai_addr->sa_data[2], ppResult->ai_addr->sa_data[3], ppResult->ai_addr->sa_data[4], ppResult->ai_addr->sa_data[5]));
+			if (!bRet)	WSACleanup();
+			goto Cleanup;
+		}
+	}
+	else if (iRet == 1) {
+		bRet = TRUE;
 	}
 	else if (iRet == (-1)) {
 		WSACleanup();
-		return FALSE;
 	}
-	return TRUE;
+
+Cleanup:
+	if (ppResult)	FreeAddrInfo(ppResult);
+	return bRet;
 }
 
 //
 // bSendPacket()
 //
-BOOL		CTCPIP::bSendPacket(LPCSTR lpszSendData, int cbSize)
+BOOL		CTCPIP::bSendPacket(LPCSTR lpszSendData, int cbSize) const
 {
 	if ((pSocket == NULL) || (lpszSendData == NULL) || (cbSize == 0))	return FALSE;
 	int	iRet = 0;

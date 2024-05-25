@@ -148,13 +148,22 @@
 #define MSG_RESTART_FLUSHMOUSE_EVENT     ((DWORD)0x40000101L)
 
 //
+// MessageId: MSG_DELAYED_RESTART_FLUSHMOUSE_EVENT
+//
+// MessageText:
+//
+// Restart FlushMouse(Delayed Start).
+//
+#define MSG_DELAYED_RESTART_FLUSHMOUSE_EVENT ((DWORD)0x40000102L)
+
+//
 // MessageId: MSG_STARTED_FLUSHMOUSE
 //
 // MessageText:
 //
 // Started FlushMouse.
 //
-#define MSG_STARTED_FLUSHMOUSE           ((DWORD)0x40000102L)
+#define MSG_STARTED_FLUSHMOUSE           ((DWORD)0x40000103L)
 
 //
 // MessageId: MSG_QUIT_FLUSHMOUSE
@@ -163,7 +172,7 @@
 //
 // Quit FlushMouse.
 //
-#define MSG_QUIT_FLUSHMOUSE              ((DWORD)0x00000103L)
+#define MSG_QUIT_FLUSHMOUSE              ((DWORD)0x00000104L)
 
 //
 // MessageId: MSG_STOPPED_FLUSHMOUSE
@@ -172,7 +181,7 @@
 //
 // Stoped FlushMouse.
 //
-#define MSG_STOPPED_FLUSHMOUSE           ((DWORD)0x00000104L)
+#define MSG_STOPPED_FLUSHMOUSE           ((DWORD)0x00000105L)
 
 //
 // MessageId: MSG_START_FLUSHMOUSE_EVENT
@@ -181,7 +190,7 @@
 //
 // Start FlushMouse.
 //
-#define MSG_START_FLUSHMOUSE_EVENT       ((DWORD)0x00000105L)
+#define MSG_START_FLUSHMOUSE_EVENT       ((DWORD)0x00000106L)
 
 //
 // MessageId: MSG_QUIT_FLUSHMOUSE_EVENT
@@ -190,7 +199,7 @@
 //
 // Quit FlushMouse.
 //
-#define MSG_QUIT_FLUSHMOUSE_EVENT        ((DWORD)0x00000106L)
+#define MSG_QUIT_FLUSHMOUSE_EVENT        ((DWORD)0x00000107L)
 
 //
 // MessageId: MSG_THREAD_HOOK_TIMER_STARTED
@@ -199,7 +208,7 @@
 //
 // Thread, Hook and Timer Started.
 //
-#define MSG_THREAD_HOOK_TIMER_STARTED    ((DWORD)0x40000107L)
+#define MSG_THREAD_HOOK_TIMER_STARTED    ((DWORD)0x40000108L)
 
 //
 // MessageId: MSG_THREAD_HOOK_TIMER_START_FAILED
@@ -208,7 +217,7 @@
 //
 // Thread, Hook and Timer Start Failed.
 //
-#define MSG_THREAD_HOOK_TIMER_START_FAILED ((DWORD)0x40008108L)
+#define MSG_THREAD_HOOK_TIMER_START_FAILED ((DWORD)0x40008109L)
 
 //
 // MessageId: MSG_THREAD_HOOK_TIMER_STOPPED
@@ -217,7 +226,7 @@
 //
 // Thread, Hook and Timer Stopped.
 //
-#define MSG_THREAD_HOOK_TIMER_STOPPED    ((DWORD)0x40000109L)
+#define MSG_THREAD_HOOK_TIMER_STOPPED    ((DWORD)0x4000010AL)
 
 //
 // MessageId: MSG_THREAD_HOOK_TIMER_RESTARTED
@@ -226,7 +235,7 @@
 //
 // Thread, Hook and Timer Restarted.
 //
-#define MSG_THREAD_HOOK_TIMER_RESTARTED  ((DWORD)0x4000010AL)
+#define MSG_THREAD_HOOK_TIMER_RESTARTED  ((DWORD)0x4000010BL)
 
 //
 // MessageId: MSG_THREAD_HOOK_TIMER_RESTART_FAILED
@@ -235,7 +244,7 @@
 //
 // Thread, Hook and Timer Restart Failed.
 //
-#define MSG_THREAD_HOOK_TIMER_RESTART_FAILED ((DWORD)0x4000810AL)
+#define MSG_THREAD_HOOK_TIMER_RESTART_FAILED ((DWORD)0x40008100L)
 
 //
 // MessageId: MSG_TASKTRAY_REGISTERED
@@ -244,7 +253,7 @@
 //
 // Registered TaskTray.
 //
-#define MSG_TASKTRAY_REGISTERED          ((DWORD)0x0000010BL)
+#define MSG_TASKTRAY_REGISTERED          ((DWORD)0x00008101L)
 
 //
 // MessageId: MSG_TASKTRAY_REGISTER_FAILD
@@ -253,7 +262,7 @@
 //
 // Register TaskTray Failed.
 //
-#define MSG_TASKTRAY_REGISTER_FAILD      ((DWORD)0x0000810BL)
+#define MSG_TASKTRAY_REGISTER_FAILD      ((DWORD)0x00008102L)
 
 //
 // MessageId: MSG_DETECT_FLUSHMOUSE_STOP
@@ -262,7 +271,7 @@
 //
 // Detected Stopping FlushMouse Process.
 //
-#define MSG_DETECT_FLUSHMOUSE_STOP       ((DWORD)0x0000810CL)
+#define MSG_DETECT_FLUSHMOUSE_STOP       ((DWORD)0x00008103L)
 
 //
 // MessageId: MSG_PBT_APMSUSPEND

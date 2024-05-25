@@ -96,7 +96,7 @@ public:
 
 private:
 	BOOL		bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name);
-	BOOL		bHook32DllStop();
+	BOOL		bHook32DllStop() const;
 	static BOOL CALLBACK bEnumWindowsProcHookStop(HWND hWnd, LPARAM lParam);
 
 private:

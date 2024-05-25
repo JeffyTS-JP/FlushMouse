@@ -5,38 +5,49 @@
 
 #### リリース情報
 
-* **2024/05/25　　Version 2.2.4.7 をリリースしました**
+* **2024/07/10　　Version 2.2.5.8 をリリースしました**
 
 * **(主な変更点)**
-   * Visual Studio Version 17.10.0 で、なぜか環境変数が変更になったようなので対応しました
-   * SynTP Helper で、Synaptics のレジストリ (HKEY_LOCAL_MACHINE\SOFTWARE\Synaptics\OEM\TouchPad) を参照するのではなく、独自に諸元を設定できるようにしました。詳しくは[下記](https://github.com/JeffyTS-JP/FlushMouse/tree/master?tab=readme-ov-file#syntp_helper%E6%A9%9F%E8%83%BD-synaptics%E7%A4%BE%E8%A3%BD%E3%82%BF%E3%83%83%E3%83%81%E3%83%91%E3%83%83%E3%83%89%E3%81%A8vmware-workstation--player%E3%81%A7%E3%81%AE-two-finger-scroll-%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)を参照してください
-   * IME 状態を表示するキーに「F5」を追加しました
+   * SynTP Helper で指定できる IP Address, Hostname をプライベートアドレスのみに限定しました
+   * マウスクリック時の IME モード表示の処理を変更しました
+   * IME の変換中には TAB キーで IME モード表示を行わないように変更しました
+   * Keyboard Hook の処理を、DLL から EXE 内の処理に変更しました
+   * エラー時などのメッセージダイアログをトップウィンドウに変更しました
+   * 外部要因により再起動が必要になった場合の処理を見直しました
    * 細かなバグを修正しました
    
-   * Version 2 から、Windows UI3に対応しました (といっても、設定画面などだけですし、あえて従来と似せたので、あまりそれらしくありませんが…)
-     * なお、デスクトップ版と、UI3版の共存はできません。切り替える場合は、いったんアンインストールしてください
-
-
 * **(今後について)**
    * ~~OSDN上ではここまでの機能で開発は終了としたいと考えています(バグ対応は除く)~~
    * ~~今後は、プレゼンテーションモードの追加や、マウスカーソルの形状や、表示する内容などをカスタマイズする機能をつけて有償に移行しようと考えています~~
    * と、上記のように考えていたのですが、この FlushMouse は Microsoft Storeに登録できないやり方を使って処理しているので無理なことが判明しました(フックを使用しいるとどうしてもだめなようです。ただ、SDKなどで、だいぶ検証しました)
    * ***ということで、今後も暇を見つけて、機能向上を目指していきますのでよろしくお願いします***
 
+* **(既知の問題)**
+   * UI3 版において、アプリ終了時にメモリーリークしていることがわかっています (動的に増えていくメモリーリークではありません)
+   * プログラム的には、WinMain に入ってくるまでと、抜けた後の処理でリークしているようです
+   * このため、当方に直す方法はなく、Microsoft の SDK 内の問題であり、アプリやシステムには影響はないものと考えています
+
 #### 対応OS
    * Windows 10 / 11 64bit  (Latest Release Versionで検証しています)
-   * Version 2 以降のUI3対応版では、.NET Framework 8 のランタイムが必要になります。インストーラーで自動的にインストール画面が出ます
+   * Version 2 以降の UI3 対応版では、.NET Framework 8 のランタイムが必要になります。インストーラーで自動的にインストール画面が出ます
 
 #### プライバシーポリシー
    * デスクトップ版、UI3版共に個人情報の収集などは一切行っていません
      * UI3版から、ネットワークへのアクセスとして、インストール時のランタイムのダウンロードと、バージョン情報にGitHubへのリンクがあります
      * また、Version 2.2から Synaptics社製タッチパッドと、VMware Playerへの対応として、ネットワークにアクセスします (詳しくは[下記](https://github.com/JeffyTS-JP/FlushMouse/tree/master?tab=readme-ov-file#syntp_helper%E6%A9%9F%E8%83%BD-synaptics%E7%A4%BE%E8%A3%BD%E3%82%BF%E3%83%83%E3%83%81%E3%83%91%E3%83%83%E3%83%89%E3%81%A8vmware-player%E3%81%A7%E3%81%AE-two-finger-scroll-%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)をご覧ください)
 
+#### Copyright
+   * インストール時に表示される「ソフトウェア使用許諾契約」をお読みください。
+
 #### インストール / アンインストール
    * Windows Installer (exe)形式になっています。実行してインストールしてください
    * アンインストールは「設定」の「アプリと機能」、または「コントロールパネル」の「プログラムと機能」からできます
      * または、同じバージョンのインストーラーがあればそれをもう一度実行してもアンインストールできます
      * こちらの場合は、本プログラムの設定(レジストリ)を削除するかどうかを選べます(デフォルトでは残すようにしてあります)
+   * Version 2 から、Windows UI3に対応しました (といっても、設定画面などだけですし、あえて従来と似せたので、あまりそれらしくありませんが…)
+     * なお、デスクトップ版と、UI3版の共存はできません。切り替える場合は、いったんアンインストールしてください
+     * UI3版はIMEモードの表示色を指定できるなど多少設定画面などが違うだけで動作は一緒になるようにしてあります。今後も、デスクトップ版では最小限の設定画面のみで、UI3版の方を充実させていくことになると思います
+     * もし、メモリなどのリソースの使用量が気になるようでしたら、UI3版をインストールして設定してから、アンインストールしてデスクトップ版に切り替えてください
 
 #### 使い方
    * スタートメニュー、デスクトップのアイコンをクリックするか、PCを起動するとシステムトレイ(タスクトレイ)に常駐します
@@ -123,11 +134,11 @@
 |英数                       |　　 あ / A　　　|　　　 －　　　　|　　　 －　　　　|
 
 
-#### SynTP_Helper機能 (Synaptics社製タッチパッドと、VMware Workstation / Playerでの Two Finger Scroll) について
+#### β機能 SynTP_Helper機能 (Synaptics社製タッチパッドと、VMware Workstation / Playerでの Two Finger Scroll) について
   * 動作環境 (検証環境)
-    * Panasonic社製 Let's note CF-SV1 搭載の Synaptics社製 Wheel Pad (Touch Pad) および Windows 11 Pro (Version 23H2  Build 22631.3296)
+    * Panasonic社製 Let's note CF-SV1 搭載の Synaptics社製 Wheel Pad (Touch Pad) および Windows 11 Pro (Version 23H2)
     * Broadcom (VMware)社製 VMware(R) Workstation 17 Pro (Version 17.5.2) / VMware(R) Workstation 17 Player (Version 17.5.2)
-    * Guest OS は、主に Windows 11 Pro (Version 23H2  Build 22635.2552)
+    * Guest OS は、主に Windows 11 Pro (Version 23H2)
     
   * 機能概要
     * 上記環境で、Wheel Padの　Two Finger Scroll、および Wheel Pad 沿いを回転するようになぞることでのスクロール(右端が起点)を可能にしました
@@ -140,17 +151,18 @@
     * Guest には、FlushMouse をインストールするか、SynTP_Receiver_vx.x.x.x.zip を展開し、SynTP_Receiver.exe をコピーしてください
     * タスクトレイにある、FlushMouse のアイコンをクリックすると出てくるメニューから、SynTP Helperを選び設定画面を出します
       ![SynTPHelperDlg](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SynTPHelperDlg.png)
-      * Host 側では、Senderとして登録します。IP Address の欄には、Guest OSの IPv4 アドレスを入力します (一般的には Ethernet1のアドレスでよいと思います)。また、UDP Portには、空いている番号を入れてください
+      * Host 側では、Senderとして登録します。IP Address の欄には、Guest OSの IPv4 アドレス、または、Hostname を入力します (一般的には Ethernet1のアドレスでよいと思います)。また、UDP Portには、空いている番号を入れてください
+      * IP Address、Hostname どちらも、プライベートアドレスのみ指定できます (10.0.0.0 - 10.255.255.255, 172.16.0.0 - 172.31.255.255, 192.168.0.0 - 192.168.255.255)
+      * Host 側で Hostname を使用して、FlushMouse 起動時からスタートする場合、名前解決ができるようにネットワークが構成されている必要が有ります。名前解決ができない場合はストップ状態となります
       * Guest 側では、Receiverとして登録します。UDP Portには、Host と同じ番号を入れてください (Guest 側では、UDPを Anyで受けますので、IP Addressは必要ありません)
       * 設定 -> ネットワークとインターネット -> ネットワークの詳細設定 -> 共有の詳細設定 -> プライベートネットワークのネットワーク探索を ON にしてください
       * (初回のみ)ネットワークへのアクセス許可のダイアログが出ますので、許可してください
-      * Host 側で Hostname を使用して、FlushMouse 起動時からスタートする場合、名前解決ができるようにネットワークが構成されている必要が有ります。名前解決ができない場合はストップ状態となります
       * Version 2.2.4.7 から、TouchPadのサイズと Edge motion の幅を、Synaptics のレジストリ (HKEY_LOCAL_MACHINE\SOFTWARE\Synaptics\OEM\TouchPad) を参照するのではなく、独自に諸元を設定できるようにしました。これにより、多少機種依存の部分が緩和され、Touch Pad のデータ出力方法が同じであれば、動く可能性があると思います
         * Let's note CF-SV1 の場合、TouchPad Width = 528, Height = 528, Edge Area Width = 88, Height = 88 (デフォルト値)です
         * TouchPad Width, Height は、左下を原点とした、Touch Pad のサイズです
         * Edge Area Width, Height は、スクロールが始まって、指を置いているとスクロールが継続するエリアの幅です。お好みで調整してみてください。この値を 0 にすると Edge motion は動作しません。
-    * SynTP_Receiver の場合は、ショートカットを作成し、プロパティを開いて「Your folder path\SynTP_Receiver.exe /Port 50008」 のように UDP Portを指定します
-      * 管理者権限で起動しない場合、タスクマネージャーなど一部のアプリでスクロールしません。ショートカットのプロパティの詳細設定で「管理者権限で実行する」にチェックをするか、タスクスケジューラに、例えば「任意のユーザーのログオン時」に「最上位の特権で実行する」ように登録するのもよいかもしれません
+    * SynTP_Receiver.exe の場合は、ショートカットを作成し、プロパティを開いて「Your folder path\SynTP_Receiver.exe /Port 50008」 のように UDP Portを指定します
+      * 管理者権限で起動しない場合、タスクマネージャーなど一部のアプリでスクロールしません。ショートカットのプロパティの詳細設定で「管理者権限で実行する」にチェックをするか、タスクスケジューラに、例えば「任意のユーザーのログオン時」に「最上位の特権で実行する」ように登録する方法もあります
       * SynTP_Receiverを終了するためには、タスクマネージャーからタスクの終了を行います
    
   * その他 (制限事項、今後など)
@@ -175,7 +187,7 @@
 
 * 以下では、(B)の方法を紹介します(私はVMwareで作業していますので、その手順を紹介しますが、他の仮想マシンでも同じような手順だと思います)。なお、ライセンス等については、よく読んでご判断ください
 
-* (B) のWindows 11開発環境を取得する　から、仮想マシンをダウンロードしてインストールしたのち、日本語化するために最低設定する項目です(他にも設定する項目はありますが割愛します)
+* (B) の Windows 11 開発環境を取得する　から、仮想マシンをダウンロードしてインストールしたのち、日本語化するために最低設定する項目です(他にも設定する項目はありますが割愛します)
 
   1. Settings -> Time & language -> Language & regionで、日本語を追加します
   2. Japaneseを上に移動します
@@ -205,7 +217,7 @@
   7. その後 OK を押してダイアログを閉じ、上の歯車の左にある「パッケージソース」を「すべて」に変更します。次に「復元」選択します
 
 * ビルド方法です
-  1. ソリューションプラットフォームを「**MixedPlatform**」にしてビルドします (Ctrl + Shift + B)
+  1. ソリューションプラットフォームを必ず「**MixedPlatform**」にしてビルドします (Ctrl + Shift + B)
   2. ソリューション構成を「Release」でビルドすると、デフォルトでは C:\Users\User\source\repos\FlushMouseにFlushMouse_x64.exe (Version 1.2以前は FlushMouse_x64.msi)と、FlushMouseUI3_x64.exeができるのでインストールしてご利用ください
 
 

@@ -15,11 +15,10 @@
 #include "FlushMouseLIB.h"
 #include "TaskTray.h"
 #include "Eventlog.h"
+#include "KeyboardHook.h"
 #include "CommonDef.h"
 #include "..\FlushMouseDLL\ShellHookDll.h"
 #include "..\FlushMouseDLL\GlobalHookDll.h"
-#include "..\FlushMouseDLL\MouseHookDll.h"
-#include "..\FlushMouseDLL\KeyboardHookDll.h"
 #include "..\FlushMouseDLL32\FlushMouseDll32.h"
 #include "..\MiscLIB\CRegistry.h"
 
@@ -307,8 +306,9 @@ CFlushMouseHook::~CFlushMouseHook()
 BOOL			CFlushMouseHook::bHookSet(HWND hWnd, LPCTSTR lpszDll64Name, LPCTSTR lpszExec32Name)
 {
 	UNREFERENCED_PARAMETER(lpszDll64Name);
-	if ((bGlobalHook64 = bGlobalHookSet(hWnd)) != FALSE) {
-		if ((bKeyboardHookLL64 = bKeyboardHookLLSet(hWnd)) != FALSE) {
+
+	if ((bKeyboardHookLL64 = bKeyboardHookLLSet(hWnd)) != FALSE) {
+		if ((bGlobalHook64 = bGlobalHookSet(hWnd)) != FALSE) {
 			if ((bShellHook64 = bShellHookSet(hWnd)) != FALSE) {
 				if ((bHook32Dll = bHook32DllStart(hWnd, lpszExec32Name)) != FALSE) {
 					return TRUE;
@@ -354,7 +354,7 @@ BOOL	 	CFlushMouseHook::bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name)
 				STARTUPINFO	stStartupInfo{};	stStartupInfo.cb = sizeof(STARTUPINFO);
 				if ((bRet = CreateProcess(NULL, lpszCommandLine, NULL, NULL, TRUE,
 					NORMAL_PRIORITY_CLASS, NULL, NULL, &stStartupInfo, lpstProcessInfomation)) != FALSE) {
-					for (int i = 3; i > 0; i--) {
+					for (int i = 5; i > 0; i--) {
 						Sleep(500);
 						if (FindWindow(CLASS_FLUSHMOUSE32, NULL) != NULL) {
 							bHook32Dll = TRUE;
@@ -378,9 +378,9 @@ BOOL	 	CFlushMouseHook::bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name)
 //
 // bKeyboardHookUnset32()
 //
-BOOL 	CFlushMouseHook::bHook32DllStop()
+BOOL 	CFlushMouseHook::bHook32DllStop() const
 {
-#define	TIMEOUT	1000 
+#define	TIMEOUT	3000 
 	if (!bHook32Dll)		return TRUE;
 	BOOL		bRet = FALSE;
 	if (lpstProcessInfomation != NULL) {
