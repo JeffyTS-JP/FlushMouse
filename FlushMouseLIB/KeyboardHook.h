@@ -1,10 +1,11 @@
 ﻿//
-// KeyboardHookDll.h
+// KeyboardHook.h
 //		Copyright (C) 2022 JeffyTS
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0000		2022/02/12  JeffyTS  	New edit.
+// #0000	2022/02/12  JeffyTS  	New edit.
+// #0001	2024/07/01  JeffyTS  	Move to exe from dll
 //
 
 //

@@ -583,7 +583,7 @@ BOOL		CCursor::bIMEModeMouseThreadRoutine(LPVOID lpvParam)
 	do {
 		if (lpstCursorData->bDisplayIMEModeOnCursor && lpstCursorData->bDisplayIMEModeByWindow) {
 			dwIMEModeMouse = Cime->dwIMEMode(lpstCursorData->hWndObserved, lpstCursorData->bForceHiragana);
-			if (!This->bIsIMECursorChanged(lpstCursorData)) {							// IMEモードの変更あるなしにかかわらず処理する
+			if (!This->bIsIMECursorChanged(lpstCursorData)) {
 				iMouse = This->iGetCurosrID(dwIMEModeMouse, lpstCursorData);
 				if (iMouse == 0) {dwIMEModeMouse = IMEOFF;	iMouse = 6;}
 				This->MouseWindow->vSetModeString(lpstCursorData->lpstFlushMouseCursor[iMouse].szMode);
