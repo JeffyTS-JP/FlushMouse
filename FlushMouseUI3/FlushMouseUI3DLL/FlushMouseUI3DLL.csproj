@@ -3,14 +3,11 @@
 		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
 		<TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
 		<RootNamespace>FlushMouseUI3DLL</RootNamespace>
-		<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
 		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
 		<UseWinUI>true</UseWinUI>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>$(AssemblyName)</Title>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
-		<AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
-		<FileVersion>$(VersionPrefix)</FileVersion>
 		<PackageId>$(AssemblyName)</PackageId>
 		<PackAsTool>False</PackAsTool>
 		<WindowsAppContainer>true</WindowsAppContainer>
@@ -27,9 +24,9 @@
 		<PublishReadyToRun>false</PublishReadyToRun>
 		<IsPublishable>False</IsPublishable>
 		<ShouldComputeInputPris>true</ShouldComputeInputPris>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	</PropertyGroup>
 	<PropertyGroup Label="Configuration">
-		<ShouldComputeInputPris>true</ShouldComputeInputPris>
 		<DesktopCompatible>true</DesktopCompatible>
 		<SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
 		<ApplicationIcon>FlushMouse.ico</ApplicationIcon>
@@ -40,14 +37,15 @@
 		<PackageIcon>FlushMouse.png</PackageIcon>
 		<IncludeSymbols>True</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<Version>1.0.0.0</Version>
 		<Authors>JeffyTS</Authors>
 		<Company>JeffyTS</Company>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-	  <NoWarn>NU5100;CS8785;NETSDK1206;IDE1006;CS0103</NoWarn>
+	  <NoWarn>NU5100;CS8785;NETSDK1206;IDE1006;CS0103;CA1416</NoWarn>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-	  <NoWarn>NU5100;CS8785;NETSDK1206;IDE1006;CS0103</NoWarn>
+	  <NoWarn>NU5100;CS8785;NETSDK1206;IDE1006;CS0103;CA1416</NoWarn>
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="readme.md" />
@@ -65,7 +63,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.0.8" />
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240627000" />
+		<PackageReference Include="Microsoft.Windows.UndockedRegFreeWinrt" Version="1.0.230112.2" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240802000" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -82,10 +81,6 @@
 		<LastGenOutput>Resources.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
 	</ItemGroup>
-
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="&#xD;&#xA;Xcopy /Y &quot;$(BaseOutputPath)$(Platform)\$(Configuration)\$(TargetFramework)\*.xbf&quot; &quot;$(SolutionDir)$(Platform)\$(Configuration)\FlushMouseUI3\&quot;&#xD;&#xA;&#xD;&#xA;Xcopy /Y &quot;$(BaseOutputPath)$(Platform)\$(Configuration)\$(TargetFramework)\$(ProjectName).dll&quot; &quot;$(SolutionDir)$(Platform)\$(Configuration)\FlushMouseUI3&quot;&#xD;&#xA;&#xD;&#xA;Xcopy /Y &quot;$(BaseOutputPath)$(Platform)\$(Configuration)\$(TargetFramework)\$(ProjectName).pdb&quot; &quot;$(SolutionDir)$(Platform)\$(Configuration)\FlushMouseUI3\&quot;&#xD;&#xA;&#xD;&#xA;Xcopy /Y &quot;$(BaseIntermediateOutputPath)$(Platform)\$(Configuration)\$(TargetFramework)\Generated Files\CsWinRT\$(ProjectName).winmd&quot; &quot;$(SolutionDir)$(Platform)\$(Configuration)\FlushMouseUI3\&quot;&#xD;&#xA;&#xD;&#xA;Xcopy /Y &quot;$(BaseOutputPath)$(Platform)\$(Configuration)\$(TargetFramework)\*.pdb&quot; &quot;$(SolutionDir)$(Platform)\$(Configuration)\FlushMouseUI3\&quot;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;" />
-	</Target>
 
 	<ItemGroup>
 	  <None Remove="C:\Users\takafumi\.nuget\packages\microsoft.windows.cswinrt\2.0.4\hosting\x64\native\WinRT.Host.dll" />
@@ -109,4 +104,15 @@
 	    <PackagePath>\</PackagePath>
 	  </None>
 	</ItemGroup>
+
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+	  <Exec Command="del /F /Q &quot;$(SolutionDir)\NuGet\$(ProjectName)\$(ProjectName)*.nupkg&quot;" />
+	</Target>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	</Target>
+	
+	<Target Name="PostBuild" AfterTargets="Pack">
+		<Exec Command="Xcopy /Y &quot;$(BaseOutputPath)$(Platform)\$(Configuration)\$(ProjectName)*.nupkg&quot; &quot;$(SolutionDir)NuGet\FlushMouseUI3DLL\&quot;&#xD;&#xA;rd /S /Q &quot;$(SolutionDir)packages\FlushMouseUI3DLL.1.0.0&quot;&#xD;&#xA;&quot;$(SolutionDir)NuGet\nuget.exe&quot; install FlushMouseUI3DLL -ConfigFile &quot;NuGet.config&quot; -OutputDirectory &quot;$(SolutionDir)packages&quot;&#xD;&#xA;" />
+	</Target>
 </Project>

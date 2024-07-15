@@ -1,4 +1,4 @@
-// About.idl for FlushMouseUI3
+// MojoWindow.idl for FlushMouseSettings
 //		Copyright (C) 1993 JeffyTS
 //
 //	  
@@ -7,13 +7,11 @@
 // #0000	2022/07/16  JeffyTS  	New edit.
 //
 
-namespace FlushMouseUI3
+namespace FlushMouseSettings
 {
 	[default_interface]
-	runtimeclass About : Microsoft.UI.Xaml.Window
+	runtimeclass MojoWindow : Microsoft.UI.Xaml.Window
 	{
-		About();
+		MojoWindow();
 	}
 }
-
-/* = EOF = */

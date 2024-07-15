@@ -13,13 +13,15 @@
 	<?define Description = "$(var.ProductName) Installer" ?>
 	<?define AppRegKey = "SOFTWARE\$(var.Manufacturer)\$(var.ProductName)" ?>
 	<?define IconSrcFile = "..\FlushMouseLIB\FlushMouse.ico" ?>
+	<?define FlushMouseSettings = "FlushMouseSettings" ?>
 
 	<!-- Target Source file Dir -->
 	<?define TargetDir01=$(var.FlushMouse.TargetDir)?>
 	<?define TargetDir02=$(var.FlushMouse32.TargetDir)?>
 	<?define TargetDir03=$(var.FlushMouseCursor.TargetDir)?>
 	<?define TargetDir04=$(var.ProjectDir)?>
-	
+	<?define TargetDir05=$(var.FlushMouseSettings.TargetDir)?>
+
 	<Product Id="$(var.ProductID)"
 			 UpgradeCode="{CAD3E2E9-B511-4EA2-8794-9BFB299D05F6}"
 			 Name="$(var.ProductName)"
@@ -51,15 +53,16 @@
 		
 		<!-- Icon -->
 		<Icon Id="MainIcon.ico" SourceFile="$(var.IconSrcFile)" />
-		<Property Id="ARPPRODUCTICON">MainIcon.ico</Property>
+		<Property Id="ARPPRODUCTICON" Value="MainIcon.ico" />
 		
-		<!-- Other Info. -->
-		<Property Id='ARPCOMMENTS'>Mouse and IME UTY</Property>
-		<Property Id='ARPCONTACT'>Twitter @JeffyTSonTW</Property>
-		<Property Id='ARPHELPLINK'>https://github.com/JeffyTS-JP/FlushMouse</Property>
-		<Property Id='ARPURLINFOABOUT'>https://github.com/JeffyTS-JP/FlushMouse</Property>
-		<Property Id='ARPURLUPDATEINFO'>https://github.com/JeffyTS-JP/FlushMouse/releases</Property>
-		<Property Id='ARPINSTALLLOCATION'>&quot;%ProgramFiles%\$(var.Manufacturer)\$(var.ProductName)&quot;</Property>
+		<Property Id="ARPCOMMENTS" Value="Mouse and IME UTY" />
+		<Property Id="ARPCONTACT" Value="Twitter @JeffyTSonTW" />
+		<Property Id="ARPHELPLINK" Value="https://github.com/JeffyTS-JP/FlushMouse" />
+		<Property Id="ARPURLINFOABOUT" Value="https://github.com/JeffyTS-JP/FlushMouse" />
+		<Property Id="ARPURLUPDATEINFO" Value="https://github.com/JeffyTS-JP/FlushMouse/releases" />
+		<Property Id="ARPINSTALLLOCATION" Value="&quot;%ProgramFiles%\$(var.Manufacturer)\$(var.ProductName)&quot;" />
+		
+		<!--Property Id="ARPNOREMOVE" Value="1"/-->
 		<Property Id="ARPNOMODIFY" Value="1" Secure="no" />
 		<Property Id="ARPNOREPAIR" Value="1" Secure="no" />
 		
@@ -78,7 +81,9 @@
 		</Feature>
 		
 		<!-- Bitmap -->
+		<!-- 493x58 -->
 		<WixVariable Id="WixUIBannerBmp" Value="banner.bmp" />
+		<!-- 493x312 -->
 		<WixVariable Id="WixUIDialogBmp" Value="dialog.bmp" />
 		
 		<!-- License.rtf -->
@@ -91,7 +96,6 @@
 		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX2" Value="1" />
 		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT3" Value=" セットアップを終了したら、すぐに $(var.ProductName) を実行する" />
 		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX3" Value="1" />
-		
 		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT4" Value=" $(var.ProductName) の設定情報を削除する" />
 		
 		<!-- Public Property (value will be overwritten with variable from the bootstrapper during installation) -->
@@ -157,6 +161,7 @@
 		
 		<!-- UI Dialog -->
 		<UI>
+			<!-- Majour Upgrade Dialog-->
 			<Dialog Id="NewerFoundDlg" Width="270" Height="105" Title="[ProductName] セットアップ" NoMinimize="yes">
 				<Control Id="MessageText" Type="Text" X="48" Y="15" Width="205" Height="60" TabSkip="no" Text="[ProductName] の新しいバージョンがすでにインストールされています。" />
 				<Control Id="Y" Type="PushButton" X="200" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUIOK)">
@@ -212,6 +217,7 @@
 		<CustomAction Id='AlreadyUpdated' Error='[ProductName] は既に、このバージョンに更新されています。' />
 		<CustomAction Id='NoDowngrade'    Error='[ProductName] の新しいバージョンが既にインストールされています。' />
 		
+		<!-- Set Windows Installer Regstry to not display Verify Dialog on uninstall -->
 		<Property Id="WixUI_InstallMode" Value="Remove"/>
 		<Property Id="REBOOT" Secure="yes" Value="ReallySuppress" />
 		<Property Id="MSIRESTARTMANAGERCONTROL" Secure="yes" Value="Disable" />
@@ -277,7 +283,7 @@
 		<CustomAction Id="SetRegisterTaskScheduler3" Property="RegisterTaskScheduler3"
 			Value="&quot;[System64Folder]schtasks.exe&quot; /Create /F /TN &quot;$(var.ProductName)_Quit&quot; /XML &quot;[INSTALLFOLDER]Register_TaskScheduler3.xml&quot;"/>
 		<CustomAction Id="RegisterTaskScheduler3" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
-
+		
 		<!-- Unregister TaskScheduler on Uninstall -->
 		<InstallExecuteSequence>
 			<Custom Action='SetUnregisterTaskScheduler' After='InstallInitialize'>Installed or REINSTALL</Custom>
@@ -304,7 +310,7 @@
 		<CustomAction Id="SetUnregisterTaskScheduler3" Property="UnregisterTaskScheduler3"
 			Value="&quot;[System64Folder]schtasks.exe&quot; /Delete /F /TN &quot;$(var.ProductName)_Quit&quot;"/>
 		<CustomAction Id="UnregisterTaskScheduler3" BinaryKey="WixCA" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
-
+		
 		<!-- Remove App Registry on Uninstall -->
 		<UI>
 			<Publish Dialog="_ExitDialog" Control="Finish" Event="DoAction" Value="RemoveAppRegMSI">Installed and (WIXUI_VERIFYDIALOGOPTIONALCHECKBOX4 = 1)</Publish>
@@ -405,6 +411,18 @@
 			<Directory Id="ProgramFiles64Folder" Name="ProgramFiles">
 				<Directory Id="ProgramFilesManufacturer" Name="$(var.Manufacturer)">
 					<Directory Id="INSTALLFOLDER" Name="$(var.ProductName)">
+						<Directory Id="FlushMouseSettingsFolder" Name="$(var.FlushMouseSettings)">
+							<!-- WinUI3 MUIs -->
+							<Directory Id="WinUI3_MUIs_Folder_01" Name="en-us">
+							</Directory>
+							<Directory Id="WinUI3_MUIs_Folder_02" Name="ja-JP">
+							</Directory>
+							<Directory Id="WinUI3_Assets_Folder_01" Name="Microsoft.UI.Xaml">
+								<!-- WinUI3 Assets -->
+								<Directory Id="WinUI3_Assets_Folder_01_01" Name="Assets">
+								</Directory>
+							</Directory>
+						</Directory>
 					</Directory>
 				</Directory>
 			</Directory>
@@ -432,6 +450,10 @@
 			<ComponentGroupRef Id="ProductComponents" />
 			<ComponentRef Id="EventLogRegistry" />
 			<ComponentRef Id="WixBundleRegistry" />
+			<ComponentGroupRef Id="WinUI3_Folders_00" />
+			<ComponentGroupRef Id="WinUI3_Folders_01" />
+			<ComponentGroupRef Id="WinUI3_Folders_02" />
+			<ComponentGroupRef Id="WinUI3_Folders_03" />
 			<ComponentGroupRef Id="ProductDataComponents" />
 			<ComponentRef Id="AppDatacomponents" />
 			<ComponentRef Id="DesktopShortcut" />
@@ -446,14 +468,26 @@
 			<Component Id="$(var.MainExeFileName)" Guid="{25BEEEA7-583D-4C15-9566-FFA42716A1C9}">
 				<File Id="$(var.MainExeFileName)" Name="$(var.MainExeFileName)" Source="$(var.TargetDir01)$(var.MainExeFileName)" />
 			</Component>
+			<Component Id="$(var.ProductName).pdb" Guid="{11E774D2-7F89-4883-9B5F-83B6E47D4443}">
+				<File Id="$(var.ProductName).pdb" Name="$(var.ProductName).pdb" Source="$(var.TargetDir01)$(var.ProductName).pdb" />
+			</Component>
 			<Component Id="$(var.ProductName)DLL.dll" Guid="{3C81EF6B-D231-4739-8361-496FE5BE93D3}">
 				<File Id="$(var.ProductName)DLL.dll" Name="$(var.ProductName)DLL.dll" Source="$(var.TargetDir01)$(var.ProductName)DLL.dll" />
+			</Component>
+			<Component Id="$(var.ProductName)DLL.pdb" Guid="{0C46B93A-7F44-4C7E-B0E4-D6589EDA5660}">
+				<File Id="$(var.ProductName)DLL.pdb" Name="$(var.ProductName)DLL.pdb" Source="$(var.TargetDir01)$(var.ProductName)DLL.pdb" />
 			</Component>
 			<Component Id="$(var.ProductName)32.exe" Guid="{CB3543F9-1CA7-4773-9105-CB1BD98F49FD}">
 				<File Id="$(var.ProductName)32.exe" Name="$(var.ProductName)32.exe" Source="$(var.TargetDir02)$(var.ProductName)32.exe" />
 			</Component>
+			<Component Id="$(var.ProductName)32.pdb" Guid="{2160C49D-BB23-45AB-9CC5-8622CC71EA11}">
+				<File Id="$(var.ProductName)32.pdb" Name="$(var.ProductName)32.pdb" Source="$(var.TargetDir02)$(var.ProductName)32.pdb" />
+			</Component>
 			<Component Id="$(var.ProductName)DLL32.dll" Guid="{CCBA3647-0988-463A-89E4-0BFD5EA13DA0}">
 				<File Id="$(var.ProductName)DLL32.dll" Name="$(var.ProductName)DLL32.dll" Source="$(var.TargetDir02)$(var.ProductName)DLL32.dll" />
+			</Component>
+			<Component Id="$(var.ProductName)DLL32.pdb" Guid="{B77F426B-9E02-46FA-9678-ECB222278CD9}">
+				<File Id="$(var.ProductName)DLL32.pdb" Name="$(var.ProductName)DLL32.pdb" Source="$(var.TargetDir02)$(var.ProductName)DLL32.pdb" />
 			</Component>
 			<Component Id="Register_TaskScheduler.xml" Guid="{3FA0C6AB-6E9C-4B55-BE44-A02A3B6A0C3E}">
 				<File Id="Register_TaskScheduler.xml" Name="Register_TaskScheduler.xml" Source="$(var.TargetDir04)Register_TaskScheduler.xml" />
@@ -476,7 +510,7 @@
 			<Component Id="Register_Eventlog.reg" Guid="{FBC3FF68-EF97-43F1-BE86-5F5CFC3AE4F1}">
 				<File Id="Register_Eventlog.reg" Name="Register_Eventlog.reg" Source="$(var.TargetDir04)Register_Eventlog.reg" />
 			</Component>
-			<!-- Application registry -->
+			<!-- Registries -->
 			<Component Id="EventLogRegistry" Guid="{B5A28410-C07F-43BD-BA17-D15F0331986B}">
 				<RegistryKey Root="HKLM" Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\$(var.ProductName)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
 					<RegistryValue Type="integer" Name="CustomSource" Value="00000001" KeyPath="yes" />
@@ -493,6 +527,256 @@
 				</RegistryKey>
 			</Component>
 		</ComponentGroup>
+		<ComponentGroup Id="WinUI3_Folders_00" Directory="FlushMouseSettingsFolder">
+			<!-- For FlushMouseSettings-->
+			<Component Id="FlushMouseSettings_01" Guid="{F47ADE4F-9835-42DA-BDC7-2689D4F56B8D}">
+				<File Id="FlushMouseSettings_01" Name="$(var.FlushMouseSettings).exe" Source="$(var.TargetDir05)$(var.FlushMouseSettings).exe" />
+			</Component>
+			<Component Id="FlushMouseSettings_02" Guid="{56711C39-2547-4876-A60F-4CB254F2FAC0}">
+				<File Id="FlushMouseSettings_02" Name="$(var.FlushMouseSettings).exe.manifest" Source="$(var.TargetDir05)$(var.FlushMouseSettings).exe.manifest" />
+			</Component>
+			<Component Id="FlushMouseSettings_03" Guid="{96F45754-9156-4E4B-A148-EC0CAE1FB877}">
+				<File Id="FlushMouseSettings_03" Name="$(var.FlushMouseSettings).pri" Source="$(var.TargetDir05)$(var.FlushMouseSettings).pri" />
+			</Component>
+			<Component Id="FlushMouseSettings_04" Guid="{1D422D98-FF1F-40B9-9DB3-6682E42B2303}">
+				<File Id="FlushMouseSettings_04" Name="$(var.FlushMouseSettings).pdb" Source="$(var.TargetDir05)$(var.FlushMouseSettings).pdb" />
+			</Component>
+			<Component Id="FlushMouseSettings_05" Guid="{9214B8C1-A36E-4D5C-BF11-6334CE712691}">
+				<File Id="FlushMouseSettings_05" Name="$(var.FlushMouseSettings).xbf" Source="$(var.TargetDir05)$(var.FlushMouseSettings).xbf" />
+			</Component>
+
+			<!-- For WinUI3 -->
+			<!-- DLL -->
+			<Component Id="WinUI3_DLL_01" Guid="{9F85333C-F9D6-4166-8DF3-F1E001DFB240}">
+				<File Id="WinUI3__DLL_01" Name="FlushMouseUI3DLL.dll" Source="$(var.TargetDir05)FlushMouseUI3DLL.dll" />
+			</Component>
+			<Component Id="WinUI3_DLL_02" Guid="{59BD4C6B-226C-426E-8D91-0123921ACCEB}">
+				<File Id="WinUI3__DLL_02" Name="FlushMouseUI3DLL.pdb" Source="$(var.TargetDir05)FlushMouseUI3DLL.pdb" />
+			</Component>
+			<!-- Icon -->
+			<Component Id="WinUI3_Icon_01" Guid="{592E3E6A-D526-4FBB-AB23-2E259DB76A05}">
+				<File Id="WinUI3__Icon_01" Name="FlushMouse.ico" Source="$(var.TargetDir05)FlushMouse.ico" />
+			</Component>
+			<Component Id="WinUI3_Icon_02" Guid="{73D6181D-2076-45DB-AF20-092C098816EB}">
+				<File Id="WinUI3__Icon_02" Name="SynTP_Receiver.ico" Source="$(var.TargetDir05)SynTP_Receiver.ico" />
+			</Component>
+			<!-- xbf -->
+			<Component Id="WinUI3_xbf_02" Guid="{7BD1F8ED-7985-4F8B-9B88-0D017F4C9D2A}">
+				<File Id="WinUI3__xbf_02" Name="MojoWindow.xbf" Source="$(var.TargetDir05)MojoWindow.xbf" />
+			</Component>
+			<Component Id="WinUI3_xbf_03" Guid="{9E400D6D-E159-413C-B2CC-ED8D72F05D8E}">
+				<File Id="WinUI3__xbf_03" Name="Settings.xbf" Source="$(var.TargetDir05)Settings.xbf" />
+			</Component>
+			<Component Id="WinUI3_xbf_04" Guid="{D40591ED-CA33-4220-9485-A1B8C7297BFD}">
+				<File Id="WinUI3__xbf_04" Name="About.xbf" Source="$(var.TargetDir05)About.xbf" />
+			</Component>
+			<Component Id="WinUI3_xbf_05" Guid="{A7480BE4-5855-4BAE-B10F-B688C4A67E56}">
+				<File Id="WinUI3__xbf_05" Name="General.xbf" Source="$(var.TargetDir05)General.xbf" />
+			</Component>
+			<Component Id="WinUI3_xbf_06" Guid="{D05E805A-CEE5-42E5-8BE7-F88B25D29C4E}">
+				<File Id="WinUI3__xbf_06" Name="SynTP_Helper.xbf" Source="$(var.TargetDir05)SynTP_Helper.xbf" />
+			</Component>
+			
+			<!-- WinUI3 DLLs and some Files-->
+			<Component Id="WinUI3_DLLs_01" Guid="{C132F5C7-A802-46F3-B302-8E6E16CBE41B}">
+				<File Id="WinUI3_DLLs_01" Name="CoreMessagingXP.dll" Source="$(var.TargetDir05)CoreMessagingXP.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_02" Guid="{2D2486F4-F84D-436A-B8C0-010D79C7F092}">
+				<File Id="WinUI3_DLLs_02" Name="dcompi.dll" Source="$(var.TargetDir05)dcompi.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_03" Guid="{8F734FC6-2310-48E9-81C7-02F2B4C41CFC}">
+				<File Id="WinUI3_DLLs_03" Name="dwmcorei.dll" Source="$(var.TargetDir05)dwmcorei.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_04" Guid="{EBE867CD-774D-4E3F-8857-4983A06662E7}">
+				<File Id="WinUI3_DLLs_04" Name="DwmSceneI.dll" Source="$(var.TargetDir05)DwmSceneI.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_05" Guid="{DCDB79CB-F4B8-4D77-B3DA-DD9225B3230E}">
+				<File Id="WinUI3_DLLs_05" Name="DWriteCore.dll" Source="$(var.TargetDir05)DWriteCore.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_06" Guid="{22B6C248-C46A-4107-A784-45CFAD5C87C0}">
+				<File Id="WinUI3_DLLs_06" Name="marshal.dll" Source="$(var.TargetDir05)marshal.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_07" Guid="{22F260A3-447A-4A1F-816C-3F8C5CFACAF5}">
+				<File Id="WinUI3_DLLs_07" Name="Microsoft.DirectManipulation.dll" Source="$(var.TargetDir05)Microsoft.DirectManipulation.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_08" Guid="{DBB5FB81-BC97-43B4-A085-E9FA2392F107}">
+				<File Id="WinUI3_DLLs_08" Name="Microsoft.Graphics.Display.dll" Source="$(var.TargetDir05)Microsoft.Graphics.Display.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_09" Guid="{B3125BE9-4F02-4178-AF42-D89FF6B58B43}">
+				<File Id="WinUI3_DLLs_09" Name="Microsoft.InputStateManager.dll" Source="$(var.TargetDir05)Microsoft.InputStateManager.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_10" Guid="{CA5CB024-06B7-49D9-B2B9-709BD9472553}">
+				<File Id="WinUI3_DLLs_10" Name="Microsoft.InteractiveExperiences.Projection.dll" Source="$(var.TargetDir05)Microsoft.InteractiveExperiences.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_11" Guid="{12DF648D-34F3-43E0-BB3B-0F5FF2C2A461}">
+				<File Id="WinUI3_DLLs_11" Name="Microsoft.Internal.FrameworkUdk.dll" Source="$(var.TargetDir05)Microsoft.Internal.FrameworkUdk.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_12" Guid="{7417A58D-1AB8-4160-B1FC-3E81129C54C5}">
+				<File Id="WinUI3_DLLs_12" Name="Microsoft.UI.Composition.OSSupport.dll" Source="$(var.TargetDir05)Microsoft.UI.Composition.OSSupport.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_13" Guid="{8CE6F139-F843-48E8-AD5A-1C3617AF41E6}">
+				<File Id="WinUI3_DLLs_13" Name="Microsoft.UI.dll" Source="$(var.TargetDir05)Microsoft.UI.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_14" Guid="{2CB7F360-1334-4158-8FC6-DFECB20E65DF}">
+				<File Id="WinUI3_DLLs_14" Name="Microsoft.UI.Input.dll" Source="$(var.TargetDir05)Microsoft.UI.Input.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_15" Guid="{4332EB29-6E59-448D-AA6A-E88A9E060BA9}">
+				<File Id="WinUI3_DLLs_15" Name="Microsoft.UI.Windowing.Core.dll" Source="$(var.TargetDir05)Microsoft.UI.Windowing.Core.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_16" Guid="{94768C35-8A92-4E1D-A252-5F11265E2037}">
+				<File Id="WinUI3_DLLs_16" Name="Microsoft.UI.Windowing.dll" Source="$(var.TargetDir05)Microsoft.UI.Windowing.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_17" Guid="{380FE697-975C-483A-B661-3BCC851A7BF8}">
+				<File Id="WinUI3_DLLs_17" Name="RestartAgent.exe" Source="$(var.TargetDir05)RestartAgent.exe" />
+			</Component>
+			<Component Id="WinUI3_DLLs_18" Guid="{F74444B8-DF83-45E6-A9D8-424CF69C5CF3}">
+				<File Id="WinUI3_DLLs_18" Name="Microsoft.UI.Xaml.Controls.dll" Source="$(var.TargetDir05)Microsoft.UI.Xaml.Controls.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_19" Guid="{E87282BA-3380-49C2-80EF-4C3A5BB61383}">
+				<File Id="WinUI3_DLLs_19" Name="Microsoft.UI.Xaml.Controls.pri" Source="$(var.TargetDir05)Microsoft.UI.Xaml.Controls.pri" />
+			</Component>
+			<Component Id="WinUI3_DLLs_20" Guid="{25B29663-0F89-4D29-82E4-B71A9EBB9BA5}">
+				<File Id="WinUI3_DLLs_20" Name="Microsoft.ui.xaml.dll" Source="$(var.TargetDir05)Microsoft.ui.xaml.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_21" Guid="{354C9FB6-7723-4C81-9BD1-768091829513}">
+				<File Id="WinUI3_DLLs_21" Name="Microsoft.UI.Xaml.Internal.dll" Source="$(var.TargetDir05)Microsoft.UI.Xaml.Internal.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_22" Guid="{5F19341F-74A9-4C98-AD88-EDF9C844F7F0}">
+				<File Id="WinUI3_DLLs_22" Name="Microsoft.UI.Xaml.Phone.dll" Source="$(var.TargetDir05)Microsoft.UI.Xaml.Phone.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_23" Guid="{3902111E-2D7D-48AD-B3D0-28CCD39B03F1}">
+				<File Id="WinUI3_DLLs_23" Name="Microsoft.ui.xaml.resources.19h1.dll" Source="$(var.TargetDir05)Microsoft.ui.xaml.resources.19h1.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_24" Guid="{CA218B78-04BB-4BE9-BEEB-EC6354BC3EE9}">
+				<File Id="WinUI3_DLLs_24" Name="Microsoft.ui.xaml.resources.common.dll" Source="$(var.TargetDir05)Microsoft.ui.xaml.resources.common.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_25" Guid="{64F7D907-C246-4649-84A0-4BB19EAC1E80}">
+				<File Id="WinUI3_DLLs_25" Name="Microsoft.Web.WebView2.Core.dll" Source="$(var.TargetDir05)Microsoft.Web.WebView2.Core.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_26" Guid="{83EB6961-4826-4BAA-B33D-5DAD07B1104A}">
+				<File Id="WinUI3_DLLs_26" Name="Microsoft.Windows.ApplicationModel.DynamicDependency.Projection.dll" Source="$(var.TargetDir05)Microsoft.Windows.ApplicationModel.DynamicDependency.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_27" Guid="{260AF955-E6B4-479C-9506-895B73F84703}">
+				<File Id="WinUI3_DLLs_27" Name="Microsoft.Windows.ApplicationModel.Resources.dll" Source="$(var.TargetDir05)Microsoft.Windows.ApplicationModel.Resources.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_28" Guid="{F6B0514E-319D-4DAC-89F5-C0A35F180641}">
+				<File Id="WinUI3_DLLs_28" Name="Microsoft.Windows.ApplicationModel.Resources.Projection.dll" Source="$(var.TargetDir05)Microsoft.Windows.ApplicationModel.Resources.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_29" Guid="{981DE7F1-5D10-4E96-88D9-0005D58B0B9F}">
+				<File Id="WinUI3_DLLs_29" Name="Microsoft.Windows.ApplicationModel.WindowsAppRuntime.Projection.dll" Source="$(var.TargetDir05)Microsoft.Windows.ApplicationModel.WindowsAppRuntime.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_30" Guid="{028D0780-9F77-4F92-9B7B-C47E9CF04CAD}">
+				<File Id="WinUI3_DLLs_30" Name="Microsoft.Windows.AppLifecycle.Projection.dll" Source="$(var.TargetDir05)Microsoft.Windows.AppLifecycle.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_31" Guid="{F482B5A2-D544-4697-B23D-E1AD4EC8B994}">
+				<File Id="WinUI3_DLLs_31" Name="Microsoft.Windows.AppNotifications.Builder.Projection.dll" Source="$(var.TargetDir05)Microsoft.Windows.AppNotifications.Builder.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_32" Guid="{ADC38393-B4B1-4424-9F96-F2F1C57564C4}">
+				<File Id="WinUI3_DLLs_32" Name="Microsoft.Windows.AppNotifications.Projection.dll" Source="$(var.TargetDir05)Microsoft.Windows.AppNotifications.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_33" Guid="{86B1173E-EA6B-4940-8F11-4A80DE680FCD}">
+				<File Id="WinUI3_DLLs_33" Name="Microsoft.Windows.PushNotifications.Projection.dll" Source="$(var.TargetDir05)Microsoft.Windows.PushNotifications.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_34" Guid="{6A666B84-6531-4334-9C6B-4BC06FC896B3}">
+				<File Id="WinUI3_DLLs_34" Name="Microsoft.Windows.SDK.NET.dll" Source="$(var.TargetDir05)Microsoft.Windows.SDK.NET.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_35" Guid="{6D3E2568-6868-4FA3-86BA-89BF95A26C47}">
+				<File Id="WinUI3_DLLs_35" Name="Microsoft.Windows.Security.AccessControl.Projection.dll" Source="$(var.TargetDir05)Microsoft.Windows.Security.AccessControl.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_36" Guid="{15DDE89C-7C01-4278-A437-176FEFFB65E2}">
+				<File Id="WinUI3_DLLs_36" Name="Microsoft.Windows.System.Power.Projection.dll" Source="$(var.TargetDir05)Microsoft.Windows.System.Power.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_37" Guid="{DD66763D-13A9-4E97-9390-2D08A8C8DA0B}">
+				<File Id="WinUI3_DLLs_37" Name="Microsoft.Windows.System.Projection.dll" Source="$(var.TargetDir05)Microsoft.Windows.System.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_38" Guid="{4439D615-B81B-413D-9C7C-8C94E0AC6737}">
+				<File Id="WinUI3_DLLs_38" Name="Microsoft.Windows.Widgets.dll" Source="$(var.TargetDir05)Microsoft.Windows.Widgets.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_40" Guid="{0A887DDE-2A11-40DF-8297-5AA24CD6B81E}">
+				<File Id="WinUI3_DLLs_40" Name="Microsoft.WindowsAppRuntime.Bootstrap.dll" Source="$(var.TargetDir05)Microsoft.WindowsAppRuntime.Bootstrap.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_41" Guid="{6EE02715-F8CD-4FFA-AE2E-D51213759CA0}">
+				<File Id="WinUI3_DLLs_41" Name="Microsoft.WindowsAppRuntime.Bootstrap.Net.dll" Source="$(var.TargetDir05)Microsoft.WindowsAppRuntime.Bootstrap.Net.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_42" Guid="{C82CF71B-34EE-44EA-9D1C-BC3DD39F3BAB}">
+				<File Id="WinUI3_DLLs_42" Name="Microsoft.WindowsAppRuntime.dll" Source="$(var.TargetDir05)Microsoft.WindowsAppRuntime.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_43" Guid="{C3FEAF51-F041-493C-AC8C-9BFA9F9C5A08}">
+				<File Id="WinUI3_DLLs_43" Name="Microsoft.WindowsAppRuntime.Insights.Resource.dll" Source="$(var.TargetDir05)Microsoft.WindowsAppRuntime.Insights.Resource.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_44" Guid="{62EB8752-7148-475A-B4F5-F4FF58DFF22E}">
+				<File Id="WinUI3_DLLs_44" Name="Microsoft.WinUI.dll" Source="$(var.TargetDir05)Microsoft.WinUI.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_45" Guid="{4282D34A-C410-4F5E-9AB4-BB067F5E346B}">
+				<File Id="WinUI3_DLLs_45" Name="MRM.dll" Source="$(var.TargetDir05)MRM.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_46" Guid="{7C453688-9345-4D61-97D9-60763768F2AF}">
+				<File Id="WinUI3_DLLs_46" Name="PushNotificationsLongRunningTask.ProxyStub.dll" Source="$(var.TargetDir05)PushNotificationsLongRunningTask.ProxyStub.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_47" Guid="{3B47D195-828A-4B7F-A87F-8C66AEC1804A}">
+				<File Id="WinUI3_DLLs_47" Name="WindowsAppRuntime.png" Source="$(var.TargetDir05)WindowsAppRuntime.png" />
+			</Component>
+			<Component Id="WinUI3_DLLs_48" Guid="{2B537BB3-F9FB-4CFD-B956-133A1E26EA9E}">
+				<File Id="WinUI3_DLLs_48" Name="WindowsAppSdk.AppxDeploymentExtensions.Desktop-EventLog-Instrumentation.dll" Source="$(var.TargetDir05)WindowsAppSdk.AppxDeploymentExtensions.Desktop-EventLog-Instrumentation.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_49" Guid="{F71CA315-423C-4EBF-A57F-DE744D8E640F}">
+				<File Id="WinUI3_DLLs_49" Name="WindowsAppSdk.AppxDeploymentExtensions.Desktop.dll" Source="$(var.TargetDir05)WindowsAppSdk.AppxDeploymentExtensions.Desktop.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_50" Guid="{3232D528-6DCE-4791-9CB6-8C29C7EBAD36}">
+				<File Id="WinUI3_DLLs_50" Name="WinRT.Host.dll" Source="$(var.TargetDir05)WinRT.Host.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_51" Guid="{15137C21-3FE1-4B52-A902-76559DFDB1D6}">
+				<File Id="WinUI3_DLLs_51" Name="WinRT.Host.dll.mui" Source="$(var.TargetDir05)WinRT.Host.dll.mui" />
+			</Component>
+			<Component Id="WinUI3_DLLs_52" Guid="{13E8EC96-24F9-4402-A0F7-72F7264025AA}">
+				<File Id="WinUI3_DLLs_52" Name="WinRT.Host.runtimeconfig.json" Source="$(var.TargetDir05)WinRT.Host.runtimeconfig.json" />
+			</Component>
+			<Component Id="WinUI3_DLLs_53" Guid="{4AB71974-CBE6-42B0-B479-A92760FF78E9}">
+				<File Id="WinUI3_DLLs_53" Name="WinRT.Host.Shim.dll" Source="$(var.TargetDir05)WinRT.Host.Shim.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_54" Guid="{FA92DA53-61F1-4181-AD92-9D86A2E823FE}">
+				<File Id="WinUI3_DLLs_54" Name="WinRT.Runtime.dll" Source="$(var.TargetDir05)WinRT.Runtime.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_55" Guid="{DDBC54CF-C854-4D03-8862-F7BEB4EE047E}">
+				<File Id="WinUI3_DLLs_55" Name="WinUIEdit.dll" Source="$(var.TargetDir05)WinUIEdit.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_56" Guid="{731FE55D-675F-4B31-A141-C87CF28FB218}">
+				<File Id="WinUI3_DLLs_56" Name="wuceffectsi.dll" Source="$(var.TargetDir05)wuceffectsi.dll" />
+			</Component>
+			<!-- for Microsoft.Windows.UndockedRegFreeWinRT -->
+			<Component Id="WinUI3_DLLs_57" Guid="{D4125B16-FFEF-4374-AA67-2C4F3701CDD5}">
+				<File Id="WinUI3_DLLs_57" Name="mwinrtact.dll" Source="$(var.TargetDir05)wuceffectsi.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_58" Guid="{74F26C7C-A17D-4B25-9964-1A23E4DDC004}">
+				<File Id="WinUI3_DLLs_58" Name="Microsoft.Windows.Management.Deployment.Projection.dll" Source="$(var.TargetDir05)Microsoft.Windows.Management.Deployment.Projection.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_59" Guid="{499096D2-BDD3-4389-BA72-C1EA6CC7A232}">
+				<File Id="WinUI3_DLLs_59" Name="Microsoft.Windows.Widgets.Projection.dll" Source="$(var.TargetDir05)Microsoft.Windows.Widgets.Projection.dll" />
+			</Component>
+		</ComponentGroup>
+		<!-- WinUI3 MUI -->
+		<ComponentGroup Id="WinUI3_Folders_01" Directory="WinUI3_MUIs_Folder_01">
+			<Component Id="WinUI3_Folders_01" Guid="{C569982F-3E9E-41AD-B0D3-06EC4458EA51}">
+				<File Id="WinUI3_Folders_01_01" Name="Microsoft.ui.xaml.dll.mui" Source="$(var.TargetDir05)en-us\Microsoft.ui.xaml.dll.mui" />
+				<File Id="WinUI3_Folders_01_02" Name="Microsoft.UI.Xaml.Phone.dll.mui" Source="$(var.TargetDir05)en-us\Microsoft.UI.Xaml.Phone.dll.mui" />
+				<RemoveFolder Id="WinUI3_MUIs_Folder_01" On="uninstall" />
+			</Component>
+		</ComponentGroup>
+		<ComponentGroup Id="WinUI3_Folders_02" Directory="WinUI3_MUIs_Folder_02">
+			<Component Id="WinUI3_Folders_02" Guid="{88CB9695-48AD-440D-9D35-AB0DC4C6726E}">
+				<File Id="WinUI3_Folders_02_01" Name="Microsoft.ui.xaml.dll.mui" Source="$(var.TargetDir05)ja-JP\Microsoft.ui.xaml.dll.mui" />
+				<File Id="WinUI3_Folders_02_02" Name="Microsoft.UI.Xaml.Phone.dll.mui" Source="$(var.TargetDir05)ja-JP\Microsoft.UI.Xaml.Phone.dll.mui" />
+				<RemoveFolder Id="WinUI3_MUIs_Folder_02" On="uninstall" />
+			</Component>
+		</ComponentGroup>
+		<!-- WinUI3 Assets -->
+		<ComponentGroup Id="WinUI3_Folders_03" Directory="WinUI3_Assets_Folder_01_01">
+			<Component Id="WinUI3_Folders_03" Guid="{1AEFF58C-4EEC-4151-9656-93EFE037369D}">
+				<File Id="WinUI3_Folders_03_01" Name="NoiseAsset_256X256_PNG.png" Source="$(var.TargetDir05)Microsoft.UI.Xaml\Assets\NoiseAsset_256X256_PNG.png" />
+				<RemoveFolder Id="WinUI3_Assets_Folder_01_01" On="uninstall" />
+			</Component>
+		</ComponentGroup>
+		
 		<!-- Data Files -->
 		<ComponentGroup Id="ProductDataComponents" Directory="DATAINSTALLFOLDER">
 			<Component Id="AppDatacomponents" Guid="{3A125A04-4180-457A-8F41-B6DC29E61431}">

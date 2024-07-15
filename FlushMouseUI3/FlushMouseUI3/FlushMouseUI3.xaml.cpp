@@ -4,7 +4,11 @@
 //	  
 // No.	  Date			Name			Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0000		2022/07/23  JeffyTS  	New edit.
+// #0000	2022/07/23  JeffyTS  	New edit.
+//
+
+//
+// Include
 //
 #include "pch.h"
 #include "WinRT.h"
@@ -31,30 +35,29 @@
 
 #include "FlushMouseUI3.xaml.h"
 #include "MojoWindow.xaml.h"
-#include "About.xaml.h"
 
 #include "..\..\FlushMouseLIB\FlushMouseLIB.h"
 #include "..\..\FlushMouseLIB\Resource.h"
+#include "..\..\FlushMouseLIB\Eventlog.h"
 
 #pragma pop_macro("GetCurrentTime")
 
 #include <commctrl.h>
 #pragma comment(lib, "Comctl32.lib")
 #include "..\..\FlushMouseLIB\TaskTray.h"
-static INT_PTR CALLBACK SynTPHelperDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-static BOOL		bInitSynTPHelperDlg(HWND hDlg, DWORD dwSynTPHelper);
-static BOOL		bSetSynTPHelperProfile(HWND hDlg);
-static BOOL		bInitDlgCenter(HWND hDlg, HICON hIcon, DWORD dwICC);
-static BOOL		bSetCheckDlgButton(HWND hDlg, int iIDButton, BOOL bCheck);
-static BOOL		bGetDlgButtonChecked(HWND hDlg, int iIDButton);
 
+//
+// Using
+//
 using namespace winrt;
 using namespace winrt::Microsoft::Windows::AppLifecycle;
 using namespace Windows::Foundation;
 using namespace Windows::Storage;
 using namespace Windows::ApplicationModel::Activation;
 
-
+//
+// Local Data
+//
 static Application	windowApp{ nullptr };
 static HINSTANCE	_hInstance{ nullptr };
 
@@ -63,13 +66,24 @@ static event_token	activationToken;
 static Collections::IVector<IInspectable> messages;
 
 //
+// Global Prototype Define
+//
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow);
+
+//
+// Local Prototype Define
+//
+
+//
 // wWinMain()
 //
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPTSTR lpCmdLine, _In_ int)
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
 	UNREFERENCED_PARAMETER(hInstance);
+	UNREFERENCED_PARAMETER(hPrevInstance);
+	UNREFERENCED_PARAMETER(lpCmdLine);
+	UNREFERENCED_PARAMETER(nCmdShow);
 
-	// TODO: ここにコードを挿入してください。
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_ASSERTE(_CrtCheckMemory());
@@ -92,7 +106,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPTSTR 
 	}
 	else {
 		try {
-			Application::Start([](auto&&) {windowApp = make<FlusMouseUI3>(); });
+			Application::Start([](auto&&) {windowApp = make<FlushMouseUI3Main>(); });
 		}
 		catch (const std::exception&) {
 		}
@@ -125,7 +139,18 @@ void vMessageBox(HWND hWnd, UINT uID, UINT uType)
 VOID		vAboutDialog(HWND hWnd)
 {
 	UNREFERENCED_PARAMETER(hWnd);
-	FlushMouseUI3::implementation::AboutExec();
+	SettingsExec(hWnd, WM_SETTINGSEX, SETTINGSEX_SELECTEDPANE_ABOUT);
+}
+
+//
+// vSynTPHelperDialog()
+//
+VOID		vSynTPHelperDialog(HWND hWnd)
+{
+	if (Profile != NULL) {
+
+	}
+	SettingsExec(hWnd, WM_SETTINGSEX, SETTINGSEX_SELECTEDPANE_SYNTPHELPER);
 }
 
 //
@@ -133,7 +158,10 @@ VOID		vAboutDialog(HWND hWnd)
 //
 VOID		vSettingDialog(HWND hWnd)
 {
-	SettingsExec(hWnd, WM_SETTINGSEX);
+	if (Profile != NULL) {
+
+	}
+	SettingsExec(hWnd, WM_SETTINGSEX, SETTINGSEX_SELECTEDPANE_GENERAL);
 }
 
 //
@@ -150,6 +178,22 @@ VOID		vSettingDialogApply()
 VOID		vSettingDialogClose()
 {
 	SettingsClose();
+}
+
+//
+// bSettingSynTPStart()
+//
+BOOL		bSettingSynTPStart()
+{
+	return SettingsSynTPStart();
+}
+
+//
+// bSettingSynTPStop()
+//
+BOOL		bSettingSynTPStop()
+{
+	return SettingsSynTPStop();
 }
 
 //
@@ -185,9 +229,9 @@ void GetMonitorDPIandRect(HWND hWnd, LPUINT lpUint,LPRECT lpRect)
 }
 
 //
-// FlusMouseUI3()
+// FlushMouseUI3Main()
 //
-FlusMouseUI3::FlusMouseUI3()
+FlushMouseUI3Main::FlushMouseUI3Main()
 {
 
 #ifdef _DEBUG
@@ -198,9 +242,9 @@ FlusMouseUI3::FlusMouseUI3()
 }
 
 //
-// ~FlusMouseUI3()
+// ~FlushMouseUI3Main()
 //
-FlusMouseUI3::~FlusMouseUI3()
+FlushMouseUI3Main::~FlushMouseUI3Main()
 {
 	return;
 }
@@ -208,39 +252,46 @@ FlusMouseUI3::~FlusMouseUI3()
 //
 // OnLaunched()
 //
-void FlusMouseUI3::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const& /*args*/)
+void FlushMouseUI3Main::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 {
-	hFlushMouseUI3DLL = ::LoadLibrary(FLUSHMOUSEUI3_DLL);
-	
-	MojoWindowExec();
-	
-	if (!bWinMain((HINSTANCE)_hInstance, NULL, NULL, SW_HIDE)) {
-		MojoWindowClose();
-		if (hFlushMouseUI3DLL)	::FreeLibrary(hFlushMouseUI3DLL);
-		return;
-	}
+#ifdef _DEBUG
+	UnhandledException([this](IInspectable const&, UnhandledExceptionEventArgs const&) {
+		::MessageBox(NULL, L"EXCEPTION", L"FlushMouseUI3", (MB_ICONSTOP | MB_OK));
+		});
+#endif // _DEBUG
 
+	hMicrosoft_ui_xaml_dll = ::LoadLibrary(L"Microsoft.ui.xaml.dll");
+	hFlushMouseUI3DLL = ::LoadLibrary(FLUSHMOUSEUI3_DLL);
+
+	MojoWindowExec();
+
+	if (!bWinMain((HINSTANCE)_hInstance, NULL, NULL, SW_HIDE)) {
+	}
+	
 	MojoWindowClose();
 
 	if (hFlushMouseUI3DLL)	::FreeLibrary(hFlushMouseUI3DLL);
+	if (hMicrosoft_ui_xaml_dll)	::FreeLibrary(hMicrosoft_ui_xaml_dll);
 
+	PostQuitMessage(0);
 	return;
 }
 
 //
 // OnSuspending()
 //
-void FlusMouseUI3::OnSuspending([[maybe_unused]] IInspectable const& sender, [[maybe_unused]] Windows::ApplicationModel::SuspendingEventArgs const& e)
+void FlushMouseUI3Main::OnSuspending([[maybe_unused]] IInspectable const& sender, [[maybe_unused]] Windows::ApplicationModel::SuspendingEventArgs const& e)
 {
 }
 
 //
 // GetInstanceFromHWND()
 //
-HINSTANCE FlusMouseUI3::GetInstanceFromHWND(HWND hWnd)
+HINSTANCE FlushMouseUI3Main::GetInstanceFromHWND(HWND hWnd)
 {
 	return (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE);
 }
+
 
 
 /* = EOF = */

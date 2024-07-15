@@ -24,10 +24,10 @@ extern void GetMonitorDPIandRect(HWND hWnd, LPUINT lpUint,LPRECT lpRect);
 namespace winrt::FlushMouseUI3::implementation
 {
 
-	struct FlusMouseUI3 : AppT<FlusMouseUI3>
+	struct FlushMouseUI3Main : AppT<FlushMouseUI3Main>
 	{
-		FlusMouseUI3();
-		~FlusMouseUI3();
+		FlushMouseUI3Main();
+		~FlushMouseUI3Main();
 		
 		void OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&);
 
@@ -38,6 +38,7 @@ namespace winrt::FlushMouseUI3::implementation
 	private:
 		Microsoft::UI::Xaml::Window windowMain{ nullptr };
 		HMODULE		hFlushMouseUI3DLL{ nullptr };
+		HMODULE		hMicrosoft_ui_xaml_dll{ nullptr };
 	};
 }
 

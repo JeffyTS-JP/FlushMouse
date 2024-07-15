@@ -20,7 +20,19 @@
 //
 // Define
 // 
-#define	SYNTP_DATA_BUFFER_SIZE		8					// "X/Y -/+0000"
+#define	SYNTP_DATA_BUFFER_SIZE		8						// "X/Y -/+0000"
+
+#define SYNTPH_DISABLE						0x00			// disable
+#define SYNTPH_SENDERIPV4					0x01			// sender (IPv4)
+#define SYNTPH_SENDERHOSNAMEIPV4			0x11			// sender (Hosstname IPV4)
+#define SYNTPH_SENDERHOSNAMEIPV6			0x31			// sender (Hosstname IPV6)
+#define SYNTPH_SENDERIPV4_START				0x02			// sender (always start IPv4)
+#define SYNTPH_SENDERHOSNAMEIPV4_START		0x12			// sender (always start Hosstname IPV4)
+#define SYNTPH_SENDERHOSNAMEIPV6_START		0x32			// sender (always start Hosstname IPV6)
+#define SYNTPH_RECEIVERIPV4					0x03			// receiver (IPv4)
+#define SYNTPH_RECEIVERIPV6					0x33			// receiver (IPv6)
+#define SYNTPH_RECEIVERIPV4_START			0x04			// receiver (always start IPv4)
+#define SYNTPH_RECEIVERIPV6_START			0x34			// receiver (always start IPv6)
 
 //
 // Struct Define
@@ -83,7 +95,7 @@ public:
 	BOOL		bStartReceiver(HWND hWnd, int iPort);
 	void		vStopReceiver();
 	BOOL		bStartSender(HWND hWnd, LPCTSTR szIPAddress, int iPort);
-	void		vStoptSender();
+	void		bStopSender();
 
 private:
 	BOOL		bRegister(HINSTANCE hInstance, LPCTSTR szWindowClass);

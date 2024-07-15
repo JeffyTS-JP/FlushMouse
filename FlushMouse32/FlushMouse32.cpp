@@ -4,7 +4,7 @@
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0000		2022/04/06  JeffyTS  	New edit.
+// #0000	2022/04/06  JeffyTS  	New edit.
 //
 
 //
@@ -38,10 +38,10 @@
 // Define
 //
 // Timer
-#define PROCINITTIMERVALUE		2000
-#define CHECKPROCTIMERID		2
-static UINT     nCheckProcTimerTickValue = PROCINITTIMERVALUE;		// Timer tick
-static UINT_PTR nCheckProcTimerID = CHECKPROCTIMERID;				// Timer ID
+constexpr auto PROCINITTIMERVALUE = 2000;
+constexpr auto CHECKPROCTIMERID = 2;
+static UINT     nCheckProcTimerTickValue = PROCINITTIMERVALUE;
+static UINT_PTR nCheckProcTimerID = CHECKPROCTIMERID;
 static UINT_PTR	uCheckProcTimer = NULL;
 
 //

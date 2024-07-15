@@ -51,14 +51,14 @@ BOOL		bIMEInConverting = FALSE;
 //
 // Local Data
 //
-#define FOCUSINITTIMERVALUE		200
-#define CHECKFOCUSTIMERID		1
+constexpr auto FOCUSINITTIMERVALUE = 200;
+constexpr auto CHECKFOCUSTIMERID = 1;
 static UINT     nCheckFocusTimerTickValue = FOCUSINITTIMERVALUE;
 static UINT_PTR nCheckFocusTimerID = CHECKFOCUSTIMERID;
 static UINT_PTR	uCheckFocusTimer = NULL;
 
-#define PROCINITTIMERVALUE		2000
-#define CHECKPROCTIMERID		2
+constexpr auto PROCINITTIMERVALUE = 2000;
+constexpr auto CHECKPROCTIMERID = 2;
 static UINT     nCheckProcTimerTickValue = PROCINITTIMERVALUE;
 static UINT_PTR nCheckProcTimerID = CHECKPROCTIMERID;
 static UINT_PTR	uCheckProcTimer = NULL;
@@ -86,7 +86,7 @@ static void		Cls_OnDestroy(HWND hWnd);
 static void		Cls_OnInput(HWND hWnd, DWORD dwFlags, HRAWINPUT hRawInput);
 
 // EX Message Handler
-static void		Cls_OnSettingsEx(HWND hWnd, WPARAM wParam, LPARAM lParam);
+static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, LPARAM lParam);
 static void		Cls_OnInputLangChangeEx(HWND hWnd, UINT CodePage, HKL hkl);
 static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd);
 static void		Cls_OnCheckIMEStartConvertingEx(HWND hWnd, BOOL bStartConverting, DWORD vkCode);
@@ -300,7 +300,6 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		HANDLE_MSG(hWnd, WM_COMMAND, Cls_OnCommand);
 		HANDLE_MSG(hWnd, WM_INPUT, Cls_OnInput);
 
-		HANDLE_MSG(hWnd, WM_SETTINGSEX, Cls_OnSettingsEx);
 		HANDLE_MSG(hWnd, WM_INPUTLANGCHANGEEX, Cls_OnInputLangChangeEx);
 		HANDLE_MSG(hWnd, WM_EVENT_SYSTEM_FOREGROUNDEX, Cls_OnEventForegroundEx);
 		HANDLE_MSG(hWnd, WM_CHECKIMESTARTCONVEX, Cls_OnCheckIMEStartConvertingEx);
@@ -311,7 +310,10 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 			break;
 
 		default:
-			if (!bCheckTaskTrayMessage(hWnd, message)) {
+			if (message == WM_SETTINGSEX) {
+				return Cls_OnSettingsEx(hWnd, (int)wParam, lParam);
+			}
+			else if (!bCheckTaskTrayMessage(hWnd, message)) {
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_SYSTEMMODAL)
 				vMessageBox(hWnd, IDS_NOTREGISTERTT, MessageBoxTYPE);
 				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
@@ -334,6 +336,11 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 
 	hMainWnd = hWnd;
 
+	CHANGEFILTERSTRUCT	cf{};
+	cf.cbSize = sizeof(CHANGEFILTERSTRUCT);
+	if (ChangeWindowMessageFilterEx(hWnd, WM_SETTINGSEX, MSGFLT_ALLOW, &cf)) {
+	}
+
 	Cime = new CIME;
 	if (Cime == NULL) {
 		vMessageBox(hWnd, IDS_CANTLOADREG, MessageBoxTYPE);
@@ -347,6 +354,39 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 			vMessageBox(hWnd, IDS_CANTLOADREG, MessageBoxTYPE);
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			return FALSE;
+		}
+	}
+
+#pragma warning(push)
+#pragma warning(disable : 101)
+	constexpr auto uiNumDevices = 1;
+	RAWINPUTDEVICE	RawInputDevice[uiNumDevices]{};
+	RawInputDevice[0].hwndTarget = hWnd;	RawInputDevice[0].dwFlags = (RIDEV_INPUTSINK | RIDEV_DEVNOTIFY);
+	RawInputDevice[0].usUsagePage =  HID_USAGE_PAGE_GENERIC;	RawInputDevice[0].usUsage = HID_USAGE_GENERIC_MOUSE;
+	MouseRawInput = new CMouseRawInput();
+	if (MouseRawInput != NULL) {
+		if (!MouseRawInput->bRegisterRawInputDevices(RawInputDevice, uiNumDevices)) {
+			vMessageBox(hWnd, IDS_NOTREGISTERMS, MessageBoxTYPE);
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);	// Quit
+			return FALSE;
+		}
+	}
+#pragma warning(pop)
+	
+	if (!bStartThreadHookTimer(hWnd)) {
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+		return FALSE;
+	}
+
+	if (((Profile != NULL) && bCheckExistingJPIME() && Profile->lpstAppRegData->bEnableEPHelper)) {
+		bForExplorerPatcherSWS(GetForegroundWindow(), TRUE, TRUE, NULL, NULL);
+	}
+
+	if (Profile != NULL) {
+		if ((Profile->lpstAppRegData->dwSynTPHelper1 == SYNTPH_SENDERIPV4_START)
+			|| (Profile->lpstAppRegData->dwSynTPHelper1 == SYNTPH_SENDERHOSNAMEIPV4_START)
+			|| (Profile->lpstAppRegData->dwSynTPHelper1 == SYNTPH_RECEIVERIPV4_START)) {
+			bStartSynTPHelper(hMainWnd, Profile->lpstAppRegData->dwSynTPHelper1, FALSE);
 		}
 	}
 
@@ -368,61 +408,6 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		return FALSE;
 	}
 
-#define	uiNumDevices	1
-	RAWINPUTDEVICE	RawInputDevice[uiNumDevices]{};
-	RawInputDevice[0].hwndTarget = hWnd;	RawInputDevice[0].dwFlags = (RIDEV_INPUTSINK | RIDEV_DEVNOTIFY);
-	RawInputDevice[0].usUsagePage =  HID_USAGE_PAGE_GENERIC;	RawInputDevice[0].usUsage = HID_USAGE_GENERIC_MOUSE;
-	MouseRawInput = new CMouseRawInput();
-	if (MouseRawInput != NULL) {
-		if (!MouseRawInput->bRegisterRawInputDevices(RawInputDevice, uiNumDevices)) {
-			vMessageBox(hWnd, IDS_NOTREGISTERMS, MessageBoxTYPE);
-			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);	// Quit
-			return FALSE;
-		}
-	}
-#undef uiNumDevices
-
-	if (!bStartThreadHookTimer(hWnd)) {
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-		return FALSE;
-	}
-
-	if (((Profile != NULL) && bCheckExistingJPIME() && Profile->lpstAppRegData->bEnableEPHelper)) {
-		bForExplorerPatcherSWS(GetForegroundWindow(), TRUE, TRUE, NULL, NULL);
-	}
-
-	if (Profile->lpstAppRegData->dwSynTPHelper1 == 0x02) {
-		SynTP = new CSynTP(Profile->lpstAppRegData->dwSynTPPadX, Profile->lpstAppRegData->dwSynTPPadY, Profile->lpstAppRegData->dwSynTPEdgeX, Profile->lpstAppRegData->dwSynTPEdgeY);
-		if (SynTP) {
-			if (!SynTP->bStartSender(hMainWnd, Profile->lpstAppRegData->szSynTPSendIPAddr1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
-				vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
-				delete SynTP;
-				SynTP = NULL;
-			}
-		}
-	}
-	else if (Profile->lpstAppRegData->dwSynTPHelper1 == 0x12) {
-		if (bCheckExistHostnameIPv4(Profile->lpstAppRegData->szSynTPSendHostname1)) {
-			SynTP = new CSynTP(Profile->lpstAppRegData->dwSynTPPadX, Profile->lpstAppRegData->dwSynTPPadY, Profile->lpstAppRegData->dwSynTPEdgeX, Profile->lpstAppRegData->dwSynTPEdgeY);
-			if (SynTP) {
-				if (!SynTP->bStartSender(hMainWnd, Profile->lpstAppRegData->szSynTPSendHostname1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
-					vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
-					delete SynTP;
-					SynTP = NULL;
-				}
-			}
-		}
-	}
-	else if (Profile->lpstAppRegData->dwSynTPHelper1 == 0x04) {
-		SynTP = new CSynTP(Profile->lpstAppRegData->dwSynTPPadX, Profile->lpstAppRegData->dwSynTPPadY, Profile->lpstAppRegData->dwSynTPEdgeX, Profile->lpstAppRegData->dwSynTPEdgeY);
-		if (SynTP) {
-			if (!SynTP->bStartReceiver(hMainWnd, Profile->lpstAppRegData->dwSynTPPortNo1)) {
-				vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
-				delete SynTP;
-				SynTP = NULL;
-			}
-		}
-	}
 
 	return TRUE;
 }
@@ -521,13 +506,13 @@ static void		Cls_OnInputLangChangeEx(HWND hWnd, UINT CodePage, HKL hkl)
 		}
 		HWND	hWndObserved = NULL;
 		POINT	pt{};
-		if (GetCursorPos(&pt)) {
+		if ((Profile != NULL) && Profile->lpstAppRegData->bDoModeDispByMouseBttnUp && GetCursorPos(&pt)) {
 			if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return;
-			if ((Profile != NULL) && Profile->lpstAppRegData->bDisplayFocusWindowIME) {
+			if (Profile->lpstAppRegData->bDisplayFocusWindowIME) {
 				hWndObserved = hForeWnd;
 			}
 			if (Cursor->bStartIMECursorChangeThread(hWndObserved)) {
-				if ((Profile != NULL) && Profile->lpstAppRegData->bDoModeDispByIMEKeyDown) {
+				if (Profile->lpstAppRegData->bDoModeDispByIMEKeyDown) {
 					if (!bCheckDrawIMEModeArea(hWndObserved))	return;
 					if (!Cursor->bStartDrawIMEModeThread(hWndObserved))	return;	
 				}
@@ -586,30 +571,49 @@ void Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground)
 // WM_SETTINGSEX (WM_USER + 0xfe)
 // Cls_OnSettingsEx()
 //
-static void		Cls_OnSettingsEx(HWND hWnd, WPARAM wParam, LPARAM lParam)
+static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(lParam);
-	if ((wParam == 0) || (wParam == 2) || (wParam == 3)) {
-		vSettingDialogApply();
 
-		if (Profile != NULL) {
-			Profile->bSetProfileData();
-		}
-		if ((wParam == 0) || (wParam == 2)) {
-			if (!Cursor->bReloadCursor()) {
-				vSettingDialogClose();
-				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
-				return;
-			}
-		}
-		else if (wParam == 3) {
-			Cursor->vSetParamFromRegistry();
-		}
-	}
-	if ((wParam == 0) || (wParam == 1)) {
+	if (iCode == SETTINGSEX_CANCEL) {
 		vSettingDialogClose();
+		return TRUE;
 	}
+	if (iCode == SETTINGSEX_RELOAD_REGISTORY) {
+		if (Profile != NULL) {
+			Profile->bGetProfileData();
+			vSettingDialogApply();
+			return TRUE;
+		}
+	}
+	if (iCode == SETTINGSEX_SYNTP_IS_STARTED) {
+		if (SynTP)	return TRUE;
+		else return FALSE;
+	}
+	vSettingDialogApply();
+	if (Profile != NULL) {
+		if (!Profile->bGetProfileData())	return FALSE;
+	}
+
+	if (iCode == SETTINGSEX_RELOAD_CURSOR) {
+		if (!Cursor->bReloadCursor()) {
+			vSettingDialogClose();
+			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+			return FALSE;
+		}
+	}
+	if (iCode == SETTINGSEX_OK) {
+		vSettingDialogClose();
+		return TRUE;
+	}
+	if (iCode == SETTINGSEX_SYNTP_START) {
+		return bSettingSynTPStart();
+	}
+	if (iCode == SETTINGSEX_SYNTP_STOP) {
+		return bSettingSynTPStop();
+	}
+	return FALSE;
 }
 
 //
@@ -629,8 +633,8 @@ static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd)
 			if ((Profile != NULL) && Profile->lpstAppRegData->bOffChangedFocus) {
 				Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 			}
-			if (GetCursorPos(&pt)) {
-				if ((Profile != NULL) && Profile->lpstAppRegData->bDisplayFocusWindowIME) {
+			if ((Profile != NULL) && Profile->lpstAppRegData->bDoModeDispByMouseBttnUp && GetCursorPos(&pt)) {
+				if (Profile->lpstAppRegData->bDisplayFocusWindowIME) {
 					hWndObserved = hForeWnd;
 				}
 				else {
@@ -1423,7 +1427,7 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 //
 // bCreateProcess()
 //
-BOOL	 	bCreateProcess(LPCTSTR lpszExecName)
+BOOL	 	bCreateProcess(LPCTSTR lpszExecName, LPTSTR lpCommandLine)
 {
 	BOOL	bRet = FALSE;
 	DWORD	dwSize = 0;
@@ -1432,77 +1436,32 @@ BOOL	 	bCreateProcess(LPCTSTR lpszExecName)
 	if (lpszBuffer) {
 		ZeroMemory(lpszBuffer, dwSize);
 		dwSize = ExpandEnvironmentStrings(lpszExecName, lpszBuffer, dwSize);
-		PROCESS_INFORMATION	ProcessInfomation{};
-		STARTUPINFO	StartupInfo{};		StartupInfo.cb = sizeof(STARTUPINFO);
-		if (CreateProcess(lpszBuffer, NULL, NULL, NULL, TRUE, NORMAL_PRIORITY_CLASS, NULL, NULL, &StartupInfo, &ProcessInfomation) != FALSE) {
-			CloseHandle(ProcessInfomation.hProcess);
-			CloseHandle(ProcessInfomation.hThread);
-			bRet = TRUE;
+		if (dwSize < MAX_PATH) {
+			size_t	size = 0x7fff;
+			size = wcsnlen_s(lpCommandLine, size);
+			if ((0 < size) && (size < (size_t)((size_t)0x7fff - (size_t)dwSize - sizeof(TCHAR)))) {
+				size = dwSize + size + sizeof(TCHAR);
+				LPTSTR	_lpCommandLine = new TCHAR[size];
+				if (_lpCommandLine) {
+					ZeroMemory(_lpCommandLine, size);
+					_sntprintf_s(_lpCommandLine, size, _TRUNCATE, _T("%s %s"), lpszBuffer, lpCommandLine);
+					PROCESS_INFORMATION	ProcessInfomation{};	
+					STARTUPINFO	StartupInfo{};		StartupInfo.cb = sizeof(STARTUPINFO);
+#define	CREATIONFLAGS	0
+					if (CreateProcess(NULL, _lpCommandLine, NULL, NULL, FALSE, CREATIONFLAGS, NULL, NULL, &StartupInfo, &ProcessInfomation) != FALSE) {
+						//WaitForSingleObject(ProcessInfomation.hProcess, INFINITE);
+						CloseHandle(ProcessInfomation.hProcess);
+						CloseHandle(ProcessInfomation.hThread);
+						bRet = TRUE;
+					}
+					delete[] _lpCommandLine;
+				}
+			}
 		}
-		delete[]		lpszBuffer;
+		delete[] lpszBuffer;
 	}
 	return bRet;
 }
 
-//
-// Class CResource
-//
-CResource::CResource()
-{
-	hModRes = NULL;
-	iResourceLoadCount = 0;
-	szResFile = NULL;
-}
-
-CResource::CResource(LPCTSTR lpszResFile)
-{
-	hModRes = NULL;
-	iResourceLoadCount = 0;
-	szResFile = new TCHAR[_MAX_PATH];
-	if (szResFile) {
-		ZeroMemory(szResFile, sizeof(TCHAR) * _MAX_PATH);
-		_tcsncpy_s(szResFile, _MAX_PATH, lpszResFile, _TRUNCATE);
-	}
-}
-
-CResource::~CResource()
-{
-	if (Resource != NULL) {
-		Resource->bUnload();
-		Resource = NULL;
-	}
-	hModRes = NULL;
-	iResourceLoadCount = 0;
-	if (szResFile)	delete[]	szResFile;
-	szResFile = NULL;
-}
-
-//
-// hLoad()
-//
-HMODULE		CResource::hLoad()
-{
-	if ((hModRes == NULL) && (iResourceLoadCount == 0)) {
-		if ((hModRes = LoadLibraryEx(szResFile, NULL, (LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))) == NULL) {
-			return NULL;
-		}
-	}
-	++iResourceLoadCount;
-	return hModRes;
-}
-
-//
-// bUnload()
-//
-BOOL		CResource::bUnload()
-{
-	if ((hModRes != NULL) && (iResourceLoadCount == 1)) {
-		if (!FreeLibrary(hModRes)) {
-			return FALSE;
-		}
-	}
-	--iResourceLoadCount;
-	return TRUE;
-}
 
 /* = EOF = */

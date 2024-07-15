@@ -1,0 +1,14 @@
+﻿<!--In order to host the C# component from C++, you must add the following Extension group and list the activatable classes-->
+<Extensions>
+	<Extension Category="windows.activatableClass.inProcessServer">
+		<InProcessServer>
+			<Path>WinRT.Host.dll</Path>
+			<activatableClass
+			  name="FlushMouseUI3DLL.FlushMouseUI3DLL_XamlTypeInfo.XamlMetaDataProvider"
+			  threadingModel="both" xmlns="urn:schemas-microsoft-com:winrt.v1" />
+			<activatableClass
+				name="FlushMouseUI3DLL.Settings"
+				threadingModel="both" xmlns="urn:schemas-microsoft-com:winrt.v1" />
+		</InProcessServer>
+	</Extension>
+</Extensions>

@@ -52,7 +52,7 @@ public:
 	VOID		vIMEConvertModeChangeForced(HWND hWndObserved, DWORD dwConvertMode);
 	DWORD		dwIMEMode(HWND hWndObserved, BOOL bForceHiragana);
 	VOID		vActivateIME(HWND hWndObserved);
-	BOOL		bGetVirtualDesktopSize();
+	BOOL		bGetVirtualDesktopSize() const;
 	BOOL		bIsNewIME();
 	DWORD		dwGetInputLocale();
 	HKL			hklGetInputLocale(HWND hWndObserved);

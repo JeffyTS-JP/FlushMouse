@@ -13,34 +13,12 @@
 #include "Profile.h"
 #include "Cursor.h"
 #include "FlushMouseSub.h"
+#include "CResource.h"
 #include "SynTP.h"
 
 //
 // Define
 //
-
-//
-// Class CResource
-//
-class CResource
-{
-public:
-	CResource(LPCTSTR lpszResFile);
-	~CResource();
-
-private:
-	CResource();
-
-public:
-	HMODULE	hLoad();
-	BOOL	bUnload();
-
-private:
-	LPTSTR	szResFile;
-	HMODULE	hModRes;
-	int		iResourceLoadCount;
-};
-
 
 //
 // Global Prototype Define
@@ -49,7 +27,7 @@ extern BOOL			bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 extern int			iCheckCmdLine(LPCTSTR lpCmdLine);
 extern VOID			vDestroyWindow(HWND hWnd);
 extern BOOL			bStartThreadHookTimer(HWND hWnd);
-extern BOOL	 		bCreateProcess(LPCTSTR lpszExecName);
+extern BOOL	 		bCreateProcess(LPCTSTR lpszExecName, LPTSTR lpCommandLine);
 
 extern void			Cls_OnLButtonDownEx(HWND hWnd, int x, int y, HWND hForeground);
 extern void			Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground);
@@ -63,6 +41,8 @@ extern VOID			vSynTPHelperDialog(HWND hWnd);
 extern VOID			vSettingDialog(HWND hWnd);
 extern VOID			vSettingDialogApply();
 extern VOID			vSettingDialogClose();
+extern BOOL			bSettingSynTPStart();
+extern BOOL			bSettingSynTPStop();
 
 //
 // Global Data

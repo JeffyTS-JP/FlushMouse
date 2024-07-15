@@ -214,7 +214,7 @@ BOOL CALLBACK CIME::bEnumChildProcActivateIME(HWND hWnd, LPARAM lParam)
 //
 // bGetVirtualDesktopSize()
 //
-BOOL			CIME::bGetVirtualDesktopSize()
+BOOL			CIME::bGetVirtualDesktopSize() const
 {
 	BOOL		bRet = FALSE;
 	if (lpstVirtualDesktop != NULL) {

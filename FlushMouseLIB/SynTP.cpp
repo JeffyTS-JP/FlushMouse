@@ -171,9 +171,9 @@ BOOL		CSynTP::bStartSender(HWND hWnd, LPCTSTR szIPAddress, int iPort)
 }
 
 //
-// bStoptSender()
+// bStopSender()
 //
-void		CSynTP::vStoptSender()
+void		CSynTP::bStopSender()
 {
 	if (hGetHWND()) {
 		SendMessage(hGetHWND(), WM_DESTROY, 0, 0);
@@ -532,29 +532,29 @@ BOOL		CSynTP::bReceivePacketThreadRoutine(LPVOID lpvParam)
 
 #define RECEIVE_LAP_TIME	1
 	ULONGLONG	uuTickCount64 = 0, _uuTickCount64 = 0;
-	CHAR	szRecieveData[SYNTP_DATA_BUFFER_SIZE]{};
+	CHAR	szReceiveData[SYNTP_DATA_BUFFER_SIZE]{};
 
 	if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST)) {
 		return FALSE;
 	}
 	do {
 		if (This == NULL)	return FALSE;
-		ZeroMemory(szRecieveData, sizeof(szRecieveData));
-		if (This->Receiver)	This->Receiver->bReceivePackaet(szRecieveData, sizeof(szRecieveData));
-		if (szRecieveData[0] == '\0')	continue;
+		ZeroMemory(szReceiveData, sizeof(szReceiveData));
+		if (This->Receiver)	This->Receiver->bReceivePacket(szReceiveData, sizeof(szReceiveData));
+		if (szReceiveData[0] == '\0')	continue;
 		_uuTickCount64 = GetTickCount64();
 		if ((_uuTickCount64 - uuTickCount64) > RECEIVE_LAP_TIME) {
 			uuTickCount64 = _uuTickCount64;
-			size_t	size = strnlen_s(szRecieveData, SYNTP_DATA_BUFFER_SIZE);
-			if (size < SYNTP_DATA_BUFFER_SIZE)	szRecieveData[size] = NULL;
+			size_t	size = strnlen_s(szReceiveData, SYNTP_DATA_BUFFER_SIZE);
+			if (size < SYNTP_DATA_BUFFER_SIZE)	szReceiveData[size] = NULL;
 			POINT	pt{};
 			GetCursorPos(&pt);
-			int	iMouseData = atoi(&szRecieveData[2]);
+			int	iMouseData = atoi(&szReceiveData[2]);
 			if (iMouseData == 0)	continue;
-			if (szRecieveData[0] == 'Y') {
+			if (szReceiveData[0] == 'Y') {
 				This->bSendInput(MOUSEEVENTF_WHEEL, pt.x, pt.y, iMouseData);
 			}
-			else if (szRecieveData[0] == 'X') {
+			else if (szReceiveData[0] == 'X') {
 				This->bSendInput(MOUSEEVENTF_HWHEEL, pt.x, pt.y, iMouseData);
 			}
 			else continue;

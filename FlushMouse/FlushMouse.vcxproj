@@ -160,7 +160,7 @@
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
@@ -173,7 +173,10 @@
       <EnableUAC>false</EnableUAC>
     </Link>
     <PostBuildEvent>
-      <Command>
+      <Command>Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouse32.exe" "$(OutDir)"
+Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouse32.pdb" "$(OutDir)"
+Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouseDLL32.dll" "$(OutDir)"
+Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouseDLL32.pdb" "$(OutDir)"
       </Command>
     </PostBuildEvent>
     <Manifest>
@@ -197,7 +200,7 @@
       <Optimization>MaxSpeed</Optimization>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
@@ -206,13 +209,18 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(IntDir)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>..\$(Platform)\$(Configuration)\MiscLIB.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <UACExecutionLevel>AsInvoker</UACExecutionLevel>
       <UACUIAccess>false</UACUIAccess>
       <EnableUAC>false</EnableUAC>
     </Link>
     <PostBuildEvent>
-      <Command>Start /min /wait cmd /c  "$(SolutionDir)Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)</Command>
+      <Command>Start /wait /min cmd /c "$(SolutionDir)Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
+Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouse32.exe" "$(OutDir)"
+Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouse32.pdb" "$(OutDir)"
+Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouseDLL32.dll" "$(OutDir)"
+Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouseDLL32.pdb" "$(OutDir)"
+</Command>
     </PostBuildEvent>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>

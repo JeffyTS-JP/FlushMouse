@@ -113,10 +113,8 @@
       <UACUIAccess>false</UACUIAccess>
     </Link>
     <PostBuildEvent>
-      <Command>Xcopy /Y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)x64\$(Configuration)\"
-Xcopy /Y "$(OutDir)$(TargetName).pdb" "$(SolutionDir)x64\$(Configuration)\"
-Xcopy /Y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)x64\$(Configuration)\FlushMouseUI3\"
-Xcopy /Y "$(OutDir)$(TargetName).pdb" "$(SolutionDir)x64\$(Configuration)\FlushMouseUI3\"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -144,11 +142,7 @@ Xcopy /Y "$(OutDir)$(TargetName).pdb" "$(SolutionDir)x64\$(Configuration)\FlushM
       <UACUIAccess>false</UACUIAccess>
     </Link>
     <PostBuildEvent>
-      <Command>Start /min /wait cmd /c "$(SolutionDir)Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
-Xcopy /Y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)x64\$(Configuration)\"
-Xcopy /Y "$(OutDir)$(TargetName).pdb" "$(SolutionDir)x64\$(Configuration)\"
-Xcopy /Y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)x64\$(Configuration)\FlushMouseUI3\"
-Xcopy /Y "$(OutDir)$(TargetName).pdb" "$(SolutionDir)x64\$(Configuration)\FlushMouseUI3\"
+      <Command>Start /wait /min cmd /c "$(SolutionDir)Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -215,9 +209,6 @@ Xcopy /Y "$(OutDir)$(TargetName).pdb" "$(SolutionDir)x64\$(Configuration)\FlushM
     <ResourceCompile Include="FlushMouseDLL32.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FlushMouseDLL\FlushMouseDLL.vcxproj">
-      <Project>{ec908a5d-8859-4b02-9ace-023ff407a3a3}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\MiscLIB32\MiscLIB32.vcxproj">
       <Project>{3d3f632c-75bb-4830-aa8e-0871c6aa1a72}</Project>
     </ProjectReference>

@@ -50,6 +50,24 @@ DWORD		dwGetString2IPv4Addr(LPCTSTR lpszIPAddress)
 }
 
 //
+// bGetString2IPv4Addr()
+// 
+BOOL		bGetString2IPv4Addr(LPCTSTR lpszIPAddress, LPTSTR addr1, LPTSTR addr2, LPTSTR addr3, LPTSTR addr4)
+{
+	if ((lpszIPAddress == NULL) || (addr1 == NULL) || (addr2 == NULL) || (addr3 == NULL) || (addr4 == NULL))	return FALSE;
+	LPCTSTR	Terminator = NULL;
+	IN_ADDR	Addr{};
+	if (RtlIpv4StringToAddress(lpszIPAddress, FALSE, &Terminator, &Addr) == 0) {
+		if (_itow_s(Addr.S_un.S_un_b.s_b1, addr1, 4, 10) != 0)	return FALSE;
+		if (_itow_s(Addr.S_un.S_un_b.s_b2, addr2, 4, 10) != 0)	return FALSE;
+		if (_itow_s(Addr.S_un.S_un_b.s_b3, addr3, 4, 10) != 0)	return FALSE;
+		if (_itow_s(Addr.S_un.S_un_b.s_b4, addr4, 4, 10) != 0)	return FALSE;
+		return TRUE;
+	}
+	return FALSE;
+}
+
+//
 // bIsPrivateAddress()
 //
 BOOL		bIsPrivateAddress(LPCTSTR lpszIPAddress)
@@ -175,9 +193,9 @@ BOOL		CTCPIP::bOpenPortForReceiveUDPv4(int Port)
 }
 
 //
-// bReceivePackaet()
+// bReceivePacket()
 //
-BOOL		CTCPIP::bReceivePackaet(LPVOID lpData, int cbSize) const
+BOOL		CTCPIP::bReceivePacket(LPVOID lpData, int cbSize) const
 {
 	if ((pSocket == NULL) || (lpData == NULL) || (cbSize == 0))	return FALSE;
 

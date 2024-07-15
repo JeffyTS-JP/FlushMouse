@@ -13,6 +13,7 @@
 #pragma once
 #include "pch.h"
 #include "CommonDef.h"
+#include "SynTP.h"
 #include "TCPIP.h"
 
 //
@@ -57,15 +58,22 @@ typedef struct tagAppRegData
 	BOOL		bEnableEPHelper = FALSE;
 
 	// for SynTP Helper
+	BOOL		bSynTPStarted1 = FALSE;
 	DWORD		dwSynTPPadX = 528;
 	DWORD		dwSynTPPadY = 528;
 	DWORD		dwSynTPEdgeX = 88;
 	DWORD		dwSynTPEdgeY = 88;
-	DWORD		dwSynTPHelper1 = 0;
+	DWORD		dwSynTPHelper1 = SYNTPH_DISABLE;
 	TCHAR		szSynTPSendIPAddr1[MAX_IPV4_ADDRESS]{};
 	TCHAR		szSynTPSendHostname1[MAX_FQDN]{};
-	
 	DWORD		dwSynTPPortNo1 = 50008;
+
+	// for Settings
+	BOOL		bIsPaneOpen = TRUE;
+	DWORD		dwSettingsX = 0;
+	DWORD		dwSettingsY = 0;
+	DWORD		dwSettingsWidth = 0;
+	DWORD		dwSettingsHeight = 0;
 
 } APPREGDATA, * PAPPREGDATA, * LPAPPREGDATA;
 

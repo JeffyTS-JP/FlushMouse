@@ -1,0 +1,14 @@
+// FlushMouseSettings.idl for FlushMouseSettings
+//		Copyright (C) 1993 JeffyTS
+//
+//	  
+// No.	  Date			Name			Reason & Document
+// -------+-----------+-----------+-------------------------------------------- -
+// #0000		2022/07/16  JeffyTS  	New edit.
+//
+
+namespace FlushMouseSettings
+{
+}
+
+/* = EOF = */

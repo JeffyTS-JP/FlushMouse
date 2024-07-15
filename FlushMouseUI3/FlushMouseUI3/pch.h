@@ -56,10 +56,9 @@
 #include "winrt/Microsoft.UI.Xaml.h"
 #include "winrt/Microsoft.UI.Xaml.Controls.h"
 #include "winrt/Microsoft.UI.Xaml.Controls.Primitives.h"
-#include "winrt/Microsoft.UI.Xaml.XamlTypeInfo.h"
 
 #include "winrt/Microsoft.Windows.AppLifecycle.h"
-
+#include "winrt/Microsoft.UI.Xaml.XamlTypeInfo.h"
 #include "winrt/FlushMouseUI3DLL.h"
 #include "winrt/FlushMouseUI3DLL.FlushMouseUI3DLL_XamlTypeInfo.h"
 

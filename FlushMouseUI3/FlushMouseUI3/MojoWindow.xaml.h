@@ -16,9 +16,11 @@ using namespace winrt;
 using namespace winrt::Microsoft::UI;
 using namespace winrt::Microsoft::UI::Xaml;
 
-void		SettingsExec(HWND hWnd, int msg);
+void		SettingsExec(HWND hWnd, UINT32 uMsg, INT32 iSelectedPane);
 void		SettingsApply();
 void		SettingsClose();
+bool		SettingsSynTPStart();
+bool		SettingsSynTPStop();
 
 namespace winrt::FlushMouseUI3::implementation
 {
@@ -31,7 +33,6 @@ namespace winrt::FlushMouseUI3::implementation
 		~MojoWindow();
 
 	private:
-
 	};
 }
 

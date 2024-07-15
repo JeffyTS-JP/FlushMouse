@@ -16,6 +16,7 @@
 #include "TaskTray.h"
 #include "Eventlog.h"
 #include "KeyboardHook.h"
+#include "Resource.h"
 #include "CommonDef.h"
 #include "..\FlushMouseDLL\ShellHookDll.h"
 #include "..\FlushMouseDLL\GlobalHookDll.h"
@@ -37,6 +38,80 @@
 //
 // Local Prototype Define
 //
+
+//
+// bStartSynTPHelper()
+//
+BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
+{
+	if (!Profile)	return FALSE;
+	Profile->lpstAppRegData->bSynTPStarted1 = FALSE;
+	if (SynTP == NULL)	SynTP = new CSynTP(Profile->lpstAppRegData->dwSynTPPadX, Profile->lpstAppRegData->dwSynTPPadY, Profile->lpstAppRegData->dwSynTPEdgeX, Profile->lpstAppRegData->dwSynTPEdgeY);
+	if (SynTP) {
+		switch (dwSynTPHelper) {
+		case SYNTPH_SENDERIPV4:
+		case SYNTPH_SENDERIPV4_START:
+			SynTP->bStopSender();
+			if (!SynTP->bStartSender(hMainWnd, Profile->lpstAppRegData->szSynTPSendIPAddr1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_SYSTEMMODAL)
+				if (bShowMessage) vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
+				delete SynTP;
+				SynTP = NULL;
+			}
+			else Profile->lpstAppRegData->bSynTPStarted1 = TRUE;
+			break;
+		case SYNTPH_SENDERHOSNAMEIPV4:
+		case SYNTPH_SENDERHOSNAMEIPV4_START:
+		case SYNTPH_SENDERHOSNAMEIPV6:
+		case SYNTPH_SENDERHOSNAMEIPV6_START:
+			SynTP->bStopSender();
+			if (bCheckExistHostnameIPv4(Profile->lpstAppRegData->szSynTPSendHostname1)) {
+				if (SynTP->bStartSender(hMainWnd, Profile->lpstAppRegData->szSynTPSendHostname1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
+					Profile->lpstAppRegData->bSynTPStarted1 = TRUE;
+					break;
+				}
+			}
+			if (bShowMessage) vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
+			delete SynTP;
+			SynTP = NULL;
+			break;
+		case SYNTPH_RECEIVERIPV4:
+		case SYNTPH_RECEIVERIPV4_START:
+		case SYNTPH_RECEIVERIPV6:
+		case SYNTPH_RECEIVERIPV6_START:
+			SynTP->vStopReceiver();
+			if (!SynTP->bStartReceiver(hMainWnd, Profile->lpstAppRegData->dwSynTPPortNo1)) {
+				if (bShowMessage) vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
+				delete SynTP;
+				SynTP = NULL;
+			}
+			else Profile->lpstAppRegData->bSynTPStarted1 = TRUE;
+			break;
+		}
+	}
+	Profile->bSetProfileData();
+	return Profile->lpstAppRegData->bSynTPStarted1;
+}
+
+//
+// bStopSynTPHelper()
+//
+BOOL		bStopSynTPHelper()
+{
+	if (SynTP) {
+		SynTP->vStopReceiver();
+		SynTP->bStopSender();
+		delete SynTP;
+		SynTP = NULL;
+		if (Profile) {
+			Profile->lpstAppRegData->bSynTPStarted1 = FALSE;
+			Profile->bSetProfileData();
+			return TRUE;
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
 
 //
 // bCheckDrawIMEModeArea()

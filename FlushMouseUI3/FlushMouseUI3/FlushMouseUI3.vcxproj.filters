@@ -4,10 +4,6 @@
     <ApplicationDefinition Include="FlushMouseUI3.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <Midl Include="About.idl" />
-    <Midl Include="About.idl" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="Generated Files\module.g.cpp" />
   </ItemGroup>
@@ -38,7 +34,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="MojoWindow.xaml" />
-    <Page Include="About.xaml" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natvis" />

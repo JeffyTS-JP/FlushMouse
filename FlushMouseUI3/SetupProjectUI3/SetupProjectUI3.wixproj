@@ -67,6 +67,30 @@
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
       <RefTargetDir>INSTALLFOLDER</RefTargetDir>
     </ProjectReference>
+    <ProjectReference Include="..\..\FlushMouseDLL32\FlushMouseDLL32.vcxproj">
+      <Name>FlushMouseDLL32</Name>
+      <Project>{701b5f8e-0e39-40c3-a692-b23a3836bede}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\FlushMouseDLL\FlushMouseDLL.vcxproj">
+      <Name>FlushMouseDLL</Name>
+      <Project>{ec908a5d-8859-4b02-9ace-023ff407a3a3}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\FlushMouseUI3DLL\FlushMouseUI3DLL.csproj">
+      <Name>FlushMouseUI3DLL</Name>
+      <Project>{dda48b43-4f82-40aa-ac94-f6b40c7d276e}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
     <ProjectReference Include="..\FlushMouseUI3\FlushMouseUI3.vcxproj">
       <Name>FlushMouseUI3</Name>
       <Project>{580b9738-824a-4c7a-abbf-6f9343a95a50}</Project>

@@ -178,6 +178,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CommonDef.h" />
+    <ClInclude Include="CResource.h" />
     <ClInclude Include="Cursor.h" />
     <ClInclude Include="Eventlog.h" />
     <ClInclude Include="FlushMouseLIB.h" />
@@ -195,6 +196,7 @@
     <ClInclude Include="TCPIP.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CResource.cpp" />
     <ClCompile Include="Cursor.cpp" />
     <ClCompile Include="Eventlog.cpp" />
     <ClCompile Include="FlushMouseLIB.cpp" />
@@ -222,8 +224,11 @@
     <ResourceCompile Include="FlushMouse.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FlushMouseDLL\FlushMouseDLL.vcxproj">
-      <Project>{ec908a5d-8859-4b02-9ace-023ff407a3a3}</Project>
+    <None Include="cpp.hint" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MiscLIB\MiscLIB.vcxproj">
+      <Project>{ccaf431f-ce8e-4879-9b1f-3f1df4ac2269}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -92,35 +92,67 @@
 		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT3" Value=" セットアップを終了したら、すぐに $(var.ProductName) を実行する" />
 		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX3" Value="1" />
 		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT4" Value=" $(var.ProductName) の設定情報を削除する" />
-		
+
 		<Property Id="BUNDLE" Value="0" />
 		<Property Id="PRODUCTED_ID">
-			<RegistrySearch Id="Producted_ID" Root="HKLM" Key="SOFTWARE\Wow6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)" Name="ProductID" Type="raw" />
+			<RegistrySearch Id="Producted_ID"
+							Root="HKLM"
+							Key="SOFTWARE\Wow6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)"
+							Name="ProductID"
+							Type="raw" />
 		</Property>
 		<Property Id="BUNDLED_ID">
-			<RegistrySearch Id="Bundled_ID" Root="HKLM" Key="SOFTWARE\Wow6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)" Name="BundleID" Type="raw" />
+			<RegistrySearch Id="Bundled_ID"
+							Root="HKLM"
+							Key="SOFTWARE\Wow6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)"
+							Name="BundleID"
+							Type="raw" />
 		</Property>
 		<Property Id="BUNDLED_VERSION">
-			<RegistrySearch Id="Bundled_Version" Root="HKLM" Key="SOFTWARE\Wow6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)" Name="BundleVersion" Type="raw" />
+			<RegistrySearch Id="Bundled_Version"
+							Root="HKLM"
+							Key="SOFTWARE\Wow6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)"
+							Name="BundleVersion"
+							Type="raw" />
 		</Property>
 		<Property Id="PRODUCT_DEPENDENCIES">
-			<RegistrySearch Id="Product_Dependencies" Root="HKLM" Key="SOFTWARE\Classes\Installer\Dependencies\&quot;[ProductCode]&quot;" Name="Dependents" Type="raw" />
+			<RegistrySearch Id="Product_Dependencies"
+							Root="HKLM"
+							Key="SOFTWARE\Classes\Installer\Dependencies\&quot;[ProductCode]&quot;"
+							Name="Dependents"
+							Type="raw" />
 		</Property>
 		<Property Id="PRODUCT_DEPENDENCIES1">
-			<RegistrySearch Id="Product_Dependencies1" Root="HKLM" Key="SOFTWARE\Classes\Installer\Dependencies\&quot;$(var.ProductID)&quot;" Name="Dependents" Type="raw" />
+			<RegistrySearch Id="Product_Dependencies1"
+							Root="HKLM"
+							Key="SOFTWARE\Classes\Installer\Dependencies\&quot;$(var.ProductID)&quot;"
+							Name="Dependents"
+							Type="raw" />
 		</Property>
 		<Property Id="PRODUCT_DEPENDENCIES2">
-			<RegistrySearch Id="Product_Dependencies2" Root="HKLM" Key="SOFTWARE\Classes\Installer\Dependencies\&quot;[ProductCode]&quot;" Name="Dependents" Type="directory" />
+			<RegistrySearch Id="Product_Dependencies2"
+							Root="HKLM"
+							Key="SOFTWARE\Classes\Installer\Dependencies\&quot;[ProductCode]&quot;"
+							Name="Dependents"
+							Type="directory" />
 		</Property>
 		<Property Id="PRODUCT_DEPENDENCIES3">
-			<RegistrySearch Id="Product_Dependencies3" Root="HKLM" Key="SOFTWARE\Classes\Installer\Dependencies\&quot;$(var.ProductID)&quot;" Name="Dependents" Type="file" />
+			<RegistrySearch Id="Product_Dependencies3"
+							Root="HKLM"
+							Key="SOFTWARE\Classes\Installer\Dependencies\&quot;$(var.ProductID)&quot;"
+							Name="Dependents"
+							Type="file" />
 		</Property>
-		
+
 		<!-- Searching for Package Cache location for the current bundle -->
 		<Property Id="BUNDLED_CACHE_PATH">
-			<RegistrySearch Id="Bundled_CachePath" Root="HKLM" Key="SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\[BUNDLED_ID]" Name="BundledCachedPath" Type="raw" />
+			<RegistrySearch Id="Bundled_CachePath"
+							Root="HKLM"
+							Key="SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\[BUNDLED_ID]"
+							Name="BundledCachedPath"
+							Type="raw" />
 		</Property>
-		
+
 		<!-- UI Dialog -->
 		<UI>
 			<!-- Majour Upgrade Dialog-->
@@ -426,14 +458,26 @@
 			<Component Id="$(var.MainExeFileName)" Guid="{25BEEEA7-583D-4C15-9566-FFA42716A1C9}">
 				<File Id="$(var.MainExeFileName)" Name="$(var.MainExeFileName)" Source="$(var.TargetDir01)$(var.MainExeFileName)" />
 			</Component>
+			<Component Id="$(var.ProductName).pdb" Guid="{11E774D2-7F89-4883-9B5F-83B6E47D4443}">
+				<File Id="$(var.ProductName).pdb" Name="$(var.ProductName).pdb" Source="$(var.TargetDir01)$(var.ProductName).pdb" />
+			</Component>
 			<Component Id="$(var.ProductName)DLL.dll" Guid="{3C81EF6B-D231-4739-8361-496FE5BE93D3}">
 				<File Id="$(var.ProductName)DLL.dll" Name="$(var.ProductName)DLL.dll" Source="$(var.TargetDir01)$(var.ProductName)DLL.dll" />
+			</Component>
+			<Component Id="$(var.ProductName)DLL.pdb" Guid="{0C46B93A-7F44-4C7E-B0E4-D6589EDA5660}">
+				<File Id="$(var.ProductName)DLL.pdb" Name="$(var.ProductName)DLL.pdb" Source="$(var.TargetDir01)$(var.ProductName)DLL.pdb" />
 			</Component>
 			<Component Id="$(var.ProductName)32.exe" Guid="{CB3543F9-1CA7-4773-9105-CB1BD98F49FD}">
 				<File Id="$(var.ProductName)32.exe" Name="$(var.ProductName)32.exe" Source="$(var.TargetDir02)$(var.ProductName)32.exe" />
 			</Component>
+			<Component Id="$(var.ProductName)32.pdb" Guid="{2160C49D-BB23-45AB-9CC5-8622CC71EA11}">
+				<File Id="$(var.ProductName)32.pdb" Name="$(var.ProductName)32.pdb" Source="$(var.TargetDir02)$(var.ProductName)32.pdb" />
+			</Component>
 			<Component Id="$(var.ProductName)DLL32.dll" Guid="{CCBA3647-0988-463A-89E4-0BFD5EA13DA0}">
 				<File Id="$(var.ProductName)DLL32.dll" Name="$(var.ProductName)DLL32.dll" Source="$(var.TargetDir02)$(var.ProductName)DLL32.dll" />
+			</Component>
+			<Component Id="$(var.ProductName)DLL32.pdb" Guid="{B77F426B-9E02-46FA-9678-ECB222278CD9}">
+				<File Id="$(var.ProductName)DLL32.pdb" Name="$(var.ProductName)DLL32.pdb" Source="$(var.TargetDir02)$(var.ProductName)DLL32.pdb" />
 			</Component>
 			<Component Id="Register_TaskScheduler.xml" Guid="{3FA0C6AB-6E9C-4B55-BE44-A02A3B6A0C3E}">
 				<File Id="Register_TaskScheduler.xml" Name="Register_TaskScheduler.xml" Source="$(var.TargetDir04)..\..\SetupProject\Register_TaskScheduler.xml" />
@@ -461,9 +505,15 @@
 			<Component Id="WinUI3_DLL_01" Guid="{9F85333C-F9D6-4166-8DF3-F1E001DFB240}">
 				<File Id="WinUI3__DLL_01" Name="FlushMouseUI3DLL.dll" Source="$(var.TargetDir01)FlushMouseUI3DLL.dll" />
 			</Component>
+			<Component Id="WinUI3_DLL_02" Guid="{59BD4C6B-226C-426E-8D91-0123921ACCEB}">
+				<File Id="WinUI3__DLL_02" Name="FlushMouseUI3DLL.pdb" Source="$(var.TargetDir01)FlushMouseUI3DLL.pdb" />
+			</Component>
 			<!-- Icon -->
 			<Component Id="WinUI3_Icon_01" Guid="{592E3E6A-D526-4FBB-AB23-2E259DB76A05}">
 				<File Id="WinUI3__Icon_01" Name="FlushMouse.ico" Source="$(var.TargetDir01)FlushMouse.ico" />
+			</Component>
+			<Component Id="WinUI3_Icon_02" Guid="{73D6181D-2076-45DB-AF20-092C098816EB}">
+				<File Id="WinUI3__Icon_02" Name="SynTP_Receiver.ico" Source="$(var.TargetDir01)SynTP_Receiver.ico" />
 			</Component>
 			<!-- pri -->
 			<Component Id="WinUI3_Pri_01" Guid="{374D0217-AF35-4F6C-B167-B14F7C3CC6EB}">
@@ -481,6 +531,12 @@
 			</Component>
 			<Component Id="WinUI3_xbf_04" Guid="{D40591ED-CA33-4220-9485-A1B8C7297BFD}">
 				<File Id="WinUI3__xbf_04" Name="About.xbf" Source="$(var.TargetDir01)About.xbf" />
+			</Component>
+			<Component Id="WinUI3_xbf_05" Guid="{A7480BE4-5855-4BAE-B10F-B688C4A67E56}">
+				<File Id="WinUI3__xbf_05" Name="General.xbf" Source="$(var.TargetDir01)General.xbf" />
+			</Component>
+			<Component Id="WinUI3_xbf_06" Guid="{D05E805A-CEE5-42E5-8BE7-F88B25D29C4E}">
+				<File Id="WinUI3__xbf_06" Name="SynTP_Helper.xbf" Source="$(var.TargetDir01)SynTP_Helper.xbf" />
 			</Component>
 
 			<!-- WinUI3 DLLs and some Files-->
@@ -648,6 +704,9 @@
 			</Component>
 			<Component Id="WinUI3_DLLs_56" Guid="{731FE55D-675F-4B31-A141-C87CF28FB218}">
 				<File Id="WinUI3_DLLs_56" Name="wuceffectsi.dll" Source="$(var.TargetDir01)wuceffectsi.dll" />
+			</Component>
+			<Component Id="WinUI3_DLLs_57" Guid="{D4125B16-FFEF-4374-AA67-2C4F3701CDD5}">
+				<File Id="WinUI3_DLLs_57" Name="mwinrtact.dll" Source="$(var.TargetDir01)wuceffectsi.dll" />
 			</Component>
 
 			<!-- Application registry -->

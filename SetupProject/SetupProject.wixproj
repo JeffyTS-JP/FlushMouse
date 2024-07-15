@@ -21,18 +21,9 @@
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
     <CompilerAdditionalOptions>-arch x64</CompilerAdditionalOptions>
     <SuppressValidation>False</SuppressValidation>
-    <SuppressIces>ICE61</SuppressIces>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
-    <DefineConstants>Debug</DefineConstants>
-    <Cultures>ja-JP</Cultures>
-    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
-    <Cultures>ja-JP</Cultures>
-    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+    <SuppressIces>ICE03</SuppressIces>
+    <LinkerAdditionalOptions>
+    </LinkerAdditionalOptions>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Product.wxs" />
@@ -44,10 +35,10 @@
   <ItemGroup>
     <Content Include="banner.bmp" />
     <Content Include="dialog.bmp" />
-    <Content Include="License.rtf" />
-    <Content Include="Readme.txt" />
     <Content Include="Register_Eventlog.reg" />
     <Content Include="Register_TaskScheduler.xml" />
+    <Content Include="License.rtf" />
+    <Content Include="Readme.txt" />
     <Content Include="Register_TaskScheduler1.xml" />
     <Content Include="Register_TaskScheduler2.xml" />
     <Content Include="Register_TaskScheduler3.xml" />
@@ -70,6 +61,38 @@
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
       <RefTargetDir>INSTALLFOLDER</RefTargetDir>
     </ProjectReference>
+    <ProjectReference Include="..\FlushMouseDLL32\FlushMouseDLL32.vcxproj">
+      <Name>FlushMouseDLL32</Name>
+      <Project>{701b5f8e-0e39-40c3-a692-b23a3836bede}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\FlushMouseDLL\FlushMouseDLL.vcxproj">
+      <Name>FlushMouseDLL</Name>
+      <Project>{ec908a5d-8859-4b02-9ace-023ff407a3a3}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\FlushMouseUI3\FlushMouseSettings\FlushMouseSettings.vcxproj">
+      <Name>FlushMouseSettings</Name>
+      <Project>{5f3b07f2-915c-447b-8db6-0d2a532885a9}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\FlushMouseUI3\FlushMouseUI3DLL\FlushMouseUI3DLL.csproj">
+      <Name>FlushMouseUI3DLL</Name>
+      <Project>{dda48b43-4f82-40aa-ac94-f6b40c7d276e}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
     <ProjectReference Include="..\FlushMouse\FlushMouse.vcxproj">
       <Name>FlushMouse</Name>
       <Project>{25ccb51d-e30e-4a21-ba9d-09cf79484fe9}</Project>
@@ -81,11 +104,11 @@
   </ItemGroup>
   <ItemGroup>
     <WixExtension Include="WixUtilExtension">
-      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
+      <HintPath>$(WixExtDir)WixUtilExtension.dll</HintPath>
       <Name>WixUtilExtension</Name>
     </WixExtension>
     <WixExtension Include="WixUIExtension">
-      <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
+      <HintPath>$(WixExtDir)WixUIExtension.dll</HintPath>
       <Name>WixUIExtension</Name>
     </WixExtension>
   </ItemGroup>
@@ -98,7 +121,9 @@
     <Error Text="The WiX Toolset v3.11 (or newer) build tools must be installed to build this project. To download the WiX Toolset, see http://wixtoolset.org/releases/" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>Start /wait /min cmd /c "$(SolutionDir)Sign_Modules.bat" $(TargetDir)ja-JP\$(TargetFileName)</PostBuildEvent>
+    <PostBuildEvent>Start /wait /min cmd /c "$(SolutionDir)Sign_Modules.bat" $(TargetDir)ja-JP\$(TargetFileName)
+rem "%25ProgramFiles(x86)%25\Microsoft SDKs\ClickOnce\SignTool\signtool.exe" sign  /a /fd SHA256 /sha1 CA5B47D3AF0E8AED7A2E86121552C558407B23B8 /t http://timestamp.sectigo.com/authenticode "$(TargetDir)ja-JP\$(TargetFileName)" 
+rem copy "$(TargetDir)ja-JP\$(TargetFileName)" "$(SolutionDir)$(TargetFileName)"</PostBuildEvent>
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.

@@ -18,24 +18,29 @@
 //
 #define MAX_LOADSTRING 100
 
-#define FLUSHMOUSE				L"FlushMouse"
-#define FLUSHMOUSE32			L"FlushMouse32"
+#define FLUSHMOUSE					L"FlushMouse"
+#define FLUSHMOUSE32				L"FlushMouse32"
+#define FLUSHMOUSESETTINGS			L"FlushMouseSettings"
 
 // Files
-#define	FULL_FLUSHMOUSE_EXE		L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouse.exe"
-#define	FULL_FLUSHMOUSE32_EXE	L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouse32.exe"
-#define FULL_FLUSHMOUSE_DLL		L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouseDLL.dll"
-#define	FULL_FLUSHMOUSE32_DLL	L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouseDLL32.dll"
-#define FULL_FLUSHMOUSEUI3_DLL	L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouseUI3DLL.dll"
-#define	FLUSHMOUSE_EXE			L"FlushMouse.exe"
-#define	FLUSHMOUSE32_EXE		L"FlushMouse32.exe"
-#define FLUSHMOUSE_DLL			L"FlushMouseDLL.dll"
-#define FLUSHMOUSE32_DLL		L"FlushMouseDLL32.dll"
-#define FLUSHMOUSEUI3_DLL		L"FlushMouseUI3DLL.dll"
+#define	FULL_FLUSHMOUSE_EXE			L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouse.exe"
+#define	FULL_FLUSHMOUSE32_EXE		L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouse32.exe"
+#define FULL_FLUSHMOUSESETTINGS_EXE	L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouseSettings\\FlushMouseSettings.exe"
+#define RELATIVE_FLUSHMOUSESETTINGS_EXE	L"FlushMouseSettings\\FlushMouseSettings.exe"
+#define FULL_FLUSHMOUSE_DLL			L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouseDLL.dll"
+#define	FULL_FLUSHMOUSE32_DLL		L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouseDLL32.dll"
+#define FULL_FLUSHMOUSEUI3_DLL		L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouseUI3DLL.dll"
+#define	FLUSHMOUSE_EXE				L"FlushMouse.exe"
+#define	FLUSHMOUSE32_EXE			L"FlushMouse32.exe"
+#define	FLUSHMOUSESETTINGS_EXE		L"FlushMouseSettings.exe"
+#define FLUSHMOUSE_DLL				L"FlushMouseDLL.dll"
+#define FLUSHMOUSE32_DLL			L"FlushMouseDLL32.dll"
+#define FLUSHMOUSEUI3_DLL			L"FlushMouseUI3DLL.dll"
 
 // Window Class
-#define	CLASS_FLUSHMOUSE		L"FlushMouse-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
-#define CLASS_FLUSHMOUSE32		L"FlushMouse32-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
+#define	CLASS_FLUSHMOUSE			L"FlushMouse-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
+#define CLASS_FLUSHMOUSE32			L"FlushMouse32-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
+#define	CLASS_FLUSHMOUSESETTINGS	L"FlushMouseSettings-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
 
 // for IME
 #define IMC_GETCONVERSIONMODE   0x0001
@@ -156,9 +161,23 @@ typedef struct tagSIZED
 #define	WM_MOUSEHWHEELEX					(WM_USER + WM_MOUSEHWHEEL)
 #define HANDLE_WM_MOUSEHWHEELEX(hwnd, wParam, lParam, fn) ((fn)((hwnd), (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (int)(short)HIWORD(wParam), (UINT)(short)LOWORD(wParam)), 0L)
 
-// void Cls_OnSettings(HWND hWnd, WPARAM wParam, LPARAM lParam);
+// BOOL Cls_OnSettings(HWND hWnd, int iCode, LPARAM lParam);
 #define WM_SETTINGSEX						(WM_USER + 0xfe)
-#define HANDLE_WM_SETTINGSEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (WPARAM)(wParam), (LPARAM)(lParam)), 0L)
+#define HANDLE_WM_SETTINGSEX(hWnd, wParam, lParam, fn) ((LRESULT)(DWORD)(BOOL)(fn)((hWnd), (int)(wParam), (LPARAM)(lParam)), 0L)
+#define SETTINGSEX_OK						0
+#define SETTINGSEX_CANCEL					1
+#define SETTINGSEX_APPLY					2
+#define SETTINGSEX_RELOAD_REGISTORY			3
+#define SETTINGSEX_RELOAD_CURSOR			4
+#define SETTINGSEX_CHANGE_PANE				5
+#define SETTINGSEX_SYNTP_START				10
+#define SETTINGSEX_SYNTP_IS_STARTED			11
+#define SETTINGSEX_SYNTP_STOP				12
+
+#define SETTINGSEX_SELECTEDPANE_GENERAL		1
+#define SETTINGSEX_SELECTEDPANE_IMEMODE		2
+#define SETTINGSEX_SELECTEDPANE_SYNTPHELPER	3
+#define SETTINGSEX_SELECTEDPANE_ABOUT		4
 
 #define KEY_TAB				(WM_USER + VK_TAB)						// Tab    (0x09)
 #define KEY_RETURN			(WM_USER + VK_RETURN)					// Enter  (0x0d)

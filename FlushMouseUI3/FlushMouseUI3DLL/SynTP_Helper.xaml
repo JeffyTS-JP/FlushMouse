@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+// SynTP_Helper.Xaml for FlushMouseUI3DLL
+//		Copyright (C) 2024 JeffyTS
+//
+//	  
+// No.		Date			Name			Reason & Document
+// #0000	2024/07/15		JeffyTS  		New edit.
+//
+-->
+
+<Page
+	x:Class="FlushMouseUI3DLL.SynTP_Helper"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="clr-namespace:FlushMouseUI3DLL"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+	xmlns:f="using:Windows.Globalization.NumberFormatting"
+	mc:Ignorable="d"
+	NavigationCacheMode="Required"
+	>
+
+	<Grid Margin="20,20,20,20" x:Name="SynTP_Helper_Panel" Loaded="SynTP_helper_Loaded" HorizontalAlignment="Left" VerticalAlignment="Top">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="48"/>
+			<ColumnDefinition Width="*"/>
+		</Grid.ColumnDefinitions>
+		<Grid Margin="0,70,0,0" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top">
+			<Image Margin="0,0,0,0" Source="SynTP_Receiver.ico" Width="48" Height="48"/>
+		</Grid>
+		<Grid Margin="80,0,0,0" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="*"/>
+			</Grid.RowDefinitions>
+			<Grid Margin="0,20,0,0" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="130"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<Grid Margin="0,0,0,0" Grid.Column="0">
+					<TextBlock Margin="0,0,0,0" Text="Mode"/>
+				</Grid>
+				<Grid Margin="0,0,0,0" Grid.Column="1">
+					<RadioButton Margin="0,-4,0,0" Content="Disable" x:Name="rb1" Checked="RadioButton_Checked"/>
+				</Grid>
+				<Grid Margin="25,0,0,0" Grid.Column="2">
+					<RadioButton Margin="0,-4,0,0" Content="Sender" x:Name="rb2" Checked="RadioButton_Checked"/>
+				</Grid>
+				<Grid Margin="25,0,0,0" Grid.Column="3">
+					<RadioButton Margin="0,-4,0,0" Content="Receiver" x:Name="rb3" Checked="RadioButton_Checked"/>
+				</Grid>
+			</Grid>
+			<Grid Margin="0,30,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="150"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<Grid Margin="0,0,0,0" Grid.Column="0">
+					<TextBlock Margin="0,0,0,0" Text="TouchPad"/>
+				</Grid>
+				<Grid Margin="10,0,0,0" Grid.Column="1">
+					<TextBlock Margin="0,0,0,0" Text="Width"/>
+					<NumberBox Margin="60,-6,0,0" x:Name="nb1" PreviewKeyDown="nb_PreviewKeyDown" PreviewKeyUp="nb_PreviewKeyUp" GotFocus="nb_GotFocus" LostFocus="nb_LostFocus" Width="60" AllowFocusWhenDisabled="False" Minimum="0" Maximum="999"  Background="White" />
+				</Grid>
+				<Grid Margin="30,0,0,0" Grid.Column="2">
+					<TextBlock Margin="0,0,0,0" Text="Height"/>
+					<NumberBox Margin="70,-6,0,0" x:Name="nb2" PreviewKeyDown="nb_PreviewKeyDown" PreviewKeyUp="nb_PreviewKeyUp" GotFocus="nb_GotFocus" LostFocus="nb_LostFocus" Width="60" AllowFocusWhenDisabled="False" Minimum="0" Maximum="999"  Background="White" />
+				</Grid>
+			</Grid>
+			<Grid Margin="0,30,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="2">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="150"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<Grid Margin="0,0,0,0" Grid.Column="0">
+					<TextBlock Margin="0,0,0,0" Text="Edge Area"/>
+				</Grid>
+				<Grid Margin="10,0,0,0" Grid.Column="1">
+					<TextBlock Margin="0,0,0,0" Text="Width"/>
+					<NumberBox Margin="60,-6,0,0" x:Name="nb3" PreviewKeyDown="nb_PreviewKeyDown" PreviewKeyUp="nb_PreviewKeyUp" GotFocus="nb_GotFocus" LostFocus="nb_LostFocus" Width="60" AllowFocusWhenDisabled="False" Minimum="0" Maximum="999"  Background="White" />
+				</Grid>
+				<Grid Margin="30,0,0,0" Grid.Column="2">
+					<TextBlock Margin="0,0,0,0" Text="Height"/>
+					<NumberBox Margin="70,-6,0,0" x:Name="nb4" PreviewKeyDown="nb_PreviewKeyDown" PreviewKeyUp="nb_PreviewKeyUp" GotFocus="nb_GotFocus" LostFocus="nb_LostFocus" Width="60" AllowFocusWhenDisabled="False" Minimum="0" Maximum="999"  Background="White" />
+				</Grid>
+			</Grid>
+			<Grid Margin="0,20,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="3">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="200"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<Grid Margin="0,0,0,0" Grid.Column="0">
+					<RadioButton Margin="0,-4,0,0" Content="IPv4 Address" x:Name="rb4" Checked="RadioButton_Checked"/>
+				</Grid>
+				<Grid Margin="20,0,0,0" Grid.Column="1">
+					<NumberBox Margin="0,-6,0,0" x:Name="nb5_1" PreviewKeyDown="nb_PreviewKeyDown" PreviewKeyUp="nb_PreviewKeyUp" GotFocus="nb_GotFocus" LostFocus="nb_LostFocus" Width="60" AllowFocusWhenDisabled="False" Minimum="0" Maximum="255"  Background="White" />
+				</Grid>
+				<Grid Margin="0,0,0,0" Grid.Column="2">
+					<TextBlock Margin="8,4,0,0" Text="."/>
+				</Grid>
+				<Grid Margin="0,0,0,0" Grid.Column="3">
+					<NumberBox Margin="4,-6,0,0" x:Name="nb5_2" PreviewKeyDown="nb_PreviewKeyDown" PreviewKeyUp="nb_PreviewKeyUp" GotFocus="nb_GotFocus" LostFocus="nb_LostFocus" Width="60" AllowFocusWhenDisabled="False" Minimum="0" Maximum="255"  Background="White" />
+				</Grid>
+				<Grid Margin="0,0,0,0" Grid.Column="4">
+					<TextBlock Margin="8,4,0,0" Text="."/>
+				</Grid>
+				<Grid Margin="0,0,0,0" Grid.Column="5">
+					<NumberBox Margin="4,-6,0,0" x:Name="nb5_3" PreviewKeyDown="nb_PreviewKeyDown" PreviewKeyUp="nb_PreviewKeyUp" GotFocus="nb_GotFocus" LostFocus="nb_LostFocus" Width="60" AllowFocusWhenDisabled="False" Minimum="0" Maximum="255"  Background="White" />
+				</Grid>
+				<Grid Margin="0,0,0,0" Grid.Column="6">
+					<TextBlock Margin="8,4,0,0" Text="."/>
+				</Grid>
+				<Grid Margin="0,0,0,0" Grid.Column="7">
+					<NumberBox Margin="4,-6,0,0" x:Name="nb5_4" PreviewKeyDown="nb_PreviewKeyDown" PreviewKeyUp="nb_PreviewKeyUp" GotFocus="nb_GotFocus" LostFocus="nb_LostFocus" Width="60" AllowFocusWhenDisabled="False" Minimum="0" Maximum="255"  Background="White" />
+				</Grid>
+			</Grid>
+			<Grid Margin="0,20,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="4">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="200"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<Grid Margin="0,0,0,0" Grid.Column="0">
+					<RadioButton Margin="0,-4,0,0" Content="Hostname" x:Name="rb5" Checked="RadioButton_Checked"/>
+				</Grid>
+				<Grid Margin="20,0,0,0" Grid.Column="1">
+					<TextBox Margin="0,-6,0,0" x:Name="tb1" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="300" AcceptsReturn="False" MaxLength="26" TextWrapping="Wrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Left" />
+				</Grid>
+			</Grid>
+			<Grid Margin="0,20,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="5">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="200"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<Grid Margin="0,0,0,0" Grid.Column="0">
+					<TextBlock Margin="0,0,0,0" Text="UDP Port"/>
+				</Grid>
+				<Grid Margin="20,0,0,0" Grid.Column="1">
+					<NumberBox Margin="0,-6,0,0" x:Name="nb6" PreviewKeyDown="nb_PreviewKeyDown" PreviewKeyUp="nb_PreviewKeyUp" GotFocus="nb_GotFocus" LostFocus="nb_LostFocus" Width="75" AllowFocusWhenDisabled="False" Minimum="50000" Maximum="59999"  Background="White" />
+				</Grid>
+				<Grid Margin="20,0,0,0" Grid.Column="2">
+					<TextBlock Margin="0,0,0,0" Text="(50000 - 59999)"/>
+				</Grid>
+			</Grid>
+			<Grid Margin="0,20,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="6">
+				<CheckBox Margin="0,-4,0,0" Content="FlushMouse の起動時からスタートする" x:Name="cb1" Click="CheckBox_Click" MinWidth="32" MinHeight="32" BorderThickness="0" />
+			</Grid>
+			<Grid Margin="20,14,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="7">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<Grid Margin="0,0,0,0" Grid.Column="0">
+					<TextBlock Margin="0,3,0,0" Text="&#xE946;" FontFamily="Segoe MDL2 Assets" Padding="0" FontSize="20" />
+				</Grid>
+				<Grid Margin="0,0,0,0" Grid.Column="1">
+					<TextBlock Margin="20,0,0,0" TextWrapping="Wrap" Width="450" Text="Hostname を使用して、起動時から Sender としてスタートする場合、Hostname が見つからない時は、ストップの状態になります&#10;(メッセージは表示しませんのでご注意ください)&#10;また、プライベートアドレスであることが必要です"/>
+				</Grid>
+			</Grid>
+			<Grid Margin="0,50,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Row="8">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<Grid Margin="0,0,0,0" Grid.Column="0">
+					<Button Margin="0,0,0,0" x:Name="btn1" Click="Button_Click" Content="Start" Width="120" Height="50" />
+				</Grid>
+				<Grid Margin="0,0,0,0" Grid.Column="1">
+					<Button Margin="50,0,0,0" x:Name="btn2" Click="Button_Click" Content="Stop" Width="120" Height="50" />
+				</Grid>
+			</Grid>
+			<Grid Margin="0,10,0,0" Grid.Row="9">
+			</Grid>
+		</Grid>
+	</Grid>
+</Page>
+
+
+<!--/* = EOF = */-->

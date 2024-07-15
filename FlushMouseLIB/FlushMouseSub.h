@@ -27,6 +27,8 @@
 //
 // Global Prototype Define
 //
+extern BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage);
+extern BOOL		bStopSynTPHelper();
 extern BOOL		bCheckDrawIMEModeArea(HWND hWndObserved);
 
 //

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+// About.Xaml for FlushMouseUI3DLL
+//		Copyright (C) 2024 JeffyTS
+//
+//	  
+// No.		Date			Name			Reason & Document
+// #0000	2024/07/15		JeffyTS  		New edit.
+//
+-->
+
+<Page
+	x:Class="FlushMouseUI3DLL.About"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="clr-namespace:FlushMouseUI3DLL"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:media="using:Microsoft.UI.Xaml.Media"
+	mc:Ignorable="d"
+	NavigationCacheMode="Required"
+	>
+
+	<Grid  Margin="100,20,20,20" x:Name="About_Panel" Loaded="About_Loaded" HorizontalAlignment="Left" VerticalAlignment="Top">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="48"/>
+			<ColumnDefinition Width="*"/>
+		</Grid.ColumnDefinitions>
+		<Grid Margin="0,50,0,0" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top">
+			<Image Margin="0,0,0,0" Source="FlushMouse.ico" Width="48" Height="48"/>
+		</Grid>
+		<Grid Margin="80,40,0,0" Grid.Column="1"  HorizontalAlignment="Left" VerticalAlignment="Top">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="*"/>
+			</Grid.RowDefinitions>
+			<Grid Margin="0,0,0,0" Grid.Row="0"  HorizontalAlignment="Left" VerticalAlignment="Top">
+				<TextBlock Margin="0,0,0,0" FontSize="18" x:Name="tb1" Text="FlushMouse"/>
+			</Grid>
+			<Grid Margin="0,30,0,0" Grid.Row="1"  HorizontalAlignment="Left" VerticalAlignment="Top">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<TextBlock Margin="0,0,0,0" Grid.Column="0" Text="Copyright © 2022 -" FontSize="14"/>
+				<TextBlock Margin="5,0,0,0" Grid.Column="1" x:Name="Copyright" Loaded="Copyright_Loaded" Text="" FontSize="14"/>
+				<TextBlock Margin="10,0,0,0" Grid.Column="2" Text="JeffyTS." FontSize="14"/>
+			</Grid>
+			<Grid Margin="0,7,0,0" Grid.Row="2"  HorizontalAlignment="Left" VerticalAlignment="Top">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<TextBlock Margin="0,0,0,0" Grid.Column="0" Text="All rights reserved." FontSize="14"/>
+			</Grid>
+			<Grid Margin="0,14,0,0" Grid.Row="3"  HorizontalAlignment="Left" VerticalAlignment="Top">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="120"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<TextBlock Margin="0,0,0,0" Grid.Column="0" Text="Version" FontSize="14"/>
+				<TextBlock Margin="0,0,0,0" Grid.Column="1" x:Name="Version" Loaded="Version_Loaded" Text="" FontSize="14"/>
+			</Grid>
+			<Grid Margin="0,14,0,0" Grid.Row="4" HorizontalAlignment="Left" VerticalAlignment="Top">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="120"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<TextBlock Margin="0,0,0,0" Grid.Column="0" Text="GitHub" FontSize="14"/>
+				<RichTextBlock Margin="0,0,0,0" Grid.Column="1" FontFamily="Segoe MDL2 Assets" Padding="0" IsTabStop="False" FontSize="14">
+					<Paragraph>
+						<Hyperlink xml:space="preserve" NavigateUri="https://github.com/JeffyTS-JP/FlushMouse/" IsTabStop="False">FlushMouse&#xE8AD; </Hyperlink>
+					</Paragraph>
+				</RichTextBlock>
+			</Grid>
+			<Grid Margin="0,14,0,0" Grid.Row="5">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="120"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<TextBlock Margin="0,0,0,0" Grid.Column="0" Text="X (Twitter)" FontSize="14"/>
+				<TextBlock Margin="0,0,0,0" Grid.Column="1" Text="@JeffyTSonTW" FontSize="14"/>
+			</Grid>
+			<Grid Margin="0,10,0,0" Grid.Row="6">
+			</Grid>
+		</Grid>
+	</Grid>
+</Page>
+
+
+<!--/* = EOF = */-->

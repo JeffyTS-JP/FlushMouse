@@ -211,56 +211,6 @@ private:
 	CCursorWindow	*CursorWindow;
 	CCursorWindow	*CaretWindow;
 	CCursorWindow	*MouseWindow;
-
-	MOUSECURSOR	stAllMouseCursor[sizeof(MOUSECURSOR) * 20] = {
-		{ OCR_APPSTARTING, 0, TRUE,  _T("AppStarting"), _T("") },
-		{ OCR_NORMAL,	   0, FALSE, _T("Arrow"),		_T("") },
-		{ OCR_CROSS,	   0, TRUE,  _T("Crosshair"),	_T("") },
-		{ OCR_HAND,		   0, FALSE, _T("Hand"),		    _T("") },
-		{ OCR_HELP,		   0, TRUE,  _T("Help"),		    _T("") },
-		{ OCR_IBEAM,	   0, FALSE, _T("IBeam"),		_T("") },
-		{ OCR_NO,		   0, TRUE,  _T("No"),			_T("") },
-		// { OCR_NWPEN,	   0, TRUE,  _T("NWPen"),		_T("") },
-		// { OCR_PEN,      0, TRUE,  _T("Pen"),		    _T("") },
-		{ OCR_PERSON,	   0, TRUE,  _T("Person"),		_T("") },
-		{ OCR_PIN,		   0, TRUE,  _T("Pin"),		    _T("") },
-		{ OCR_SIZEALL,	   0, TRUE,  _T("SizeAll"),	    _T("") },
-		{ OCR_SIZENESW,	   0, TRUE,  _T("SizeNESW"),    _T("") },
-		{ OCR_SIZENS,	   0, TRUE,  _T("SizeNS"),		_T("") },
-		{ OCR_SIZENWSE,	   0, TRUE,  _T("SizeNWSE"),    _T("") },
-		{ OCR_SIZEWE,	   0, TRUE,  _T("SizeWE"),		_T("") },
-		{ OCR_UP,		   0, TRUE,  _T("UpArrow"),	    _T("") },
-		{ OCR_WAIT,		   0, TRUE,  _T("Wait"),		    _T("") },
-		{ OCR_HIDE,		   0, TRUE,  _T("Hide"),		    _T("") },
-		{ (DWORD)(-1), 	   0, FALSE, _T(""),			    _T("") }
-	};
-
-	FLUSHMOUSECURSOR	stFlushMouseCursor[sizeof(FLUSHMOUSECURSOR) * 8] = {
-		{ IMEOFF,			_T("A"),	{OCR_NORMAL, IDC_IMEOFF_ARROW,		  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeOffArrow.cur")},
-										{OCR_HAND,   IDC_IMEOFF_HAND,		  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeOffHand.cur")},
-										{OCR_IBEAM,  IDC_IMEOFF_IBEAM,		  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeOffIBeam.cur")}},
-		{ ZENHIRA_IMEON,	_T("あ"),	{OCR_NORMAL, IDC_ZENHIRA_IMEON_ARROW, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenHiraOnArrow.cur")},
-										{OCR_HAND,   IDC_ZENHIRA_IMEON_HAND,  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenHiraOnHand.cur")},
-										{OCR_IBEAM,  IDC_ZENHIRA_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenHiraOnIBeam.cur")}},
-		{ HANEISU_IMEON,	_T("_A"),	{OCR_NORMAL, IDC_HANEISU_IMEON_ARROW, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHanEisuOnArrow.cur")},
-										{OCR_HAND,   IDC_HANEISU_IMEON_HAND,  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHanEisuOnHand.cur")},
-										{OCR_IBEAM,  IDC_HANEISU_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHanEisuOnIBeam.cur")}},
-		{ HANKANA_IMEON,	_T("_ｱ"),	{OCR_NORMAL, IDC_HANKANA_IMEON_ARROW, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHanKanaOnArrow.cur")},
-										{OCR_HAND,   IDC_HANKANA_IMEON_HAND,  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHanKanaOnHand.cur")},
-										{OCR_IBEAM,  IDC_HANKANA_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHanKanaOnIBeam.cur")}},
-		{ ZENEISU_IMEON,	_T("Ａ"),	{OCR_NORMAL, IDC_ZENEISU_IMEON_ARROW, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenEisuOnArrow.cur")},
-										{OCR_HAND,   IDC_ZENEISU_IMEON_HAND,  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenEisuOnHand.cur")},
-										{OCR_IBEAM,  IDC_ZENEISU_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenEisuOnIBeam.cur")}},
-		{ ZENKANA_IMEON,	_T("ア"),	{OCR_NORMAL, IDC_ZENKANA_IMEON_ARROW, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenKanaOnArrow.cur")},
-										{OCR_HAND,   IDC_ZENKANA_IMEON_HAND,  FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenKanaOnHand.cur")},
-										{OCR_IBEAM,  IDC_ZENKANA_IMEON_IBEAM, FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeZenKanaOnIBeam.cur")}},
-		{ IMEHIDE,			_T(""),		{OCR_NORMAL, IDC_HIDE_ARROW,          FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHideOnArrow.cur")},
-										{OCR_HAND,   IDC_HIDE_HAND,           FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHideOnHand.cur")},
-										{OCR_IBEAM,  IDC_HIDE_IBEAM,          FALSE, _T(""), _T("%APPDATA%\\JeffyTS\\FlushMouse\\ImeHideOnIBeam.cur")}},
-		{ (DWORD)(-1),		_T(""),		{0,			 0,						  FALSE, _T(""), _T("")},
-										{0,			 0,						  FALSE, _T(""), _T("")},
-										{0,			 0,						  FALSE, _T(""), _T("")} }
-	};
 };
 
 

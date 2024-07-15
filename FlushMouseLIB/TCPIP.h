@@ -18,15 +18,15 @@
 //
 // Define
 // 
-#define MAX_FQDN					253
-#define MAX_IPV4_ADDRESS			16
+constexpr auto MAX_FQDN = 253;
+constexpr auto MAX_IPV4_ADDRESS = 16;
 
 // ICMP types and codes
-#define ICMPV4_ECHO_REQUEST_TYPE	8
-#define ICMPV4_ECHO_REQUEST_CODE	0
-#define ICMPV4_ECHO_REPLY_TYPE		0
-#define ICMPV4_ECHO_REPLY_CODE		0
-#define ICMPV4_MINIMUM_HEADER		8
+constexpr auto ICMPV4_ECHO_REQUEST_TYPE = 8;
+constexpr auto ICMPV4_ECHO_REQUEST_CODE = 0;
+constexpr auto ICMPV4_ECHO_REPLY_TYPE = 0;
+constexpr auto ICMPV4_ECHO_REPLY_CODE =	0;
+constexpr auto ICMPV4_MINIMUM_HEADER = 8;
 
 //
 // Struct Define
@@ -50,6 +50,7 @@ typedef struct icmp_hdr
 // Global Prototype Define
 //
 extern DWORD		dwGetString2IPv4Addr(LPCTSTR lpszIPAddress);
+extern BOOL			bGetString2IPv4Addr(LPCTSTR lpszIPAddress, LPTSTR addr1, LPTSTR addr2, LPTSTR addr3, LPTSTR addr4);
 extern BOOL			bIsPrivateAddress(LPCTSTR lpszIPAddress);
 extern BOOL			bCheckExistHostnameIPv4(LPCTSTR lpszHostname);
 
@@ -63,7 +64,7 @@ class CTCPIP
 		~CTCPIP();
 
 		BOOL		bOpenPortForReceiveUDPv4(int Port);
-		BOOL		bReceivePackaet(LPVOID lpData, int cbSize) const;
+		BOOL		bReceivePacket(LPVOID lpData, int cbSize) const;
 		BOOL		bOpenPortForSendUDPv4(LPCTSTR lpszIPAddress, int Port);
 		BOOL		bSendPacket(LPCSTR lpszSendData, int cbSize) const;
 

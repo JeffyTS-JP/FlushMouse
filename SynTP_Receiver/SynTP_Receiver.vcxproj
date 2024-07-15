@@ -225,6 +225,9 @@ Start /wait /min cmd /c "$(SolutionDir)Sign_Modules.bat" $(OutDir)$(TargetName)$
     <ProjectReference Include="..\FlushMouseLIB\FlushMouseLIB.vcxproj">
       <Project>{24085cf0-ec19-4a1c-9ddf-1c04a571ed57}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\MiscLIB\MiscLIB.vcxproj">
+      <Project>{ccaf431f-ce8e-4879-9b1f-3f1df4ac2269}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

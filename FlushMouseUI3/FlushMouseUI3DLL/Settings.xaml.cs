@@ -1,5 +1,5 @@
 //
-// Settings.cs
+// Settings.xaml.cs
 //      Copyright (C) 2023 JeffyTS
 //
 // No.      Date            Name            Reason & Document
@@ -7,346 +7,383 @@
 // #0000    2023/12/10  JeffyTS     New edit.
 //
 
-using WinRT;
-
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Media;
 
 using System;
-using System.Collections.ObjectModel;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Reflection;
-using System.Runtime.ConstrainedExecution;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Runtime.Intrinsics.Arm;
-using System.Xml.Linq;
-
-using Windows.Foundation;
 using Windows.Graphics;
-using Windows.Graphics.Display;
-using Windows.UI.Popups;
-using Windows.System;
-
-using ABI.Windows.Foundation;
 
 namespace FlushMouseUI3DLL
 {
-	public sealed partial class Settings
+	public struct RectDouble
 	{
-		[LibraryImport("User32.dll", SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.SysInt)]
-		internal static partial IntPtr SendMessageW(Int64 hWnd, int Msg, Int64 wParam, Int64 lParam);
-		[LibraryImport("User32.dll", SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		internal static partial bool EnableMenuItem(IntPtr hMenu, uint uIDEnableItem, uint uEnable);
-		internal const UInt32 SC_CLOSE = 0x0000F060;
-		internal const UInt32 MF_DISABLED = 0x00000002;
-		[LibraryImport("User32.dll", SetLastError = true)]
-        internal static partial IntPtr GetSystemMenu(IntPtr hWnd, [MarshalAs(UnmanagedType.Bool)] bool bRevert);
-		[LibraryImport("User32.dll", SetLastError = true)]
-        internal static partial UInt32 GetDpiForWindow(Int64 hWnd);
-		internal const UInt32 USER_DEFAULT_SCREEN_DPI = 96;
-		
-		public Settings settings { get; set; }
-		public Int64 hSettingsWnd { get; set; }
-		public AppWindow wSettings { get; private set; }
-
-		public Int32 Monitor_DPI { get; set; }
-		public Int32 Monitor_Left { get; set; }
-		public Int32 Monitor_Top { get; set; }
-		public Int32 Monitor_Right { get; set; }
-		public Int32 Monitor_Bottom { get; set; }
-		
-		public Int32 Window_Top { get; set; }
-		public Int32 Window_Left { get; set; }
-		public Int32 Window_Width { get; set; }
-		public Int32 Window_Height { get; set; }
-
-		public Int64 hMainWnd { get; set; }
-		public int msg { get; set; }
-
-		public bool bDisplayFocusWindowIME { get; set; }
-		public bool bDisplayIMEModeOnCursor { get; set; }
-		public bool bDisplayIMEModeByWindow { get; set; }
-		public bool bOffChangedFocus { get; set; }
-		public bool bForceHiragana { get; set; }
-		public bool bDoModeDispByIMEKeyDown { get; set; }
-		public bool bDoModeDispByMouseBttnUp { get; set; }
-		public bool bDoModeDispByCtrlUp { get; set; }
-		public bool bDrawNearCaret { get; set; }
-		public bool bIMEModeForced { get; set; }
-		public bool bEnableEPHelper { get; set; }
-		public Int32 iCursorSize { get; set; }
-		public Int32 iModeSize { get; set; }
-		public Int32 dwDisplayModeTime { get; set; }
-		public Int32 dwAdditionalWaitTime { get; set; }
-		public Int32 dwWaitWaveTime { get; set; }
-		public Int32 dwNearDrawMouseColor { get; set; }
-		public Int32 dwNearDrawCaretColor { get; set; }
-		public Int32 dwNearMouseColor { get; set; }
+		public double X;
+		public double Y;
+		public double Width;
+		public double Height;
+	}
+	
+	public struct SizeDouble
+	{
+		public double Width;
+		public double Height; 
 	}
 
-	public sealed partial class Settings : Window
+	public partial class Settings
 	{
-		public Settings()
+		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.I8)]
+		internal static partial Int64 SendMessageW(Int64 hWnd, UInt32 uMsg, Int64 wParam, Int64 lParam);
+		internal const UInt32 WM_DESTROY = (0x0002);
+
+		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = false)]
+		[return: MarshalAs(UnmanagedType.I8)]
+		internal static partial Int64 FindWindowW(String lpClassName, String lpWindowName);
+
+		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		internal static partial bool EnableMenuItem(Int64 hMenu, UInt64 uIDEnableItem, UInt64 uEnable);
+		internal const UInt32 SC_CLOSE = 0x0000F060;
+		internal const UInt32 SC_MINIMIZE = 0x0000F020;
+		internal const UInt32 SC_MAXIMIZE = 0x0000F030;
+		internal const UInt32 SC_RESTORE = 0x0000F120;
+
+		internal const UInt32 MF_DISABLED = 0x00000002;
+
+		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.I8)]
+		internal static partial Int64 GetSystemMenu(Int64 hWnd, [MarshalAs(UnmanagedType.Bool)] bool bRevert);
+
+		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.U4)]
+		internal static partial UInt32 GetDpiForWindow(Int64 hWnd);
+		internal const UInt32 USER_DEFAULT_SCREEN_DPI = 96;
+
+		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.I8)]
+		internal static partial Int64 MonitorFromWindow(Int64 hWnd, UInt32 dwFlags);
+		internal const UInt32 MONITOR_DEFAULTTONULL    = 0x00000000;
+		internal const UInt32 MONITOR_DEFAULTTOPRIMARY = 0x00000001;
+		internal const UInt32 MONITOR_DEFAULTTONEAREST = 0x00000002;
+
+		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto, Pack = 4)]
+		internal class MONITORINFOEXW
+		{
+			public int          cbSize;
+			public RectInt32    rcMonitor;
+			public RectInt32    rcWork;
+			public uint         dwFlags;
+			[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+			public char[] szDevice = new char[32];
+		};
+#pragma warning disable SYSLIB1054
+		[DllImport("User32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+		private static extern bool GetMonitorInfoW(Int64 hMonitor, [In, Out] MONITORINFOEXW lpmi);
+#pragma warning restore SYSLIB1054
+	
+		internal const String CLASS_FLUSHMOUSE = "FlushMouse-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}";
+		internal const String CLASS_FLUSHMOUSESETTINGS = "FlushMouseSettings-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}";
+		
+		public const UInt32 WM_SETTINGSEX = (0x0400 + 0xfe);
+		public const Int64 SETTINGSEX_OK = 0;
+		public const Int64 SETTINGSEX_CANCEL = 1;
+		public const Int64 SETTINGSEX_APPLY = 2;
+		public const Int64 SETTINGSEX_RELOAD_REGISTRY = 3;
+		public const Int64 SETTINGSEX_RELOAD_CURSOR = 4;
+		public const Int64 SETTINGSEX_CHANGE_PANE = 5;
+		public const Int64 SETTINGSEX_SYNTP_START = 10;
+		public const Int64 SETTINGSEX_SYNTP_IS_STARTED = 11;
+		public const Int64 SETTINGSEX_SYNTP_STOP = 12;
+
+		public static Settings g_Settings { get; set; }
+		public Int64 g_hSettingsWnd { get; set; }
+		
+		public static Int64 g_hMainWnd { get; set; }
+		public static UInt32 g_uMsg { get; set; }
+		private static RectDouble g_ContentFrameRectDouble;
+		public static RectDouble G_ContentFrameRectDouble { get => g_ContentFrameRectDouble; set => g_ContentFrameRectDouble = value; }
+
+		private static AppWindow m_AppWindow { get; set; }
+		private static RectDouble m_WindowRectDouble;
+
+		internal const double Window_Width = 1000;
+		internal const double Window_Height = 920;
+		internal const double Window_CompactPaneLength = 48;
+		internal const double Window_OpenPaneLength = 220;
+
+		private static Int32 m_SelectedPane {  get; set; }
+		private static General m_General {  get; set; }
+		private static SynTP_Helper m_SynTP_Helper {  get; set; }
+		private static About m_About {  get; set; }
+
+		public static bool bIsPaneOpen { get; set; }
+		public static Int32 dwSettingsX { get; set; }
+		public static Int32 dwSettingsY { get; set; }
+		public static Int32 dwSettingsWidth { get; set; }
+		public static Int32 dwSettingsHeight { get; set; }
+		
+		public static bool bDisplayFocusWindowIME { get; set; }
+		public static bool bDisplayIMEModeOnCursor { get; set; }
+		public static bool bDisplayIMEModeByWindow { get; set; }
+		public static bool bOffChangedFocus { get; set; }
+		public static bool bForceHiragana { get; set; }
+		public static bool bDoModeDispByIMEKeyDown { get; set; }
+		public static bool bDoModeDispByMouseBttnUp { get; set; }
+		public static bool bDoModeDispByCtrlUp { get; set; }
+		public static bool bDrawNearCaret { get; set; }
+		public static bool bIMEModeForced { get; set; }
+		public static bool bEnableEPHelper { get; set; }
+		public static Int32 iCursorSize { get; set; }
+		public static Int32 iModeSize { get; set; }
+		public static Int32 dwDisplayModeTime { get; set; }
+		public static Int32 dwAdditionalWaitTime { get; set; }
+		public static Int32 dwWaitWaveTime { get; set; }
+		public static Int32 dwNearDrawMouseColor { get; set; }
+		public static Int32 dwNearDrawCaretColor { get; set; }
+		public static Int32 dwNearMouseColor { get; set; }
+
+		public static Int32 dwSynTPHelper1 { get; set; }
+		public static Int32 dwSynTPPadX { get; set; }
+		public static Int32 dwSynTPPadY { get; set; }
+		public static Int32 dwSynTPEdgeX { get; set; }
+		public static Int32 dwSynTPEdgeY { get; set; }
+		public static String szSynTPSendIPAddr1_1 { get; set; }
+		public static String szSynTPSendIPAddr1_2 { get; set; }
+		public static String szSynTPSendIPAddr1_3 { get; set; }
+		public static String szSynTPSendIPAddr1_4 { get; set; }
+		public static String szSynTPSendHostname1 { get; set; }
+		public static Int32 dwSynTPPortNo1 { get; set; }
+		public static bool bSynTPStarted1 { get; set; }
+	}
+	
+	public sealed partial class Settings : Window 
+	{
+		public Settings(Int32 SelectedPane)
 		{
 			InitializeComponent();
-			if (wSettings == null) {
-				hSettingsWnd = (Int64)WinRT.Interop.WindowNative.GetWindowHandle(this);
-				WindowId windowId = Win32Interop.GetWindowIdFromWindow((nint)hSettingsWnd);
-				wSettings = AppWindow.GetFromWindowId(windowId);
+			
+			m_SelectedPane = SelectedPane;
+
+			if (g_Settings == null) {
+				ExtendsContentIntoTitleBar = true;
+				SetTitleBar(TitleBar);
+				g_hSettingsWnd = (Int64)WinRT.Interop.WindowNative.GetWindowHandle(this);
+				WindowId windowId = Win32Interop.GetWindowIdFromWindow((nint)g_hSettingsWnd);
+				m_AppWindow = AppWindow.GetFromWindowId(windowId);
 				var op = OverlappedPresenter.Create();
 				op.IsMaximizable = false;
-				op.IsMinimizable = false;
-				op.IsResizable = false;
+				op.IsMinimizable = true;
+				op.IsResizable = true;
 				op.IsAlwaysOnTop = false;
-				wSettings.SetPresenter(op);
+				m_AppWindow.SetPresenter(op);
 
-				Window_Width = 700; Window_Height = 780;
-				wSettings.SetIcon("FlushMouse.ico");
+				m_AppWindow.SetIcon("FlushMouse.ico");
 			}
 			else {
-				wSettings.Show();
+				m_AppWindow.Show();
 			}
 		}
 
-		private void EnableDisableItems(object sender, RoutedEventArgs e) {
-			if (e == null) { }
+		public void ChangePane(Int32 SelectedPane)
+		{
+			m_SelectedPane = SelectedPane;
+			switch (m_SelectedPane) {
+				case 1:
+					if (!Menu1.IsSelected) Menu1.IsSelected = true;
+					break;
+				case 3:
+					if (!Menu3.IsSelected) Menu3.IsSelected = true;
+					break;
+				case 4:
+					if (!Menu4.IsSelected) Menu4.IsSelected = true;
+					break;
+				default:
+					if (!Menu1.IsSelected) Menu1.IsSelected = true;
+					break;
+			}
+		}
+
+		private void navigationView_Loading(FrameworkElement sender, object args)
+		{
+			if (args == null) { }
 			if (sender != null) {
-				if (bDisplayIMEModeOnCursor) {
-					if (Combo1 == null)	Combo1 = new ComboBox();
-					if (Combo1 != null)	Combo1.IsEnabled = true;
-					if (bDisplayIMEModeByWindow) {
-						if (grid4_1 != null)	grid4_1.Visibility = Visibility.Collapsed;
+				NavigationView NaviView = sender as NavigationView;
+				
+				NaviView.IsPaneOpen = bIsPaneOpen;
+				
+				SizeDouble sizeDouble;
+				sizeDouble.Width = (int)Window_OpenPaneLength;
+				sizeDouble.Height = (int)Window_CompactPaneLength;
+				CalcWindowSizeByDPI(g_hSettingsWnd, ref sizeDouble);        
+				NaviView.OpenPaneLength = sizeDouble.Width;
+				NaviView.CompactPaneLength = sizeDouble.Height;
+				if ((dwSettingsX == 0) && (dwSettingsY == 0) && (dwSettingsWidth == 0) && (dwSettingsHeight == 0))
+				{
+					if (bIsPaneOpen) {
+						m_WindowRectDouble.Width = Window_Width + sizeDouble.Height;
 					}
-					else {
-						if (grid4_1 != null)	grid4_1.Visibility = Visibility.Visible;
+					else
+					{
+						m_WindowRectDouble.Width = Window_Width;
 					}
+					m_WindowRectDouble.Height = Window_Height;
+					CalcWindowCentralizeByDesktop(g_hSettingsWnd, ref m_WindowRectDouble);
 				}
 				else {
-					if (Combo1 != null)	Combo1.IsEnabled = false;
-					if (grid4_1 == null)	grid4_1 = new Grid();
-					if (grid4_1 != null)	grid4_1.Visibility = Visibility.Visible;
-				}
-				if (bDoModeDispByIMEKeyDown || bDoModeDispByMouseBttnUp) {
-					if (sl2 == null)	sl2 = new Slider();
-					else sl2.IsEnabled = true;
-					if (sl3 == null)	sl3 = new Slider();
-					else sl3.IsEnabled = true;
-					if (sl4 == null)	sl4 = new Slider();
-					else sl4.IsEnabled = true;
+					m_WindowRectDouble.X = dwSettingsX;
+					m_WindowRectDouble.Y = dwSettingsY;
+					m_WindowRectDouble.Width = dwSettingsWidth;
+					m_WindowRectDouble.Height = dwSettingsHeight;
+				}				
+
+				RectInt32 rect;
+				rect.X = (int)m_WindowRectDouble.X;
+				rect.Y = (int)m_WindowRectDouble.Y;
+				rect.Width = (int)m_WindowRectDouble.Width;
+				rect.Height = (int)m_WindowRectDouble.Height;
+				m_AppWindow.MoveAndResize(rect);
+			}
+		}
+
+		private void contentFrame_Loaded(object sender, RoutedEventArgs e)
+		{
+			if (sender == null) { }
+			if (e == null) { }
+			if (m_General == null) m_General = new General();
+			if (m_SynTP_Helper == null) m_SynTP_Helper = new SynTP_Helper();
+			if (m_About == null) m_About = new About();
+
+			ChangePane(m_SelectedPane);
+			
+			m_AppWindow.Changed += Window_SizeChanged;
+			m_AppWindow.Show();
+		}
+
+		private void navigationView_SelectionChanged(NavigationView sender, object args)
+		{
+			if (sender == null) { }
+			if (args != null)
+			{
+				NavigationViewSelectionChangedEventArgs _args = args as NavigationViewSelectionChangedEventArgs;
+				NavigationViewItem selectedItem = _args.SelectedItem as NavigationViewItem;
+				if (selectedItem != null) {
+					System.Type pageType = null;
+					if ((string)selectedItem.Tag == "Menu1") {
+						sender.Header = "基本動作設定";
+						if (m_General == null) { m_General = new General(); }
+						pageType = m_General.GetType();
+					}
+					else if ((string)selectedItem.Tag == "Menu3") {
+						sender.Header = "SynTP Helper";
+						if (m_SynTP_Helper == null) { m_SynTP_Helper = new SynTP_Helper(); }
+						pageType = m_SynTP_Helper.GetType();
+					}
+					else if ((string)selectedItem.Tag == "Menu4") {
+						sender.Header = "バージョン";
+						if (m_About == null) { m_About = new About(); }
+						pageType = m_About.GetType();
+					}
+					contentFrame.Navigate(pageType);
+					navigationView.SelectedItem = contentFrame.Navigate(pageType);
 				}
 				else {
-					if (sl2 != null)	sl2.IsEnabled = false;
-					if (sl3 != null)	sl3.IsEnabled = false;
-					if (sl4 != null)	sl4.IsEnabled = false;
-				}
-				if (bDoModeDispByCtrlUp) {
-					if (sl5 == null)	sl5 = new Slider();
-					else sl5.IsEnabled = true;
-				}
-				else {
-					if (sl5 != null)	sl5.IsEnabled = false;
+					SetWindowSize();
 				}
 			}
 		}
-		
-		unsafe private void Settings_Loading(FrameworkElement sender, object args)
+
+		private void navigationView_BackRequested(NavigationView sender, object args)
 		{
 			if (sender == null) { }
 			if (args == null) { }
-			if (wSettings != null) { }
+			if (contentFrame.CanGoBack) {
+				contentFrame.GoBack();
+			}
 		}
 
-		private void Settings_Loaded(object sender, RoutedEventArgs e)
+		private void navigationView_PaneOpening(NavigationView sender, object args)
 		{
-			if (wSettings != null) {
-				Grid grid = sender as Grid;
-				if (grid != null) {
-					SetComboBox();
-					SetToggleSwitch();
-					SetSlider();
-					SetColorButton();
-					EnableDisableItems(sender, e);
+			if (args == null) { }
+			if (sender != null) {
+				SizeDouble sizeDouble;
+				sizeDouble.Width = Window_OpenPaneLength;
+				sizeDouble.Height = Window_CompactPaneLength;
+				CalcWindowSizeByDPI(g_hSettingsWnd, ref sizeDouble);
+				sender.OpenPaneLength = sizeDouble.Width;
+				sender.CompactPaneLength = sizeDouble.Height;
+			}
+		}
+
+		private void navigationView_PaneOpened(NavigationView sender, object args)
+		{
+			if (args == null) { }
+			if (sender != null) {
+				SetWindowSize();
+			}
+		}
+
+		private void navigationView_PaneClosing(NavigationView sender, object args)
+		{
+			if (args == null) { }
+			if (sender != null) {
+				SizeDouble sizeDouble;
+				sizeDouble.Width = Window_OpenPaneLength;
+				sizeDouble.Height = Window_CompactPaneLength;
+				CalcWindowSizeByDPI(g_hSettingsWnd, ref sizeDouble);
+				sender.OpenPaneLength = sizeDouble.Width;
+			}
+		}
+
+		private void navigationView_PaneClosed(NavigationView sender, object args)
+		{
+			if (args == null) { }
+			if (sender != null) {
+				SetWindowSize();
+			}
+			Int64 _hWnd = FindWindowW(CLASS_FLUSHMOUSESETTINGS, null);
+			if (_hWnd != 0) {
+				SendMessageW(_hWnd, WM_DESTROY, 0, 0);
+			}
+		}
+
+		private void SetWindowSize()
+		{
+			if (FlushMouseUI3DLL.Settings.g_Settings != null) {
+				if (navigationView != null) {
+					if ((settingsMain.ActualWidth != 0) && (settingsMain.ActualHeight != 0))
+					{
+						navigationView.Width = settingsMain.ActualWidth;
+						navigationView.Height = settingsMain.ActualHeight;
+					}
 				}
-				wSettings.Show(true);
+				if (contentFrame != null) {
+					g_ContentFrameRectDouble.Width = contentFrame.ActualWidth;
+					g_ContentFrameRectDouble.Height = contentFrame.ActualHeight;
+				}
+				if (navigationView != null) {
+					bIsPaneOpen = navigationView.IsPaneOpen;
+					m_WindowRectDouble.X = AppWindow.Position.X; m_WindowRectDouble.Y = AppWindow.Position.Y;
+					m_WindowRectDouble.Width = AppWindow.Size.Width; m_WindowRectDouble.Height = AppWindow.Size.Height;
+
+				}
 			}
 		}
 
-		private void    SetComboBox()
-		{
-			ComboBox combo = (ComboBox)Combo1;
-			if (combo != null) {
-				if (bDisplayFocusWindowIME) combo.SelectedItem = Item1;
-				else combo.SelectedItem = Item2;
-			}
-		}
-
-		private void Combo1_Loaded(object sender, RoutedEventArgs e)
+		private void Window_SizeChanged(AppWindow sender, object args)
 		{
 			if (sender == null) { }
-			if (e == null) { }
-		}
-
-		private void Combo1_SelectionChanged(object sender, RoutedEventArgs e)
-		{
-			ComboBox combo = sender as ComboBox;
-			ComboBoxItem selectedItem = (ComboBoxItem)combo.SelectedItem;
-			if (selectedItem != null) {
-				if (selectedItem.Name == "Item1") bDisplayFocusWindowIME = true;
-				else if (selectedItem.Name == "Item2") bDisplayFocusWindowIME = false;
-				EnableDisableItems(sender, e);
-				SendMessageW(hMainWnd, msg, 2, 0);
-			}
-		}
-
-		private void SetToggleSwitch()
-		{
-			ts1.IsOn = bDisplayIMEModeOnCursor;
-			ts3.IsOn = bOffChangedFocus;
-			ts4.IsOn = bForceHiragana;
-			ts5.IsOn = bDoModeDispByIMEKeyDown;
-			ts6.IsOn = bDoModeDispByMouseBttnUp;
-			ts7.IsOn = bDoModeDispByCtrlUp;
-			ts8.IsOn = bDrawNearCaret;
-			ts9.IsOn = bIMEModeForced;
-			ts10.IsOn = bEnableEPHelper;
-		}
-
-		private void HandleToggleSwitch(object sender, RoutedEventArgs e)
-		{
-			ToggleSwitch ts = sender as ToggleSwitch;
-			if (ts != null) {
-				if (ts.Name == "ts1") {
-					bDisplayIMEModeOnCursor = ts1.IsOn;
-					EnableDisableItems(sender, e);
-					SendMessageW(hMainWnd, msg, 3, 0);
-					return;
+			if (args != null) {
+				AppWindowChangedEventArgs _args = args as AppWindowChangedEventArgs;
+				if (_args.DidSizeChange) {
+					SetWindowSize();
 				}
-				else if (ts.Name == "ts3") bOffChangedFocus = ts3.IsOn;
-				else if (ts.Name == "ts4") bForceHiragana = ts4.IsOn;
-				else if (ts.Name == "ts5") bDoModeDispByIMEKeyDown = ts5.IsOn;
-				else if (ts.Name == "ts6") bDoModeDispByMouseBttnUp = ts6.IsOn;
-				else if (ts.Name == "ts7") bDoModeDispByCtrlUp = ts7.IsOn;
-				else if (ts.Name == "ts8") bDrawNearCaret = ts8.IsOn;
-				else if (ts.Name == "ts9") bIMEModeForced = ts9.IsOn;
-				else if (ts.Name == "ts10") bEnableEPHelper = ts10.IsOn;
-				EnableDisableItems(sender, e);
-				SendMessageW(hMainWnd, msg, 2, 0);
-			}
-		}
-
-		private void SetSlider()
-		{
-			sl1_1.Value = iCursorSize;
-			sl2.Value = iModeSize;
-			sl3.Value = dwDisplayModeTime / 10;
-			sl4.Value = dwAdditionalWaitTime / 10;
-			sl5.Value = dwWaitWaveTime / 10;
-		}
-
-		private void Slider_ValueChanged(object sender, RoutedEventArgs e)
-		{
-			Slider sl = sender as Slider;
-			if (sl != null) {
-				if (sl.Name == "sl1_1")			iCursorSize = (Int32)sl.Value;
-				else if (sl.Name == "sl2")		iModeSize = (Int32)sl.Value;
-				else if (sl.Name == "sl3")		dwDisplayModeTime = (Int32)(sl.Value * 10);
-				else if (sl.Name == "sl4")		dwAdditionalWaitTime = (Int32)(sl.Value * 10);
-				else if (sl.Name == "sl5")		dwWaitWaveTime = (Int32)(sl.Value * 10);
-				EnableDisableItems(sender, e);
-				SendMessageW(hMainWnd, msg, 2, 0);
-			}
-		}
-
-		private void SetColorButton()
-		{
-			Color clr = Color.FromArgb(dwNearDrawMouseColor);
-			Button4.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
-			clr = Color.FromArgb(dwNearDrawCaretColor);
-			Button5.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
-		}
-
-		unsafe private void ColorButton_Click(object sender, RoutedEventArgs e)
-		{
-			if (e == null) { }
-			Button btn = sender as Button;
-			if (btn != null) {
-				if (btn.Name == "Button4") {
-					Color clr = Color.FromArgb(dwNearDrawMouseColor);
-					byte A = (byte)(255 - clr.A);
-					byte R = (byte)(clr.B);
-					byte G = (byte)(clr.G);
-					byte B = (byte)(clr.R);
-					ColorPicker1.Color = Windows.UI.Color.FromArgb(A, R, G, B);
-					ColorPicker1.PreviousColor = ColorPicker1.Color;
-					FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
-				}
-				else if (btn.Name == "Button5") {
-					Color clr = Color.FromArgb(dwNearDrawCaretColor);
-					byte A = (byte)(255 - clr.A);
-					byte R = (byte)(clr.B);
-					byte G = (byte)(clr.G);
-					byte B = (byte)(clr.R);
-					ColorPicker2.Color = Windows.UI.Color.FromArgb(A, R, G, B);
-					ColorPicker2.PreviousColor = ColorPicker2.Color;
-					FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
-				}
-			}
-		}
-
-		// Button
-		private void Button_Click(object sender, RoutedEventArgs e)
-		{
-			Button btn = sender as Button;
-			if (btn != null) {
-				if (btn.Name == "Button1") {
-					SendMessageW(hMainWnd, msg, 0, 0);
-				}
-				else if (btn.Name == "CP_Button1") {
-					Windows.UI.Color wclr = ColorPicker1.Color;
-					byte A = (byte)(255 - wclr.A);
-					byte R = wclr.B;
-					byte G = wclr.G;
-					byte B = wclr.R;
-					Int32 i = dwNearDrawMouseColor;
-					dwNearDrawMouseColor = (A << 24) ^ (R << 16) ^ (G << 8) ^ (B << 0); 
-					Flyout1.Hide();
-					if (i != dwNearDrawMouseColor) {
-						Color	clr = Color.FromArgb(dwNearDrawMouseColor);
-						Button4.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
-						EnableDisableItems(sender, e);
-						SendMessageW(hMainWnd, msg, 3, 0);
-					}
-				}
-				else if (btn.Name == "CP_Button2") {
-					Flyout1.Hide();
-				}
-				else if (btn.Name == "CP_Button3") {
-					Windows.UI.Color wclr = ColorPicker2.Color;
-					byte A = (byte)(255 - wclr.A);
-					byte R = wclr.B;
-					byte G = wclr.G;
-					byte B = wclr.R;
-					Int32 i = dwNearDrawCaretColor;
-					dwNearDrawCaretColor = (A << 24) ^ (R << 16) ^ (G << 8) ^ (B << 0); 
-					Flyout2.Hide();
-					if (i != dwNearDrawCaretColor) {
-						Color	clr = Color.FromArgb(dwNearDrawCaretColor);
-						Button5.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
-						EnableDisableItems(sender, e);
-						SendMessageW(hMainWnd, msg, 3, 0);
-					}
-				}
-				else if (btn.Name == "CP_Button4") {
-					Flyout2.Hide();
+				else if (_args.DidPresenterChange)
+				{
+					SetWindowSize();
 				}
 			}
 		}
@@ -355,21 +392,70 @@ namespace FlushMouseUI3DLL
 		{
 			if (sender == null) { }
 			if (args == null) { }
-			SendMessageW(hMainWnd, msg, 1, 0);
-			if (wSettings != null) {
-				wSettings = null;
-				hSettingsWnd = 0;
+			dwSettingsX = (Int32)m_WindowRectDouble.X;
+			dwSettingsY = (Int32)m_WindowRectDouble.Y;
+			dwSettingsWidth = (Int32)m_WindowRectDouble.Width;
+			dwSettingsHeight = (Int32)m_WindowRectDouble.Height;
+			UpdateProfile(SETTINGSEX_OK);
+			if (g_Settings != null) {
+				g_Settings = null;
+				g_hSettingsWnd = 0;
 			}
 		}
 
-		unsafe private void CalcWindowCentralize(int dpi, RectInt32 rectOutside, RectInt32* rectWindow)
+		public static Int64 UpdateProfile(Int64 iSettingsEX)
 		{
-			rectWindow->Width = (int)((float)rectWindow->Width * (float)dpi / (float)USER_DEFAULT_SCREEN_DPI);
-			rectWindow->Height = (int)((float)rectWindow->Height * (float)dpi / (float)USER_DEFAULT_SCREEN_DPI);
-			rectWindow->X = rectOutside.X * 2 + (rectOutside.Width - rectOutside.X - rectWindow->Width) / 2;
-			rectWindow->Y = rectOutside.Y * 2 + (rectOutside.Height - rectOutside.Y - rectWindow->Height) / 2;
+			Int64 iRet = 0;
+			if (g_hMainWnd != 0) {
+				iRet = SendMessageW(g_hMainWnd, g_uMsg, iSettingsEX, 0);
+			}
+			Int64 _hWnd = FindWindowW(CLASS_FLUSHMOUSE, null);
+			if ((_hWnd != 0) && (_hWnd != g_hMainWnd)) {
+				SendMessageW(_hWnd, g_uMsg, SETTINGSEX_RELOAD_REGISTRY, 0);
+				iRet = SendMessageW(_hWnd, g_uMsg, iSettingsEX, 0);
+			}
+			return iRet;
+		}
+
+		unsafe private static void CalcWindowCentralizeByDesktop(Int64 hWnd, ref RectDouble rectWindowDouble)
+		{
+			Int64   hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+			if (hMonitor != (Int64)0) {
+				MONITORINFOEXW lpmi = new() { cbSize = (int)Marshal.SizeOf(typeof(MONITORINFOEXW)) };
+				if (GetMonitorInfoW(hMonitor, lpmi)) {
+					SizeDouble sizeDouble;
+					sizeDouble.Width = rectWindowDouble.Width;
+					sizeDouble.Height = rectWindowDouble.Height;
+					CalcWindowSizeByDPI(hWnd, ref sizeDouble);
+					if (sizeDouble.Width >= (double)lpmi.rcWork.Width) {
+						rectWindowDouble.Width = lpmi.rcWork.Width;
+					}
+					else {
+						rectWindowDouble.Width = sizeDouble.Width;
+					}
+					if (sizeDouble.Height >= (double)lpmi.rcWork.Height) {
+						rectWindowDouble.Height = lpmi.rcWork.Height;
+					}
+					else {
+						rectWindowDouble.Height = sizeDouble.Height;
+					}
+					rectWindowDouble.X = (int)((double)lpmi.rcWork.X + ((double)lpmi.rcWork.Width - (double)lpmi.rcWork.X - rectWindowDouble.Width) / 2.0);
+					rectWindowDouble.Y = (int)((double)lpmi.rcWork.Y + ((double)lpmi.rcWork.Height - (double)lpmi.rcWork.Y - rectWindowDouble.Height) / 2.0);
+				}
+			}
+		}
+
+		unsafe private static void CalcWindowSizeByDPI(Int64 hWnd, ref SizeDouble sizeDouble)
+		{
+			UInt32 dpi = GetDpiForWindow(hWnd);
+			if (dpi != 0)
+			{
+				sizeDouble.Width = ((double)sizeDouble.Width * (double)dpi / (double)USER_DEFAULT_SCREEN_DPI);
+				sizeDouble.Height = ((double)sizeDouble.Height * (double)dpi / (double)USER_DEFAULT_SCREEN_DPI);
+			}
 		}
 	}
 }
+
 
 /* = EOF = */
