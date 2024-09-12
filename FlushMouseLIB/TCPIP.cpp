@@ -223,10 +223,12 @@ BOOL		CTCPIP::bOpenPortForSendUDPv4(LPCTSTR lpszIPAddress, int Port)
 	BOOL	bRet = FALSE;
 	PADDRINFOW	ppResult = NULL;
 	
+	if (lpszIPAddress == NULL)	return FALSE;
+	if (!bIsPrivateAddress(lpszIPAddress))	return FALSE;
 	if (lpszIPAddr == NULL)	lpszIPAddr = new TCHAR[MAX_FQDN];
 	if (lpszIPAddr) {
 		ZeroMemory(lpszIPAddr, (MAX_FQDN * sizeof(TCHAR)));
-		if (lpszIPAddress)	wcsncpy_s(lpszIPAddr, MAX_FQDN, lpszIPAddress, MAX_FQDN);
+		wcsncpy_s(lpszIPAddr, MAX_FQDN, lpszIPAddress, MAX_FQDN);
 	}
 	else goto Cleanup;
 

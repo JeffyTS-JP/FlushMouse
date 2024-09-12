@@ -53,7 +53,7 @@ BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
 		case SYNTPH_SENDERIPV4_START:
 			SynTP->bStopSender();
 			if (!SynTP->bStartSender(hMainWnd, Profile->lpstAppRegData->szSynTPSendIPAddr1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_SYSTEMMODAL)
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
 				if (bShowMessage) vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
 				delete SynTP;
 				SynTP = NULL;

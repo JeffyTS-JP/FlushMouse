@@ -1,22 +1,19 @@
 
 # FlushMouse
-|![Icon](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/FlushMouse.png)|**システムトレイ(タスクトレイ)に常駐して、マウスカーソルへIMEモードの表示をするユーティリティです<br>FlushMouse is a software developed by JeffyTS. It is a mouse gesture tool that allows you to perform various operations by drawing gestures with your mouse. (by Bing)**|
+|![Icon](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/FlushMouse.png)|**システムトレイ(タスクトレイ)に常駐して、マウスカーソルやキャレットに IMEモードの表示をするユーティリティです<br>FlushMouse is a software developed by JeffyTS. It is a mouse gesture tool that allows you to perform various operations by drawing gestures with your mouse. (by Bing)**|
 | :---: | :--- |
 
 #### リリース情報
 
-* **2024/09/12　　Version 3.0.1.44 を プレ・リリースしました**
+* **2024/09/17　　Version 3.0.2.9 を リリースしました**
 
 * **(主な変更点)**
-   * 今回の Ver.3 から、プログラム構成が大きく変わりました
-   * １．IME モードを表示したりする、本体は従来のデスクトップ版とし、設定画面を、WinUI3 の別プロセスとしました
-   * ２．上記の改良により、本体のメモリ使用量は少なくて済みます
-   * ３．設定画面を独立させたことにより、WinUI3 の機能を利用して、今後設定できる項目を増やしていこうと考えています
-   * ４．上記の通りですので、WinUI3 版はリリースから外しました。ビルドはできます
-   * 　
-   * 設定画面は、まだ洗練されていず、既知のバグがありますが、本体の動作には影響はありません
-   * 今回はプレ・リリースということで、設定画面やビルドについての説明は、今後修正します
-   * 本体については、細かなバグを修正しました
+   * Ver.3 から、プログラム構成が大きく変わりました
+     * IME モードを表示したりする本体は従来のデスクトップ版とし、設定画面を WinUI3 の別プロセスとしました
+     * 上記の改良により、本体のメモリ使用量は少なくて済みます
+     * 設定画面を独立させたことにより、WinUI3 の機能を利用して、今後設定できる項目を増やしていこうと考えています
+     * 上記の通りですので、WinUI3 版はリリースから外しました。ビルドはできます
+   * その他、細かなバグを修正しました
    
 * **(今後について)**
    * ~~OSDN上ではここまでの機能で開発は終了としたいと考えています(バグ対応は除く)~~
@@ -25,7 +22,7 @@
    * ***ということで、今後も暇を見つけて、機能向上を目指していきますのでよろしくお願いします***
 
 * **(既知の問題)**
-   * UI3 版や、Ver.3からの設定画面において、アプリ終了時にメモリーリークしていることがわかっています (動的に増えていくメモリーリークではありません)
+   * Ver.3からの設定画面や UI3 版において、アプリ終了時にメモリーリークしていることがわかっています (動的に増えていくメモリーリークではありません)
    * プログラム的には、WinMain に入ってくるまでと、抜けた後の処理でリークしているようです
    * このため、当方に直す方法はなく、Microsoft の SDK 内の問題であり、アプリやシステムには影響はないものと考えています
 
@@ -35,8 +32,9 @@
 
 #### プライバシーポリシー
    * デスクトップ版、UI3版共に個人情報の収集などは一切行っていません
-     * UI3版から、ネットワークへのアクセスとして、インストール時のランタイムのダウンロードと、バージョン情報にGitHubへのリンクがあります
-     * また、Version 2.2から Synaptics社製タッチパッドと、VMware Playerへの対応として、ネットワークにアクセスします (詳しくは[下記](https://github.com/JeffyTS-JP/FlushMouse/tree/master?tab=readme-ov-file#syntp_helper%E6%A9%9F%E8%83%BD-synaptics%E7%A4%BE%E8%A3%BD%E3%82%BF%E3%83%83%E3%83%81%E3%83%91%E3%83%83%E3%83%89%E3%81%A8vmware-player%E3%81%A7%E3%81%AE-two-finger-scroll-%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)をご覧ください)
+     * ネットワークへのアクセスとして、インストール時のランタイムのダウンロードと、バージョン情報にGitHubへのリンクがあります
+     * また、Ver.3 から最新のバージョンを確認できるようにしました
+     * Ver.2.2 から Synaptics社製タッチパッドと、VMware Workstation / Playerへの対応として、ネットワークにアクセスします (詳しくは[下記](https://github.com/JeffyTS-JP/FlushMouse/tree/master?tab=readme-ov-file#syntp_helper%E6%A9%9F%E8%83%BD-synaptics%E7%A4%BE%E8%A3%BD%E3%82%BF%E3%83%83%E3%83%81%E3%83%91%E3%83%83%E3%83%89%E3%81%A8vmware-player%E3%81%A7%E3%81%AE-two-finger-scroll-%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)をご覧ください)
 
 #### Copyright
    * インストール時に表示される「ソフトウェア使用許諾契約」をお読みください。
@@ -45,10 +43,8 @@
    * Windows Installer (exe)形式になっています。実行してインストールしてください
    * アンインストールは「設定」の「アプリと機能」、または「コントロールパネル」の「プログラムと機能」からできます
      * または、同じバージョンのインストーラーがあればそれをもう一度実行してもアンインストールできます。この場合は、本プログラムの設定(レジストリ)を削除するかどうかを選べます(デフォルトでは残すようにしてあります)
-   * Version 2 から、Windows UI3に対応しました (といっても、設定画面などだけですし、あえて従来と似せたので、あまりそれらしくありませんが…)
+   * Ver.2 から、Windows UI3に対応しました。プログラム構成については、[下記]()をご参照ください
      * なお、デスクトップ版と、UI3版の共存はできません。切り替える場合は、いったんアンインストールしてください
-     * UI3版はIMEモードの表示色を指定できるなど多少設定画面などが違うだけで動作は一緒になるようにしてあります。今後も、デスクトップ版では最小限の設定画面のみで、UI3版の方を充実させていくことになると思います
-     * もし、メモリなどのリソースの使用量が気になるようでしたら、UI3版をインストールして設定してから、アンインストールしてデスクトップ版に切り替えてください
 
 #### 使い方
    * スタートメニュー、デスクトップのアイコンをクリックするか、PCを起動するとシステムトレイ(タスクトレイ)に常駐します
@@ -62,11 +58,11 @@
 ![Cursors](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/Cursors.png)
 
 #### 設定ダイアログ画面
-   * システムトレイ(タスクトレイ)の中にあるFlushMouseのアイコンをクリックすることで表示します
-   * UI3版
-![SettingDialogUI3](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SettingDlgUI3.png)
-   * デスクトップアプリ版
-![SettingDialog](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SettingDlg.png)
+   * システムトレイ(タスクトレイ)の中にある FlushMouseのアイコンをクリックすることで表示します
+   * Ver.3から、デスクトップアプリ版、UI3版共に同じ設定画面が表示されます
+![基本動作設定](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SettingDlg3.png)
+   * 
+![バージョン](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/VersionDlg3.png)
 
 #### 設定のヒント
    * Windows 10 / 11ではマウスカーソルの形状や大きさを決める方法が複数あるため、下記の順番で設定することをお勧めします 
@@ -86,7 +82,7 @@
      * アプリによってはキャレットの位置が取得できなかったり、表示位置がおかしくなることがあります(これは制限事項となります)。ただし、位置が取得できない場合は、マウスカーソルの左に表示します
    * **IME 関連キーのサポートを有効にする**
    * **ExplorerPatcher Simple Window Switcher Helperを有効にする**
-     *上記2項目は [こちらの説明](https://github.com/JeffyTS-JP/FlushMouse/tree/master?tab=readme-ov-file#ime-%E9%96%A2%E9%80%A3%E3%82%AD%E3%83%BC%E3%81%AE%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88-%E3%81%A8-explorerpatcher-simple-window-switcher-helper-%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)をご覧ください
+     * 上記 2項目は [こちらの説明](https://github.com/JeffyTS-JP/FlushMouse/tree/master?tab=readme-ov-file#ime-%E9%96%A2%E9%80%A3%E3%82%AD%E3%83%BC%E3%81%AE%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88-%E3%81%A8-explorerpatcher-simple-window-switcher-helper-%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)をご覧ください
    * **モード表示の時間**
      * マウスカーソルの左に「あ」「ア」「Ａ」「_ｱ」「_A」を表示をしている時間を調整できます
    * **モード表示までの時間**
@@ -103,7 +99,7 @@
 
   * しかし、[Valinetのブログ](https://valinet.ro/2021/11/18/Functional-Windows-10-flyouts-on-Windows-11.html)を読むとわかるのですが、英語キーボード(101/102/104キーボード)のドライバーをロードして実現しています。このため、日本語キーボード(106/109)メインの我々にはちょっと困ったことになってしまいます。例えば、漢字(半角/全角)キーで「 ` 」が入力されてしまったり、「@」マークなどの記号の位置が変わってしまったり。何より日本語変換ができません。そこで、FlushMouseに、強制的に「US / ENG」を排除する機能を加えました
   * ~~Windowsキー + スペースで入力言語を切り替えた時、IME関連キー押したときやマウスクリックしたとき、フォーカスが切り替わったときなどにIMEの状態をチェックして、後述するように動作します~~
-  * FlushMouse Version 2 以降から、EP Helperの機能を独立させました。ON になっている場合、IME関連キーを押下したかどうかにかかわらず「US / ENG」にならないように動作します
+  * Ver.2 以降から、[US / ENG] になったことが、Hookで通知されることがわかりましたので、EP Helperの機能を独立させました。設定が ON になっている場合、IME関連キーを押下したかどうかにかかわらず「US / ENG」にならないように動作します
   * ただし、以下のような制限事項があります
     * ★**物理的に英語(101/102/104)キーボードを接続している場合は動きません。必ず日本語(106/109)キーボードの環境で使用してください**(日本語キーボードが見つからないときには、本機能が動作しないようにチェックしています)
 
@@ -139,7 +135,7 @@
 #### (β機能) SynTP_Helper機能 (Synaptics社製タッチパッドと、VMware Workstation / Playerでの Two Finger Scroll) について
   * 動作環境 (検証環境)
     * Panasonic社製 Let's note CF-SV1 搭載の Synaptics社製 Wheel Pad (Touch Pad) および Windows 11 Pro (Version 23H2)
-    * Broadcom (VMware)社製 VMware(R) Workstation 17 Pro (Version 17.5.2) / VMware(R) Workstation 17 Player (Version 17.5.2)
+    * Broadcom (VMware)社製 VMware(R) Workstation 17 Pro (Version 17.6.0) / VMware(R) Workstation 17 Player (Version 17.6.0)
     * Guest OS は、主に Windows 11 Pro (Version 23H2)
     
   * 機能概要
@@ -150,16 +146,16 @@
  
   * 使用方法
     * Host には、FlushMouse をインストールしてください
-    * Guest には、FlushMouse をインストールするか、SynTP_Receiver_vx.x.x.x.zip を展開し、SynTP_Receiver.exe をコピーしてください
+    * Guest には、FlushMouse をインストールするか、SynTP_Receiver_vx.x.x.x.zip を展開し、任意の場所に SynTP_Receiver.exe をコピーしてください
     * タスクトレイにある、FlushMouse のアイコンをクリックすると出てくるメニューから、SynTP Helperを選び設定画面を出します
-      ![SynTPHelperDlg](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SynTPHelperDlg.png)
+      ![SynTPHelperDlg](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SynTPDlg3.png)
       * Host 側では、Senderとして登録します。IP Address の欄には、Guest OSの IPv4 アドレス、または、Hostname を入力します (一般的には Ethernet1のアドレスでよいと思います)。また、UDP Portには、空いている番号を入れてください
       * IP Address、Hostname どちらも、プライベートアドレスのみ指定できます (10.0.0.0 - 10.255.255.255, 172.16.0.0 - 172.31.255.255, 192.168.0.0 - 192.168.255.255)
       * Host 側で Hostname を使用して、FlushMouse 起動時からスタートする場合、名前解決ができるようにネットワークが構成されている必要が有ります。名前解決ができない場合はストップ状態となります
       * Guest 側では、Receiverとして登録します。UDP Portには、Host と同じ番号を入れてください (Guest 側では、UDPを Anyで受けますので、IP Addressは必要ありません)
       * 設定 -> ネットワークとインターネット -> ネットワークの詳細設定 -> 共有の詳細設定 -> プライベートネットワークのネットワーク探索を ON にしてください
       * (初回のみ)ネットワークへのアクセス許可のダイアログが出ますので、許可してください
-      * Version 2.2.4.7 から、TouchPadのサイズと Edge motion の幅を、Synaptics のレジストリ (HKEY_LOCAL_MACHINE\SOFTWARE\Synaptics\OEM\TouchPad) を参照するのではなく、独自に諸元を設定できるようにしました。これにより、多少機種依存の部分が緩和され、Touch Pad のデータ出力方法が同じであれば、動く可能性があると思います
+      * Ver. 2.2.4.7 から、TouchPadのサイズと Edge motion の幅を、Synaptics のレジストリ (HKEY_LOCAL_MACHINE\SOFTWARE\Synaptics\OEM\TouchPad) を参照するのではなく、独自に諸元を設定できるようにしました。これにより、多少機種依存の部分が緩和され、Touch Pad のデータ出力方法が同じであれば、動く可能性があると思います
         * Let's note CF-SV1 の場合、TouchPad Width = 528, Height = 528, Edge Area Width = 88, Height = 88 (デフォルト値)です
         * TouchPad Width, Height は、左下を原点とした、Touch Pad のサイズです
         * Edge Area Width, Height は、スクロールが始まって、指を置いているとスクロールが継続するエリアの幅です。お好みで調整してみてください。この値を 0 にすると Edge motion は動作しません。
@@ -174,7 +170,23 @@
     * Guest OS で、UNIX系については、私は詳しくありませんので、どなたか受信側を書いていただければ。。。
     * 設定画面は、手を抜いてUI3でも従来のやり方にしています。今後考えます
     * VMware社が Broadcom社に買収され、先日、Player をやめて Workstation Proに移行するとのアナウンスがありました。商用利用ではない場合は、無償とのことです。~~今後、開発環境を整えて、移行を考えたいと思います~~　Ver.2.2.3.1で対応しました
+
     
+#### プログラム構成
+  * Ver.3 以降のプログラム構成を説明します
+    * デスクトップ版 (FlushMouse_x64.exe)
+      * FlushMouse.exe - デスクトップ版のプログラム本体 (Win32 API)
+      * FlushMouseDLL.dll - フックなど (Win32 API)
+      * FlushMouse32.dll - プロセスの監視など (Win32 API)
+      * FlushMouseDLL32.dll - フックなど (Win32 API)
+      * FlushMouseSettings.exe - 設定画面のメインプログラム (C++/WinUI3)
+      * FlushMouseUI3DLL.dll - 設定画面のプログラム (C#/WinUI3 .NET Framework)
+    * WinUI3版 (FlushMouseUI3_x64.exe)
+      * FlushMouseUI3.exe - UI3版のメインプログラム (C++/WinUI3)
+      * FlushMouseDLL.dll - フックなど (Win32 API)
+      * FlushMouse32.dll - プロセスの監視など (Win32 API)
+      * FlushMouseDLL32.dll - フックなど (Win32 API)
+      * FlushMouseUI3DLL.dll - 設定画面のプログラム (C#/WinUI3 .NET Framework)
 
 
 #### ビルド方法
@@ -208,18 +220,17 @@
   5. Visual Studioを起動して 右下の「コードなし」で起動します
   6. Tools -> Options -> Environment -> International Settings をクリックして、Languageを日本語にします
   7. 拡張機能 -> 検索で　WiXと入力し「 WiX v3 - Visual Studio 2022 Extension」を選択して、Visual Studioを終了するとインストールが始まります
-  8. Visual Studioを再起動して、リポジトリのクローン -> リポジトリの場所に [https://github.com/JeffyTS-JP/FlushMouse.git](https://github.com/JeffyTS-JP/FlushMouse.git)　を入力してクローンします
-
-* 以下はUI3のために必要な作業です
-  1. .NET Framework SDK 8 を[https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-8.0.101-windows-x64-installer](https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-8.0.101-windows-x64-installer)からダウンロードしてインストールします
-  2. NuGet CLI(nuget.exe)を[https://dist.nuget.org/win-x86-commandline/latest/nuget.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)からダウンロードして、FlushMouseをクローンしたフォルダの直下の「NuGet」フォルダ(デフォルトでは C:\Users\User\source\repos\FlushMouse\NuGet です)に入れます
-  3. Windowsの 設定 -> システム -> 開発者向け で 開発者モードを ON にします
-  5. 次に、ツール -> NuGet パッケージマネージャー -> ソリューションの NuGet パッケージの管理 (Altキーを押しながら続けて T N N) を開き、右側にある歯車(⚙)を選択して、ダイアログを開きます
-  6. まず、右上のプラス(＋)を押してから、下にある「ソース」欄には、nuget.exeを入れた「NuGet」フォルダ(デフォルトでは C:\Users\User\source\repos\FlushMouse\NuGet)を選択して「更新」を押します(名前については適当で構いません)
-  7. その後 OK を押してダイアログを閉じ、上の歯車の左にある「パッケージソース」を「すべて」に変更します。次に「復元」選択します
+  8. .NET Framework SDK 8 を[https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-8.0.101-windows-x64-installer](https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-8.0.101-windows-x64-installer)からダウンロードしてインストールします
+  9. Visual Studioを再起動して、リポジトリのクローン -> リポジトリの場所に [https://github.com/JeffyTS-JP/FlushMouse.git](https://github.com/JeffyTS-JP/FlushMouse.git)　を入力してクローンします
+  10. NuGet CLI(nuget.exe)を[https://dist.nuget.org/win-x86-commandline/latest/nuget.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)からダウンロードして、FlushMouseをクローンしたフォルダの直下の「NuGet」フォルダ(デフォルトでは C:\Users\User\source\repos\FlushMouse\NuGet です)に入れます
+  11. Windowsの 設定 -> システム -> 開発者向け で 開発者モードを ON にします
+  12. 次に、ツール -> NuGet パッケージマネージャー -> ソリューションの NuGet パッケージの管理 (Altキーを押しながら続けて T N N) を開き、右側にある歯車(⚙)を選択して、ダイアログを開きます
+  13. まず、右上のプラス(＋)を押してから、下にある「ソース」欄には、nuget.exeを入れた「NuGet」フォルダ(デフォルトでは C:\Users\User\source\repos\FlushMouse\NuGet)を選択して「更新」を押します(名前については適当で構いません)
+  14. その後 OK を押してダイアログを閉じ、上の歯車の左にある「パッケージソース」を「すべて」に変更します。次に「復元」選択します
 
 * ビルド方法です
   1. ソリューションプラットフォームを必ず「**MixedPlatform**」にしてビルドします (Ctrl + Shift + B)
-  2. ソリューション構成を「Release」でビルドすると、デフォルトでは C:\Users\User\source\repos\FlushMouseにFlushMouse_x64.exe (Version 1.2以前は FlushMouse_x64.msi)と、FlushMouseUI3_x64.exeができるのでインストールしてご利用ください
+  2. ソリューション構成を「Release」でビルドすると、デフォルトでは C:\Users\User\source\repos\FlushMouseにFlushMouse_x64.exe (Ver. 1.2以前は FlushMouse_x64.msi)と、FlushMouseUI3_x64.exeができるのでインストールしてご利用ください
+   * ビルドの依存関係で、場合によっては「ソリューション エクスプローラー」で FlushMouseUI3DLL を、右クリックして先にリビルドする必要が有ります
 
 

@@ -89,7 +89,7 @@ static void				vMessageBox(HWND hWnd, UINT uID, UINT uType);
 //
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_SYSTEMMODAL)					// MessageBox style
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)					// MessageBox style
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
@@ -246,7 +246,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 {
 	UNREFERENCED_PARAMETER(lpCreateStruct);
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_SYSTEMMODAL)
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
 	
 	PowerNotification = new CPowerNotification(hWnd);
 	if (PowerNotification == NULL) {

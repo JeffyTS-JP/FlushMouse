@@ -78,6 +78,10 @@ CProfile::CProfile()
 		lpstAppRegData->dwSynTPPortNo1 = 50008;						// SynTP Helper Port Number 1
 
 		// for Settings
+		lpstAppRegData->dwSettingsX = 0;							// Settings Position X
+		lpstAppRegData->dwSettingsY = 0;							// Settings Position Y
+		lpstAppRegData->dwSettingsWidth = 0;						// Settings Position Width
+		lpstAppRegData->dwSettingsHeight = 0;						// Settings Position Height
 		lpstAppRegData->bIsPaneOpen = TRUE;							// Is Pane Open
 
 	}
@@ -161,7 +165,11 @@ BOOL		CProfile::bGetProfileData() const
 	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPSendHostname1"), lpstAppRegData->szSynTPSendHostname1, sizeof(lpstAppRegData->szSynTPSendHostname1)))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPPortNo1"), (LPDWORD) & lpstAppRegData->dwSynTPPortNo1, lpstAppRegData->dwSynTPPortNo1))	goto Cleanup;
 
-	// BOOL registry for Settings
+	// Registry in Use Settings
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SettingsX"), (LPDWORD)&(lpstAppRegData->dwSettingsX), lpstAppRegData->dwSettingsX))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SettingsY"), (LPDWORD)&(lpstAppRegData->dwSettingsY), lpstAppRegData->dwSettingsY))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SettingsWidth"), (LPDWORD)&(lpstAppRegData->dwSettingsWidth), lpstAppRegData->dwSettingsWidth))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SettingsHeight"), (LPDWORD)&(lpstAppRegData->dwSettingsHeight), lpstAppRegData->dwSettingsHeight))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("SettingsIsPaneOpen"), (LPBOOL)&(lpstAppRegData->bIsPaneOpen), lpstAppRegData->bIsPaneOpen))	goto Cleanup;
 
 	bRet = TRUE;
@@ -233,7 +241,11 @@ BOOL		CProfile::bSetProfileData() const
 	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPSendHostname1"), lpstAppRegData->szSynTPSendHostname1, sizeof(lpstAppRegData->szSynTPSendHostname1)))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPPortNo1"), lpstAppRegData->dwSynTPPortNo1))	goto Cleanup;
 
-	// BOOL registry for Settings
+	// Registry in Use Settings
+	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SettingsX"), lpstAppRegData->dwSettingsX))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SettingsY"), lpstAppRegData->dwSettingsY))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SettingsWidth"), lpstAppRegData->dwSettingsWidth))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SettingsHeight"), lpstAppRegData->dwSettingsHeight))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("SettingsIsPaneOpen"), lpstAppRegData->bIsPaneOpen))	goto Cleanup;
 
 

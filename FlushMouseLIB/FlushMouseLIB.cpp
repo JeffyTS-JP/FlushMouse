@@ -200,7 +200,7 @@ int			iCheckCmdLine(LPCTSTR lpCmdLine)
 					}
 					Resource = new CResource(FLUSHMOUSE_EXE);
 					if (Resource->hLoad() != NULL) {
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_SYSTEMMODAL)
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
 						vMessageBox(NULL, IDS_ALREADYRUN, MessageBoxTYPE);
 						if (Resource)	delete	Resource;
 					}
@@ -300,6 +300,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		HANDLE_MSG(hWnd, WM_COMMAND, Cls_OnCommand);
 		HANDLE_MSG(hWnd, WM_INPUT, Cls_OnInput);
 
+		HANDLE_MSG(hWnd, WM_SETTINGSEX, Cls_OnSettingsEx);
 		HANDLE_MSG(hWnd, WM_INPUTLANGCHANGEEX, Cls_OnInputLangChangeEx);
 		HANDLE_MSG(hWnd, WM_EVENT_SYSTEM_FOREGROUNDEX, Cls_OnEventForegroundEx);
 		HANDLE_MSG(hWnd, WM_CHECKIMESTARTCONVEX, Cls_OnCheckIMEStartConvertingEx);
@@ -310,11 +311,8 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 			break;
 
 		default:
-			if (message == WM_SETTINGSEX) {
-				return Cls_OnSettingsEx(hWnd, (int)wParam, lParam);
-			}
-			else if (!bCheckTaskTrayMessage(hWnd, message)) {
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_SYSTEMMODAL)
+			if (!bCheckTaskTrayMessage(hWnd, message)) {
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
 				vMessageBox(hWnd, IDS_NOTREGISTERTT, MessageBoxTYPE);
 				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 				break;
@@ -332,7 +330,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 {
 	UNREFERENCED_PARAMETER(lpCreateStruct);
 
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_SYSTEMMODAL)
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
 
 	hMainWnd = hWnd;
 
@@ -608,6 +606,30 @@ static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, LPARAM lParam)
 		return TRUE;
 	}
 	if (iCode == SETTINGSEX_SYNTP_START) {
+		if (Profile) {
+			switch (Profile->lpstAppRegData->dwSynTPHelper1) {
+				case SYNTPH_DISABLE:
+					return false;
+				case SYNTPH_SENDERIPV4:
+				case SYNTPH_SENDERIPV4_START:
+					if (!bIsPrivateAddress(Profile->lpstAppRegData->szSynTPSendIPAddr1)) {
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
+						vMessageBox(hWnd, IDS_NOTPRIVATEADDR, MessageBoxTYPE);
+						return false;
+					}
+					break;
+				case SYNTPH_SENDERHOSNAMEIPV4:
+				case SYNTPH_SENDERHOSNAMEIPV4_START:
+					if (!bIsPrivateAddress(Profile->lpstAppRegData->szSynTPSendHostname1)) {
+						vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
+						return false;
+					}
+					break;
+				case SYNTPH_RECEIVERIPV4:
+				case SYNTPH_RECEIVERIPV4_START:
+					break;
+			}
+		}
 		return bSettingSynTPStart();
 	}
 	if (iCode == SETTINGSEX_SYNTP_STOP) {
@@ -1299,7 +1321,7 @@ static BOOL	bChromium_Helper(HWND hForeWnd)
 //
 BOOL		bStartThreadHookTimer(HWND hWnd)
 {
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_SYSTEMMODAL)
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
 	
 	if (Cursor == NULL) {
 		Cursor = new CCursor;

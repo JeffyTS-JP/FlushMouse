@@ -31,10 +31,10 @@
 				<RowDefinition Height="*"/>
 				<RowDefinition Height="Auto"/>
 			</Grid.RowDefinitions>
-			<Grid Grid.Row="0">
-				<StackPanel Orientation="Horizontal" Spacing="15" x:Name="TitleBar" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+			<Grid Grid.Row="0" x:Name="TitleBar">
+				<StackPanel Orientation="Horizontal" Spacing="15" HorizontalAlignment="Stretch" VerticalAlignment="Top">
 					<Image Margin="20,4,0,0" Source="FlushMouse.ico" Width="24" Height="24" />
-					<TextBlock Margin="0,4,0,0" VerticalAlignment="Center" Text="FlushMouse 設定" />
+					<TextBlock x:Name="TitleBarTextBlock" Margin="0,4,0,0" VerticalAlignment="Center" Text="FlushMouse 設定" />
 				</StackPanel>
 			</Grid>
 			<Grid Grid.Row="1">

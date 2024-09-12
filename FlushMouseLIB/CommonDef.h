@@ -163,7 +163,7 @@ typedef struct tagSIZED
 
 // BOOL Cls_OnSettings(HWND hWnd, int iCode, LPARAM lParam);
 #define WM_SETTINGSEX						(WM_USER + 0xfe)
-#define HANDLE_WM_SETTINGSEX(hWnd, wParam, lParam, fn) ((LRESULT)(DWORD)(BOOL)(fn)((hWnd), (int)(wParam), (LPARAM)(lParam)), 0L)
+#define HANDLE_WM_SETTINGSEX(hWnd, wParam, lParam, fn) ((LRESULT)(BOOL)(fn)((hWnd), (int)(wParam), (LPARAM)(lParam)))
 #define SETTINGSEX_OK						0
 #define SETTINGSEX_CANCEL					1
 #define SETTINGSEX_APPLY					2

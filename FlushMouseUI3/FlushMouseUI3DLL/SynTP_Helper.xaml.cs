@@ -169,15 +169,29 @@ namespace FlushMouseUI3DLL {
 
 					if (tb1 != null)    tb1.IsEnabled = false;
 					if (cb1 != null)    cb1.IsEnabled = false;
-					if (btn1 != null)	btn1.IsEnabled = false;
-					if (btn2 != null)	btn2.IsEnabled = true;
+					Int64 _hWnd = FindWindowW(CLASS_FLUSHMOUSE, null);
+					if (_hWnd != 0) {
+						if (btn1 != null) btn1.IsEnabled = false;
+						if (btn2 != null) btn2.IsEnabled = true;
+					}
+					else {
+						if (btn1 != null) btn1.IsEnabled = false;
+						if (btn2 != null) btn2.IsEnabled = false;
+					}
 				}
 				else {
 					if (rb1 != null)	rb1.IsEnabled = true;	
 					if (rb2 != null)	rb2.IsEnabled = true;	
 					if (rb3 != null)	rb3.IsEnabled = true;	
-					if (btn1 != null)	btn1.IsEnabled = true;
-					if (btn2 != null)	btn2.IsEnabled = false;
+					Int64 _hWnd = FindWindowW(CLASS_FLUSHMOUSE, null);
+					if (_hWnd != 0) {
+						if (btn1 != null)	btn1.IsEnabled = true;
+						if (btn2 != null)	btn2.IsEnabled = false;
+					}
+					else {
+						if (btn1 != null) btn1.IsEnabled = false;
+						if (btn2 != null) btn2.IsEnabled = false;
+					}
 				}
 			}
 		}
@@ -467,6 +481,8 @@ namespace FlushMouseUI3DLL {
 			Button btn = sender as Button;
 			if (btn == null) { return; }
 			if (btn.Name == "btn1") {
+				if (btn1 != null) btn1.IsEnabled = false;
+				if (btn2 != null) btn2.IsEnabled = false;
 				if (UpdateProfile(SETTINGSEX_SYNTP_START) != 0) {
 					bSynTPStarted1 = true;
 				}

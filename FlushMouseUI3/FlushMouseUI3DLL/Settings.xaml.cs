@@ -15,6 +15,8 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+
 using Windows.Graphics;
 
 namespace FlushMouseUI3DLL
@@ -71,8 +73,7 @@ namespace FlushMouseUI3DLL
 		internal const UInt32 MONITOR_DEFAULTTONEAREST = 0x00000002;
 
 		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto, Pack = 4)]
-		internal class MONITORINFOEXW
-		{
+		internal class MONITORINFOEXW {
 			public int          cbSize;
 			public RectInt32    rcMonitor;
 			public RectInt32    rcWork;
@@ -84,7 +85,14 @@ namespace FlushMouseUI3DLL
 		[DllImport("User32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
 		private static extern bool GetMonitorInfoW(Int64 hMonitor, [In, Out] MONITORINFOEXW lpmi);
 #pragma warning restore SYSLIB1054
-	
+
+		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.I8)]
+		internal static partial Int64 MessageBoxW(Int64 hWnd, string MessageBox, string lpCaption, UInt32 uType);
+		public const UInt32 MB_OK = 0x00000000;
+		public const UInt32 MB_ICONINFORMATION = 0x00000040;
+		public const UInt32 MB_APPLMODAL = 0x00000000;
+
 		internal const String CLASS_FLUSHMOUSE = "FlushMouse-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}";
 		internal const String CLASS_FLUSHMOUSESETTINGS = "FlushMouseSettings-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}";
 		
@@ -176,7 +184,7 @@ namespace FlushMouseUI3DLL
 				m_AppWindow = AppWindow.GetFromWindowId(windowId);
 				var op = OverlappedPresenter.Create();
 				op.IsMaximizable = false;
-				op.IsMinimizable = true;
+				op.IsMinimizable = false;
 				op.IsResizable = true;
 				op.IsAlwaysOnTop = false;
 				m_AppWindow.SetPresenter(op);
@@ -246,6 +254,14 @@ namespace FlushMouseUI3DLL
 				rect.Width = (int)m_WindowRectDouble.Width;
 				rect.Height = (int)m_WindowRectDouble.Height;
 				m_AppWindow.MoveAndResize(rect);
+				m_AppWindow.MoveAndResize(rect);
+				if (CalcWindowAdjustByMonitor(g_hSettingsWnd, ref m_WindowRectDouble) == true) {
+					rect.X = (int)m_WindowRectDouble.X;
+					rect.Y = (int)m_WindowRectDouble.Y;
+					rect.Width = (int)m_WindowRectDouble.Width;
+					rect.Height = (int)m_WindowRectDouble.Height;
+					m_AppWindow.MoveAndResize(rect);
+				}
 			}
 		}
 
@@ -344,10 +360,6 @@ namespace FlushMouseUI3DLL
 			if (sender != null) {
 				SetWindowSize();
 			}
-			Int64 _hWnd = FindWindowW(CLASS_FLUSHMOUSESETTINGS, null);
-			if (_hWnd != 0) {
-				SendMessageW(_hWnd, WM_DESTROY, 0, 0);
-			}
 		}
 
 		private void SetWindowSize()
@@ -380,9 +392,14 @@ namespace FlushMouseUI3DLL
 				AppWindowChangedEventArgs _args = args as AppWindowChangedEventArgs;
 				if (_args.DidSizeChange) {
 					SetWindowSize();
+					m_WindowRectDouble.X = (Double)sender.Position.X;
+					m_WindowRectDouble.Y = (Double)sender.Position.Y;
 				}
-				else if (_args.DidPresenterChange)
-				{
+				else if (_args.DidPositionChange) {
+					m_WindowRectDouble.X = sender.Position.X;
+					m_WindowRectDouble.Y = sender.Position.Y;
+				}
+				else if (_args.DidPresenterChange) {
 					SetWindowSize();
 				}
 			}
@@ -401,13 +418,19 @@ namespace FlushMouseUI3DLL
 				g_Settings = null;
 				g_hSettingsWnd = 0;
 			}
+			Int64 _hWnd = FindWindowW(CLASS_FLUSHMOUSESETTINGS, null);
+			if (_hWnd != 0) {
+				SendMessageW(_hWnd, WM_DESTROY, 0, 0);
+			}
 		}
 
 		public static Int64 UpdateProfile(Int64 iSettingsEX)
 		{
 			Int64 iRet = 0;
 			if (g_hMainWnd != 0) {
-				iRet = SendMessageW(g_hMainWnd, g_uMsg, iSettingsEX, 0);
+				if (SendMessageW(g_hMainWnd, g_uMsg, iSettingsEX, 0) == 0) {
+					return 0;
+				}
 			}
 			Int64 _hWnd = FindWindowW(CLASS_FLUSHMOUSE, null);
 			if ((_hWnd != 0) && (_hWnd != g_hMainWnd)) {
@@ -445,14 +468,43 @@ namespace FlushMouseUI3DLL
 			}
 		}
 
+		unsafe private static bool CalcWindowAdjustByMonitor(Int64 hWnd, ref RectDouble rectWindowDouble)
+		{
+			Int64   hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+			if (hMonitor != (Int64)0) {
+				MONITORINFOEXW lpmi = new() { cbSize = (int)Marshal.SizeOf(typeof(MONITORINFOEXW)) };
+				if (GetMonitorInfoW(hMonitor, lpmi)) {
+					if ((rectWindowDouble.X < lpmi.rcWork.X) 
+							|| (lpmi.rcWork.Width > (lpmi.rcWork.Width + rectWindowDouble.Width)) 
+							|| (rectWindowDouble.Y < lpmi.rcWork.Y)
+							|| (lpmi.rcWork.Height < (rectWindowDouble.Y + rectWindowDouble.Height))) {
+						rectWindowDouble.X = (int)((double)lpmi.rcWork.X + ((double)lpmi.rcWork.Width - (double)lpmi.rcWork.X - rectWindowDouble.Width) / 2.0);
+						rectWindowDouble.Y = (int)((double)lpmi.rcWork.Y + ((double)lpmi.rcWork.Height - (double)lpmi.rcWork.Y - rectWindowDouble.Height) / 2.0);
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
 		unsafe private static void CalcWindowSizeByDPI(Int64 hWnd, ref SizeDouble sizeDouble)
 		{
 			UInt32 dpi = GetDpiForWindow(hWnd);
-			if (dpi != 0)
-			{
+			if (dpi != 0) {
 				sizeDouble.Width = ((double)sizeDouble.Width * (double)dpi / (double)USER_DEFAULT_SCREEN_DPI);
 				sizeDouble.Height = ((double)sizeDouble.Height * (double)dpi / (double)USER_DEFAULT_SCREEN_DPI);
 			}
+		}
+
+		public static long MessageBox(Int64 hWnd, string MessageBox, string lpCaption, UInt32 uType)
+		{
+			try {
+				Task<long> ret = Task<long>.Run(() => MessageBoxW(hWnd, MessageBox, lpCaption, uType));
+				return ret.Result;
+			}
+			catch (Exception) {
+			}
+			return 0;
 		}
 	}
 }

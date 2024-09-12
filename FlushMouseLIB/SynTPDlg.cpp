@@ -48,8 +48,8 @@ VOID		vSynTPHelperDialog(HWND hWnd)
 		SendMessage(_hWnd, WM_SETTINGSEX, SETTINGSEX_CHANGE_PANE, SETTINGSEX_SELECTEDPANE_SYNTPHELPER);
 	}
 	else {
-		TCHAR	CommandLine[1]{};
-		if (_itow_s(SETTINGSEX_SELECTEDPANE_SYNTPHELPER, CommandLine, sizeof(CommandLine), 10) != 0)	return;
+		TCHAR	CommandLine[2]{};
+		if (_itow_s(SETTINGSEX_SELECTEDPANE_SYNTPHELPER, CommandLine, (sizeof(CommandLine) - sizeof(TCHAR)), 10) != 0)	return;
 
 		if (!bCreateProcess(RELATIVE_FLUSHMOUSESETTINGS_EXE, CommandLine)) {
 			return;

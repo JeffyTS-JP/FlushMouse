@@ -35,8 +35,14 @@ using namespace winrt;
 //
 static Window	wMojoWnd{ nullptr };
 static HWND		hMojoWnd{ nullptr };
-
 static FlushMouseUI3DLL::Settings	m_Settings{ nullptr };
+static LONG_PTR	m_SettingsWndProc = NULL;
+
+//
+// Local Prototype Define
+//
+static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+static void			Cls_OnNCLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT codeHitTest);
 
 //
 // FlushMouseUI3
@@ -159,6 +165,16 @@ void		SettingsExec(HWND hWnd, UINT32 uMsg, INT32 iSelectedPane)
 			if (wcsncpy_s(Profile->lpstAppRegData->szSynTPSendHostname1, MAX_FQDN, (LPTSTR)(m_Settings.szSynTPSendHostname1().c_str()), MAX_FQDN) != 0) {
 			}
 			m_Settings.bSynTPStarted1(Profile->lpstAppRegData->bSynTPStarted1);
+
+			HWND	_hSettingsWnd = (HWND)m_Settings.g_hSettingsWnd();
+			if (_hSettingsWnd) {
+				m_SettingsWndProc = GetWindowLongPtr(_hSettingsWnd, GWLP_WNDPROC);
+				if (m_SettingsWndProc) {
+					if (SetWindowLongPtr(_hSettingsWnd, GWLP_WNDPROC, (LONG_PTR)WndProc)) {
+						return;
+					}
+				}
+			}
 		}
 	}
 	else {
@@ -169,6 +185,35 @@ void		SettingsExec(HWND hWnd, UINT32 uMsg, INT32 iSelectedPane)
 			SetForegroundWindow((HWND)m_Settings.g_hSettingsWnd());
 		}
 	}
+}
+
+//
+// WndProc()
+//
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message) {
+		HANDLE_MSG(hWnd, WM_NCLBUTTONDBLCLK, Cls_OnNCLButtonDown);
+		break;
+
+	default:
+		break;
+	}
+	return CallWindowProc((WNDPROC)m_SettingsWndProc, hWnd, message, wParam, lParam);
+}
+
+//
+// WM_NCLBUTTONDBLCLK
+// Cls_OnNCLButtonDown()
+//
+void			Cls_OnNCLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT codeHitTest)
+{
+	UNREFERENCED_PARAMETER(hwnd);
+	UNREFERENCED_PARAMETER(fDoubleClick);
+	UNREFERENCED_PARAMETER(x);
+	UNREFERENCED_PARAMETER(y);
+	UNREFERENCED_PARAMETER(codeHitTest);
+	return;
 }
 
 //

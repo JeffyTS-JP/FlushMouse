@@ -454,12 +454,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message) {
 		HANDLE_MSG(hWnd, WM_CREATE, Cls_OnCreate);
 		HANDLE_MSG(hWnd, WM_DESTROY, Cls_OnDestroy);
+		HANDLE_MSG(hWnd, WM_SETTINGSEX, Cls_OnSettingsEx);
 		break;
 
 		default:
-			if (message == WM_SETTINGSEX) {
-				return Cls_OnSettingsEx(hWnd, (int)wParam, lParam);
-			}
 			break;
 	}
 	return DefWindowProc(hWnd, message, wParam, lParam);
@@ -472,7 +470,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 {
 	UNREFERENCED_PARAMETER(lpCreateStruct);
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_SYSTEMMODAL)
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
 
 	hMainWnd = hWnd;
 
@@ -540,8 +538,9 @@ static bool		Cls_OnSettingsEx(HWND hWnd, int iCode, LPARAM lParam)
 				iSelectedPane = SETTINGSEX_SELECTEDPANE_ABOUT;
 				vAboutDialog(hWnd);
 			}
-
+			return true;
 		}
+		return false;
 	}
 
 	if (iCode == SETTINGSEX_OK) {
@@ -549,12 +548,36 @@ static bool		Cls_OnSettingsEx(HWND hWnd, int iCode, LPARAM lParam)
 		return true;
 	}
 	if (iCode == SETTINGSEX_SYNTP_START) {
+		if (Profile) {
+			switch (Profile->lpstAppRegData->dwSynTPHelper1) {
+				case SYNTPH_DISABLE:
+					return false;
+				case SYNTPH_SENDERIPV4:
+				case SYNTPH_SENDERIPV4_START:
+					if (!bIsPrivateAddress(Profile->lpstAppRegData->szSynTPSendIPAddr1)) {
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
+						vMessageBox(hWnd, IDS_NOTPRIVATEADDR, MessageBoxTYPE);
+						return false;
+					}
+					break;
+				case SYNTPH_SENDERHOSNAMEIPV4:
+				case SYNTPH_SENDERHOSNAMEIPV4_START:
+					if (!bIsPrivateAddress(Profile->lpstAppRegData->szSynTPSendHostname1)) {
+						vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
+						return false;
+					}
+					break;
+				case SYNTPH_RECEIVERIPV4:
+				case SYNTPH_RECEIVERIPV4_START:
+					break;
+			}
+		}
 		return bSettingSynTPStart();
 	}
 	if (iCode == SETTINGSEX_SYNTP_STOP) {
 		return bSettingSynTPStop();
 	}
-	return false;
+	return true;
 }
 
 
