@@ -143,13 +143,18 @@ VOID		vAboutDialog(HWND hWnd)
 }
 
 //
+// vIMEModeDialog()
+//
+VOID		vIMEModeDialog(HWND hWnd)
+{
+	SettingsExec(hWnd, WM_SETTINGSEX, SETTINGSEX_SELECTEDPANE_IMEMODE);
+}
+
+//
 // vSynTPHelperDialog()
 //
 VOID		vSynTPHelperDialog(HWND hWnd)
 {
-	if (Profile != NULL) {
-
-	}
 	SettingsExec(hWnd, WM_SETTINGSEX, SETTINGSEX_SELECTEDPANE_SYNTPHELPER);
 }
 
@@ -158,9 +163,6 @@ VOID		vSynTPHelperDialog(HWND hWnd)
 //
 VOID		vSettingDialog(HWND hWnd)
 {
-	if (Profile != NULL) {
-
-	}
 	SettingsExec(hWnd, WM_SETTINGSEX, SETTINGSEX_SELECTEDPANE_GENERAL);
 }
 

@@ -83,8 +83,36 @@ VOID		vAboutDialog(HWND hWnd)
 		SendMessage(_hWnd, WM_SETTINGSEX, SETTINGSEX_CHANGE_PANE, SETTINGSEX_SELECTEDPANE_ABOUT);
 	}
 	else {
+		if (Cursor != NULL) {
+			Cursor->vStopDrawIMEModeMouseByWndThread();
+		}
 		TCHAR	CommandLine[2]{};
 		if (_itow_s(SETTINGSEX_SELECTEDPANE_ABOUT, CommandLine, (sizeof(CommandLine) - sizeof(TCHAR)), 10) != 0)	return;
+
+		if (!bCreateProcess(RELATIVE_FLUSHMOUSESETTINGS_EXE, CommandLine)) {
+			return;
+		}
+	}
+}
+
+//
+// vIMEModeDialog()
+//
+VOID		vIMEModeDialog(HWND hWnd)
+{
+	UNREFERENCED_PARAMETER(hWnd);
+
+	HWND	_hWnd = FindWindow(CLASS_FLUSHMOUSESETTINGS, NULL);
+	if (_hWnd != NULL) {
+		SetForegroundWindow(_hWnd);
+		SendMessage(_hWnd, WM_SETTINGSEX, SETTINGSEX_CHANGE_PANE, SETTINGSEX_SELECTEDPANE_IMEMODE);
+	}
+	else {
+		if (Cursor != NULL) {
+			Cursor->vStopDrawIMEModeMouseByWndThread();
+		}
+		TCHAR	CommandLine[2]{};
+		if (_itow_s(SETTINGSEX_SELECTEDPANE_IMEMODE, CommandLine, (sizeof(CommandLine) - sizeof(TCHAR)), 10) != 0)	return;
 
 		if (!bCreateProcess(RELATIVE_FLUSHMOUSESETTINGS_EXE, CommandLine)) {
 			return;
@@ -105,6 +133,9 @@ VOID		vSettingDialog(HWND hWnd)
 		SendMessage(_hWnd, WM_SETTINGSEX, SETTINGSEX_CHANGE_PANE, SETTINGSEX_SELECTEDPANE_GENERAL);
 	}
 	else {
+		if (Cursor != NULL) {
+			Cursor->vStopDrawIMEModeMouseByWndThread();
+		}
 		TCHAR	CommandLine[2]{};
 		if (_itow_s(SETTINGSEX_SELECTEDPANE_GENERAL, CommandLine, (sizeof(CommandLine) - sizeof(TCHAR)), 10) != 0)	return;
 

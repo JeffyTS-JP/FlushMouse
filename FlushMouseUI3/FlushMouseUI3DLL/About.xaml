@@ -75,7 +75,7 @@
 				<TextBlock Margin="0,0,0,0" Grid.Column="0" Text="GitHub" FontSize="14"/>
 				<RichTextBlock Margin="0,0,0,0" Grid.Column="1" FontFamily="Segoe MDL2 Assets" Padding="0" IsTabStop="False" FontSize="14">
 					<Paragraph>
-						<Hyperlink xml:space="preserve" NavigateUri="https://github.com/JeffyTS-JP/FlushMouse/" IsTabStop="False" Foreground="Blue">FlushMouse&#xE8AD; </Hyperlink>
+						<Hyperlink xml:space="preserve" NavigateUri="https://github.com/JeffyTS-JP/FlushMouse/" IsTabStop="False" Foreground="RoyalBlue">FlushMouse&#xE8AD; </Hyperlink>
 					</Paragraph>
 				</RichTextBlock>
 			</Grid>
@@ -88,7 +88,7 @@
 				<TextBlock Margin="0,0,0,0" Grid.Column="1" Text="@JeffyTSonTW" FontSize="14"/>
 			</Grid>
 			<Grid Margin="0,14,0,0" Grid.Row="6">
-				<Button Margin="-10,0,0,0" x:Name="btn1" Click="Button_Click" Content="最新バージョンを確認する" BorderThickness="0" Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}" Foreground="Blue"/>
+				<Button Margin="-10,0,0,0" x:Name="btn1" Click="Button_Click" Content="最新バージョンを確認する" BorderThickness="0" Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}" Foreground="RoyalBlue"/>
 			</Grid>
 			<Grid Margin="0,10,0,0" Grid.Row="7">
 			</Grid>

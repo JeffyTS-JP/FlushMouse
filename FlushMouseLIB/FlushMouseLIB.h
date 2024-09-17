@@ -37,6 +37,7 @@ extern BOOL			bCheckExistingJPIME();
 
 extern VOID			vMessageBox(HWND hWnd, UINT uID, UINT uType);
 extern VOID			vAboutDialog(HWND hWnd);
+extern VOID			vIMEModeDialog(HWND hWnd);
 extern VOID			vSynTPHelperDialog(HWND hWnd);
 extern VOID			vSettingDialog(HWND hWnd);
 extern VOID			vSettingDialogApply();

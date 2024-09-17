@@ -176,7 +176,7 @@
 					<TextBlock Margin="0,3,0,0" Text="&#xE946;" FontFamily="Segoe MDL2 Assets" Padding="0" FontSize="20" />
 				</Grid>
 				<Grid Margin="0,0,0,0" Grid.Column="1">
-					<TextBlock Margin="20,0,0,0" TextWrapping="Wrap" Width="450" Text="Hostname を使用して、起動時から Sender としてスタートする場合、Hostname が見つからない時は、ストップの状態になります&#10;(メッセージは表示しませんのでご注意ください)&#10;また、プライベートアドレスであることが必要です"/>
+					<TextBlock Margin="20,0,0,0" TextWrapping="Wrap" Width="450" Text="Hostname を使用して、起動時から Sender としてスタートする場合、Hostname が見つからない時は、ストップの状態になります&#10;&#10;また、プライベートアドレスであることが必要です"/>
 				</Grid>
 			</Grid>
 			<Grid Margin="0,50,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Row="8">

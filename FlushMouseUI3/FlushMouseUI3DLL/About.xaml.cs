@@ -69,27 +69,24 @@ namespace FlushMouseUI3DLL {
 				string urlExperimentGroups = "JeffyTS-JP/FlushMouse/releases/latest";
 				Task<string> task = Task<string>.Run(() => GetReleaseVersionOnGitHub(urlExperimentGroups));
 				string result = await task;
-				if (result != null)
-				{
+				if (result != null) {
 					string tag = "\"tag_name\":\"";
 					int foundIndex1 = result.IndexOf(tag, StringComparison.OrdinalIgnoreCase);
 					int nextIndex = foundIndex1 + tag.Length;
 					if (nextIndex < result.Length) {
 						int foundIndex2 = result.IndexOf("\",", nextIndex);
-						string[] gitVersion = new string[(foundIndex2 - nextIndex + 1)];
-						int k = 0;
+						string gitVersion = "";
 						for (int i = nextIndex; i < foundIndex2; i++) {
-							gitVersion[k] = result[i].ToString();
-							k++;
+							gitVersion += result[i].ToString();
 						}
 						Assembly assembly = Assembly.GetExecutingAssembly();
 						AssemblyFileVersionAttribute asmFileVersion = (AssemblyFileVersionAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyFileVersionAttribute));
 						string currentVersion = asmFileVersion.Version;
-						if (Compare(gitVersion[0], currentVersion) >= 1) {
+						if (Compare(gitVersion, currentVersion) >= 1) {
 							try {
 								String lpCaption = "FlushMouse";
-								String lpText = "FlushMouse の新しいバージョンがあります";
-								MessageBox(g_hMainWnd, lpText, lpCaption, (MB_OK | MB_ICONINFORMATION | MB_APPLMODAL));
+								String lpText = "FlushMouse の新しいバージョンがあります\nVer. " + gitVersion;
+								MessageBox(g_hMainWnd, lpText, lpCaption, (MB_OK | MB_ICONINFORMATION| MB_TOPMOST));
 								return;
 							}
 							catch (Exception) {
@@ -99,7 +96,7 @@ namespace FlushMouseUI3DLL {
 							try {
 								String lpCaption = "FlushMouse";
 								String lpText = "FlushMouse の新しいバージョンは見つかりませんでした";
-								MessageBox(g_hMainWnd, lpText, lpCaption, (MB_OK | MB_ICONINFORMATION | MB_APPLMODAL));
+								MessageBox(g_hMainWnd, lpText, lpCaption, (MB_OK | MB_ICONINFORMATION| MB_TOPMOST));
 								return;
 							}
 							catch (Exception) {

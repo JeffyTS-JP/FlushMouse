@@ -224,11 +224,10 @@ BOOL		CTCPIP::bOpenPortForSendUDPv4(LPCTSTR lpszIPAddress, int Port)
 	PADDRINFOW	ppResult = NULL;
 	
 	if (lpszIPAddress == NULL)	return FALSE;
-	if (!bIsPrivateAddress(lpszIPAddress))	return FALSE;
 	if (lpszIPAddr == NULL)	lpszIPAddr = new TCHAR[MAX_FQDN];
 	if (lpszIPAddr) {
 		ZeroMemory(lpszIPAddr, (MAX_FQDN * sizeof(TCHAR)));
-		wcsncpy_s(lpszIPAddr, MAX_FQDN, lpszIPAddress, MAX_FQDN);
+		_tcsncpy_s(lpszIPAddr, MAX_FQDN, lpszIPAddress, _TRUNCATE);
 	}
 	else goto Cleanup;
 

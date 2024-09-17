@@ -60,6 +60,14 @@
 				<ComboBoxItem Name="Item2">マウスカーソル下のウィンドウの IME モードを表示する</ComboBoxItem>
 			</ComboBox>
 		</Grid>
+		<Grid Margin="0,12,0,0" Grid.Row="2">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="マウスカーソルの右下の IME モードを描画で表示する"/>
+			<ToggleSwitch Margin="0,-6,0,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="ts2" Toggled="HandleToggleSwitch" OffContent="オフ" OnContent="オン" IsOn="False" FlowDirection="RightToLeft"/>
+		</Grid>
 		<Grid Margin="0,6,0,0" Grid.Row="3">
 			<Grid x:Name="grid4_1">
 				<Grid.ColumnDefinitions>
@@ -70,72 +78,89 @@
 				<Slider Margin="0,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl1_1" ValueChanged="Slider_ValueChanged"
 									Minimum="8" Maximum="80" StepFrequency="1" SmallChange="1" Value="32" TickFrequency="8" TickPlacement="Outside" SnapsTo="StepValues"/>
 			</Grid>
+			<Grid x:Name="grid4_2">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="マウスカーソルからの距離"/>
+				<Slider Margin="0,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl1_2" ValueChanged="Slider_ValueChanged"
+									Minimum="0" Maximum="80" StepFrequency="1" SmallChange="1" Value="32" TickFrequency="8" TickPlacement="Outside" SnapsTo="StepValues"/>
+			</Grid>
 		</Grid>
 		<Grid Margin="0,12,0,0" Grid.Row="4">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
-			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="フォーカスを取得したウィンドウの IMEを強制的に OFFにする"/>
+			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="直接入力 (IME OFF) の時も IME モードの表示をする"/>
 			<ToggleSwitch Margin="0,-8,0,0" Grid.Column="1" HorizontalAlignment="Right"  x:Name="ts3" Toggled="HandleToggleSwitch" OffContent="オフ" OnContent="オン" IsOn="False" FlowDirection="RightToLeft"/>
 		</Grid>
-			<Grid Margin="0,12,0,0" Grid.Row="5">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*"/>
-					<ColumnDefinition Width="*"/>
-				</Grid.ColumnDefinitions>
-				<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="IME ON時のモードを「全角ひらがな」のみにする"/>
-			<ToggleSwitch Margin="0,-8,0,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="ts4" Toggled="HandleToggleSwitch" OffContent="オフ" OnContent="オン" IsOn="False" FlowDirection="RightToLeft"/>
+		<Grid Margin="0,12,0,0" Grid.Row="5">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="フォーカスを取得したウィンドウの IMEを強制的に OFFにする"/>
+			<ToggleSwitch Margin="0,-8,0,0" Grid.Column="1" HorizontalAlignment="Right"  x:Name="ts4" Toggled="HandleToggleSwitch" OffContent="オフ" OnContent="オン" IsOn="False" FlowDirection="RightToLeft"/>
 		</Grid>
 		<Grid Margin="0,12,0,0" Grid.Row="6">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
-			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="IME 関連キーをクリックしたときに IME モードを表示する"/>
-			<ToggleSwitch Margin="0,-8,0,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="ts5" Toggled="HandleToggleSwitch" OffContent="オフ" OnContent="オン" IsOn="True" FlowDirection="RightToLeft"/>
+			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="IME ON時のモードを「全角ひらがな」のみにする"/>
+			<ToggleSwitch Margin="0,-8,0,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="ts5" Toggled="HandleToggleSwitch" OffContent="オフ" OnContent="オン" IsOn="False" FlowDirection="RightToLeft"/>
 		</Grid>
 		<Grid Margin="0,12,0,0" Grid.Row="7">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
-			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="マウスの左ボタンをクリックしたときに IME モードを表示する"/>
-			<ToggleSwitch Margin="0,-8,0,0" Grid.Column="1" HorizontalAlignment="Right"  x:Name="ts6" Toggled="HandleToggleSwitch" OffContent="オフ" OnContent="オン" IsOn="True" FlowDirection="RightToLeft"/>
+			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="IME 関連キーをクリックしたときに IME モードを表示する"/>
+			<ToggleSwitch Margin="0,-8,0,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="ts6" Toggled="HandleToggleSwitch" OffContent="オフ" OnContent="オン" IsOn="True" FlowDirection="RightToLeft"/>
 		</Grid>
 		<Grid Margin="0,12,0,0" Grid.Row="8">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
-			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="Ctrlキーを離したときに IME モードを表示する"/>
-			<ToggleSwitch Margin="0,-8,0,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="ts7" Toggled="HandleToggleSwitch" OffContent="オフ" OnContent="オン" IsOn="True" FlowDirection="RightToLeft"/>
+			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="マウスの左ボタンをクリックしたときに IME モードを表示する"/>
+			<ToggleSwitch Margin="0,-8,0,0" Grid.Column="1" HorizontalAlignment="Right"  x:Name="ts7" Toggled="HandleToggleSwitch" OffContent="オフ" OnContent="オン" IsOn="True" FlowDirection="RightToLeft"/>
 		</Grid>
 		<Grid Margin="0,12,0,0" Grid.Row="9">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
-			<TextBlock Margin="0,-8,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="IME モードをできるだけキャレットの左に表示する&#10;　　(キャレット位置を判定できない場合はマウスカーソル左に表示します)"/>
-			<ToggleSwitch Margin="0,-6,0,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="ts8" Toggled="HandleToggleSwitch" OffContent="オフ" OnContent="オン" IsOn="False" FlowDirection="RightToLeft"/>
+			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="Ctrlキーを離したときに IME モードを表示する"/>
+			<ToggleSwitch Margin="0,-8,0,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="ts8" Toggled="HandleToggleSwitch" OffContent="オフ" OnContent="オン" IsOn="True" FlowDirection="RightToLeft"/>
 		</Grid>
 		<Grid Margin="0,12,0,0" Grid.Row="10">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
-			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="IME 関連キーのサポート機能を有効にする"/>
-			<ToggleSwitch Margin="0,-8,0,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="ts9" Toggled="HandleToggleSwitch" OffContent="オフ" OnContent="オン" IsOn="False" FlowDirection="RightToLeft"/>
+			<TextBlock Margin="0,-8,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="IME モードをできるだけキャレットの左に表示する&#10;　　(キャレット位置を判定できない場合はマウスカーソル左に表示します)"/>
+			<ToggleSwitch Margin="0,-6,0,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="ts9" Toggled="HandleToggleSwitch" OffContent="オフ" OnContent="オン" IsOn="False" FlowDirection="RightToLeft"/>
 		</Grid>
-		<Grid Margin="0,10,0,0" Grid.Row="11">
+		<Grid Margin="0,12,0,0" Grid.Row="11">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="IME 関連キーのサポート機能を有効にする"/>
+			<ToggleSwitch Margin="0,-8,0,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="ts10" Toggled="HandleToggleSwitch" OffContent="オフ" OnContent="オン" IsOn="False" FlowDirection="RightToLeft"/>
+		</Grid>
+		<Grid Margin="0,10,0,0" Grid.Row="12">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
 			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="ExplorerPatcher Simple Window Switcher Helperを有効にする"/>
-			<ToggleSwitch Margin="0,-6,0,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="ts10" Toggled="HandleToggleSwitch" OffContent="オフ" OnContent="オン" IsOn="False" FlowDirection="RightToLeft"/>
+			<ToggleSwitch Margin="0,-6,0,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="ts11" Toggled="HandleToggleSwitch" OffContent="オフ" OnContent="オン" IsOn="False" FlowDirection="RightToLeft"/>
 		</Grid>
-		<Grid Margin="0,10,0,0" Grid.Row="12">
+		<Grid Margin="0,10,0,0" Grid.Row="13">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
@@ -144,7 +169,7 @@
 			<Slider Margin="0,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl2" ValueChanged="Slider_ValueChanged"
 									Minimum="8" Maximum="80" StepFrequency="1" SmallChange="1" Value="24" TickFrequency="8" TickPlacement="Outside" SnapsTo="StepValues"/>
 		</Grid>
-		<Grid Margin="0,12,0,0" Grid.Row="13">
+		<Grid Margin="0,12,0,0" Grid.Row="14">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
@@ -153,7 +178,7 @@
 			<Slider Margin="0,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl3" ValueChanged="Slider_ValueChanged"
 									Minimum="1" Maximum="100" StepFrequency="1" SmallChange="1" Value="40" TickFrequency="10" TickPlacement="Outside" SnapsTo="StepValues"/>
 		</Grid>
-		<Grid Margin="0,12,0,0" Grid.Row="14">
+		<Grid Margin="0,12,0,0" Grid.Row="15">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
@@ -162,7 +187,7 @@
 			<Slider Margin="0,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl4" ValueChanged="Slider_ValueChanged"
 									Minimum="1" Maximum="100" StepFrequency="1" SmallChange="1" Value="30" TickFrequency="10" TickPlacement="Outside" SnapsTo="StepValues"/>
 		</Grid>
-		<Grid Margin="0,12,0,0" Grid.Row="15">
+		<Grid Margin="0,12,0,0" Grid.Row="16">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
@@ -170,62 +195,6 @@
 			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="Ctrlキーを離してからIME&#10;モードを表示するまでの時間"/>
 			<Slider Margin="0,8,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl5" ValueChanged="Slider_ValueChanged"
 									Minimum="1" Maximum="100" StepFrequency="1" SmallChange="1" Value="40" TickFrequency="10" TickPlacement="Outside" SnapsTo="StepValues"/>
-		</Grid>
-		<Grid Margin="0,20,0,0" Grid.Row="16">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="*"/>
-				<ColumnDefinition Width="*"/>
-				<ColumnDefinition Width="*"/>
-				<ColumnDefinition Width="*"/>
-				<ColumnDefinition Width="*"/>
-			</Grid.ColumnDefinitions>
-			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="IME モードの表示色"/>
-			<TextBlock Margin="120,0,0,0" Grid.Column="1" HorizontalAlignment="Left" Text="マウスカーソルの左"/>
-			<Button Margin="8,-4,0,0" Grid.Column="2" HorizontalAlignment="Left"  x:Name="Button4" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="あ" Click="ColorButton_Click">
-				<FlyoutBase.AttachedFlyout>
-					<Flyout x:Name="Flyout1">
-						<Grid>
-							<Grid.RowDefinitions>
-								<RowDefinition Height="*"/>
-								<RowDefinition Height="*"/>
-							</Grid.RowDefinitions>
-							<ColorPicker x:Name="ColorPicker1" Grid.Row="0" Color="White" ColorSpectrumShape="Ring" IsMoreButtonVisible="False" IsColorSliderVisible="True"
-										IsColorChannelTextInputVisible="False" IsHexInputVisible="False" IsAlphaEnabled="True" IsAlphaSliderVisible="True" IsAlphaTextInputVisible="False" />
-							<Grid Grid.Row="1">
-								<Grid.ColumnDefinitions>
-									<ColumnDefinition Width="*"/>
-									<ColumnDefinition Width="*"/>
-								</Grid.ColumnDefinitions>
-								<Button  Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Width="75" x:Name="CP_Button1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
-								<Button  Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Width="75" x:Name="CP_Button2" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="キャンセル" />
-							</Grid>
-						</Grid>
-					</Flyout>
-				</FlyoutBase.AttachedFlyout>
-			</Button>
-			<TextBlock Margin="40,0,0,0" Grid.Column="3" HorizontalAlignment="Left" Text="キャレットの左"/>
-			<Button Margin="8,-4,0,0" Grid.Column="4" HorizontalAlignment="Left" x:Name="Button5" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="あ" Click="ColorButton_Click">
-				<FlyoutBase.AttachedFlyout>
-					<Flyout x:Name="Flyout2">
-						<Grid>
-							<Grid.RowDefinitions>
-								<RowDefinition Height="*"/>
-								<RowDefinition Height="*"/>
-							</Grid.RowDefinitions>
-							<ColorPicker x:Name="ColorPicker2" Grid.Row="0" Color="White" ColorSpectrumShape="Ring" IsMoreButtonVisible="False" IsColorSliderVisible="True"
-										IsColorChannelTextInputVisible="False" IsHexInputVisible="False" IsAlphaEnabled="True" IsAlphaSliderVisible="True" IsAlphaTextInputVisible="False" />
-							<Grid Grid.Row="1">
-								<Grid.ColumnDefinitions>
-									<ColumnDefinition Width="*"/>
-									<ColumnDefinition Width="*"/>
-								</Grid.ColumnDefinitions>
-								<Button  Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Width="75" x:Name="CP_Button3" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
-								<Button  Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Width="75" x:Name="CP_Button4" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="キャンセル" />
-							</Grid>
-						</Grid>
-					</Flyout>
-				</FlyoutBase.AttachedFlyout>
-			</Button>
 		</Grid>
 		<Grid Margin="0,10,0,0" Grid.Row="17">
 		</Grid>

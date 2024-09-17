@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+// IMEMode.Xaml for FlushMouseUI3DLL
+//		Copyright (C) 2024 JeffyTS
+//
+//	  
+// No.		Date			Name			Reason & Document
+// #0000	2024/07/15		JeffyTS  		New edit.
+//
+-->
+
+<Page
+	x:Class="FlushMouseUI3DLL.IMEMode"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="clr-namespace:FlushMouseUI3DLL"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d"
+	NavigationCacheMode="Required"
+	>
+
+	<Grid Loaded="IMEMode_Loaded" Margin="100,20,20,20" x:Name="IMEMode_Panel" HorizontalAlignment="Left" VerticalAlignment="Top">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+		<Grid Margin="0,0,0,0" Grid.Row="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Text="" Width="180"/>
+			<TextBlock Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Text="マウスカーソルの左" Width="140"/>
+			<TextBlock Margin="0,0,0,0" Grid.Column="2" HorizontalAlignment="Center" Text="　　キャレットの左" Width="140"/>
+			<TextBlock Margin="0,0,0,0" Grid.Column="3" HorizontalAlignment="Center" Text="マウスカーソルの右下" Width="140"/>
+		</Grid>
+		<Grid Margin="0,0,0,0" Grid.Row="1">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<TextBlock Margin="0,24,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="直接入力 (IME OFF)" Width="180"/>
+			<Button Margin="0,20,0,0" Grid.Column="1" HorizontalAlignment="Center"  x:Name="Button1_1" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="A" Click="ColorButton_Click">
+				<FlyoutBase.AttachedFlyout>
+					<Flyout x:Name="Flyout1_1">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+							<ColorPicker x:Name="ColorPicker1_1" Grid.Row="0" Color="White" ColorSpectrumShape="Ring" IsMoreButtonVisible="False" IsColorSliderVisible="True"
+										IsColorChannelTextInputVisible="False" IsHexInputVisible="False" IsAlphaEnabled="True" IsAlphaSliderVisible="True" IsAlphaTextInputVisible="False" />
+							<Grid Grid.Row="1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Button  Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Width="75" x:Name="CP_Button1_1_1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
+								<Button  Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Width="75" x:Name="CP_Button1_1_2" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="キャンセル" />
+							</Grid>
+						</Grid>
+					</Flyout>
+				</FlyoutBase.AttachedFlyout>
+			</Button>
+			<Button Margin="0,20,0,0" Grid.Column="2" HorizontalAlignment="Center"  x:Name="Button1_2" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="A" Click="ColorButton_Click">
+				<FlyoutBase.AttachedFlyout>
+					<Flyout x:Name="Flyout1_2">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+							<ColorPicker x:Name="ColorPicker1_2" Grid.Row="0" Color="White" ColorSpectrumShape="Ring" IsMoreButtonVisible="False" IsColorSliderVisible="True"
+										IsColorChannelTextInputVisible="False" IsHexInputVisible="False" IsAlphaEnabled="True" IsAlphaSliderVisible="True" IsAlphaTextInputVisible="False" />
+							<Grid Grid.Row="1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Button  Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Width="75" x:Name="CP_Button1_2_1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
+								<Button  Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Width="75" x:Name="CP_Button1_2_2" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="キャンセル" />
+							</Grid>
+						</Grid>
+					</Flyout>
+				</FlyoutBase.AttachedFlyout>
+			</Button>
+			<Button Margin="0,20,0,0" Grid.Column="3" HorizontalAlignment="Center"  x:Name="Button1_3" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="A" Click="ColorButton_Click">
+				<FlyoutBase.AttachedFlyout>
+					<Flyout x:Name="Flyout1_3">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+							<ColorPicker x:Name="ColorPicker1_3" Grid.Row="0" Color="White" ColorSpectrumShape="Ring" IsMoreButtonVisible="False" IsColorSliderVisible="True"
+										IsColorChannelTextInputVisible="False" IsHexInputVisible="False" IsAlphaEnabled="True" IsAlphaSliderVisible="True" IsAlphaTextInputVisible="False" />
+							<Grid Grid.Row="1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Button  Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Width="75" x:Name="CP_Button1_3_1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
+								<Button  Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Width="75" x:Name="CP_Button1_3_2" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="キャンセル" />
+							</Grid>
+						</Grid>
+					</Flyout>
+				</FlyoutBase.AttachedFlyout>
+			</Button>
+		</Grid>
+		<Grid Margin="0,0,0,0" Grid.Row="2">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<TextBlock Margin="0,24,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="全角 ひらがな" Width="180"/>
+			<Button Margin="0,20,0,0" Grid.Column="1" HorizontalAlignment="Center"  x:Name="Button2_1" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="あ" Click="ColorButton_Click">
+				<FlyoutBase.AttachedFlyout>
+					<Flyout x:Name="Flyout2_1">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+							<ColorPicker x:Name="ColorPicker2_1" Grid.Row="0" Color="White" ColorSpectrumShape="Ring" IsMoreButtonVisible="False" IsColorSliderVisible="True"
+										IsColorChannelTextInputVisible="False" IsHexInputVisible="False" IsAlphaEnabled="True" IsAlphaSliderVisible="True" IsAlphaTextInputVisible="False" />
+							<Grid Grid.Row="1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Button  Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Width="75" x:Name="CP_Button2_1_1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
+								<Button  Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Width="75" x:Name="CP_Button2_1_2" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="キャンセル" />
+							</Grid>
+						</Grid>
+					</Flyout>
+				</FlyoutBase.AttachedFlyout>
+			</Button>
+			<Button Margin="0,20,0,0" Grid.Column="2" HorizontalAlignment="Center"  x:Name="Button2_2" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="あ" Click="ColorButton_Click">
+				<FlyoutBase.AttachedFlyout>
+					<Flyout x:Name="Flyout2_2">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+							<ColorPicker x:Name="ColorPicker2_2" Grid.Row="0" Color="White" ColorSpectrumShape="Ring" IsMoreButtonVisible="False" IsColorSliderVisible="True"
+										IsColorChannelTextInputVisible="False" IsHexInputVisible="False" IsAlphaEnabled="True" IsAlphaSliderVisible="True" IsAlphaTextInputVisible="False" />
+							<Grid Grid.Row="1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Button  Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Width="75" x:Name="CP_Button2_2_1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
+								<Button  Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Width="75" x:Name="CP_Button2_2_2" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="キャンセル" />
+							</Grid>
+						</Grid>
+					</Flyout>
+				</FlyoutBase.AttachedFlyout>
+			</Button>
+			<Button Margin="0,20,0,0" Grid.Column="3" HorizontalAlignment="Center"  x:Name="Button2_3" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="あ" Click="ColorButton_Click">
+				<FlyoutBase.AttachedFlyout>
+					<Flyout x:Name="Flyout2_3">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+							<ColorPicker x:Name="ColorPicker2_3" Grid.Row="0" Color="White" ColorSpectrumShape="Ring" IsMoreButtonVisible="False" IsColorSliderVisible="True"
+										IsColorChannelTextInputVisible="False" IsHexInputVisible="False" IsAlphaEnabled="True" IsAlphaSliderVisible="True" IsAlphaTextInputVisible="False" />
+							<Grid Grid.Row="1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Button  Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Width="75" x:Name="CP_Button2_3_1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
+								<Button  Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Width="75" x:Name="CP_Button2_3_2" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="キャンセル" />
+							</Grid>
+						</Grid>
+					</Flyout>
+				</FlyoutBase.AttachedFlyout>
+			</Button>
+		</Grid>
+		<Grid Margin="0,0,0,0" Grid.Row="3">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<TextBlock Margin="0,24,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="全角 カタカナ" Width="180"/>
+			<Button Margin="0,20,0,0" Grid.Column="1" HorizontalAlignment="Center"  x:Name="Button3_1" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="ア" Click="ColorButton_Click">
+				<FlyoutBase.AttachedFlyout>
+					<Flyout x:Name="Flyout3_1">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+							<ColorPicker x:Name="ColorPicker3_1" Grid.Row="0" Color="White" ColorSpectrumShape="Ring" IsMoreButtonVisible="False" IsColorSliderVisible="True"
+										IsColorChannelTextInputVisible="False" IsHexInputVisible="False" IsAlphaEnabled="True" IsAlphaSliderVisible="True" IsAlphaTextInputVisible="False" />
+							<Grid Grid.Row="1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Button  Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Width="75" x:Name="CP_Button3_1_1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
+								<Button  Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Width="75" x:Name="CP_Button3_1_2" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="キャンセル" />
+							</Grid>
+						</Grid>
+					</Flyout>
+				</FlyoutBase.AttachedFlyout>
+			</Button>
+			<Button Margin="0,20,0,0" Grid.Column="2" HorizontalAlignment="Center"  x:Name="Button3_2" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="ア" Click="ColorButton_Click">
+				<FlyoutBase.AttachedFlyout>
+					<Flyout x:Name="Flyout3_2">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+							<ColorPicker x:Name="ColorPicker3_2" Grid.Row="0" Color="White" ColorSpectrumShape="Ring" IsMoreButtonVisible="False" IsColorSliderVisible="True"
+										IsColorChannelTextInputVisible="False" IsHexInputVisible="False" IsAlphaEnabled="True" IsAlphaSliderVisible="True" IsAlphaTextInputVisible="False" />
+							<Grid Grid.Row="1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Button  Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Width="75" x:Name="CP_Button3_2_1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
+								<Button  Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Width="75" x:Name="CP_Button3_2_2" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="キャンセル" />
+							</Grid>
+						</Grid>
+					</Flyout>
+				</FlyoutBase.AttachedFlyout>
+			</Button>
+			<Button Margin="0,20,0,0" Grid.Column="3" HorizontalAlignment="Center"  x:Name="Button3_3" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="ア" Click="ColorButton_Click">
+				<FlyoutBase.AttachedFlyout>
+					<Flyout x:Name="Flyout3_3">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+							<ColorPicker x:Name="ColorPicker3_3" Grid.Row="0" Color="White" ColorSpectrumShape="Ring" IsMoreButtonVisible="False" IsColorSliderVisible="True"
+										IsColorChannelTextInputVisible="False" IsHexInputVisible="False" IsAlphaEnabled="True" IsAlphaSliderVisible="True" IsAlphaTextInputVisible="False" />
+							<Grid Grid.Row="1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Button  Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Width="75" x:Name="CP_Button3_3_1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
+								<Button  Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Width="75" x:Name="CP_Button3_3_2" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="キャンセル" />
+							</Grid>
+						</Grid>
+					</Flyout>
+				</FlyoutBase.AttachedFlyout>
+			</Button>
+		</Grid>
+		<Grid Margin="0,0,0,0" Grid.Row="4">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<TextBlock Margin="0,24,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="全角 英数" Width="180"/>
+			<Button Margin="0,20,0,0" Grid.Column="1" HorizontalAlignment="Center"  x:Name="Button4_1" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="Ａ" Click="ColorButton_Click">
+				<FlyoutBase.AttachedFlyout>
+					<Flyout x:Name="Flyout4_1">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+							<ColorPicker x:Name="ColorPicker4_1" Grid.Row="0" Color="White" ColorSpectrumShape="Ring" IsMoreButtonVisible="False" IsColorSliderVisible="True"
+										IsColorChannelTextInputVisible="False" IsHexInputVisible="False" IsAlphaEnabled="True" IsAlphaSliderVisible="True" IsAlphaTextInputVisible="False" />
+							<Grid Grid.Row="1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Button  Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Width="75" x:Name="CP_Button4_1_1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
+								<Button  Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Width="75" x:Name="CP_Button4_1_2" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="キャンセル" />
+							</Grid>
+						</Grid>
+					</Flyout>
+				</FlyoutBase.AttachedFlyout>
+			</Button>
+			<Button Margin="0,20,0,0" Grid.Column="2" HorizontalAlignment="Center"  x:Name="Button4_2" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="Ａ" Click="ColorButton_Click">
+				<FlyoutBase.AttachedFlyout>
+					<Flyout x:Name="Flyout4_2">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+							<ColorPicker x:Name="ColorPicker4_2" Grid.Row="0" Color="White" ColorSpectrumShape="Ring" IsMoreButtonVisible="False" IsColorSliderVisible="True"
+										IsColorChannelTextInputVisible="False" IsHexInputVisible="False" IsAlphaEnabled="True" IsAlphaSliderVisible="True" IsAlphaTextInputVisible="False" />
+							<Grid Grid.Row="1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Button  Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Width="75" x:Name="CP_Button4_2_1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
+								<Button  Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Width="75" x:Name="CP_Button4_2_2" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="キャンセル" />
+							</Grid>
+						</Grid>
+					</Flyout>
+				</FlyoutBase.AttachedFlyout>
+			</Button>
+			<Button Margin="0,20,0,0" Grid.Column="3" HorizontalAlignment="Center"  x:Name="Button4_3" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="Ａ" Click="ColorButton_Click">
+				<FlyoutBase.AttachedFlyout>
+					<Flyout x:Name="Flyout4_3">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+							<ColorPicker x:Name="ColorPicker4_3" Grid.Row="0" Color="White" ColorSpectrumShape="Ring" IsMoreButtonVisible="False" IsColorSliderVisible="True"
+										IsColorChannelTextInputVisible="False" IsHexInputVisible="False" IsAlphaEnabled="True" IsAlphaSliderVisible="True" IsAlphaTextInputVisible="False" />
+							<Grid Grid.Row="1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Button  Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Width="75" x:Name="CP_Button4_3_1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
+								<Button  Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Width="75" x:Name="CP_Button4_3_2" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="キャンセル" />
+							</Grid>
+						</Grid>
+					</Flyout>
+				</FlyoutBase.AttachedFlyout>
+			</Button>
+		</Grid>
+		<Grid Margin="0,0,0,0" Grid.Row="5">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<TextBlock Margin="0,24,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="半角 カタカナ" Width="180"/>
+			<Button Margin="0,20,0,0" Grid.Column="1" HorizontalAlignment="Center"  x:Name="Button5_1" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="_ｱ" Click="ColorButton_Click">
+				<FlyoutBase.AttachedFlyout>
+					<Flyout x:Name="Flyout5_1">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+							<ColorPicker x:Name="ColorPicker5_1" Grid.Row="0" Color="White" ColorSpectrumShape="Ring" IsMoreButtonVisible="False" IsColorSliderVisible="True"
+										IsColorChannelTextInputVisible="False" IsHexInputVisible="False" IsAlphaEnabled="True" IsAlphaSliderVisible="True" IsAlphaTextInputVisible="False" />
+							<Grid Grid.Row="1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Button  Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Width="75" x:Name="CP_Button5_1_1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
+								<Button  Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Width="75" x:Name="CP_Button5_1_2" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="キャンセル" />
+							</Grid>
+						</Grid>
+					</Flyout>
+				</FlyoutBase.AttachedFlyout>
+			</Button>
+			<Button Margin="0,20,0,0" Grid.Column="2" HorizontalAlignment="Center"  x:Name="Button5_2" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="_ｱ" Click="ColorButton_Click">
+				<FlyoutBase.AttachedFlyout>
+					<Flyout x:Name="Flyout5_2">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+							<ColorPicker x:Name="ColorPicker5_2" Grid.Row="0" Color="White" ColorSpectrumShape="Ring" IsMoreButtonVisible="False" IsColorSliderVisible="True"
+										IsColorChannelTextInputVisible="False" IsHexInputVisible="False" IsAlphaEnabled="True" IsAlphaSliderVisible="True" IsAlphaTextInputVisible="False" />
+							<Grid Grid.Row="1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Button  Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Width="75" x:Name="CP_Button5_2_1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
+								<Button  Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Width="75" x:Name="CP_Button5_2_2" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="キャンセル" />
+							</Grid>
+						</Grid>
+					</Flyout>
+				</FlyoutBase.AttachedFlyout>
+			</Button>
+			<Button Margin="0,20,0,0" Grid.Column="3" HorizontalAlignment="Center"  x:Name="Button5_3" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="_ｱ" Click="ColorButton_Click">
+				<FlyoutBase.AttachedFlyout>
+					<Flyout x:Name="Flyout5_3">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+							<ColorPicker x:Name="ColorPicker5_3" Grid.Row="0" Color="White" ColorSpectrumShape="Ring" IsMoreButtonVisible="False" IsColorSliderVisible="True"
+										IsColorChannelTextInputVisible="False" IsHexInputVisible="False" IsAlphaEnabled="True" IsAlphaSliderVisible="True" IsAlphaTextInputVisible="False" />
+							<Grid Grid.Row="1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Button  Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Width="75" x:Name="CP_Button5_3_1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
+								<Button  Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Width="75" x:Name="CP_Button5_3_2" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="キャンセル" />
+							</Grid>
+						</Grid>
+					</Flyout>
+				</FlyoutBase.AttachedFlyout>
+			</Button>
+		</Grid>
+		<Grid Margin="0,0,0,0" Grid.Row="6">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<TextBlock Margin="0,24,0,0" Grid.Column="0" HorizontalAlignment="Left" Text="半角 英数" Width="180"/>
+			<Button Margin="0,20,0,0" Grid.Column="1" HorizontalAlignment="Center"  x:Name="Button6_1" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="_A" Click="ColorButton_Click">
+				<FlyoutBase.AttachedFlyout>
+					<Flyout x:Name="Flyout6_1">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+							<ColorPicker x:Name="ColorPicker6_1" Grid.Row="0" Color="White" ColorSpectrumShape="Ring" IsMoreButtonVisible="False" IsColorSliderVisible="True"
+										IsColorChannelTextInputVisible="False" IsHexInputVisible="False" IsAlphaEnabled="True" IsAlphaSliderVisible="True" IsAlphaTextInputVisible="False" />
+							<Grid Grid.Row="1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Button  Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Width="75" x:Name="CP_Button6_1_1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
+								<Button  Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Width="75" x:Name="CP_Button6_1_2" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="キャンセル" />
+							</Grid>
+						</Grid>
+					</Flyout>
+				</FlyoutBase.AttachedFlyout>
+			</Button>
+			<Button Margin="0,20,0,0" Grid.Column="2" HorizontalAlignment="Center"  x:Name="Button6_2" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="_A" Click="ColorButton_Click">
+				<FlyoutBase.AttachedFlyout>
+					<Flyout x:Name="Flyout6_2">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+							<ColorPicker x:Name="ColorPicker6_2" Grid.Row="0" Color="White" ColorSpectrumShape="Ring" IsMoreButtonVisible="False" IsColorSliderVisible="True"
+										IsColorChannelTextInputVisible="False" IsHexInputVisible="False" IsAlphaEnabled="True" IsAlphaSliderVisible="True" IsAlphaTextInputVisible="False" />
+							<Grid Grid.Row="1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Button  Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Width="75" x:Name="CP_Button6_2_1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
+								<Button  Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Width="75" x:Name="CP_Button6_2_2" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="キャンセル" />
+							</Grid>
+						</Grid>
+					</Flyout>
+				</FlyoutBase.AttachedFlyout>
+			</Button>
+			<Button Margin="0,20,0,0" Grid.Column="3" HorizontalAlignment="Center"  x:Name="Button6_3" FontFamily="Yu Gothic UI" FontWeight="Bold" Background="White" Content="_A" Click="ColorButton_Click">
+				<FlyoutBase.AttachedFlyout>
+					<Flyout x:Name="Flyout6_3">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+							<ColorPicker x:Name="ColorPicker6_3" Grid.Row="0" Color="White" ColorSpectrumShape="Ring" IsMoreButtonVisible="False" IsColorSliderVisible="True"
+										IsColorChannelTextInputVisible="False" IsHexInputVisible="False" IsAlphaEnabled="True" IsAlphaSliderVisible="True" IsAlphaTextInputVisible="False" />
+							<Grid Grid.Row="1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Button  Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Center" Width="75" x:Name="CP_Button6_3_1" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="OK" />
+								<Button  Margin="0,0,0,0" Grid.Column="1" HorizontalAlignment="Center" Width="75" x:Name="CP_Button6_3_2" Click="Button_Click" FontSize="10" Style="{StaticResource AccentButtonStyle}" Content="キャンセル" />
+							</Grid>
+						</Grid>
+					</Flyout>
+				</FlyoutBase.AttachedFlyout>
+			</Button>
+		</Grid>
+		<Grid Margin="50,0,0,0" Grid.Row="7">
+		</Grid>
+	</Grid>
+</Page>
+
+
+<!--/* = EOF = */-->

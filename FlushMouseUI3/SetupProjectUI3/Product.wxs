@@ -538,6 +538,9 @@
 			<Component Id="WinUI3_xbf_06" Guid="{D05E805A-CEE5-42E5-8BE7-F88B25D29C4E}">
 				<File Id="WinUI3__xbf_06" Name="SynTP_Helper.xbf" Source="$(var.TargetDir01)SynTP_Helper.xbf" />
 			</Component>
+			<Component Id="WinUI3_xbf_07" Guid="{B642B2E6-DE1C-489E-99FE-4E11609B0FA3}">
+				<File Id="WinUI3__xbf_07" Name="IMEMode.xbf" Source="$(var.TargetDir01)IMEMode.xbf" />
+			</Component>
 
 			<!-- WinUI3 DLLs and some Files-->
 			<Component Id="WinUI3_DLLs_01" Guid="{C132F5C7-A802-46F3-B302-8E6E16CBE41B}">

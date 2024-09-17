@@ -28,6 +28,7 @@ typedef struct tagAppRegData
 {
 	// for Cursor
 	int			iCursorSize = 32;
+	int			iIMEModeDistance = 32;
 	int			iModeSize = 24;
 	DWORD		dwInThreadSleepTime = 0;
 	DWORD		dwWaitWaveTime = 400;
@@ -35,12 +36,28 @@ typedef struct tagAppRegData
 	DWORD		dwDisplayModeTime = 400;
 	BOOL		bDisplayIMEModeOnCursor = FALSE;
 	BOOL		bDisplayIMEModeByWindow = FALSE;
+	BOOL		bDisplayIMEModeIMEOFF = FALSE;
 	BOOL		bForceHiragana = FALSE;
 	BOOL		bDenyChangedByApp = FALSE;
 	BOOL		bUseBigArrow = FALSE;
-	COLORREF	dwNearDrawMouseColor = aRGB(48, 255, 0, 0);;
-	COLORREF	dwNearDrawCaretColor= aRGB(48, 0, 0, 255);
-	COLORREF	dwNearMouseColor = aRGB(48, 0, 255, 0);
+	COLORREF	dwNearDrawMouseIMEOFFColor = aRGB(48, 255, 0, 0);
+	COLORREF	dwNearDrawMouseHANEISU_IMEONColor = aRGB(48, 255, 0, 0);
+	COLORREF	dwNearDrawMouseHANKANA_IMEONColor = aRGB(48, 255, 0, 0);
+	COLORREF	dwNearDrawMouseZENEISU_IMEONColor = aRGB(48, 255, 0, 0);
+	COLORREF	dwNearDrawMouseZENHIRA_IMEONColor = aRGB(48, 255, 0, 0);
+	COLORREF	dwNearDrawMouseZENKANA_IMEONColor = aRGB(48, 255, 0, 0);
+	COLORREF	dwNearDrawCaretIMEOFFColor = aRGB(48, 0, 0, 255);
+	COLORREF	dwNearDrawCaretHANEISU_IMEONColor = aRGB(48, 0, 0, 255);
+	COLORREF	dwNearDrawCaretHANKANA_IMEONColor = aRGB(48, 0, 0, 255);
+	COLORREF	dwNearDrawCaretZENEISU_IMEONColor = aRGB(48, 0, 0, 255);
+	COLORREF	dwNearDrawCaretZENHIRA_IMEONColor = aRGB(48, 0, 0, 255);
+	COLORREF	dwNearDrawCaretZENKANA_IMEONColor = aRGB(48, 0, 0, 255);
+	COLORREF	dwNearDrawMouseByWndIMEOFFColor = aRGB(48, 255, 0, 0);
+	COLORREF	dwNearDrawMouseByWndHANEISU_IMEONColor = aRGB(48, 255, 0, 0);
+	COLORREF	dwNearDrawMouseByWndHANKANA_IMEONColor = aRGB(48, 255, 0, 0);
+	COLORREF	dwNearDrawMouseByWndZENEISU_IMEONColor = aRGB(48, 255, 0, 0);
+	COLORREF	dwNearDrawMouseByWndZENHIRA_IMEONColor = aRGB(48, 255, 0, 0);
+	COLORREF	dwNearDrawMouseByWndZENKANA_IMEONColor = aRGB(48, 255, 0, 0);
 
 	// for FlushMouse & Cursor
 	BOOL		bDisplayFocusWindowIME = FALSE;
@@ -95,6 +112,14 @@ public:
 				~CProfile();
 	BOOL		bGetProfileData() const;
 	BOOL		bSetProfileData() const;
+
+	BOOL		bFixChangedProfileData() const;
+	BOOL		bGetProfileData4FlushMouse() const;
+	BOOL		bSetProfileData4FlushMouse() const;
+	BOOL		bGetProfileData4SynTPHelper() const;
+	BOOL		bSetProfileData4SynTPHelper() const;
+	BOOL		bGetProfileData4Settings() const;
+	BOOL		bSetProfileData4Settings() const;
 
 public:
 	LPAPPREGDATA	lpstAppRegData;

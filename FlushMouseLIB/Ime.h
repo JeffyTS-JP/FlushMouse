@@ -15,7 +15,6 @@
 //
 // Define
 //
-#define	IMEMODECHAR		3
 
 // IME mode
 #define IMECLOSE		0x0000

@@ -51,6 +51,7 @@
 					</NavigationView.PaneHeader>
 					<NavigationView.MenuItems>
 						<NavigationViewItem x:Name="Menu1" Tag="Menu1" Icon="Globe" Content="基本動作設定" />
+						<NavigationViewItem x:Name="Menu2" Tag="Menu2" Icon="FontSize" Content="IME モード表示設定" />
 						<NavigationViewItem x:Name="Menu3" Tag="Menu3" Icon="Rotate" Content="SynTP Helper" />
 						<NavigationViewItem x:Name="Menu4" Tag="Menu4" Icon="Help" Content="バージョン" />
 					</NavigationView.MenuItems>

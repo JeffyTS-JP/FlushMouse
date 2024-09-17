@@ -13,6 +13,7 @@
 #define IDR_TT_ABOUT                    143
 #define IDR_TT_SETTING                  144
 #define IDR_TT_SYNTPHELPER              145
+#define IDR_TT_IMEMODE                  146
 #define IDM_ABOUT                       151
 #define IDM_EXIT                        152
 #define IDD_SYNTPHELPERBOX              163

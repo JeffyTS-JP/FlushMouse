@@ -91,7 +91,7 @@ namespace FlushMouseUI3DLL
 		internal static partial Int64 MessageBoxW(Int64 hWnd, string MessageBox, string lpCaption, UInt32 uType);
 		public const UInt32 MB_OK = 0x00000000;
 		public const UInt32 MB_ICONINFORMATION = 0x00000040;
-		public const UInt32 MB_APPLMODAL = 0x00000000;
+		public const UInt32 MB_TOPMOST = 0x00040000;
 
 		internal const String CLASS_FLUSHMOUSE = "FlushMouse-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}";
 		internal const String CLASS_FLUSHMOUSESETTINGS = "FlushMouseSettings-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}";
@@ -103,6 +103,7 @@ namespace FlushMouseUI3DLL
 		public const Int64 SETTINGSEX_RELOAD_REGISTRY = 3;
 		public const Int64 SETTINGSEX_RELOAD_CURSOR = 4;
 		public const Int64 SETTINGSEX_CHANGE_PANE = 5;
+		public const Int64 SETTINGSEX_SETTINGS_STARTED = 6;
 		public const Int64 SETTINGSEX_SYNTP_START = 10;
 		public const Int64 SETTINGSEX_SYNTP_IS_STARTED = 11;
 		public const Int64 SETTINGSEX_SYNTP_STOP = 12;
@@ -123,10 +124,15 @@ namespace FlushMouseUI3DLL
 		internal const double Window_CompactPaneLength = 48;
 		internal const double Window_OpenPaneLength = 220;
 
-		private static Int32 m_SelectedPane {  get; set; }
-		private static General m_General {  get; set; }
-		private static SynTP_Helper m_SynTP_Helper {  get; set; }
-		private static About m_About {  get; set; }
+		private static Int32 m_SelectedPane { get; set; }
+		internal const Int32 SETTINGSEX_SELECTEDPANE_GENERAL = 1;
+		internal const Int32 SETTINGSEX_SELECTEDPANE_IMEMODE = 2;
+		internal const Int32 SETTINGSEX_SELECTEDPANE_SYNTPHELPER = 3;
+		internal const Int32 SETTINGSEX_SELECTEDPANE_ABOUT = 4;
+		private static General m_General { get; set; }
+		private static IMEMode m_IMEMode { get; set; }
+		private static SynTP_Helper m_SynTP_Helper { get; set; }
+		private static About m_About { get; set; }
 
 		public static bool bIsPaneOpen { get; set; }
 		public static Int32 dwSettingsX { get; set; }
@@ -137,6 +143,7 @@ namespace FlushMouseUI3DLL
 		public static bool bDisplayFocusWindowIME { get; set; }
 		public static bool bDisplayIMEModeOnCursor { get; set; }
 		public static bool bDisplayIMEModeByWindow { get; set; }
+		public static bool bDisplayIMEModeIMEOFF { get; set; }
 		public static bool bOffChangedFocus { get; set; }
 		public static bool bForceHiragana { get; set; }
 		public static bool bDoModeDispByIMEKeyDown { get; set; }
@@ -145,14 +152,31 @@ namespace FlushMouseUI3DLL
 		public static bool bDrawNearCaret { get; set; }
 		public static bool bIMEModeForced { get; set; }
 		public static bool bEnableEPHelper { get; set; }
+
 		public static Int32 iCursorSize { get; set; }
+		public static Int32 iIMEModeDistance { get; set; }
 		public static Int32 iModeSize { get; set; }
 		public static Int32 dwDisplayModeTime { get; set; }
 		public static Int32 dwAdditionalWaitTime { get; set; }
 		public static Int32 dwWaitWaveTime { get; set; }
-		public static Int32 dwNearDrawMouseColor { get; set; }
-		public static Int32 dwNearDrawCaretColor { get; set; }
-		public static Int32 dwNearMouseColor { get; set; }
+		public static Int32 dwNearDrawMouseIMEOFFColor { get; set; }
+		public static Int32 dwNearDrawMouseHANEISU_IMEONColor { get; set; }
+		public static Int32 dwNearDrawMouseHANKANA_IMEONColor { get; set; }
+		public static Int32 dwNearDrawMouseZENEISU_IMEONColor { get; set; }
+		public static Int32 dwNearDrawMouseZENHIRA_IMEONColor { get; set; }
+		public static Int32 dwNearDrawMouseZENKANA_IMEONColor { get; set; }
+		public static Int32 dwNearDrawCaretIMEOFFColor { get; set; }
+		public static Int32 dwNearDrawCaretHANEISU_IMEONColor { get; set; }
+		public static Int32 dwNearDrawCaretHANKANA_IMEONColor { get; set; }
+		public static Int32 dwNearDrawCaretZENEISU_IMEONColor { get; set; }
+		public static Int32 dwNearDrawCaretZENHIRA_IMEONColor { get; set; }
+		public static Int32 dwNearDrawCaretZENKANA_IMEONColor { get; set; }
+		public static Int32 dwNearDrawMouseByWndIMEOFFColor { get; set; }
+		public static Int32 dwNearDrawMouseByWndHANEISU_IMEONColor { get; set; }
+		public static Int32 dwNearDrawMouseByWndHANKANA_IMEONColor { get; set; }
+		public static Int32 dwNearDrawMouseByWndZENEISU_IMEONColor { get; set; }
+		public static Int32 dwNearDrawMouseByWndZENHIRA_IMEONColor { get; set; }
+		public static Int32 dwNearDrawMouseByWndZENKANA_IMEONColor { get; set; }
 
 		public static Int32 dwSynTPHelper1 { get; set; }
 		public static Int32 dwSynTPPadX { get; set; }
@@ -200,13 +224,16 @@ namespace FlushMouseUI3DLL
 		{
 			m_SelectedPane = SelectedPane;
 			switch (m_SelectedPane) {
-				case 1:
+				case SETTINGSEX_SELECTEDPANE_GENERAL:
 					if (!Menu1.IsSelected) Menu1.IsSelected = true;
 					break;
-				case 3:
+				case SETTINGSEX_SELECTEDPANE_IMEMODE:
+					if (!Menu2.IsSelected) Menu2.IsSelected = true;
+					break;
+				case SETTINGSEX_SELECTEDPANE_SYNTPHELPER:
 					if (!Menu3.IsSelected) Menu3.IsSelected = true;
 					break;
-				case 4:
+				case SETTINGSEX_SELECTEDPANE_ABOUT:
 					if (!Menu4.IsSelected) Menu4.IsSelected = true;
 					break;
 				default:
@@ -270,6 +297,7 @@ namespace FlushMouseUI3DLL
 			if (sender == null) { }
 			if (e == null) { }
 			if (m_General == null) m_General = new General();
+			if (m_IMEMode == null) m_IMEMode = new IMEMode();
 			if (m_SynTP_Helper == null) m_SynTP_Helper = new SynTP_Helper();
 			if (m_About == null) m_About = new About();
 
@@ -292,6 +320,11 @@ namespace FlushMouseUI3DLL
 						sender.Header = "基本動作設定";
 						if (m_General == null) { m_General = new General(); }
 						pageType = m_General.GetType();
+					}
+					else if ((string)selectedItem.Tag == "Menu2") {
+						sender.Header = "IME モード表示設定";
+						if (m_IMEMode == null) { m_IMEMode = new IMEMode(); }
+						pageType = m_IMEMode.GetType();
 					}
 					else if ((string)selectedItem.Tag == "Menu3") {
 						sender.Header = "SynTP Helper";

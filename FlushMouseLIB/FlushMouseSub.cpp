@@ -65,11 +65,9 @@ BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
 		case SYNTPH_SENDERHOSNAMEIPV6:
 		case SYNTPH_SENDERHOSNAMEIPV6_START:
 			SynTP->bStopSender();
-			if (bCheckExistHostnameIPv4(Profile->lpstAppRegData->szSynTPSendHostname1)) {
-				if (SynTP->bStartSender(hMainWnd, Profile->lpstAppRegData->szSynTPSendHostname1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
-					Profile->lpstAppRegData->bSynTPStarted1 = TRUE;
-					break;
-				}
+			if (SynTP->bStartSender(hMainWnd, Profile->lpstAppRegData->szSynTPSendHostname1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
+				Profile->lpstAppRegData->bSynTPStarted1 = TRUE;
+				break;
 			}
 			if (bShowMessage) vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
 			delete SynTP;

@@ -88,16 +88,34 @@ typedef struct tagIMECursorData
 	LPFLUSHMOUSECURSOR	lpstFlushMouseCursor;
 
 	int			iCursorSize;
+	int			iIMEModeDistance;
 	int			iModeSize;
 	DWORD		dwInThreadSleepTime;
 	DWORD		dwDisplayModeTime;
 	BOOL		bDisplayIMEModeOnCursor;
 	BOOL		bDisplayIMEModeByWindow;
+	BOOL		bDisplayIMEModeIMEOFF;
 	BOOL		bForceHiragana;
 	BOOL		bDrawNearCaret;
-	COLORREF	dwNearDrawCaretColor;
-	COLORREF	dwNearDrawMouseColor;
-	COLORREF	dwNearMouseColor;
+
+	COLORREF	dwNearDrawMouseIMEOFFColor;
+	COLORREF	dwNearDrawMouseHANEISU_IMEONColor;
+	COLORREF	dwNearDrawMouseHANKANA_IMEONColor;
+	COLORREF	dwNearDrawMouseZENEISU_IMEONColor;
+	COLORREF	dwNearDrawMouseZENHIRA_IMEONColor;
+	COLORREF	dwNearDrawMouseZENKANA_IMEONColor;
+	COLORREF	dwNearDrawCaretIMEOFFColor;
+	COLORREF	dwNearDrawCaretHANEISU_IMEONColor;
+	COLORREF	dwNearDrawCaretHANKANA_IMEONColor;
+	COLORREF	dwNearDrawCaretZENEISU_IMEONColor;
+	COLORREF	dwNearDrawCaretZENHIRA_IMEONColor;
+	COLORREF	dwNearDrawCaretZENKANA_IMEONColor;
+	COLORREF	dwNearDrawMouseByWndIMEOFFColor;
+	COLORREF	dwNearDrawMouseByWndHANEISU_IMEONColor;
+	COLORREF	dwNearDrawMouseByWndHANKANA_IMEONColor;
+	COLORREF	dwNearDrawMouseByWndZENEISU_IMEONColor;
+	COLORREF	dwNearDrawMouseByWndZENHIRA_IMEONColor;
+	COLORREF	dwNearDrawMouseByWndZENKANA_IMEONColor;
 
 	BOOL		bDenyChangedByApp;
 	BOOL		bUseBigArrow;
@@ -120,9 +138,8 @@ public:
 	~CCursorWindow();
 
 public:
-	BOOL		bRegister(HINSTANCE hInstance, LPCTSTR szWindowClass, COLORREF dwRGB);
-	VOID		vSetTextColor(COLORREF dwRGB);
-	VOID		vSetModeString(LPTSTR lpszIMEMode);
+	BOOL		bRegister(HINSTANCE hInstance, LPCTSTR szWindowClass);
+	VOID		vSetModeStringAndColor(LPCTSTR lpszIMEMode, COLORREF dwRGB);
 
 private:
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -160,6 +177,8 @@ public:
 	BOOL		bStartDrawIMEModeThreadWaitDblClk(HWND hWndObserved);
 
 	BOOL		bShowHideCursor(HWND hWndObserved, BOOL bShow);
+	BOOL		bStartDrawIMEModeMouseByWndThread();
+	VOID		vStopDrawIMEModeMouseByWndThread();
 
 private:
 	BOOL		bStartDrawIMEModeThreadSub(HWND hWndObserved);
@@ -173,11 +192,9 @@ private:
 	VOID		vUnRegisterIMECursorChangeThread();
 	static BOOL WINAPI		bIMECursorChangeRoutine(LPVOID lpvParam);
 
-	BOOL		bRegisterDrawIMEModeMouseThread(HWND hWnd);
-	BOOL		bStartDrawIMEModeMouseThread(HWND hWndObserved);
-	VOID		vStopDrawIMEModeMouseThread();
-	VOID		vUnRegisterDrawIMEModeMouseThread();
-	static BOOL WINAPI		bIMEModeMouseThreadRoutine(LPVOID lpvParam);
+	BOOL		bRegisterDrawIMEModeMouseByWndThread(HWND hWnd);
+	VOID		vUnRegisterDrawIMEModeMouseByWndThread();
+	static BOOL WINAPI	bIMEModeMouseByWndThreadRoutine(LPVOID lpvParam);
 
 	BOOL		bRegisterDrawIMEModeThread(HWND hWndObserved);
 	BOOL		bIsIMECursorChanged(LPIMECURSORDATA lpstCursorData);
@@ -188,7 +205,8 @@ private:
 	BOOL		bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData);
 	static BOOL	CALLBACK	bIconDrawEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam);
 	static BOOL WINAPI		bDrawIMEModeRoutine(LPVOID lpvParam);
-	int			iGetCurosrID(DWORD dwIMEMode, LPIMECURSORDATA lpstCursorData);
+	int			iGetCursorID(DWORD dwIMEMode, LPIMECURSORDATA lpstCursorData);
+	COLORREF	dwGetColorFromIMEMode(DWORD dwIMEMode, int iWindow) const;
 
 	BOOL		bGetMouseRegValue(LPCTSTR szValue, LPTSTR szFile);
 	BOOL		bChangeFlushMouseCursor(UINT uCurID, LPIMECURSORDATA lpstCursorData);
@@ -206,7 +224,7 @@ private:
 	CThread			*IMECursorChangeThread;
 	CThread			*DrawIMEModeThread;
 	CThread			*DrawIMEModeCaretThread;
-	CThread			*DrawIMEModeMouseThread;
+	CThread			*DrawIMEModeMouseByWndThread;
 
 	CCursorWindow	*CursorWindow;
 	CCursorWindow	*CaretWindow;

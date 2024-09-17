@@ -30,6 +30,7 @@ extern BOOL		bDestroyTaskTrayWindow(HWND hWnd);
 extern BOOL		bGetTaskTrayWindowRect(HWND hWnd, LPRECT lpRect);
 extern void		Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify);
 extern void		Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg);
+extern BOOL		bDisplayBalloon(HWND hWnd, DWORD dwInfoFlags, LPCTSTR szInfoTitle, LPCTSTR szInfo);
 
 
 /* = EOF = */

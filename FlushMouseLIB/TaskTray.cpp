@@ -156,7 +156,7 @@ BOOL		bDestroyTaskTrayWindow(HWND hWnd)
 		nIco.hWnd = hWnd;
 		nIco.uID = NOTIFYICONDATA_ID;
 		nIco.guidItem = GUID_NULL;
-		nIco.uFlags = 0;
+		nIco.uFlags = NIM_ADD;
 		try {
 			throw Shell_NotifyIcon(NIM_DELETE, &nIco);
 		}
@@ -229,6 +229,10 @@ void		Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 		Profile->bGetProfileData();
 		vSettingDialog(hWnd);
 		break;
+	case IDR_TT_IMEMODE:
+		Profile->bGetProfileData();
+		vIMEModeDialog(hWnd);
+		break;
 	case IDR_TT_SYNTPHELPER:
 		Profile->bGetProfileData();
 		vSynTPHelperDialog(hWnd);
@@ -292,6 +296,40 @@ void		Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg)
 		break;
 	}
 	return;
+}
+
+//
+// bDisplayBalloon()
+//	dwInfoFlags : NIIF_INFO or NIIF_WARNING or NIIF_ERROR
+//
+BOOL		bDisplayBalloon(HWND hWnd, DWORD dwInfoFlags, LPCTSTR szInfoTitle, LPCTSTR szInfo)
+{
+	if (bTaskTray != FALSE) {
+		NOTIFYICONDATA nIco{};
+		nIco.cbSize = sizeof(NOTIFYICONDATA);
+		nIco.hWnd = hWnd;
+		nIco.uID = NOTIFYICONDATA_ID;
+		nIco.guidItem = GUID_NULL;
+		nIco.uFlags = NIF_INFO;
+		nIco.dwInfoFlags = dwInfoFlags;
+		if (szInfoTitle)	_tcsncpy_s(nIco.szInfoTitle, ARRAYSIZE(nIco.szInfoTitle), szInfoTitle, _TRUNCATE);
+		if (szInfo)			_tcsncpy_s(nIco.szInfo, ARRAYSIZE(nIco.szInfo), szInfo, _TRUNCATE);
+		try {
+			throw Shell_NotifyIcon(NIM_MODIFY, &nIco);
+		}
+		catch (BOOL bRet) {
+			if (bRet) {
+				return TRUE;
+			}
+			else {
+				return FALSE;
+			}
+		}
+		catch (...) {
+			return FALSE;
+		}
+	}
+	return FALSE;
 }
 
 

@@ -348,6 +348,11 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 	
 	Profile = new CProfile;
 	if (Profile != NULL) {
+		if (!Profile->bFixChangedProfileData()) {
+			vMessageBox(hWnd, IDS_CANTLOADREG, MessageBoxTYPE);
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			return FALSE;
+		}
 		if (!Profile->bGetProfileData()) {
 			vMessageBox(hWnd, IDS_CANTLOADREG, MessageBoxTYPE);
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
@@ -380,11 +385,12 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		bForExplorerPatcherSWS(GetForegroundWindow(), TRUE, TRUE, NULL, NULL);
 	}
 
+	BOOL	bSynTP = TRUE;
 	if (Profile != NULL) {
 		if ((Profile->lpstAppRegData->dwSynTPHelper1 == SYNTPH_SENDERIPV4_START)
 			|| (Profile->lpstAppRegData->dwSynTPHelper1 == SYNTPH_SENDERHOSNAMEIPV4_START)
 			|| (Profile->lpstAppRegData->dwSynTPHelper1 == SYNTPH_RECEIVERIPV4_START)) {
-			bStartSynTPHelper(hMainWnd, Profile->lpstAppRegData->dwSynTPHelper1, FALSE);
+			bSynTP = bStartSynTPHelper(hMainWnd, Profile->lpstAppRegData->dwSynTPHelper1, FALSE);
 		}
 	}
 
@@ -406,6 +412,19 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		return FALSE;
 	}
 
+	if (!bSynTP) {
+		TCHAR	szInfo[MAX_LOADSTRING];
+		LoadString(Resource->hLoad(), IDS_CANTSYTPHELPER, szInfo, MAX_LOADSTRING);
+		if (!bDisplayBalloon(hWnd, NIIF_WARNING, NULL, szInfo)) {
+			try {
+				vMessageBox(hWnd, IDS_NOTREGISTERTT, MessageBoxTYPE);
+			}
+			catch (...) {
+			}
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			return FALSE;
+		}
+	}
 
 	return TRUE;
 }
@@ -436,6 +455,9 @@ void		vDestroyWindow(HWND hWnd)
 		Profile->lpstAppRegData->bDisplayIMEModeByWindow = FALSE;
 		Profile->lpstAppRegData->bDoModeDispByMouseBttnUp = FALSE;
 		Profile->lpstAppRegData->bDrawNearCaret = FALSE;
+	}
+	if (Cursor != NULL) {
+		Cursor->vStopDrawIMEModeMouseByWndThread();
 	}
 	if (uCheckProcTimer != NULL) {
 		if (KillTimer(hWnd, nCheckProcTimerID)) {
@@ -574,68 +596,54 @@ static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, LPARAM lParam)
 	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(lParam);
 
-	if (iCode == SETTINGSEX_CANCEL) {
+	if (!Profile)	return FALSE;
+
+	switch(iCode) {
+	case SETTINGSEX_OK:
+		vSettingDialogApply();
+		if (!Profile->bGetProfileData())	return FALSE;
 		vSettingDialogClose();
 		return TRUE;
-	}
-	if (iCode == SETTINGSEX_RELOAD_REGISTORY) {
-		if (Profile != NULL) {
-			Profile->bGetProfileData();
-			vSettingDialogApply();
+	case SETTINGSEX_CANCEL:
+		vSettingDialogClose();
+		return TRUE;
+	case SETTINGSEX_APPLY:
+		vSettingDialogApply();
+		if (!Profile->bGetProfileData())	return FALSE;
+		return TRUE;
+	case SETTINGSEX_SETTINGS_STARTED:
+		if((Cursor) && (Cursor->bStartDrawIMEModeMouseByWndThread())) {
+			vSettingDialogClose();
 			return TRUE;
 		}
-	}
-	if (iCode == SETTINGSEX_SYNTP_IS_STARTED) {
-		if (SynTP)	return TRUE;
-		else return FALSE;
-	}
-	vSettingDialogApply();
-	if (Profile != NULL) {
+		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+		return TRUE;
+	case SETTINGSEX_RELOAD_REGISTRY:
 		if (!Profile->bGetProfileData())	return FALSE;
-	}
-
-	if (iCode == SETTINGSEX_RELOAD_CURSOR) {
+		vSettingDialogApply();
+		return TRUE;
+	case SETTINGSEX_RELOAD_CURSOR:
+		vSettingDialogApply();
+		if (!Profile->bGetProfileData())	return FALSE;
 		if (!Cursor->bReloadCursor()) {
 			vSettingDialogClose();
 			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
 			return FALSE;
 		}
-	}
-	if (iCode == SETTINGSEX_OK) {
-		vSettingDialogClose();
 		return TRUE;
-	}
-	if (iCode == SETTINGSEX_SYNTP_START) {
-		if (Profile) {
-			switch (Profile->lpstAppRegData->dwSynTPHelper1) {
-				case SYNTPH_DISABLE:
-					return false;
-				case SYNTPH_SENDERIPV4:
-				case SYNTPH_SENDERIPV4_START:
-					if (!bIsPrivateAddress(Profile->lpstAppRegData->szSynTPSendIPAddr1)) {
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
-						vMessageBox(hWnd, IDS_NOTPRIVATEADDR, MessageBoxTYPE);
-						return false;
-					}
-					break;
-				case SYNTPH_SENDERHOSNAMEIPV4:
-				case SYNTPH_SENDERHOSNAMEIPV4_START:
-					if (!bIsPrivateAddress(Profile->lpstAppRegData->szSynTPSendHostname1)) {
-						vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
-						return false;
-					}
-					break;
-				case SYNTPH_RECEIVERIPV4:
-				case SYNTPH_RECEIVERIPV4_START:
-					break;
-			}
-		}
+	case SETTINGSEX_SYNTP_START:
+		vSettingDialogApply();
+		if (!Profile->bGetProfileData())	return FALSE;
 		return bSettingSynTPStart();
-	}
-	if (iCode == SETTINGSEX_SYNTP_STOP) {
+	case SETTINGSEX_SYNTP_STOP:
+		vSettingDialogApply();
+		if (!Profile->bGetProfileData())	return FALSE;
 		return bSettingSynTPStop();
+	case SETTINGSEX_SYNTP_IS_STARTED:
+		if (SynTP)	return TRUE;
+		else return FALSE;
 	}
-	return FALSE;
+	return TRUE;
 }
 
 //

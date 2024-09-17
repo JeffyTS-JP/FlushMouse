@@ -115,6 +115,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 			if (CompareStringOrdinal(_lpArgv[1], -1, L"1", -1, TRUE) == CSTR_EQUAL) {
 				iSelectedPane = SETTINGSEX_SELECTEDPANE_GENERAL;
 			}
+			else if (CompareStringOrdinal(_lpArgv[1], -1, L"2", -1, TRUE) == CSTR_EQUAL) {
+				iSelectedPane = SETTINGSEX_SELECTEDPANE_IMEMODE;
+			}
 			else if (CompareStringOrdinal(_lpArgv[1], -1, L"3", -1, TRUE) == CSTR_EQUAL) {
 				iSelectedPane = SETTINGSEX_SELECTEDPANE_SYNTPHELPER;
 			}
@@ -168,6 +171,17 @@ VOID		vAboutDialog(HWND hWnd)
 {
 	UNREFERENCED_PARAMETER(hWnd);
 	SettingsExec(hWnd, WM_SETTINGSEX, SETTINGSEX_SELECTEDPANE_ABOUT);
+}
+
+//
+// vIMEModeDialog()
+//
+VOID		vIMEModeDialog(HWND hWnd)
+{
+	if (Profile != NULL) {
+
+	}
+	SettingsExec(hWnd, WM_SETTINGSEX, SETTINGSEX_SELECTEDPANE_IMEMODE);
 }
 
 //
@@ -481,6 +495,11 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 
 	Profile = new CProfile;
 	if (Profile != NULL) {
+		if (!Profile->bFixChangedProfileData()) {
+			vMessageBox(hWnd, IDS_CANTLOADREG, MessageBoxTYPE);
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			return FALSE;
+		}
 		if (!Profile->bGetProfileData()) {
 			vMessageBox(hWnd, IDS_CANTLOADREG, MessageBoxTYPE);
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
@@ -530,6 +549,10 @@ static bool		Cls_OnSettingsEx(HWND hWnd, int iCode, LPARAM lParam)
 				iSelectedPane = SETTINGSEX_SELECTEDPANE_GENERAL;
 				vSettingDialog(hWnd);
 			}
+			else if (lParam == SETTINGSEX_SELECTEDPANE_IMEMODE)	{
+				iSelectedPane = SETTINGSEX_SELECTEDPANE_IMEMODE;
+				vIMEModeDialog(hWnd);
+			}
 			else if (lParam == SETTINGSEX_SELECTEDPANE_SYNTPHELPER)	{
 				iSelectedPane = SETTINGSEX_SELECTEDPANE_SYNTPHELPER;
 				vSynTPHelperDialog(hWnd);
@@ -548,30 +571,6 @@ static bool		Cls_OnSettingsEx(HWND hWnd, int iCode, LPARAM lParam)
 		return true;
 	}
 	if (iCode == SETTINGSEX_SYNTP_START) {
-		if (Profile) {
-			switch (Profile->lpstAppRegData->dwSynTPHelper1) {
-				case SYNTPH_DISABLE:
-					return false;
-				case SYNTPH_SENDERIPV4:
-				case SYNTPH_SENDERIPV4_START:
-					if (!bIsPrivateAddress(Profile->lpstAppRegData->szSynTPSendIPAddr1)) {
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
-						vMessageBox(hWnd, IDS_NOTPRIVATEADDR, MessageBoxTYPE);
-						return false;
-					}
-					break;
-				case SYNTPH_SENDERHOSNAMEIPV4:
-				case SYNTPH_SENDERHOSNAMEIPV4_START:
-					if (!bIsPrivateAddress(Profile->lpstAppRegData->szSynTPSendHostname1)) {
-						vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
-						return false;
-					}
-					break;
-				case SYNTPH_RECEIVERIPV4:
-				case SYNTPH_RECEIVERIPV4_START:
-					break;
-			}
-		}
 		return bSettingSynTPStart();
 	}
 	if (iCode == SETTINGSEX_SYNTP_STOP) {
