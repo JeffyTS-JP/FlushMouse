@@ -30,6 +30,7 @@
 #define FULL_FLUSHMOUSE_DLL			L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouseDLL.dll"
 #define	FULL_FLUSHMOUSE32_DLL		L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouseDLL32.dll"
 #define FULL_FLUSHMOUSEUI3_DLL		L"%ProgramFiles%\\JeffyTS\\FlushMouse\\FlushMouseUI3DLL.dll"
+#define RELATIVE_FLUSHMOUSEUI3DLL_DLL	L"FlushMouseSettings\\FlushMouseUI3DLL.dll"
 #define	FLUSHMOUSE_EXE				L"FlushMouse.exe"
 #define	FLUSHMOUSE32_EXE			L"FlushMouse32.exe"
 #define	FLUSHMOUSESETTINGS_EXE		L"FlushMouseSettings.exe"
@@ -163,17 +164,19 @@ typedef struct tagSIZED
 
 // BOOL Cls_OnSettings(HWND hWnd, int iCode, LPARAM lParam);
 #define WM_SETTINGSEX						(WM_USER + 0xfe)
-#define HANDLE_WM_SETTINGSEX(hWnd, wParam, lParam, fn) ((LRESULT)(BOOL)(fn)((hWnd), (int)(wParam), (LPARAM)(lParam)))
+#define HANDLE_WM_SETTINGSEX(hWnd, wParam, lParam, fn) ((LRESULT)(BOOL)(fn)((hWnd), (int)(wParam), (int)(lParam)))
 #define SETTINGSEX_OK						0
 #define SETTINGSEX_CANCEL					1
 #define SETTINGSEX_APPLY					2
 #define SETTINGSEX_RELOAD_REGISTRY			3
-#define SETTINGSEX_RELOAD_CURSOR			4
-#define SETTINGSEX_CHANGE_PANE				5
-#define SETTINGSEX_SETTINGS_STARTED			6
-#define SETTINGSEX_SYNTP_START				10
-#define SETTINGSEX_SYNTP_IS_STARTED			11
-#define SETTINGSEX_SYNTP_STOP				12
+#define SETTINGSEX_RELOAD_MOUSE				4
+#define SETTINGSEX_SETTINGS_CHANGE_PANE		10
+#define SETTINGSEX_SETTINGS_STARTED			11
+#define SETTINGSEX_SETTINGS_SETREGISTRY		12
+#define SETTINGSEX_SYNTP_START				20
+#define SETTINGSEX_SYNTP_IS_STARTED			21
+#define SETTINGSEX_SYNTP_STOP				22
+#define SETTINGSEX_SYNTP_SETREGISRY			23
 
 #define SETTINGSEX_SELECTEDPANE_GENERAL		1
 #define SETTINGSEX_SELECTEDPANE_IMEMODE		2

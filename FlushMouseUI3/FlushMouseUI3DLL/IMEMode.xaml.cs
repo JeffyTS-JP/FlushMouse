@@ -390,7 +390,7 @@ namespace FlushMouseUI3DLL {
 						Color clr = Color.FromArgb(dwNearDrawMouseIMEOFFColor);
 						Button1_1.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
 						EnableDisableItems(sender, e);
-						UpdateProfile(SETTINGSEX_RELOAD_CURSOR);
+						UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
 					}
 				}
 				else if (btn.Name == "CP_Button1_1_2") {
@@ -409,7 +409,7 @@ namespace FlushMouseUI3DLL {
 						Color clr = Color.FromArgb(dwNearDrawCaretIMEOFFColor);
 						Button1_2.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
 						EnableDisableItems(sender, e);
-						UpdateProfile(SETTINGSEX_RELOAD_CURSOR);
+						UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
 					}
 				}
 				else if (btn.Name == "CP_Button1_2_2") {
@@ -429,7 +429,7 @@ namespace FlushMouseUI3DLL {
 						Color clr = Color.FromArgb(dwNearDrawMouseByWndIMEOFFColor);
 						Button1_3.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
 						EnableDisableItems(sender, e);
-						UpdateProfile(SETTINGSEX_RELOAD_CURSOR);
+						UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
 					}
 				}
 				else if (btn.Name == "CP_Button1_3_2") {
@@ -448,7 +448,7 @@ namespace FlushMouseUI3DLL {
 						Color   clr = Color.FromArgb(dwNearDrawMouseZENHIRA_IMEONColor);
 						Button2_1.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
 						EnableDisableItems(sender, e);
-						UpdateProfile(SETTINGSEX_RELOAD_CURSOR);
+						UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
 					}
 				}
 				else if (btn.Name == "CP_Button2_1_2") {
@@ -467,7 +467,7 @@ namespace FlushMouseUI3DLL {
 						Color   clr = Color.FromArgb(dwNearDrawCaretZENHIRA_IMEONColor);
 						Button2_2.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
 						EnableDisableItems(sender, e);
-						UpdateProfile(SETTINGSEX_RELOAD_CURSOR);
+						UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
 					}
 				}
 				else if (btn.Name == "CP_Button2_2_2") {
@@ -486,7 +486,7 @@ namespace FlushMouseUI3DLL {
 						Color   clr = Color.FromArgb(dwNearDrawMouseByWndZENHIRA_IMEONColor);
 						Button2_3.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
 						EnableDisableItems(sender, e);
-						UpdateProfile(SETTINGSEX_RELOAD_CURSOR);
+						UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
 					}
 				}
 				else if (btn.Name == "CP_Button2_3_2") {
@@ -505,7 +505,7 @@ namespace FlushMouseUI3DLL {
 						Color   clr = Color.FromArgb(dwNearDrawMouseZENKANA_IMEONColor);
 						Button3_1.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
 						EnableDisableItems(sender, e);
-						UpdateProfile(SETTINGSEX_RELOAD_CURSOR);
+						UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
 					}
 				}
 				else if (btn.Name == "CP_Button3_1_2") {
@@ -524,7 +524,7 @@ namespace FlushMouseUI3DLL {
 						Color   clr = Color.FromArgb(dwNearDrawCaretZENKANA_IMEONColor);
 						Button3_2.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
 						EnableDisableItems(sender, e);
-						UpdateProfile(SETTINGSEX_RELOAD_CURSOR);
+						UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
 					}
 				}
 				else if (btn.Name == "CP_Button3_2_2") {
@@ -543,7 +543,7 @@ namespace FlushMouseUI3DLL {
 						Color   clr = Color.FromArgb(dwNearDrawMouseByWndZENKANA_IMEONColor);
 						Button3_3.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
 						EnableDisableItems(sender, e);
-						UpdateProfile(SETTINGSEX_RELOAD_CURSOR);
+						UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
 					}
 				}
 				else if (btn.Name == "CP_Button3_3_2") {
@@ -562,7 +562,7 @@ namespace FlushMouseUI3DLL {
 						Color   clr = Color.FromArgb(dwNearDrawMouseZENEISU_IMEONColor);
 						Button4_1.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
 						EnableDisableItems(sender, e);
-						UpdateProfile(SETTINGSEX_RELOAD_CURSOR);
+						UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
 					}
 				}
 				else if (btn.Name == "CP_Button4_1_2") {
@@ -581,7 +581,7 @@ namespace FlushMouseUI3DLL {
 						Color   clr = Color.FromArgb(dwNearDrawCaretZENEISU_IMEONColor);
 						Button4_2.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
 						EnableDisableItems(sender, e);
-						UpdateProfile(SETTINGSEX_RELOAD_CURSOR);
+						UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
 					}
 				}
 				else if (btn.Name == "CP_Button4_2_2") {
@@ -600,7 +600,7 @@ namespace FlushMouseUI3DLL {
 						Color   clr = Color.FromArgb(dwNearDrawMouseByWndZENEISU_IMEONColor);
 						Button4_3.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
 						EnableDisableItems(sender, e);
-						UpdateProfile(SETTINGSEX_RELOAD_CURSOR);
+						UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
 					}
 				}
 				else if (btn.Name == "CP_Button4_3_2") {
@@ -619,7 +619,7 @@ namespace FlushMouseUI3DLL {
 						Color   clr = Color.FromArgb(dwNearDrawMouseHANKANA_IMEONColor);
 						Button5_1.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
 						EnableDisableItems(sender, e);
-						UpdateProfile(SETTINGSEX_RELOAD_CURSOR);
+						UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
 					}
 				}
 				else if (btn.Name == "CP_Button5_1_2") {
@@ -638,7 +638,7 @@ namespace FlushMouseUI3DLL {
 						Color   clr = Color.FromArgb(dwNearDrawCaretHANKANA_IMEONColor);
 						Button5_2.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
 						EnableDisableItems(sender, e);
-						UpdateProfile(SETTINGSEX_RELOAD_CURSOR);
+						UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
 					}
 				}
 				else if (btn.Name == "CP_Button5_2_2") {
@@ -657,7 +657,7 @@ namespace FlushMouseUI3DLL {
 						Color   clr = Color.FromArgb(dwNearDrawMouseByWndHANKANA_IMEONColor);
 						Button5_3.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
 						EnableDisableItems(sender, e);
-						UpdateProfile(SETTINGSEX_RELOAD_CURSOR);
+						UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
 					}
 				}
 				else if (btn.Name == "CP_Button5_3_2") {
@@ -676,7 +676,7 @@ namespace FlushMouseUI3DLL {
 						Color   clr = Color.FromArgb(dwNearDrawMouseHANEISU_IMEONColor);
 						Button6_1.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
 						EnableDisableItems(sender, e);
-						UpdateProfile(SETTINGSEX_RELOAD_CURSOR);
+						UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
 					}
 				}
 				else if (btn.Name == "CP_Button6_1_2") {
@@ -695,7 +695,7 @@ namespace FlushMouseUI3DLL {
 						Color   clr = Color.FromArgb(dwNearDrawCaretHANEISU_IMEONColor);
 						Button6_2.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
 						EnableDisableItems(sender, e);
-						UpdateProfile(SETTINGSEX_RELOAD_CURSOR);
+						UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
 					}
 				}
 				else if (btn.Name == "CP_Button6_2_2") {
@@ -714,7 +714,7 @@ namespace FlushMouseUI3DLL {
 						Color   clr = Color.FromArgb(dwNearDrawMouseByWndHANEISU_IMEONColor);
 						Button6_3.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb((byte)(255 - clr.A), clr.B, clr.G, clr.R));
 						EnableDisableItems(sender, e);
-						UpdateProfile(SETTINGSEX_RELOAD_CURSOR);
+						UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
 					}
 				}
 				else if (btn.Name == "CP_Button6_3_2") {

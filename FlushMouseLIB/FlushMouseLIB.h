@@ -42,8 +42,6 @@ extern VOID			vSynTPHelperDialog(HWND hWnd);
 extern VOID			vSettingDialog(HWND hWnd);
 extern VOID			vSettingDialogApply();
 extern VOID			vSettingDialogClose();
-extern BOOL			bSettingSynTPStart();
-extern BOOL			bSettingSynTPStop();
 
 //
 // Global Data

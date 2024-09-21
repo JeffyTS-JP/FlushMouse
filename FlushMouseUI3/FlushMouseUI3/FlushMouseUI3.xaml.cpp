@@ -59,7 +59,7 @@ using namespace Windows::ApplicationModel::Activation;
 // Local Data
 //
 static Application	windowApp{ nullptr };
-static HINSTANCE	_hInstance{ nullptr };
+static HINSTANCE	m_hInstance{ nullptr };
 
 static int			activationCount = 1;
 static event_token	activationToken;
@@ -90,7 +90,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 #endif
 
-	_hInstance = hInstance;
+	m_hInstance = hInstance;
 
 	int	iRet = 0;
 	if ((iRet = iCheckCmdLine(lpCmdLine)) != 1) {
@@ -183,22 +183,6 @@ VOID		vSettingDialogClose()
 }
 
 //
-// bSettingSynTPStart()
-//
-BOOL		bSettingSynTPStart()
-{
-	return SettingsSynTPStart();
-}
-
-//
-// bSettingSynTPStop()
-//
-BOOL		bSettingSynTPStop()
-{
-	return SettingsSynTPStop();
-}
-
-//
 // CalcWindowCentralizeRect()
 //
 void CalcWindowCentralizeRect(HWND hWnd, Windows::Graphics::RectInt32* Rect32)
@@ -258,22 +242,22 @@ void FlushMouseUI3Main::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs
 {
 #ifdef _DEBUG
 	UnhandledException([this](IInspectable const&, UnhandledExceptionEventArgs const&) {
-		::MessageBox(NULL, L"EXCEPTION", L"FlushMouseUI3", (MB_ICONSTOP | MB_OK));
+		MessageBox(NULL, L"EXCEPTION", L"FlushMouseUI3", (MB_ICONSTOP | MB_OK));
 		});
 #endif // _DEBUG
 
-	hMicrosoft_ui_xaml_dll = ::LoadLibrary(L"Microsoft.ui.xaml.dll");
-	hFlushMouseUI3DLL = ::LoadLibrary(FLUSHMOUSEUI3_DLL);
+	hMicrosoft_ui_xaml_dll = LoadLibrary(L"Microsoft.ui.xaml.dll");
+	hFlushMouseUI3DLL = LoadLibrary(FLUSHMOUSEUI3_DLL);
 
 	MojoWindowExec();
 
-	if (!bWinMain((HINSTANCE)_hInstance, NULL, NULL, SW_HIDE)) {
+	if (!bWinMain((HINSTANCE)m_hInstance, NULL, NULL, SW_HIDE)) {
 	}
 	
 	MojoWindowClose();
 
-	if (hFlushMouseUI3DLL)	::FreeLibrary(hFlushMouseUI3DLL);
-	if (hMicrosoft_ui_xaml_dll)	::FreeLibrary(hMicrosoft_ui_xaml_dll);
+	if (hFlushMouseUI3DLL)	FreeLibrary(hFlushMouseUI3DLL);
+	if (hMicrosoft_ui_xaml_dll)	FreeLibrary(hMicrosoft_ui_xaml_dll);
 
 	PostQuitMessage(0);
 	return;

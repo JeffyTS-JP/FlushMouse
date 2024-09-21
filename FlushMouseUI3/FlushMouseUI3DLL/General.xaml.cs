@@ -80,6 +80,17 @@ namespace FlushMouseUI3DLL {
 				else {
 					if (sl5 != null)	sl5.IsEnabled = true;
 				}
+				if (ts1.IsOn)	text1.Text = "オン";		else text1.Text = "オフ";
+				if (ts2.IsOn)	text2.Text = "オン";		else text2.Text = "オフ";
+				if (ts3.IsOn)	text3.Text = "オン";		else text3.Text = "オフ";
+				if (ts4.IsOn)	text4.Text = "オン";		else text4.Text = "オフ";
+				if (ts5.IsOn)	text5.Text = "オン";		else text5.Text = "オフ";
+				if (ts6.IsOn)	text6.Text = "オン";		else text6.Text = "オフ";
+				if (ts7.IsOn)	text7.Text = "オン";		else text7.Text = "オフ";
+				if (ts8.IsOn)	text8.Text = "オン";		else text8.Text = "オフ";
+				if (ts9.IsOn)	text9.Text = "オン";		else text9.Text = "オフ";
+				if (ts10.IsOn)	text10.Text = "オン";	else text10.Text = "オフ";
+				if (ts11.IsOn)	text11.Text = "オン";	else text11.Text = "オフ";
 			}
 		}
 		
@@ -95,7 +106,7 @@ namespace FlushMouseUI3DLL {
 			m_Sentinel = true;
 			EnableDisableItems(sender, e);
 		}
-		
+
 		private void SetGrid()
 		{
 			if (grid4_1 == null)    grid4_1 = new Grid();
@@ -164,13 +175,13 @@ namespace FlushMouseUI3DLL {
 				if (ts.Name == "ts1") {
 					bDisplayIMEModeOnCursor = !bDisplayIMEModeOnCursor;
 					EnableDisableItems(sender, e);
-					UpdateProfile(SETTINGSEX_RELOAD_CURSOR);
+					UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
 					return;
 				}
 				else if (ts.Name == "ts2") {
 					bDisplayIMEModeByWindow = !bDisplayIMEModeByWindow;
 					EnableDisableItems(sender, e);
-					UpdateProfile(SETTINGSEX_RELOAD_CURSOR);
+					UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
 					return;
 				}
 				else if (ts.Name == "ts3") bDisplayIMEModeIMEOFF = !bDisplayIMEModeIMEOFF;

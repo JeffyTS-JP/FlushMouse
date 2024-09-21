@@ -94,8 +94,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 //
 VOID		vSettingDialogApply()
 {
-	if (Profile == NULL)	return;
-	Profile->bSetProfileData();
 }
 
 //
@@ -103,29 +101,6 @@ VOID		vSettingDialogApply()
 //
 VOID		vSettingDialogClose()
 {
-	if (Profile == NULL)	return;
-	Profile->bSetProfileData();
-}
-
-//
-// bSettingSynTPStart()
-//
-BOOL		bSettingSynTPStart()
-{
-	if (Profile == NULL)	return FALSE;
-	BOOL bRet = bStartSynTPHelper(hMainWnd, Profile->lpstAppRegData->dwSynTPHelper1, TRUE);
-	vSettingDialogApply();
-	return bRet;
-}
-
-//
-// bSettingSynTPStop()
-//
-BOOL		bSettingSynTPStop()
-{
-	BOOL bRet = bStopSynTPHelper();
-	vSettingDialogApply();
-	return bRet;
 }
 
 

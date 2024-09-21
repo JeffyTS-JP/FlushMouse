@@ -66,7 +66,7 @@ namespace FlushMouseUI3DLL {
 						if (rb1 != null)    rb1.IsEnabled = true;
 						if (rb2 != null)    rb2.IsEnabled = true;
 						if (rb3 != null)    rb3.IsEnabled = true;
-						if (rb4 != null)    rb4.IsEnabled = true;
+						if (rb4 != null)    rb4.IsEnabled = false;
 						if (rb5 != null)    rb5.IsEnabled = false;
 
 						if (nb1 != null)    nb1.IsEnabled = false;
@@ -306,7 +306,7 @@ namespace FlushMouseUI3DLL {
 					rb5.IsChecked = true;
 				}
 				EnableDisableItems(sender as RadioButton, e);
-				UpdateProfile(SETTINGSEX_APPLY);
+				UpdateProfile(SETTINGSEX_SYNTP_SETREGISRY);
 			}
 		}
 
@@ -348,7 +348,7 @@ namespace FlushMouseUI3DLL {
 				else if (nb == nb5_4) { if (nb5_4.Text == "") nb5_4.Text = "0"; nb5_4.Text = szSynTPSendIPAddr1_4 = Convert.ToInt32(nb5_4.Text).ToString(); }
 				else if (nb == nb6) { if (nb6.Text == "") nb6.Text = "0"; dwSynTPPortNo1 = Convert.ToInt32(nb6.Text); nb6.Text = dwSynTPPortNo1.ToString(); }
 
-				UpdateProfile(SETTINGSEX_APPLY);
+				UpdateProfile(SETTINGSEX_SYNTP_SETREGISRY);
 			}
 		}
 
@@ -401,8 +401,7 @@ namespace FlushMouseUI3DLL {
 			TextBox tb = sender as TextBox;
 			if (tb != null) {
 				if (tb == tb1) { szSynTPSendHostname1 = tb1.Text; }
-
-				UpdateProfile(SETTINGSEX_APPLY);
+				UpdateProfile(SETTINGSEX_SYNTP_SETREGISRY);
 			}
 		}
 		
@@ -470,7 +469,7 @@ namespace FlushMouseUI3DLL {
 					}
 				}
 				EnableDisableItems(sender, e);
-				UpdateProfile(SETTINGSEX_APPLY);
+				UpdateProfile(SETTINGSEX_SYNTP_SETREGISRY);
 			}
 		}
 
@@ -493,9 +492,6 @@ namespace FlushMouseUI3DLL {
 			else if (btn.Name == "btn2") {
 				UpdateProfile(SETTINGSEX_SYNTP_STOP);
 				bSynTPStarted1 = false;
-			}
-			else if (btn.Name == "btn3") {
-				UpdateProfile(SETTINGSEX_APPLY);
 			}
 			EnableDisableItems(sender, e);
 		 }

@@ -16,6 +16,7 @@
 #include "FlushMouseLIB.h"
 #include "CommonDef.h"
 #include "Eventlog.h"
+#include "..\MiscLIB\CThread.h"
 #include "..\MiscLIB\CRegistry.h"
 
 //
@@ -575,7 +576,31 @@ BOOL		CCursor::bRegisterDrawIMEModeMouseByWndThread(HWND hWnd)
 			return	FALSE;
 		}
 	}
-	if (!bRegisterIMECursorChangeThread(hMainWnd)) return FALSE;
+	HANDLE	hHandle = GetCurrentProcess();
+	if (hHandle != NULL) {
+		if (!SetPriorityClass(hHandle, REALTIME_PRIORITY_CLASS)) {
+			CloseHandle(hHandle);
+			return FALSE;
+		}
+	}
+	if (!DrawIMEModeMouseByWndThread->bSetThreadPriority(THREAD_PRIORITY_TIME_CRITICAL)) {
+		if (hHandle != NULL)	CloseHandle(hHandle);
+		return FALSE;
+	}
+	if (!MouseWindow->bSetWndThreadPriority(THREAD_PRIORITY_TIME_CRITICAL)) {
+		if (hHandle != NULL)	CloseHandle(hHandle);
+		return FALSE;
+	}
+	if (hHandle != NULL) {
+		if (!SetPriorityClass(hHandle, NORMAL_PRIORITY_CLASS)) {
+			CloseHandle(hHandle);
+			return FALSE;
+		}
+		CloseHandle(hHandle);
+	}
+	if (Profile) {
+		if (!stIMECursorData.bDisplayIMEModeByWindow)	vStopDrawIMEModeMouseByWndThread();
+	}
 	return	TRUE;
 }
 
@@ -676,6 +701,7 @@ BOOL		CCursor::bIMEModeMouseByWndThreadRoutine(LPVOID lpvParam)
 				Sleep(100);
 			}
 			if (!This->MouseWindow->bSetWindowPos(HWND_TOPMOST, pt.x, pt.y, iMouseSizeX, iMouseSizeY, (SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS)))	return FALSE;
+			Sleep(0);
 		}
 		else Sleep(10);
 	} while(lpstCursorData->bIMEModeByWindowThreadSentinel);

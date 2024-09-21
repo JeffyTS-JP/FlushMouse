@@ -189,7 +189,7 @@ BOOL		CSynTP::bRegister(HINSTANCE hInstance, LPCTSTR szWindowClassName)
 {
 	if (hInstance == NULL)	return FALSE;
 
-#define CLASSSTYLE (CS_HREDRAW | CS_VREDRAW | CS_NOCLOSE)
+#define CLASSSTYLE (CS_NOCLOSE)
 	WNDCLASSEX wcex{};
 		wcex.cbSize = sizeof(WNDCLASSEX);
 		wcex.style = CLASSSTYLE;
@@ -206,8 +206,8 @@ BOOL		CSynTP::bRegister(HINSTANCE hInstance, LPCTSTR szWindowClassName)
 
 	if (!bRegisterClassEx(&wcex))	return FALSE;
 
-#define		EX_WINDOWSTYLE	(WS_EX_LAYERED | WS_EX_NOACTIVATE)
-#define		WINDOWSTYLE		(WS_POPUP)
+#define		EX_WINDOWSTYLE	(WS_EX_NOACTIVATE)
+#define		WINDOWSTYLE		(WS_DISABLED)
 	if (!bCreateWindowEx(
 		EX_WINDOWSTYLE,
 		NULL,

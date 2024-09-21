@@ -35,6 +35,7 @@ public:
 	BOOL		bSetWindowText(_In_opt_ LPCTSTR szTitle);
 	BOOL		bSetWindowPos(_In_opt_ HWND hWndInsertAfter, _In_ int X, _In_ int Y, _In_ int cx, _In_ int cy,_In_  UINT uFlags);
 	BOOL		bInvalidateRect(_In_opt_ LPRECT lpRect, _In_ BOOL bErase);
+	BOOL		bSetWndThreadPriority(int nPriority);
 
 private:
 	void		vSetWindowLongPtr(HWND hWnd);

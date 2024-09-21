@@ -56,10 +56,8 @@ namespace winrt::FlushMouseSettings::implementation
 				wMojoWnd = make<MojoWindow>();
 			}
 			catch (const std::exception&) {
-				// NOP
 			}
 			catch (...) {
-				// NOP
 			}
 			if (wMojoWnd != nullptr) {
 				auto windowNative{ wMojoWnd.try_as<::IWindowNative>() };
@@ -124,7 +122,7 @@ void		SettingsExec(HWND hWnd, UINT32 uMsg, INT32 iSelectedPane)
 			m_Settings.dwSettingsY(Profile->lpstAppRegData->dwSettingsY);
 			m_Settings.dwSettingsWidth(Profile->lpstAppRegData->dwSettingsWidth);
 			m_Settings.dwSettingsHeight(Profile->lpstAppRegData->dwSettingsHeight);
-
+			
 			m_Settings.bDisplayFocusWindowIME(Profile->lpstAppRegData->bDisplayFocusWindowIME);
 			
 			m_Settings.bDisplayIMEModeOnCursor(Profile->lpstAppRegData->bDisplayIMEModeOnCursor);
@@ -220,8 +218,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		HANDLE_MSG(hWnd, WM_NCLBUTTONDBLCLK, Cls_OnNCLButtonDown);
 		break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 	return CallWindowProc((WNDPROC)m_SettingsWndProc, hWnd, message, wParam, lParam);
 }
@@ -252,7 +250,7 @@ void		SettingsApply()
 		Profile->lpstAppRegData->dwSettingsY = m_Settings.dwSettingsY();
 		Profile->lpstAppRegData->dwSettingsWidth = m_Settings.dwSettingsWidth();
 		Profile->lpstAppRegData->dwSettingsHeight = m_Settings.dwSettingsHeight();
-
+		
 		Profile->lpstAppRegData->bDisplayFocusWindowIME = m_Settings.bDisplayFocusWindowIME();
 		
 		Profile->lpstAppRegData->bDisplayIMEModeOnCursor = m_Settings.bDisplayIMEModeOnCursor();
@@ -323,22 +321,6 @@ void		SettingsClose()
 		m_Settings.Close();
 		m_Settings = nullptr;
 	}
-}
-
-//
-// SettingsSynTPStart()
-//
-bool		SettingsSynTPStart()
-{
-	return true;
-}
-
-//
-// SettingsSynTPStop()
-//
-bool		SettingsSynTPStop()
-{
-	return true;
 }
 
 

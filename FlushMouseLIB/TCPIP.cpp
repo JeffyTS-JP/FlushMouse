@@ -17,6 +17,7 @@
 #include <Mstcpip.h>
 #include <Inaddr.h>
 #pragma comment(lib, "ntdll.lib")
+#include <future>
 
 //
 // Define
@@ -96,36 +97,51 @@ static BOOL	bIsPrivateIPv4Addr(DWORD dwIPv4Addr)
 //
 // bCheckExistHostnameIPv4() 
 //
-BOOL		bCheckExistHostnameIPv4(LPCTSTR lpszHostname)
+BOOL		bCheckExistHostnameIPv4(LPCTSTR lpszHostname, int iTimeOut)
 {
-	BOOL		bRet = FALSE;
-	LPWSADATA	_lpWSAData = new WSADATA[sizeof(WSADATA)];
-	PADDRINFOW	ppResult = NULL;
+	if (lpszHostname == NULL)	return FALSE;
 
-	if (_lpWSAData) {
-		ZeroMemory(_lpWSAData, sizeof(WSADATA));
-		if (WSAStartup(MAKEWORD(2, 2), _lpWSAData) != 0)	goto Cleanup;
-		ADDRINFOW	pHints{};
-		SecureZeroMemory(&pHints, sizeof(ADDRINFOW));
-		pHints.ai_flags  = AI_V4MAPPED;
-		pHints.ai_family = AF_INET;
-		pHints.ai_socktype = SOCK_DGRAM;
-		pHints.ai_protocol = IPPROTO_UDP;
-		if (GetAddrInfo(lpszHostname, NULL, &pHints, &ppResult) != 0) {
-			goto Cleanup;
-		}
-		else {
-			if (ppResult && ppResult->ai_addr && (ppResult->ai_addr->sa_family == AF_INET) && (ppResult->ai_addrlen >= 10)) {
-				bRet = bIsPrivateIPv4Addr((DWORD)MAKEIPADDRESS(ppResult->ai_addr->sa_data[2], ppResult->ai_addr->sa_data[3], ppResult->ai_addr->sa_data[4], ppResult->ai_addr->sa_data[5]));
+	std::future<BOOL> _future;
+	std::promise<BOOL> _promise;
+	_future = _promise.get_future();
+	try {
+		std::thread([&](std::promise<BOOL> _promise) { 
+			LPWSADATA	lpWSAData = NULL;
+			if (lpWSAData == NULL)	lpWSAData = new WSADATA[sizeof(WSADATA)];
+			if (lpWSAData)	ZeroMemory(lpWSAData, sizeof(WSADATA));
+			else return FALSE;;
+
+			if (WSAStartup(MAKEWORD(2, 2), lpWSAData) != 0) {
+				if (lpWSAData)	delete []	lpWSAData;
+				return FALSE;
 			}
+
+			ADDRINFOW	pHints{};	
+			SecureZeroMemory(&pHints, sizeof(ADDRINFOW));
+			pHints.ai_flags  = AI_V4MAPPED;
+			pHints.ai_family = PF_INET;
+			pHints.ai_socktype = SOCK_STREAM;
+			pHints.ai_protocol = IPPROTO_UDP;
+			PADDRINFOW	ppResult = NULL;
+			if (GetAddrInfo(lpszHostname, NULL, &pHints, &ppResult) != 0) {
+				WSACleanup();
+				if (ppResult)	FreeAddrInfo(ppResult);
+				if (lpWSAData)	delete []	lpWSAData;
+				return FALSE;
+			}
+			WSACleanup();
+			if (ppResult)	FreeAddrInfo(ppResult);
+			if (lpWSAData)	delete []	lpWSAData;
+			return TRUE;
+			}, std::move(_promise)).detach();
+
+		if(std::future_status::ready == _future.wait_until(std::chrono::system_clock::now() + std::chrono::milliseconds(iTimeOut))) {
+			return TRUE;
 		}
 	}
-Cleanup:
-	if (ppResult)	FreeAddrInfo(ppResult);
-	if (_lpWSAData)	delete [] _lpWSAData;
-	WSACleanup();
-
-	return bRet;
+	catch (...) {
+	}
+	return FALSE;
 }
 
 //

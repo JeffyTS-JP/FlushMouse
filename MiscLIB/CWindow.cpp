@@ -246,5 +246,14 @@ BOOL		CWindow::bInvalidateRect(_In_opt_ LPRECT lpRect, _In_ BOOL bErase)
 	return FALSE;
 }
 
+//
+// bSetWndThreadPriority()
+//
+BOOL		CWindow::bSetWndThreadPriority(int nPriority)
+{
+	if (_hWnd == NULL)		return FALSE;
+	if (SetThreadPriority(GetCurrentThread(), nPriority) != 0)	return TRUE;
+	return FALSE;
+}
 
 /* = EOF = */

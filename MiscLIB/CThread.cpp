@@ -102,6 +102,16 @@ BOOL	CThread::bSetSentinel(BOOL bSentinel)
 }
 
 //
+// bSetThreadPriority()
+//
+BOOL	CThread::bSetThreadPriority(int nPriority) const
+{
+	if ((lpstThreadData == NULL) || (lpstThreadData->lpstSA == NULL) || (lpstThreadData->hEvent == NULL) || (lpstThreadData->hThread == NULL))	return FALSE;		// error
+	if (SetThreadPriority(lpstThreadData->hThread, nPriority) != 0)	return TRUE;
+	return FALSE;
+}
+
+//
 // vUnregister()
 //
 VOID 	CThread::vUnregister()

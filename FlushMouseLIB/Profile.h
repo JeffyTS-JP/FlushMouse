@@ -84,6 +84,7 @@ typedef struct tagAppRegData
 	TCHAR		szSynTPSendIPAddr1[MAX_IPV4_ADDRESS]{};
 	TCHAR		szSynTPSendHostname1[MAX_FQDN]{};
 	DWORD		dwSynTPPortNo1 = 50008;
+	DWORD		dwSynTPTimeOut = 100;
 
 	// for Settings
 	BOOL		bIsPaneOpen = TRUE;
@@ -114,8 +115,8 @@ public:
 	BOOL		bSetProfileData() const;
 
 	BOOL		bFixChangedProfileData() const;
-	BOOL		bGetProfileData4FlushMouse() const;
-	BOOL		bSetProfileData4FlushMouse() const;
+	BOOL		bGetProfileData4Mouse() const;
+	BOOL		bSetProfileData4Mouse() const;
 	BOOL		bGetProfileData4SynTPHelper() const;
 	BOOL		bSetProfileData4SynTPHelper() const;
 	BOOL		bGetProfileData4Settings() const;

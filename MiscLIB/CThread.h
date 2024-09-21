@@ -46,7 +46,8 @@ public:
 	BOOL 	bStart();
 	BOOL	bCheckSentinel() const;
 	BOOL	bSetSentinel(BOOL bSentinel);
-	
+	BOOL	bSetThreadPriority(int nPriority) const;
+
 private:
 	VOID 	vUnregister();
 	static unsigned __stdcall	uThreadProc(void* pArguments);

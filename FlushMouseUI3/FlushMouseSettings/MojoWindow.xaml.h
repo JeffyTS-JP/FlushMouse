@@ -19,8 +19,6 @@ using namespace winrt::Microsoft::UI::Xaml;
 void		SettingsExec(HWND hWnd, UINT32 uMsg, INT32 iSelectedPane);
 void		SettingsApply();
 void		SettingsClose();
-bool		SettingsSynTPStart();
-bool		SettingsSynTPStop();
 
 namespace winrt::FlushMouseSettings::implementation
 {

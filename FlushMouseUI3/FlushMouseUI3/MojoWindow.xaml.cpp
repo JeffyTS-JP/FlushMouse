@@ -79,8 +79,6 @@ namespace winrt::FlushMouseUI3::implementation
 				}
 			}
 		}
-		else {
-		}
 	}
 
 	void		MojoWindowClose()
@@ -127,11 +125,12 @@ void		SettingsExec(HWND hWnd, UINT32 uMsg, INT32 iSelectedPane)
 			m_Settings.dwSettingsY(Profile->lpstAppRegData->dwSettingsY);
 			m_Settings.dwSettingsWidth(Profile->lpstAppRegData->dwSettingsWidth);
 			m_Settings.dwSettingsHeight(Profile->lpstAppRegData->dwSettingsHeight);
-
+			
 			m_Settings.bDisplayFocusWindowIME(Profile->lpstAppRegData->bDisplayFocusWindowIME);
+			
 			m_Settings.bDisplayIMEModeOnCursor(Profile->lpstAppRegData->bDisplayIMEModeOnCursor);
-			Profile->lpstAppRegData->bDisplayIMEModeIMEOFF = m_Settings.bDisplayIMEModeIMEOFF();
 			m_Settings.bDisplayIMEModeByWindow(Profile->lpstAppRegData->bDisplayIMEModeByWindow);
+			m_Settings.bDisplayIMEModeIMEOFF(Profile->lpstAppRegData->bDisplayIMEModeIMEOFF);
 			m_Settings.bOffChangedFocus(Profile->lpstAppRegData->bOffChangedFocus);
 			m_Settings.bForceHiragana(Profile->lpstAppRegData->bForceHiragana);
 			m_Settings.bDoModeDispByIMEKeyDown(Profile->lpstAppRegData->bDoModeDispByIMEKeyDown);
@@ -140,14 +139,14 @@ void		SettingsExec(HWND hWnd, UINT32 uMsg, INT32 iSelectedPane)
 			m_Settings.bDrawNearCaret(Profile->lpstAppRegData->bDrawNearCaret);
 			m_Settings.bIMEModeForced(Profile->lpstAppRegData->bIMEModeForced);
 			m_Settings.bEnableEPHelper(Profile->lpstAppRegData->bEnableEPHelper);
-
+			
 			m_Settings.iCursorSize(Profile->lpstAppRegData->iCursorSize);
 			m_Settings.iIMEModeDistance(Profile->lpstAppRegData->iIMEModeDistance);
 			m_Settings.iModeSize(Profile->lpstAppRegData->iModeSize);
 			m_Settings.dwDisplayModeTime(Profile->lpstAppRegData->dwDisplayModeTime);
 			m_Settings.dwAdditionalWaitTime(Profile->lpstAppRegData->dwAdditionalWaitTime);
 			m_Settings.dwWaitWaveTime(Profile->lpstAppRegData->dwWaitWaveTime);
-
+			
 			m_Settings.dwNearDrawMouseIMEOFFColor(Profile->lpstAppRegData->dwNearDrawMouseIMEOFFColor);
 			m_Settings.dwNearDrawMouseHANEISU_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseHANEISU_IMEONColor);
 			m_Settings.dwNearDrawMouseHANKANA_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseHANKANA_IMEONColor);
@@ -166,7 +165,7 @@ void		SettingsExec(HWND hWnd, UINT32 uMsg, INT32 iSelectedPane)
 			m_Settings.dwNearDrawMouseByWndZENEISU_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseByWndZENEISU_IMEONColor);
 			m_Settings.dwNearDrawMouseByWndZENHIRA_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseByWndZENHIRA_IMEONColor);
 			m_Settings.dwNearDrawMouseByWndZENKANA_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseByWndZENKANA_IMEONColor);
-
+			
 			m_Settings.dwSynTPHelper1(Profile->lpstAppRegData->dwSynTPHelper1);
 			m_Settings.dwSynTPPadX(Profile->lpstAppRegData->dwSynTPPadX);
 			m_Settings.dwSynTPPadY(Profile->lpstAppRegData->dwSynTPPadY);
@@ -222,8 +221,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		HANDLE_MSG(hWnd, WM_NCLBUTTONDBLCLK, Cls_OnNCLButtonDown);
 		break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 	return CallWindowProc((WNDPROC)m_SettingsWndProc, hWnd, message, wParam, lParam);
 }
@@ -254,11 +253,12 @@ void		SettingsApply()
 		Profile->lpstAppRegData->dwSettingsY = m_Settings.dwSettingsY();
 		Profile->lpstAppRegData->dwSettingsWidth = m_Settings.dwSettingsWidth();
 		Profile->lpstAppRegData->dwSettingsHeight = m_Settings.dwSettingsHeight();
-
+		
 		Profile->lpstAppRegData->bDisplayFocusWindowIME = m_Settings.bDisplayFocusWindowIME();
+		
 		Profile->lpstAppRegData->bDisplayIMEModeOnCursor = m_Settings.bDisplayIMEModeOnCursor();
-		Profile->lpstAppRegData->bDisplayIMEModeIMEOFF = m_Settings.bDisplayIMEModeIMEOFF();
 		Profile->lpstAppRegData->bDisplayIMEModeByWindow = m_Settings.bDisplayIMEModeByWindow();
+		Profile->lpstAppRegData->bDisplayIMEModeIMEOFF = m_Settings.bDisplayIMEModeIMEOFF();
 		Profile->lpstAppRegData->bOffChangedFocus = m_Settings.bOffChangedFocus();
 		Profile->lpstAppRegData->bForceHiragana = m_Settings.bForceHiragana();
 		Profile->lpstAppRegData->bDoModeDispByIMEKeyDown = m_Settings.bDoModeDispByIMEKeyDown();
@@ -267,14 +267,14 @@ void		SettingsApply()
 		Profile->lpstAppRegData->bDrawNearCaret = m_Settings.bDrawNearCaret();
 		Profile->lpstAppRegData->bIMEModeForced = m_Settings.bIMEModeForced();
 		Profile->lpstAppRegData->bEnableEPHelper = m_Settings.bEnableEPHelper();
-
+		
 		Profile->lpstAppRegData->iCursorSize = m_Settings.iCursorSize();
 		Profile->lpstAppRegData->iIMEModeDistance = m_Settings.iIMEModeDistance();
 		Profile->lpstAppRegData->iModeSize = m_Settings.iModeSize();
 		Profile->lpstAppRegData->dwDisplayModeTime = m_Settings.dwDisplayModeTime();
 		Profile->lpstAppRegData->dwAdditionalWaitTime = m_Settings.dwAdditionalWaitTime();
 		Profile->lpstAppRegData->dwWaitWaveTime = m_Settings.dwWaitWaveTime();
-
+		
 		Profile->lpstAppRegData->dwNearDrawMouseIMEOFFColor = m_Settings.dwNearDrawMouseIMEOFFColor();
 		Profile->lpstAppRegData->dwNearDrawMouseHANEISU_IMEONColor = m_Settings.dwNearDrawMouseHANEISU_IMEONColor();
 		Profile->lpstAppRegData->dwNearDrawMouseHANKANA_IMEONColor = m_Settings.dwNearDrawMouseHANKANA_IMEONColor();
@@ -301,7 +301,7 @@ void		SettingsApply()
 		Profile->lpstAppRegData->dwSynTPEdgeY = m_Settings.dwSynTPEdgeY();
 		ZeroMemory(Profile->lpstAppRegData->szSynTPSendIPAddr1, (MAX_IPV4_ADDRESS * sizeof(TCHAR)));
 		if (_snwprintf_s(Profile->lpstAppRegData->szSynTPSendIPAddr1, MAX_IPV4_ADDRESS, _TRUNCATE, L"%s.%s.%s.%s", 
-			(LPCTSTR)(m_Settings.szSynTPSendIPAddr1_1().c_str()), (LPCTSTR)(m_Settings.szSynTPSendIPAddr1_2().c_str()), (LPCTSTR)(m_Settings.szSynTPSendIPAddr1_3().c_str()), (LPCTSTR)(m_Settings.szSynTPSendIPAddr1_4().c_str())) <= 0) {
+				(LPCTSTR)(m_Settings.szSynTPSendIPAddr1_1().c_str()), (LPCTSTR)(m_Settings.szSynTPSendIPAddr1_2().c_str()), (LPCTSTR)(m_Settings.szSynTPSendIPAddr1_3().c_str()), (LPCTSTR)(m_Settings.szSynTPSendIPAddr1_4().c_str())) <= 0) {
 		}
 		ZeroMemory(Profile->lpstAppRegData->szSynTPSendHostname1, (MAX_FQDN * sizeof(TCHAR)));
 		if (_tcsncpy_s(Profile->lpstAppRegData->szSynTPSendHostname1, MAX_FQDN, (LPCTSTR)(m_Settings.szSynTPSendHostname1().c_str()), _TRUNCATE) != 0) {
@@ -310,7 +310,6 @@ void		SettingsApply()
 		Profile->lpstAppRegData->bSynTPStarted1 = m_Settings.bSynTPStarted1();
 	}
 	Profile->bSetProfileData();
-
 }
 
 //
@@ -327,36 +326,5 @@ void		SettingsClose()
 	}
 }
 
-//
-// SettingsSynTPStart()
-//
-bool		SettingsSynTPStart()
-{
-	if (Profile == NULL)	return false;
-	if (m_Settings != nullptr) {
-		m_Settings.bSynTPStarted1(false);
-	}
-	bool bRet = bStartSynTPHelper(hMainWnd, Profile->lpstAppRegData->dwSynTPHelper1, TRUE);
-	if (bRet) {
-		if (m_Settings != nullptr) {
-			m_Settings.bSynTPStarted1(true);
-		}
-	}
-	SettingsApply();
-	return bRet;
-}
-
-//
-// SettingsSynTPStop()
-//
-bool		SettingsSynTPStop()
-{
-	bool bRet = bStopSynTPHelper();
-	if (m_Settings != nullptr) {
-		m_Settings.bSynTPStarted1(false);
-	}
-	SettingsApply();
-	return bRet;
-}
 
 /* = EOF = */

@@ -69,7 +69,7 @@ CSynTP		*SynTP = NULL;
 // Local Data
 //
 static Application	windowApp{ nullptr };
-static HINSTANCE	_hInstance{ nullptr };
+static HINSTANCE	m_hInstance{ nullptr };
 
 static int			activationCount = 1;
 static event_token	activationToken;
@@ -93,7 +93,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 // Handler
 static BOOL		Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct);
 static void		Cls_OnDestroy(HWND hWnd);
-static bool		Cls_OnSettingsEx(HWND hWnd, int iCode, LPARAM lParam);
+static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, int iSubCode);
 
 //
 // wWinMain()
@@ -105,7 +105,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	UNREFERENCED_PARAMETER(lpCmdLine);
 	UNREFERENCED_PARAMETER(nCmdShow);
 
-	_hInstance = hInstance;
+	m_hInstance = hInstance;
 
 	LPCTSTR	_lpCmdLine = GetCommandLine();
 	int		iNumArgs = 0;
@@ -217,22 +217,6 @@ VOID		vSettingDialogClose()
 }
 
 //
-// bSettingSynTPStart()
-//
-BOOL		bSettingSynTPStart()
-{
-	return SettingsSynTPStart();
-}
-
-//
-// bSettingSynTPStop()
-//
-BOOL		bSettingSynTPStop()
-{
-	return SettingsSynTPStop();
-}
-
-//
 // CalcWindowCentralizeRect()
 //
 void CalcWindowCentralizeRect(HWND hWnd, Windows::Graphics::RectInt32* Rect32)
@@ -285,18 +269,24 @@ SettingsMain::~SettingsMain()
 //
 void SettingsMain::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 {
-	hMicrosoft_ui_xaml_dll = ::LoadLibrary(L"Microsoft.ui.xaml.dll");
-	hFlushMouseUI3DLL = ::LoadLibrary(FLUSHMOUSEUI3_DLL);
+#ifdef _DEBUG
+	UnhandledException([this](IInspectable const&, UnhandledExceptionEventArgs const&) {
+		MessageBox(NULL, L"EXCEPTION", L"FlushMouseSettings", (MB_ICONSTOP | MB_OK));
+		});
+#endif // _DEBUG
+
+	hMicrosoft_ui_xaml_dll = LoadLibrary(L"Microsoft.ui.xaml.dll");
+	hFlushMouseUI3DLL = LoadLibrary(FLUSHMOUSEUI3_DLL);
 	
 	MojoWindowExec();
 	
-	if (!bSettingsWinMain((HINSTANCE)_hInstance, NULL, NULL, SW_HIDE)) {
+	if (!bSettingsWinMain((HINSTANCE)m_hInstance, NULL, NULL, SW_HIDE)) {
 	}
 
 	MojoWindowClose();
 
-	if (hFlushMouseUI3DLL)	::FreeLibrary(hFlushMouseUI3DLL);
-	if (hMicrosoft_ui_xaml_dll)	::FreeLibrary(hMicrosoft_ui_xaml_dll);
+	if (hFlushMouseUI3DLL)	FreeLibrary(hFlushMouseUI3DLL);
+	if (hMicrosoft_ui_xaml_dll)	FreeLibrary(hMicrosoft_ui_xaml_dll);
 
 	PostQuitMessage(0);
 	return;
@@ -328,7 +318,6 @@ static BOOL		bSettingsWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrev
 	if (hHandle != NULL) {
 		if (!SetPriorityClass(hHandle, NORMAL_PRIORITY_CLASS)) {
 			CloseHandle(hHandle);
-			//bReportEvent(MSG_STOPPED_FLUSHMOUSE, APPLICATION_CATEGORY);		// Eventlog
 			return FALSE;
 		}
 		CloseHandle(hHandle);
@@ -518,8 +507,6 @@ static void Cls_OnDestroy(HWND hWnd)
 {
 	UNREFERENCED_PARAMETER(hWnd);
 	
-	//vDestroyWindow(hWnd);
-
 	if (Profile != NULL) {
 		delete	Profile;
 		Profile = NULL;
@@ -532,51 +519,65 @@ static void Cls_OnDestroy(HWND hWnd)
 // WM_SETTINGSEX (WM_USER + 0xfe)
 // Cls_OnSettingsEx()
 //
-static bool		Cls_OnSettingsEx(HWND hWnd, int iCode, LPARAM lParam)
+static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, int iSubCode)
 {
-	UNREFERENCED_PARAMETER(hWnd);
-	UNREFERENCED_PARAMETER(lParam);
-	if (iCode == SETTINGSEX_CANCEL) {
-		vSettingDialogClose();
-		return true;
-	}
 
-	vSettingDialogApply();
+	if (!hWnd || !Profile)	return FALSE;
 
-	if (iCode == SETTINGSEX_CHANGE_PANE) {
-		if (hWnd) {
-			if (lParam == SETTINGSEX_SELECTEDPANE_GENERAL)	{
-				iSelectedPane = SETTINGSEX_SELECTEDPANE_GENERAL;
-				vSettingDialog(hWnd);
+	switch (iCode) {
+		case SETTINGSEX_OK:	
+			vSettingDialogApply();
+			if (!Profile->bSetProfileData())	return FALSE;
+			vSettingDialogClose();
+			return TRUE;
+		case SETTINGSEX_CANCEL:
+			vSettingDialogClose();
+			return TRUE;
+		case SETTINGSEX_APPLY:
+			vSettingDialogApply();
+			if (!Profile->bSetProfileData())	return FALSE;
+			return TRUE;
+		case SETTINGSEX_RELOAD_REGISTRY:
+			return TRUE;
+		case SETTINGSEX_RELOAD_MOUSE:
+			vSettingDialogApply();
+			if (!Profile->bSetProfileData4Mouse())	return FALSE;
+			return TRUE;
+		case SETTINGSEX_SETTINGS_CHANGE_PANE:
+			vSettingDialogApply();
+			iSelectedPane = iSubCode;
+			if (!Profile->bSetProfileData4Settings())	return FALSE;
+			switch (iSubCode) {
+				case SETTINGSEX_SELECTEDPANE_GENERAL:
+					vSettingDialog(hWnd);
+					break;
+				case SETTINGSEX_SELECTEDPANE_IMEMODE:
+					vIMEModeDialog(hWnd);
+					break;
+				case SETTINGSEX_SELECTEDPANE_SYNTPHELPER:
+					vSynTPHelperDialog(hWnd);
+					break;
+				case SETTINGSEX_SELECTEDPANE_ABOUT:
+					vAboutDialog(hWnd);
+					break;
 			}
-			else if (lParam == SETTINGSEX_SELECTEDPANE_IMEMODE)	{
-				iSelectedPane = SETTINGSEX_SELECTEDPANE_IMEMODE;
-				vIMEModeDialog(hWnd);
-			}
-			else if (lParam == SETTINGSEX_SELECTEDPANE_SYNTPHELPER)	{
-				iSelectedPane = SETTINGSEX_SELECTEDPANE_SYNTPHELPER;
-				vSynTPHelperDialog(hWnd);
-			}
-			else if (lParam == SETTINGSEX_SELECTEDPANE_ABOUT) {
-				iSelectedPane = SETTINGSEX_SELECTEDPANE_ABOUT;
-				vAboutDialog(hWnd);
-			}
-			return true;
-		}
-		return false;
+			return TRUE;
+		case SETTINGSEX_SETTINGS_STARTED:
+			return TRUE;
+		case SETTINGSEX_SETTINGS_SETREGISTRY:
+			vSettingDialogApply();
+			if (!Profile->bSetProfileData4Settings())	return FALSE;
+			return TRUE;
+		case SETTINGSEX_SYNTP_START:
+		case SETTINGSEX_SYNTP_STOP:
+		case SETTINGSEX_SYNTP_IS_STARTED:
+			return TRUE;
+		case SETTINGSEX_SYNTP_SETREGISRY:
+			vSettingDialogApply();
+			if (!Profile->bSetProfileData4SynTPHelper())	return FALSE;
+			return TRUE;
 	}
-
-	if (iCode == SETTINGSEX_OK) {
-		vSettingDialogClose();
-		return true;
-	}
-	if (iCode == SETTINGSEX_SYNTP_START) {
-		return bSettingSynTPStart();
-	}
-	if (iCode == SETTINGSEX_SYNTP_STOP) {
-		return bSettingSynTPStop();
-	}
-	return true;
+	return TRUE;
 }
 
 

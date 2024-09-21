@@ -92,6 +92,7 @@ CProfile::CProfile()
 		_tcsncpy_s(lpstAppRegData->szSynTPSendIPAddr1, MAX_IPV4_ADDRESS, L"10.0.100.128", _TRUNCATE);	// SynTP Helper Send IP Addr 1
 		_tcsncpy_s(lpstAppRegData->szSynTPSendHostname1, MAX_FQDN, L"", _TRUNCATE);			// SynTP Helper Hostname 1
 		lpstAppRegData->dwSynTPPortNo1 = 50008;						// SynTP Helper Port Number 1
+		lpstAppRegData->dwSynTPTimeOut = 100;						// TCP/IP Timeout (ms)
 
 		lpstAppRegData->dwSettingsX = 0;							// Settings Position X
 		lpstAppRegData->dwSettingsY = 0;							// Settings Position Y
@@ -119,7 +120,7 @@ BOOL		CProfile::bGetProfileData() const
 
 	BOOL		bRet = FALSE;
 
-	if (!bGetProfileData4FlushMouse())	goto Cleanup;
+	if (!bGetProfileData4Mouse())	goto Cleanup;
 	if (!bGetProfileData4SynTPHelper())	goto Cleanup;
 	if (!bGetProfileData4Settings())	goto Cleanup;
 
@@ -138,7 +139,7 @@ BOOL		CProfile::bSetProfileData() const
 
 	BOOL		bRet = FALSE;
 
-	if (!bSetProfileData4FlushMouse())	goto Cleanup;
+	if (!bSetProfileData4Mouse())	goto Cleanup;
 	if (!bSetProfileData4SynTPHelper())	goto Cleanup;
 	if (!bSetProfileData4Settings())	goto Cleanup;
 
@@ -212,9 +213,9 @@ Cleanup:
 }
 
 //
-// bGetProfileData4FlushMouse()
+// bGetProfileData4Mouse()
 //
-BOOL		CProfile::bGetProfileData4FlushMouse() const
+BOOL		CProfile::bGetProfileData4Mouse() const
 {
 	if (lpstAppRegData == NULL) return FALSE;
 
@@ -275,9 +276,9 @@ Cleanup:
 }
 
 //
-// bSetProfileData4FlushMouse()
+// bSetProfileData4Mouse()
 //
-BOOL		CProfile::bSetProfileData4FlushMouse() const
+BOOL		CProfile::bSetProfileData4Mouse() const
 {
 	if (lpstAppRegData == NULL) return FALSE;
 
@@ -359,6 +360,7 @@ BOOL		CProfile::bGetProfileData4SynTPHelper() const
 	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPSendIPAddr1"), lpstAppRegData->szSynTPSendIPAddr1, sizeof(lpstAppRegData->szSynTPSendIPAddr1)))	goto Cleanup;
 	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPSendHostname1"), lpstAppRegData->szSynTPSendHostname1, sizeof(lpstAppRegData->szSynTPSendHostname1)))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPPortNo1"), (LPDWORD) & lpstAppRegData->dwSynTPPortNo1, lpstAppRegData->dwSynTPPortNo1))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPTimeOut"), (LPDWORD) & lpstAppRegData->dwSynTPTimeOut, lpstAppRegData->dwSynTPTimeOut))	goto Cleanup;
 
 	bRet = TRUE;
 
@@ -387,6 +389,7 @@ BOOL		CProfile::bSetProfileData4SynTPHelper() const
 	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPSendIPAddr1"), lpstAppRegData->szSynTPSendIPAddr1, sizeof(lpstAppRegData->szSynTPSendIPAddr1)))	goto Cleanup;
 	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPSendHostname1"), lpstAppRegData->szSynTPSendHostname1, sizeof(lpstAppRegData->szSynTPSendHostname1)))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPPortNo1"), lpstAppRegData->dwSynTPPortNo1))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("SynTPTimeOut"), lpstAppRegData->dwSynTPTimeOut))	goto Cleanup;
 
 	bRet = TRUE;
 

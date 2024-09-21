@@ -55,5 +55,6 @@ typedef unsigned short USHORT;
 //#include <bit>
 #include <cstdlib>
 #include <stdio.h>
+#include <future>
 
 #endif //PCH_H

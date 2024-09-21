@@ -86,7 +86,7 @@ static void		Cls_OnDestroy(HWND hWnd);
 static void		Cls_OnInput(HWND hWnd, DWORD dwFlags, HRAWINPUT hRawInput);
 
 // EX Message Handler
-static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, LPARAM lParam);
+static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, int iSubCode);
 static void		Cls_OnInputLangChangeEx(HWND hWnd, UINT CodePage, HKL hkl);
 static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd);
 static void		Cls_OnCheckIMEStartConvertingEx(HWND hWnd, BOOL bStartConverting, DWORD vkCode);
@@ -385,15 +385,6 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		bForExplorerPatcherSWS(GetForegroundWindow(), TRUE, TRUE, NULL, NULL);
 	}
 
-	BOOL	bSynTP = TRUE;
-	if (Profile != NULL) {
-		if ((Profile->lpstAppRegData->dwSynTPHelper1 == SYNTPH_SENDERIPV4_START)
-			|| (Profile->lpstAppRegData->dwSynTPHelper1 == SYNTPH_SENDERHOSNAMEIPV4_START)
-			|| (Profile->lpstAppRegData->dwSynTPHelper1 == SYNTPH_RECEIVERIPV4_START)) {
-			bSynTP = bStartSynTPHelper(hMainWnd, Profile->lpstAppRegData->dwSynTPHelper1, FALSE);
-		}
-	}
-
 	HICON	hIcon = NULL;
 	if ((hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE))) != NULL) {
 		if (bCreateTaskTrayWindow(hWnd, hIcon, szTitle) == FALSE) {
@@ -412,17 +403,11 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		return FALSE;
 	}
 
-	if (!bSynTP) {
-		TCHAR	szInfo[MAX_LOADSTRING];
-		LoadString(Resource->hLoad(), IDS_CANTSYTPHELPER, szInfo, MAX_LOADSTRING);
-		if (!bDisplayBalloon(hWnd, NIIF_WARNING, NULL, szInfo)) {
-			try {
-				vMessageBox(hWnd, IDS_NOTREGISTERTT, MessageBoxTYPE);
-			}
-			catch (...) {
-			}
-			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-			return FALSE;
+	if (Profile != NULL) {
+		if ((Profile->lpstAppRegData->dwSynTPHelper1 == SYNTPH_SENDERIPV4_START)
+			|| (Profile->lpstAppRegData->dwSynTPHelper1 == SYNTPH_RECEIVERIPV4_START)
+			|| (Profile->lpstAppRegData->dwSynTPHelper1 == SYNTPH_SENDERHOSNAMEIPV4_START)) {
+			bStartSynTPHelper(hMainWnd, Profile->lpstAppRegData->dwSynTPHelper1, TRUE);
 		}
 	}
 
@@ -458,6 +443,10 @@ void		vDestroyWindow(HWND hWnd)
 	}
 	if (Cursor != NULL) {
 		Cursor->vStopDrawIMEModeMouseByWndThread();
+	}
+	HWND	_hWnd = FindWindow(CLASS_FLUSHMOUSESETTINGS, NULL);
+	if (_hWnd != NULL) {
+		SendMessage(_hWnd, WM_DESTROY, 0, 0);
 	}
 	if (uCheckProcTimer != NULL) {
 		if (KillTimer(hWnd, nCheckProcTimerID)) {
@@ -591,59 +580,9 @@ void Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground)
 // WM_SETTINGSEX (WM_USER + 0xfe)
 // Cls_OnSettingsEx()
 //
-static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, LPARAM lParam)
+static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, int iSubCode)
 {
-	UNREFERENCED_PARAMETER(hWnd);
-	UNREFERENCED_PARAMETER(lParam);
-
-	if (!Profile)	return FALSE;
-
-	switch(iCode) {
-	case SETTINGSEX_OK:
-		vSettingDialogApply();
-		if (!Profile->bGetProfileData())	return FALSE;
-		vSettingDialogClose();
-		return TRUE;
-	case SETTINGSEX_CANCEL:
-		vSettingDialogClose();
-		return TRUE;
-	case SETTINGSEX_APPLY:
-		vSettingDialogApply();
-		if (!Profile->bGetProfileData())	return FALSE;
-		return TRUE;
-	case SETTINGSEX_SETTINGS_STARTED:
-		if((Cursor) && (Cursor->bStartDrawIMEModeMouseByWndThread())) {
-			vSettingDialogClose();
-			return TRUE;
-		}
-		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
-		return TRUE;
-	case SETTINGSEX_RELOAD_REGISTRY:
-		if (!Profile->bGetProfileData())	return FALSE;
-		vSettingDialogApply();
-		return TRUE;
-	case SETTINGSEX_RELOAD_CURSOR:
-		vSettingDialogApply();
-		if (!Profile->bGetProfileData())	return FALSE;
-		if (!Cursor->bReloadCursor()) {
-			vSettingDialogClose();
-			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
-			return FALSE;
-		}
-		return TRUE;
-	case SETTINGSEX_SYNTP_START:
-		vSettingDialogApply();
-		if (!Profile->bGetProfileData())	return FALSE;
-		return bSettingSynTPStart();
-	case SETTINGSEX_SYNTP_STOP:
-		vSettingDialogApply();
-		if (!Profile->bGetProfileData())	return FALSE;
-		return bSettingSynTPStop();
-	case SETTINGSEX_SYNTP_IS_STARTED:
-		if (SynTP)	return TRUE;
-		else return FALSE;
-	}
-	return TRUE;
+	return bSettingsEx(hWnd, iCode, iSubCode);
 }
 
 //

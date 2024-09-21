@@ -1,4 +1,5 @@
-﻿// FlushMouseSub.cpp
+﻿//
+// FlushMouseSub.cpp
 //		Copyright (C) 2022 JeffyTS
 //
 // No.      Date		    Name		    Reason & Document
@@ -40,21 +41,110 @@
 //
 
 //
+// bSettingsEx()
+//
+BOOL		bSettingsEx(HWND hWnd, int iCode, int iSubCode)
+{
+	UNREFERENCED_PARAMETER(hWnd);
+	UNREFERENCED_PARAMETER(iSubCode);
+
+	if (!Profile || !Cursor)	return FALSE;
+
+	switch(iCode) {
+		case SETTINGSEX_OK:
+			vSettingDialogApply();
+			if (!Profile->bSetProfileData())	return FALSE;
+			if (!Profile->bGetProfileData())	return FALSE;
+			if (Profile->lpstAppRegData->bDisplayIMEModeByWindow)	Cursor->bStartDrawIMEModeMouseByWndThread();
+			else Cursor->vStopDrawIMEModeMouseByWndThread();
+			vSettingDialogClose();
+			return TRUE;
+		case SETTINGSEX_CANCEL:
+			vSettingDialogClose();
+			if (Profile->lpstAppRegData->bDisplayIMEModeByWindow)	Cursor->bStartDrawIMEModeMouseByWndThread();
+			else Cursor->vStopDrawIMEModeMouseByWndThread();
+			return TRUE;
+		case SETTINGSEX_APPLY:
+			vSettingDialogApply();
+			if (!Profile->bSetProfileData())	return FALSE;
+			if (!Profile->bGetProfileData())	return FALSE;
+			Cursor->vSetParamFromRegistry();
+			return TRUE;
+		case SETTINGSEX_RELOAD_REGISTRY:
+			if (!Profile->bGetProfileData())	return FALSE;
+			Cursor->vSetParamFromRegistry();
+			return TRUE;
+		case SETTINGSEX_RELOAD_MOUSE:
+			vSettingDialogApply();
+			if (!Profile->bGetProfileData4Mouse())	return FALSE;
+			Cursor->vSetParamFromRegistry();
+			if (!Cursor->bReloadCursor()) {
+				vSettingDialogClose();
+				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+				return FALSE;
+			}
+			if (!Profile->lpstAppRegData->bDisplayIMEModeOnCursor && !Profile->lpstAppRegData->bDisplayIMEModeByWindow) {
+				Cursor->vStopDrawIMEModeMouseByWndThread();
+			}
+			else {
+				Cursor->bStartDrawIMEModeMouseByWndThread();
+			}
+			return TRUE;
+		case SETTINGSEX_SETTINGS_CHANGE_PANE:
+			return TRUE;
+		case SETTINGSEX_SETTINGS_STARTED:
+			if (Profile->lpstAppRegData->bDisplayIMEModeByWindow) {
+				if (Cursor->bStartDrawIMEModeMouseByWndThread()) {
+					return TRUE;
+				}
+				vSettingDialogClose();
+				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+				return FALSE;
+			}
+			return TRUE;
+		case SETTINGSEX_SETTINGS_SETREGISTRY:
+			vSettingDialogApply();
+			return Profile->bSetProfileData4Settings();
+		case SETTINGSEX_SYNTP_START:
+			vSettingDialogApply();
+			if (!Profile->bGetProfileData4SynTPHelper())	return FALSE;
+			return bStartSynTPHelper(hWnd, Profile->lpstAppRegData->dwSynTPHelper1, TRUE);
+		case SETTINGSEX_SYNTP_STOP:
+			vSettingDialogApply();
+			if (!Profile->bGetProfileData4SynTPHelper())	return FALSE;
+			return bStopSynTPHelper();
+		case SETTINGSEX_SYNTP_IS_STARTED:
+			if (!Profile->bGetProfileData4SynTPHelper())	return FALSE;
+			if (SynTP)	return TRUE;
+			else return FALSE;
+		case SETTINGSEX_SYNTP_SETREGISRY:
+			vSettingDialogApply();
+			if (!Profile->bSetProfileData4SynTPHelper())	return FALSE;
+			if (!Profile->bGetProfileData4SynTPHelper())	return FALSE;
+			return TRUE;
+	}
+	return TRUE;
+}
+
+//
 // bStartSynTPHelper()
 //
 BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
 {
+	UNREFERENCED_PARAMETER(bShowMessage);
+
 	if (!Profile)	return FALSE;
 	Profile->lpstAppRegData->bSynTPStarted1 = FALSE;
 	if (SynTP == NULL)	SynTP = new CSynTP(Profile->lpstAppRegData->dwSynTPPadX, Profile->lpstAppRegData->dwSynTPPadY, Profile->lpstAppRegData->dwSynTPEdgeX, Profile->lpstAppRegData->dwSynTPEdgeY);
 	if (SynTP) {
+		TCHAR	szInfo[MAX_LOADSTRING];
+		LoadString(Resource->hLoad(), IDS_CANTSYTPHELPER, szInfo, MAX_LOADSTRING);
 		switch (dwSynTPHelper) {
 		case SYNTPH_SENDERIPV4:
 		case SYNTPH_SENDERIPV4_START:
 			SynTP->bStopSender();
 			if (!SynTP->bStartSender(hMainWnd, Profile->lpstAppRegData->szSynTPSendIPAddr1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
-				if (bShowMessage) vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
+				if (bShowMessage) bDisplayBalloon(hWnd, NIIF_WARNING, NULL, szInfo);
 				delete SynTP;
 				SynTP = NULL;
 			}
@@ -64,12 +154,14 @@ BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
 		case SYNTPH_SENDERHOSNAMEIPV4_START:
 		case SYNTPH_SENDERHOSNAMEIPV6:
 		case SYNTPH_SENDERHOSNAMEIPV6_START:
-			SynTP->bStopSender();
-			if (SynTP->bStartSender(hMainWnd, Profile->lpstAppRegData->szSynTPSendHostname1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
-				Profile->lpstAppRegData->bSynTPStarted1 = TRUE;
-				break;
+			if (bCheckExistHostnameIPv4(Profile->lpstAppRegData->szSynTPSendHostname1, Profile->lpstAppRegData->dwSynTPTimeOut)) {
+				SynTP->bStopSender();
+				if (SynTP->bStartSender(hMainWnd, Profile->lpstAppRegData->szSynTPSendHostname1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
+					Profile->lpstAppRegData->bSynTPStarted1 = TRUE;
+					break;
+				}
 			}
-			if (bShowMessage) vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
+			if (bShowMessage) bDisplayBalloon(hWnd, NIIF_WARNING, NULL, szInfo);
 			delete SynTP;
 			SynTP = NULL;
 			break;
@@ -79,7 +171,7 @@ BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
 		case SYNTPH_RECEIVERIPV6_START:
 			SynTP->vStopReceiver();
 			if (!SynTP->bStartReceiver(hMainWnd, Profile->lpstAppRegData->dwSynTPPortNo1)) {
-				if (bShowMessage) vMessageBox(hWnd, IDS_CANTSYTPHELPER, MessageBoxTYPE);
+				if (bShowMessage) bDisplayBalloon(hWnd, NIIF_WARNING, NULL, szInfo);
 				delete SynTP;
 				SynTP = NULL;
 			}

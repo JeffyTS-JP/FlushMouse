@@ -52,7 +52,7 @@ typedef struct icmp_hdr
 extern DWORD		dwGetString2IPv4Addr(LPCTSTR lpszIPAddress);
 extern BOOL			bGetString2IPv4Addr(LPCTSTR lpszIPAddress, LPTSTR addr1, LPTSTR addr2, LPTSTR addr3, LPTSTR addr4);
 extern BOOL			bIsPrivateAddress(LPCTSTR lpszIPAddress);
-extern BOOL			bCheckExistHostnameIPv4(LPCTSTR lpszHostname);
+extern BOOL			bCheckExistHostnameIPv4(LPCTSTR lpszHostname, int iTimeOut);
 
 //
 // class CTCPIP
