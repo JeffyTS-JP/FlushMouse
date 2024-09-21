@@ -173,7 +173,8 @@
       <EnableUAC>false</EnableUAC>
     </Link>
     <PostBuildEvent>
-      <Command>Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouse32.exe" "$(OutDir)"
+      <Command>Xcopy /Y "$(SolutionDir)$(Platform)\$(Configuration)\FlushMouseCursor.dat" "$(ProjectDir)"
+Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouse32.exe" "$(OutDir)"
 Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouse32.pdb" "$(OutDir)"
 Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouseDLL32.dll" "$(OutDir)"
 Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouseDLL32.pdb" "$(OutDir)"
@@ -216,6 +217,7 @@ Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouseDLL32.pdb" "$(OutDir)"
     </Link>
     <PostBuildEvent>
       <Command>Start /wait /min cmd /c "$(SolutionDir)Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
+Xcopy /Y "$(SolutionDir)$(Platform)\$(Configuration)\FlushMouseCursor.dat" "$(ProjectDir)"
 Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouse32.exe" "$(OutDir)"
 Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouse32.pdb" "$(OutDir)"
 Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouseDLL32.dll" "$(OutDir)"

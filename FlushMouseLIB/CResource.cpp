@@ -15,8 +15,6 @@
 
 #include "CResource.h"
 
-#include "..\..\MiscLIB\CDebug\CDebug.h"
-
 //
 // Define
 //
