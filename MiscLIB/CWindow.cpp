@@ -197,7 +197,7 @@ LRESULT CWindow::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 //
 // bUpdateWindow()
 //
-BOOL		CWindow::bUpdateWindow()
+BOOL		CWindow::bUpdateWindow() const
 {
 	if (_hWnd == NULL)	return FALSE;
 
@@ -208,7 +208,7 @@ BOOL		CWindow::bUpdateWindow()
 //
 // bShowWindow()
 //
-BOOL		CWindow::bShowWindow(_In_ int nCmdShow)
+BOOL		CWindow::bShowWindow(_In_ int nCmdShow) const
 {
 	if (_hWnd == NULL)	return FALSE;
 
@@ -219,7 +219,7 @@ BOOL		CWindow::bShowWindow(_In_ int nCmdShow)
 //
 // bSetWindowText()
 //
-BOOL		CWindow::bSetWindowText(_In_opt_ LPCTSTR szTitle)
+BOOL		CWindow::bSetWindowText(_In_opt_ LPCTSTR szTitle) const
 {
 	if (_hWnd == NULL)		return FALSE;
 	if (szTitle == NULL)	return FALSE;
@@ -230,7 +230,7 @@ BOOL		CWindow::bSetWindowText(_In_opt_ LPCTSTR szTitle)
 //
 // bSetWindowPos()
 //
-BOOL		CWindow::bSetWindowPos(_In_opt_ HWND hWndInsertAfter, _In_ int X, _In_ int Y, _In_ int cx, _In_ int cy,_In_  UINT uFlags)
+BOOL		CWindow::bSetWindowPos(_In_opt_ HWND hWndInsertAfter, _In_ int X, _In_ int Y, _In_ int cx, _In_ int cy,_In_  UINT uFlags) const
 {
 	if (_hWnd == NULL)		return FALSE;
 	if (SetWindowPos(_hWnd, hWndInsertAfter, X, Y, cx, cy, uFlags))	return TRUE;
@@ -239,7 +239,7 @@ BOOL		CWindow::bSetWindowPos(_In_opt_ HWND hWndInsertAfter, _In_ int X, _In_ int
 //
 // bInvalidateRect()
 //
-BOOL		CWindow::bInvalidateRect(_In_opt_ LPRECT lpRect, _In_ BOOL bErase)
+BOOL		CWindow::bInvalidateRect(_In_opt_ LPRECT lpRect, _In_ BOOL bErase) const
 {
 	if (_hWnd == NULL)		return FALSE;
 	if (InvalidateRect(_hWnd, lpRect, bErase))	return TRUE;
@@ -249,7 +249,7 @@ BOOL		CWindow::bInvalidateRect(_In_opt_ LPRECT lpRect, _In_ BOOL bErase)
 //
 // bSetWndThreadPriority()
 //
-BOOL		CWindow::bSetWndThreadPriority(int nPriority)
+BOOL		CWindow::bSetWndThreadPriority(int nPriority) const
 {
 	if (_hWnd == NULL)		return FALSE;
 	if (SetThreadPriority(GetCurrentThread(), nPriority) != 0)	return TRUE;

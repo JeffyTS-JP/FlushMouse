@@ -5,13 +5,14 @@
 
 #### リリース情報
 
-* **2024/09/27　　Version 3.1.1.6 を リリースしました**
+* **2024/09/27　　Version 3.2.0.26 を リリースしました**
 
 * **(主な変更点)**
-   * 設定画面のトグルスイッチを Windows の設定と同じ向きにしました (右側でオン、キャプションは左側。WinUI3 の機能だと、そうならないようなので、わざわざやるようにしました。なぜなんでしょ？)
-   * マウスカーソルの右下の表示を、ダイレクトに描画する場合のスレッドのプライオリティを上げました
-   * SynTP Helper で、エラーの場合、TCP/IPのルーチンから戻るのが遅かったため、処理を見直してスレッドにに投げて中断できるようにしました
-   * GitHub からリポジトリのクローンをしてビルドする際に、エラーになっていたのを修正しました
+   * 設定画面を見直しました
+   * IME モード表示の、表示文字、表示色、フォントを変更できるようにしました。詳しくは[下記](https://github.com/JeffyTS-JP/FlushMouse?tab=readme-ov-file#%E8%A8%AD%E5%AE%9A%E9%A0%85%E7%9B%AE%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6-%E3%82%8F%E3%81%8B%E3%82%8A%E3%81%A5%E3%82%89%E3%81%84%E9%A0%85%E7%9B%AE%E3%81%AE%E3%81%BF%E8%AA%AC%E6%98%8E%E3%81%97%E3%81%BE%E3%81%99)をご参照ください
+   * 設定画面にスクロールバーを出すようにしました
+   * マウスクリックでキャレット左に IME モードを表示する際、最低でもダブルクリックの時間を待つ必要が有りましたが、今回その制限を外しました (動くようになった理由が想像でしかわからないので、不都合がある場合は連絡をください。対策を考えます)
+   * SynTP_Helper で、起動できな時のメッセージを変更しました
    * その他、細かなバグの修正や機能改善をしました
    
 * **(今後について)**
@@ -21,8 +22,8 @@
    * ***ということで、今後も暇を見つけて、機能向上を目指していきますのでよろしくお願いします***
 
 * **(既知の問題)**
-   * Ver.3からの設定画面や UI3 版において、アプリ終了時にメモリーリークしていることがわかっています (動的に増えていくメモリーリークではありません)
-   * プログラム的には、WinMain に入ってくるまでと、抜けた後の処理でリークしているようです
+   * Ver.3 からの デスクトップ版の UI3 で動く設定画面や、UI3 版の本体において、アプリ終了時にメモリーリークしていることがわかっています (動的に増えていくメモリーリークではありません)
+   * プログラム的には、WinMain に入ってくるまでと、抜けた後の処理でリークしているようです (Ver.3.2 から WinMain を使っていませんが同様の症状がでます)
    * このため、当方に直す方法はなく、Microsoft の SDK 内の問題であり、アプリやシステムには影響はないものと考えています
 
 #### 対応OS
@@ -32,7 +33,7 @@
 #### プライバシーポリシー
    * デスクトップ版、UI3版共に個人情報の収集などは一切行っていません
      * ネットワークへのアクセスとして、インストール時のランタイムのダウンロードと、バージョン情報にGitHubへのリンクがあります
-     * また、Ver.3 から最新のバージョンを確認できるようにしました
+     * また、Ver.3 から最新のバージョンを確認できるようにしましたので、その際にネットワークへのアクセスがあります
      * Ver.2.2 から Synaptics社製タッチパッドと、VMware Workstation / Playerへの対応として、ネットワークにアクセスします (詳しくは[下記](https://github.com/JeffyTS-JP/FlushMouse/tree/master?tab=readme-ov-file#syntp_helper%E6%A9%9F%E8%83%BD-synaptics%E7%A4%BE%E8%A3%BD%E3%82%BF%E3%83%83%E3%83%81%E3%83%91%E3%83%83%E3%83%89%E3%81%A8vmware-player%E3%81%A7%E3%81%AE-two-finger-scroll-%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)をご覧ください)
 
 #### Copyright
@@ -43,29 +44,22 @@
    * アンインストールは「設定」の「アプリと機能」、または「コントロールパネル」の「プログラムと機能」からできます
      * または、同じバージョンのインストーラーがあればそれをもう一度実行してもアンインストールできます。この場合は、本プログラムの設定(レジストリ)を削除するかどうかを選べます(デフォルトでは残すようにしてあります)
    * Ver.2 から、Windows UI3に対応しました。プログラム構成については、[下記](https://github.com/JeffyTS-JP/FlushMouse?tab=readme-ov-file#%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0%E6%A7%8B%E6%88%90)をご参照ください
-     * なお、デスクトップ版と、UI3版の共存はできません。切り替える場合は、いったんアンインストールしてください
+     * なお、デスクトップ版と、UI3版の共存はできません。切り替える場合は、いったんアンインストールしてください (設定は共通ですので、レジストリを消す必要はありません)
 
 #### 使い方
-   * スタートメニュー、デスクトップのアイコンをクリックするか、PCを起動するとシステムトレイ(タスクトレイ)に常駐します
+   * スタートメニュー、デスクトップのアイコンをクリックするか、PC を起動するとシステムトレイ(タスクトレイ)に常駐します
    * 不要であればデスクトップのショートカットアイコンは、削除してしまっても問題ありません
 
 #### マウスカーソル
    * Ver.3.1 以降では、「マウスカーソルの右下の IME モードを描画で表示する」が、ON の場合には、システムのカーソルをそのまま使用します。すべてのマウスカーソルで IME のモード表示が行えます
-   * IME ONの時にモードを表示するマウスカーソルは、「矢印(通常の選択)」「Ｉビーム(テキスト選択)」「ハンド(リンクの選択)」の3種類です
+   * 「マウスカーソルの右下の IME モードを描画で表示する」が、OFF の場合には、モードを表示するマウスカーソルは、「矢印(通常の選択)」「Ｉビーム(テキスト選択)」「ハンド(リンクの選択)」の3種類です
    * IME OFF(直接入力)ではマウスカーソル左にはモードを表示しません(キャレットのモード表示は行います)
-   * キャレットとマウスカーソル左へのIMEモード表示に、Caps Lock ONの時はアンダーラインを表示します (マウスカーソル右下の表示にはアンダーラインは表示されません。ご了承ください)
+   * キャレットとマウスカーソル左へのIMEモード表示に、Caps Lock ONの時はアンダーラインを表示します (直接描画ではない場合のマウスカーソル右下の表示にはアンダーラインは表示されません。ご了承ください)
    
 <img src="https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/Cursors.png" width="80%">
 
-#### 設定ダイアログ画面
-   * システムトレイ(タスクトレイ)の中にある FlushMouseのアイコンをクリックすることで表示します
-   * Ver.3から、デスクトップアプリ版、UI3版共に同じ設定画面が表示されます
-<img src="https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SettingDlg3.png" width="50%">
-<img src="https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/IMEModeDlg3.png" width="50%">
-<img src="https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/VersionDlg3.png" width="50%">
-
 #### 設定のヒント
-   * Ver.3.1 以降では、「マウスカーソルの右下の IME モードを描画で表示する」が、ON の場合には、システムのカーソルをそのまま使用しますので、下記設定は不要です (OFF の場合に行ってください)
+   * Ver.3.1 以降では、「マウスカーソルの右下の IME モードを描画で表示する」が、ON の場合には、システムのカーソルをそのまま使用しますので、下記設定は不要です (OFF の場合に行ってください。ただし、マウスカーソルの大きさを決める際に参考にしていただければ)
    * Windows 10 / 11ではマウスカーソルの形状や大きさを決める方法が複数あるため、下記の順番で設定することをお勧めします 
   1. 設定→ディスプレイ→拡大縮小とレイアウトで、「ディスプレイの解像度」、「テキスト、アプリ、その他の項目のサイズ」、「表示スケールの詳細設定」を好みに設定します
   2. 設定→デバイス→マウス→「マウスとカーソルのサイズを調整する」で好みに設定します。ただし、この変更を行うとマウスカーソルが、Windows 10 / 11特有のものになります。もし、Windows 7などの以前のマウスカーソルを使いたい場合は３の設定をします。必要なければ４に進んでください
@@ -74,15 +68,19 @@
    * FlushMouseで設定するカーソルの大きさは、アプリケーション独自に表示するもの(例えばExcelの十字型のカーソルなど)には影響しませんので、１から３を繰り返して、それらが好みの大きさになるようにしてから、FlushMouseでコントロールするカーソルの大きさを合わせると使いやすくなると思います
 
 #### 設定項目について (わかりづらい項目のみ説明します)
+   * 設定ダイアログ画面はシステムトレイ(タスクトレイ)の中にある FlushMouseのアイコンをクリックすることで表示します
+   * Ver.3から、デスクトップアプリ版、UI3版共に同じ設定画面が表示されます
+
+<img src="https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SettingDlg3.png" width="50%">
+
    * **IMEモードの取得方法**
      * 「マウスカーソル下のウィンドウのIMEモードを表示する」 / 「フォーカスウィンドウのIMEモードを表示する」から選べます
      * 設定→時刻と言語→言語→キーボードの「入力方式の切り替え」や、旧IMEのプロパティにある「IME入力モード切替の通知の画面中央に表示する」と関わってきますので、ご自分の設定に合わせて好みな方を選択してください
    * **マウスカーソルの右下の IME モードを描画で表示する (Ver.3.1 以降)**
      * ON の時は、IME モードを描画して表示します。このため、非力な PC や、システムがビジーの時には、モード表示が遅れます。これは制限事項となります
      * マウスカーソルはシステム設定のものに切り替わり、すべてのカーソル形状で IME モード表示を行います
-     * 「マウスカーソルのサイズ」のスライダーが「マウスカーソルからの距離」に変わりますので、お好みで調整してください
    * **直接入力 (IME OFF) の時も  IME モードの表示をする (Ver.3.1 以降)**
-     * 変換モードではない、すなわち直接入力(IME OFF)の時も、マウスカーソル左、マウスカーソル右下に IME モードを 「A」と表示します。ただしマウスカーソル右下は「マウスカーソルの右下の IME モードを描画で表示する」が ON の場合のみです
+     * 変換モードではない、すなわち直接入力(IME OFF)の時も、マウスカーソル左、マウスカーソル右下に IME モードを 「A」と表示します
    * **IME関連キーがクリックされたときにIMEモードを表示する**
      * IME関連キーとは「半角/全角(漢字)」「変換」「無変換」「カタカナ/ひらがな」「Ctrl + F6～F9」などを指します。加えて、「TAB」「Enter」「F5」キーでも表示します
    * **IMEモードをできるだけキャレット(テキストカーソル)の左に表示する**
@@ -98,6 +96,18 @@
    * **Ctrlキーを離してからモードを表示するまでの時間**
      * 設定の「マウスのプロパティ」にある、「Ctrlキーを押すとポインターの位置を表示する」をONにしているとき、この表示と重なるのを避けるためにモードを表示するまでの時間を調整できます
    * 本FlushMouseでは、「マウスカーソルの右下の IME モードを描画で表示する」が OFF の時に表示する「矢印」「Ｉビーム」「ハンド」を 「aero_」から抽出したものを表示しています(これは固定になります。ご了承ください)
+
+<img src="https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/IMEModeDlg3.png" width="50%">
+
+   * Ver.3.2 から、マウスカーソルの左、キャレットの左、マウスカーソルの右下(「マウスカーソルの右下の IME モードを描画で表示する」が、ON の場合)の、モード表示のサイズ、フォント、色、表示文字を変更できます
+   * また、マウスカーソルの右下に表示する場合の、表示位置の距離を変更できます。お好みで設定してください
+   * 表示する文字は、全角の場合 1 文字まで、半角の場合 2 文字までになります (入力の関係で、多く入力できますが、フォーカスを失った際に後ろ側は切り捨てられます)
+   * 表示する文字は、記号などでも設定できますので、お好みで変更してみてください
+   * フォントは「Yu Gothic UI (デフォルト)」「Meiryo UI」「MS Gothic」「Consolas」の４種類です。選択したフォントによっては表示が切れたりしますが、現時点では仕様となります。ご了承ください
+
+   * バージョン画面
+
+<img src="https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/VersionDlg3.png" width="50%">
 
 
 #### IME 関連キーのサポート と ExplorerPatcher Simple Window Switcher Helper について
@@ -142,20 +152,23 @@
 #### (β機能) SynTP_Helper機能 (Synaptics社製タッチパッドと、VMware Workstation / Playerでの Two Finger Scroll) について
   * 動作環境 (検証環境)
     * Panasonic社製 Let's note CF-SV1 搭載の Synaptics社製 Wheel Pad (Touch Pad) および Windows 11 Pro (Version 23H2)
-    * Broadcom (VMware)社製 VMware(R) Workstation 17 Pro (Version 17.6.0) / VMware(R) Workstation 17 Player (Version 17.6.0)
-    * Guest OS は、主に Windows 11 Pro (Version 23H2)
+    * Broadcom (VMware)社製 VMware(R) Workstation 17 Pro (Version 17.6.1) / VMware(R) Workstation 17 Player (Version 17.6.1)
+    * Guest OS は、主に Windows 11 Pro (Version 24H2)
     
   * 機能概要
     * 上記環境で、Wheel Padの　Two Finger Scroll、および Wheel Pad 沿いを回転するようになぞることでのスクロール(右端が起点)を可能にしました
 
   * 仕組み (内部動作)
     * Host OS で、Wheel Padの動作を RawInputを使用して受取り、UDPを使用して、Guest OSに送ります。Guest OS では送られてきたデータを SendInputで WM_MOUSE(H)WHEEL として出力しています
- 
+  
+  * 設定画面
+
+<img src="https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SynTPDlg3.png" width="50%">
+
   * 使用方法
     * Host には、FlushMouse をインストールしてください
     * Guest には、FlushMouse をインストールするか、SynTP_Receiver_vx.x.x.x.zip を展開し、任意の場所に SynTP_Receiver.exe をコピーしてください
     * タスクトレイにある、FlushMouse のアイコンをクリックすると出てくるメニューから、SynTP Helperを選び設定画面を出します
-      <img src="https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SynTPDlg3.png" width="50%">
       * Host 側では、Senderとして登録します。IP Address の欄には、Guest OSの IPv4 アドレス、または、Hostname を入力します (一般的には Ethernet1のアドレスでよいと思います)。また、UDP Portには、空いている番号を入れてください
       * IP Address、Hostname どちらも、プライベートアドレスのみ指定できます (10.0.0.0 - 10.255.255.255, 172.16.0.0 - 172.31.255.255, 192.168.0.0 - 192.168.255.255)
       * Host 側で Hostname を使用して、FlushMouse 起動時からスタートする場合、名前解決ができるようにネットワークが構成されている必要が有ります。名前解決ができない場合はストップ状態となりメッセージを表示します
@@ -184,31 +197,33 @@
     * デスクトップ版 (FlushMouse_x64.exe)
       * FlushMouse.exe - デスクトップ版のプログラム本体 (Win32 API)
       * FlushMouseDLL.dll - フックなど (Win32 API)
-      * FlushMouse32.dll - プロセスの監視など (Win32 API)
+      * FlushMouse32.exe - プロセスの監視など (Win32 API)
       * FlushMouseDLL32.dll - フックなど (Win32 API)
       * FlushMouseSettings.exe - 設定画面のメインプログラム (C++/WinUI3)
       * FlushMouseUI3DLL.dll - 設定画面のプログラム (C#/WinUI3 .NET Framework)
     * WinUI3版 (FlushMouseUI3_x64.exe)
       * FlushMouseUI3.exe - UI3版のメインプログラム (C++/WinUI3)
       * FlushMouseDLL.dll - フックなど (Win32 API)
-      * FlushMouse32.dll - プロセスの監視など (Win32 API)
+      * FlushMouse32.exe - プロセスの監視など (Win32 API)
       * FlushMouseDLL32.dll - フックなど (Win32 API)
       * FlushMouseUI3DLL.dll - 設定画面のプログラム (C#/WinUI3 .NET Framework)
 
 
 #### ビルド方法
 
+* ** 注意 Visual Studio 2022 の Ver.17.11.4 では正常にビルドして動作しますが、Ver.17.11.5 では、動作しません。設定画面を呼び出すと例外で落ちます。原因は調査中です**
+
 * まず、Visual Studio 2022 の開発環境が必要になりますので、二つの方法を紹介します
 
   (A). ご自分のPCに直接Visual Studioを入れる場合は、
-  このリンク [https://visualstudio.microsoft.com/ja/downloads/](https://visualstudio.microsoft.com/ja/downloads/) から入手してください(Communityで十分だと思います)
+  このリンク [https://visualstudio.microsoft.com/ja/downloads/](https://visualstudio.microsoft.com/ja/downloads/) から入手できます(Communityで十分だと思います)
   
-  (B). 仮想マシンで開発環境を構築したい方は、このリンク [https://developer.microsoft.com/ja-jp/windows/downloads/virtual-machines/](https://developer.microsoft.com/ja-jp/windows/downloads/virtual-machines/) から入手してください
+  (B). 仮想マシンで開発環境を構築したい方は、このリンク [https://developer.microsoft.com/ja-jp/windows/downloads/virtual-machines/](https://developer.microsoft.com/ja-jp/windows/downloads/virtual-machines/) から入手できます
   
 
 * 以下では、(B)の方法を紹介します(私はVMwareで作業していますので、その手順を紹介しますが、他の仮想マシンでも同じような手順だと思います)。なお、ライセンス等については、よく読んでご判断ください
 
-* (B) の Windows 11 開発環境を取得する　から、仮想マシンをダウンロードしてインストールしたのち、日本語化するために最低設定する項目です(他にも設定する項目はありますが割愛します)
+* (B) の Windows 11 開発環境を取得するから、仮想マシンをダウンロードしてインストールしたのち、日本語化するために最低設定する項目です(他にも設定する項目はありますが割愛します)
 
   1. Settings -> Time & language -> Language & regionで、日本語を追加します
   2. Japaneseを上に移動します
@@ -237,7 +252,7 @@
 
 * ビルド方法です
   1. ソリューションプラットフォームを必ず「**MixedPlatform**」にしてビルドします (Ctrl + Shift + B)
-  2. ソリューション構成を「Release」でビルドすると、デフォルトでは C:\Users\User\source\repos\FlushMouseにFlushMouse_x64.exe (Ver. 1.2以前は FlushMouse_x64.msi)と、FlushMouseUI3_x64.exeができるのでインストールしてご利用ください
-   * **ビルドの依存関係の順番の都合で、場合によっては「ソリューション エクスプローラー」で FlushMouseUI3DLL を、右クリックして先にリビルドする必要が有ります**
+  2. ソリューション構成を「Release」でビルドすると、デフォルトでは C:\Users\User\source\repos\FlushMouseにFlushMouse_x64.exe (Ver.1.2 以前は FlushMouse_x64.msi)と、FlushMouseUI3_x64.exeができるのでインストールしてご利用ください
+   * **NuGet を使用しているため、ビルドの依存関係の順番の都合で、場合によっては「ソリューション エクスプローラー」で FlushMouseUI3DLL を、右クリックして先にリビルドする必要が有ります**
 
 

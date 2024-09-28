@@ -68,18 +68,12 @@ CSynTP		*SynTP = NULL;
 //
 // Local Data
 //
-static Application	windowApp{ nullptr };
 static HINSTANCE	m_hInstance{ nullptr };
-
-static int			activationCount = 1;
-static event_token	activationToken;
-static Collections::IVector<IInspectable> messages;
 static int			iSelectedPane = SETTINGSEX_SELECTEDPANE_GENERAL;
 
 //
 // Global Prototype Define
 //
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow);
 
 //
 // Local Prototype Define
@@ -94,64 +88,6 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 static BOOL		Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct);
 static void		Cls_OnDestroy(HWND hWnd);
 static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, int iSubCode);
-
-//
-// wWinMain()
-//
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
-{
-	UNREFERENCED_PARAMETER(hInstance);
-	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
-	UNREFERENCED_PARAMETER(nCmdShow);
-
-	m_hInstance = hInstance;
-
-	LPCTSTR	_lpCmdLine = GetCommandLine();
-	int		iNumArgs = 0;
-	LPTSTR	*_lpArgv = CommandLineToArgvW(_lpCmdLine, &iNumArgs);
-	if (iNumArgs != 0) {
-		if (_lpArgv[1]  != _T('\0')) {
-			if (CompareStringOrdinal(_lpArgv[1], -1, L"1", -1, TRUE) == CSTR_EQUAL) {
-				iSelectedPane = SETTINGSEX_SELECTEDPANE_GENERAL;
-			}
-			else if (CompareStringOrdinal(_lpArgv[1], -1, L"2", -1, TRUE) == CSTR_EQUAL) {
-				iSelectedPane = SETTINGSEX_SELECTEDPANE_IMEMODE;
-			}
-			else if (CompareStringOrdinal(_lpArgv[1], -1, L"3", -1, TRUE) == CSTR_EQUAL) {
-				iSelectedPane = SETTINGSEX_SELECTEDPANE_SYNTPHELPER;
-			}
-			else if (CompareStringOrdinal(_lpArgv[1], -1, L"4", -1, TRUE) == CSTR_EQUAL) {
-				iSelectedPane = SETTINGSEX_SELECTEDPANE_ABOUT;
-			}
-		}
-	}
-	LocalFree(_lpArgv);
-
-	init_apartment(apartment_type::multi_threaded);
-	messages = multi_threaded_observable_vector<IInspectable>();
-	
-	HRESULT hre = CoInitializeEx(NULL, (COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE));
-	if (FAILED(hre)) {
-		return (-1);
-	}
-	else {
-		try {
-			Application::Start([](auto&&) {
-				windowApp = make<SettingsMain>(); });
-		}
-		catch (const std::exception&) {
-		}
-		catch (...) {
-		}
-		try {
-			CoUninitialize();
-		}
-		catch (...) {
-		}
-	}
-	return 0;
-}
 
 // 
 // vMessageBox()
@@ -249,17 +185,17 @@ void GetMonitorDPIandRect(HWND hWnd, LPUINT lpUint,LPRECT lpRect)
 }
 
 //
-// SettingsMain()
+// App()
 //
-SettingsMain::SettingsMain()
+App::App()
 {
 	InitializeComponent();
 }
 
 //
-// ~FlushMouseSettings()
+// ~App()
 //
-SettingsMain::~SettingsMain()
+App::~App()
 {
 	return;
 }
@@ -267,13 +203,39 @@ SettingsMain::~SettingsMain()
 //
 // OnLaunched()
 //
-void SettingsMain::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
+void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 {
 #ifdef _DEBUG
 	UnhandledException([this](IInspectable const&, UnhandledExceptionEventArgs const&) {
 		MessageBox(NULL, L"EXCEPTION", L"FlushMouseSettings", (MB_ICONSTOP | MB_OK));
 		});
 #endif // _DEBUG
+
+	LPCTSTR	_lpCmdLine = GetCommandLine();
+	int		iNumArgs = 0;
+	LPTSTR	*_lpArgv = CommandLineToArgvW(_lpCmdLine, &iNumArgs);
+	if (iNumArgs != 0) {
+		if (_lpArgv[1]  != _T('\0')) {
+			if (CompareStringOrdinal(_lpArgv[1], -1, L"1", -1, TRUE) == CSTR_EQUAL) {
+				iSelectedPane = SETTINGSEX_SELECTEDPANE_GENERAL;
+			}
+			else if (CompareStringOrdinal(_lpArgv[1], -1, L"2", -1, TRUE) == CSTR_EQUAL) {
+				iSelectedPane = SETTINGSEX_SELECTEDPANE_IMEMODE;
+			}
+			else if (CompareStringOrdinal(_lpArgv[1], -1, L"3", -1, TRUE) == CSTR_EQUAL) {
+				iSelectedPane = SETTINGSEX_SELECTEDPANE_SYNTPHELPER;
+			}
+			else if (CompareStringOrdinal(_lpArgv[1], -1, L"4", -1, TRUE) == CSTR_EQUAL) {
+				iSelectedPane = SETTINGSEX_SELECTEDPANE_ABOUT;
+			}
+		}
+	}
+	LocalFree(_lpArgv);
+
+	if ((m_hInstance = GetModuleHandle(FLUSHMOUSESETTINGS_EXE)) == NULL) {
+		PostQuitMessage(0);
+		return;
+	}
 
 	hMicrosoft_ui_xaml_dll = LoadLibrary(L"Microsoft.ui.xaml.dll");
 	hFlushMouseUI3DLL = LoadLibrary(FLUSHMOUSEUI3_DLL);
@@ -295,16 +257,8 @@ void SettingsMain::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs cons
 //
 // OnSuspending()
 //
-void SettingsMain::OnSuspending([[maybe_unused]] IInspectable const& sender, [[maybe_unused]] Windows::ApplicationModel::SuspendingEventArgs const& e)
+void App::OnSuspending([[maybe_unused]] IInspectable const& sender, [[maybe_unused]] Windows::ApplicationModel::SuspendingEventArgs const& e)
 {
-}
-
-//
-// GetInstanceFromHWND()
-//
-HINSTANCE SettingsMain::GetInstanceFromHWND(HWND hWnd)
-{
-	return (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE);
 }
 
 //
@@ -539,9 +493,10 @@ static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, int iSubCode)
 			return TRUE;
 		case SETTINGSEX_RELOAD_REGISTRY:
 			return TRUE;
-		case SETTINGSEX_RELOAD_MOUSE:
+		case SETTINGSEX_RELOAD_MOUSECURSOR:
 			vSettingDialogApply();
 			if (!Profile->bSetProfileData4Mouse())	return FALSE;
+			if (!Profile->bSetProfileData4IMEMode())	return FALSE;
 			return TRUE;
 		case SETTINGSEX_SETTINGS_CHANGE_PANE:
 			vSettingDialogApply();
@@ -568,7 +523,19 @@ static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, int iSubCode)
 			vSettingDialogApply();
 			if (!Profile->bSetProfileData4Settings())	return FALSE;
 			return TRUE;
+		case SETTINGSEX_SETTINGS_GENERAL_SETREGISTRY:
+			vSettingDialogApply();
+			if (!Profile->bSetProfileData4Mouse())	return FALSE;
+			return TRUE;
+		case SETTINGSEX_SETTINGS_IMEMODE_SETREGISTRY:
+			vSettingDialogApply();
+			if (!Profile->bSetProfileData4IMEMode())	return FALSE;
+			return TRUE;
+		case SETTINGSEX_SETTINGS_CLOSE:
+			return TRUE;
 		case SETTINGSEX_SYNTP_START:
+			vSettingDialogApply();
+			return TRUE;
 		case SETTINGSEX_SYNTP_STOP:
 		case SETTINGSEX_SYNTP_IS_STARTED:
 			return TRUE;

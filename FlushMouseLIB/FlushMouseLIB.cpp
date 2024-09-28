@@ -598,16 +598,17 @@ static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd)
 		EventHook->hFormerWnd = hForeWnd;
 		if (hWnd != hForeWnd) {
 			HWND	hWndObserved = NULL;
-			POINT	pt{};
+			CURSORINFO	ci{ci.cbSize = sizeof(CURSORINFO)};
 			if ((Profile != NULL) && Profile->lpstAppRegData->bOffChangedFocus) {
 				Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 			}
-			if ((Profile != NULL) && Profile->lpstAppRegData->bDoModeDispByMouseBttnUp && GetCursorPos(&pt)) {
+			if ((Profile) && Profile->lpstAppRegData->bDoModeDispByMouseBttnUp && GetCursorInfo(&ci)) {
+				if (ci.flags != CURSOR_SHOWING)	return;
 				if (Profile->lpstAppRegData->bDisplayFocusWindowIME) {
 					hWndObserved = hForeWnd;
 				}
 				else {
-					if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return;
+					if ((hWndObserved = WindowFromPoint(ci.ptScreenPos)) == NULL)	return;
 				}
 				if (!Cursor->bStartIMECursorChangeThread(hWndObserved))	return;
 				if (!bCheckDrawIMEModeArea(hWndObserved))	return;

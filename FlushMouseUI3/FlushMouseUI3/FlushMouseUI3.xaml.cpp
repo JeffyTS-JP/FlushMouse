@@ -58,12 +58,7 @@ using namespace Windows::ApplicationModel::Activation;
 //
 // Local Data
 //
-static Application	windowApp{ nullptr };
 static HINSTANCE	m_hInstance{ nullptr };
-
-static int			activationCount = 1;
-static event_token	activationToken;
-static Collections::IVector<IInspectable> messages;
 
 //
 // Global Prototype Define
@@ -73,54 +68,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 //
 // Local Prototype Define
 //
-
-//
-// wWinMain()
-//
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
-{
-	UNREFERENCED_PARAMETER(hInstance);
-	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
-	UNREFERENCED_PARAMETER(nCmdShow);
-
-#ifdef _DEBUG
-	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	_ASSERTE(_CrtCheckMemory());
-
-#endif
-
-	m_hInstance = hInstance;
-
-	int	iRet = 0;
-	if ((iRet = iCheckCmdLine(lpCmdLine)) != 1) {
-		return (iRet);
-	}
-	
-	init_apartment(apartment_type::multi_threaded);
-	messages = multi_threaded_observable_vector<IInspectable>();
-
-	HRESULT hre = CoInitializeEx(NULL, (COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE));
-	if (FAILED(hre)) {
-		return (-1);
-	}
-	else {
-		try {
-			Application::Start([](auto&&) {windowApp = make<FlushMouseUI3Main>(); });
-		}
-		catch (const std::exception&) {
-		}
-		catch (...) {
-		}
-
-		try {
-			CoUninitialize();
-		}
-		catch (...) {
-		}
-	}
-	return iRet;
-}
 
 // 
 // vMessageBox()
@@ -215,9 +162,9 @@ void GetMonitorDPIandRect(HWND hWnd, LPUINT lpUint,LPRECT lpRect)
 }
 
 //
-// FlushMouseUI3Main()
+// App()
 //
-FlushMouseUI3Main::FlushMouseUI3Main()
+App::App()
 {
 
 #ifdef _DEBUG
@@ -228,9 +175,9 @@ FlushMouseUI3Main::FlushMouseUI3Main()
 }
 
 //
-// ~FlushMouseUI3Main()
+// ~App()
 //
-FlushMouseUI3Main::~FlushMouseUI3Main()
+App::~App()
 {
 	return;
 }
@@ -238,13 +185,35 @@ FlushMouseUI3Main::~FlushMouseUI3Main()
 //
 // OnLaunched()
 //
-void FlushMouseUI3Main::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
+void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 {
 #ifdef _DEBUG
 	UnhandledException([this](IInspectable const&, UnhandledExceptionEventArgs const&) {
 		MessageBox(NULL, L"EXCEPTION", L"FlushMouseUI3", (MB_ICONSTOP | MB_OK));
 		});
 #endif // _DEBUG
+
+	int	iRet = 0;
+	LPCTSTR	_lpCmdLine = GetCommandLine();
+	int		iNumArgs = 0;
+	LPTSTR	*_lpArgv = CommandLineToArgvW(_lpCmdLine, &iNumArgs);
+	if (iNumArgs != 0) {
+		if (_lpArgv[1]  != _T('\0')) {
+			if ((iRet = iCheckCmdLine((LPCTSTR)_lpArgv) != 1)) {
+				LocalFree(_lpArgv);
+				//return (iRet);
+				return;
+			}
+		}
+	}
+	LocalFree(_lpArgv);
+	
+	if ((m_hInstance = GetModuleHandle(FLUSHMOUSE_EXE)) == NULL) {
+		if ((m_hInstance = GetModuleHandle(FLUSHMOUSEUI3_EXE)) == NULL) {
+			PostQuitMessage(0);
+			return;
+		}
+	}
 
 	hMicrosoft_ui_xaml_dll = LoadLibrary(L"Microsoft.ui.xaml.dll");
 	hFlushMouseUI3DLL = LoadLibrary(FLUSHMOUSEUI3_DLL);
@@ -266,16 +235,8 @@ void FlushMouseUI3Main::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs
 //
 // OnSuspending()
 //
-void FlushMouseUI3Main::OnSuspending([[maybe_unused]] IInspectable const& sender, [[maybe_unused]] Windows::ApplicationModel::SuspendingEventArgs const& e)
+void App::OnSuspending([[maybe_unused]] IInspectable const& sender, [[maybe_unused]] Windows::ApplicationModel::SuspendingEventArgs const& e)
 {
-}
-
-//
-// GetInstanceFromHWND()
-//
-HINSTANCE FlushMouseUI3Main::GetInstanceFromHWND(HWND hWnd)
-{
-	return (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE);
 }
 
 

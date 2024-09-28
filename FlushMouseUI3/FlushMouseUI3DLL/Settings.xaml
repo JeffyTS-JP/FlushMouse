@@ -63,8 +63,8 @@
 					</NavigationView.Resources>
 					<ScrollViewer x:Name="scrollViewer"
 						ZoomMode="Disabled" IsTabStop="True"
-						HorizontalScrollMode="Enabled" HorizontalScrollBarVisibility="Hidden"
-						VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Hidden">
+						HorizontalScrollMode="Enabled" HorizontalScrollBarVisibility="Auto"
+						VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Auto">
 						<Frame x:Name="contentFrame" Margin="0,0,40,40"
 								Loaded="contentFrame_Loaded"
 								HorizontalAlignment="Left" VerticalAlignment="Top"

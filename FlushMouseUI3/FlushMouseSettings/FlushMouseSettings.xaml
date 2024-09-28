@@ -1,7 +1,7 @@
 ﻿<!-- FlushMouseSettings.xaml for FlushMouseSettings Copyright (C) 2022 JeffyTS -->
 
 <Application
-	x:Class="FlushMouseSettings.FlushMouseSettings"
+	x:Class="FlushMouseSettings.App"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	>

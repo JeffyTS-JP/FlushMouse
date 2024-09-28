@@ -9,29 +9,31 @@
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 
-using System.Net;
+using System;
+using System.Diagnostics;
+using Windows.System;
 
 using static FlushMouseUI3DLL.Settings;
-using Windows.System;
-using System.ComponentModel.Design;
-
 
 namespace FlushMouseUI3DLL {
+	public sealed partial class Settings
+	{
+		public static Int32 dwSynTPHelper1 { get; set; }
+		public static Int32 dwSynTPPadX { get; set; }
+		public static Int32 dwSynTPPadY { get; set; }
+		public static Int32 dwSynTPEdgeX { get; set; }
+		public static Int32 dwSynTPEdgeY { get; set; }
+		public static String szSynTPSendIPAddr1_1 { get; set; }
+		public static String szSynTPSendIPAddr1_2 { get; set; }
+		public static String szSynTPSendIPAddr1_3 { get; set; }
+		public static String szSynTPSendIPAddr1_4 { get; set; }
+		public static String szSynTPSendHostname1 { get; set; }
+		public static Int32 dwSynTPPortNo1 { get; set; }
+		public static bool bSynTPStarted1 { get; set; }
+	}
+	
 	public sealed partial class SynTP_Helper
 	{
 		private static bool m_Sentinel {  get; set; }
@@ -391,6 +393,12 @@ namespace FlushMouseUI3DLL {
 		private void SetTextBox()
 		{
 			if (tb1 == null)	tb1 = new TextBox();
+			InputScope scope = new();
+			InputScopeName scopeName = new() {
+				NameValue = InputScopeNameValue.AlphanumericHalfWidth
+			};
+			scope.Names.Add(scopeName);
+			tb1.InputScope = scope;
 			tb1.Text = szSynTPSendHostname1;
 		}
 

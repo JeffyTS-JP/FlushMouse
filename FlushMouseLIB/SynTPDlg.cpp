@@ -48,9 +48,7 @@ VOID		vSynTPHelperDialog(HWND hWnd)
 		SendMessage(_hWnd, WM_SETTINGSEX, SETTINGSEX_SETTINGS_CHANGE_PANE, SETTINGSEX_SELECTEDPANE_SYNTPHELPER);
 	}
 	else {
-		if (Cursor != NULL) {
-			Cursor->vStopDrawIMEModeMouseByWndThread();
-		}
+		if (Cursor)	Cursor->vStopDrawIMEModeMouseByWndThread();
 		TCHAR	CommandLine[2]{};
 		if (_itow_s(SETTINGSEX_SELECTEDPANE_SYNTPHELPER, CommandLine, (sizeof(CommandLine) - sizeof(TCHAR)), 10) != 0)	return;
 

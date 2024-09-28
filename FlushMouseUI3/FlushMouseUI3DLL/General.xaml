@@ -39,8 +39,6 @@
 			<RowDefinition Height="*"/>
 			<RowDefinition Height="*"/>
 			<RowDefinition Height="*"/>
-			<RowDefinition Height="*"/>
-			<!--RowDefinition Height="*"/-->
 		</Grid.RowDefinitions>
 		<Grid Margin="0,0,0,0" Grid.Row="0">
 			<Grid.ColumnDefinitions>
@@ -57,7 +55,7 @@
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
 			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="200" Text="IME モードの取得方法"/>
-			<ComboBox  Margin="0,-4,-10,0" Grid.Column="1" HorizontalAlignment="Right" Width="420" x:Name="Combo1" Loaded="Combo1_Loaded" SelectionChanged="Combo1_SelectionChanged"  Header="" SelectedIndex="1">
+			<ComboBox  Margin="0,-4,-10,0" Grid.Column="1" HorizontalAlignment="Right" Width="420" x:Name="Combo1" Loaded="Combo1_Loaded" SelectionChanged="Combo1_SelectionChanged" Header="" SelectedIndex="1">
 				<ComboBoxItem Name="Item1">フォーカスウィンドウの IME モードを表示する</ComboBoxItem>
 				<ComboBoxItem Name="Item2">マウスカーソル下のウィンドウの IME モードを表示する</ComboBoxItem>
 			</ComboBox>
@@ -72,24 +70,13 @@
 			<ToggleSwitch Margin="0,-8,-115,0" Grid.Column="1" HorizontalAlignment="Right"  x:Name="ts2" Toggled="HandleToggleSwitch" OffContent="" OnContent="" IsOn="False" FlowDirection="LeftToRight"/>
 		</Grid>
 		<Grid Margin="0,6,0,0" Grid.Row="3">
-			<Grid x:Name="grid4_1">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*"/>
-					<ColumnDefinition Width="*"/>
-				</Grid.ColumnDefinitions>
-				<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="200" Text="マウスカーソルのサイズ"/>
-				<Slider Margin="0,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl1_1" ValueChanged="Slider_ValueChanged"
-									Minimum="8" Maximum="80" StepFrequency="1" SmallChange="1" Value="32" TickFrequency="8" TickPlacement="Outside" SnapsTo="StepValues"/>
-			</Grid>
-			<Grid x:Name="grid4_2">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*"/>
-					<ColumnDefinition Width="*"/>
-				</Grid.ColumnDefinitions>
-				<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="200" Text="マウスカーソルからの距離"/>
-				<Slider Margin="0,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl1_2" ValueChanged="Slider_ValueChanged"
-									Minimum="0" Maximum="80" StepFrequency="1" SmallChange="1" Value="32" TickFrequency="8" TickPlacement="Outside" SnapsTo="StepValues"/>
-			</Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="200" Text="マウスカーソルのサイズ"/>
+			<Slider Margin="0,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl1" ValueChanged="Slider_ValueChanged"
+								Minimum="8" Maximum="80" StepFrequency="1" SmallChange="1" Value="32" TickFrequency="8" TickPlacement="Outside" SnapsTo="StepValues"/>
 		</Grid>
 		<Grid Margin="0,12,0,0" Grid.Row="4">
 			<Grid.ColumnDefinitions>
@@ -172,43 +159,34 @@
 			<TextBlock Margin="0,0,45,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="text11" Text="オン"/>
 			<ToggleSwitch Margin="0,-8,-115,0" Grid.Column="1" HorizontalAlignment="Right"  x:Name="ts11" Toggled="HandleToggleSwitch" OffContent="" OnContent="" IsOn="False" FlowDirection="LeftToRight"/>
 		</Grid>
-		<Grid Margin="0,10,0,0" Grid.Row="13">
+		<Grid Margin="0,12,0,0" Grid.Row="13">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
-			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="200" Text="IME モード表示のサイズ"/>
+			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="200" Text="IME モード表示の時間"/>
 			<Slider Margin="0,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl2" ValueChanged="Slider_ValueChanged"
-									Minimum="8" Maximum="80" StepFrequency="1" SmallChange="1" Value="24" TickFrequency="8" TickPlacement="Outside" SnapsTo="StepValues"/>
+									Minimum="1" Maximum="100" StepFrequency="1" SmallChange="1" Value="40" TickFrequency="10" TickPlacement="Outside" SnapsTo="StepValues"/>
 		</Grid>
 		<Grid Margin="0,12,0,0" Grid.Row="14">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
-			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="200" Text="IME モード表示の時間"/>
-			<Slider Margin="0,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl3" ValueChanged="Slider_ValueChanged"
-									Minimum="1" Maximum="100" StepFrequency="1" SmallChange="1" Value="40" TickFrequency="10" TickPlacement="Outside" SnapsTo="StepValues"/>
-		</Grid>
-		<Grid Margin="0,12,0,0" Grid.Row="15">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="*"/>
-				<ColumnDefinition Width="*"/>
-			</Grid.ColumnDefinitions>
 			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="200" Text="IME モード表示までの時間"/>
-			<Slider Margin="0,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl4" ValueChanged="Slider_ValueChanged"
+			<Slider Margin="0,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl3" ValueChanged="Slider_ValueChanged"
 									Minimum="1" Maximum="100" StepFrequency="1" SmallChange="1" Value="30" TickFrequency="10" TickPlacement="Outside" SnapsTo="StepValues"/>
 		</Grid>
-		<Grid Margin="0,6,0,0" Grid.Row="16">
+		<Grid Margin="0,6,0,0" Grid.Row="15">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
 			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="200" Text="Ctrlキーを離してからIME&#10;モードを表示するまでの時間"/>
-			<Slider Margin="0,8,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl5" ValueChanged="Slider_ValueChanged"
+			<Slider Margin="0,8,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl4" ValueChanged="Slider_ValueChanged"
 									Minimum="1" Maximum="100" StepFrequency="1" SmallChange="1" Value="40" TickFrequency="10" TickPlacement="Outside" SnapsTo="StepValues"/>
 		</Grid>
-		<Grid Margin="0,10,0,0" Grid.Row="17">
+		<Grid Margin="0,10,0,0" Grid.Row="16">
 		</Grid>
 	</Grid>
 </Page>

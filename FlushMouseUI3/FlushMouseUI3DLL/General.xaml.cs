@@ -9,21 +9,39 @@
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Media;
 
 using System;
-using System.Drawing;
 using System.Diagnostics;
 
 using static FlushMouseUI3DLL.Settings;
 
 namespace FlushMouseUI3DLL {
+	public sealed partial class Settings
+	{
+		public static bool bDisplayFocusWindowIME { get; set; }
+		public static bool bDisplayIMEModeOnCursor { get; set; }
+		public static bool bDisplayIMEModeByWindow { get; set; }
+		public static bool bDisplayIMEModeIMEOFF { get; set; }
+		public static bool bOffChangedFocus { get; set; }
+		public static bool bForceHiragana { get; set; }
+		public static bool bDoModeDispByIMEKeyDown { get; set; }
+		public static bool bDoModeDispByMouseBttnUp { get; set; }
+		public static bool bDoModeDispByCtrlUp { get; set; }
+		public static bool bDrawNearCaret { get; set; }
+		public static bool bIMEModeForced { get; set; }
+		public static bool bEnableEPHelper { get; set; }
+
+		public static Int32 iCursorSize { get; set; }
+		public static Int32 dwDisplayModeTime { get; set; }
+		public static Int32 dwAdditionalWaitTime { get; set; }
+		public static Int32 dwWaitWaveTime { get; set; }
+	}
+
 	public sealed partial class General
 	{
 		private static bool m_Sentinel {  get; set; }
 	}
-
+	
 	public sealed partial class General : Page {
 		public General()
 		{
@@ -36,49 +54,39 @@ namespace FlushMouseUI3DLL {
 			if (sender != null) {
 				if (!bDisplayIMEModeOnCursor) {
 					if (Combo1 != null) Combo1.IsEnabled = false;
-					if (ts2 != null)    ts2.IsEnabled = false;
 					if (!bDisplayIMEModeByWindow) {
-						if (grid4_1 != null)    grid4_1.Visibility = Visibility.Visible;
-						if (grid4_2 != null)    grid4_2.Visibility = Visibility.Collapsed;
-						if (sl1_1 != null)      sl1_1.IsEnabled = true;
+						if (sl1 != null)      sl1.IsEnabled = true;
 					}
 					else {
-						if (grid4_1 != null)    grid4_1.Visibility = Visibility.Collapsed;
-						if (grid4_2 != null)    grid4_2.Visibility = Visibility.Visible;
-						if (sl1_2 != null)      sl1_2.IsEnabled = false;
+						if (sl1 != null)      sl1.IsEnabled = false;
 					}
+					if (ts2 != null)    ts2.IsEnabled = false;
 				}
 				else {
 					if (Combo1 != null) Combo1.IsEnabled = true;
-					if (ts2 != null)    ts2.IsEnabled = true;
 					if (!bDisplayIMEModeByWindow) {
-						if (grid4_1 != null)    grid4_1.Visibility = Visibility.Visible;
-						if (grid4_2 != null)    grid4_2.Visibility = Visibility.Collapsed;
-						if (sl1_1 != null)      sl1_1.IsEnabled = true;
+						if (sl1 != null)      sl1.IsEnabled = true;
 					}
 					else {
-						if (grid4_1 != null)    grid4_1.Visibility = Visibility.Collapsed;
-						if (grid4_2 != null)    grid4_2.Visibility = Visibility.Visible;
-						if (sl1_2 != null)      sl1_2.IsEnabled = true;
+						if (sl1 != null)      sl1.IsEnabled = false;
 					}
+					if (ts2 != null)    ts2.IsEnabled = true;
 				}
 				if (!bDoModeDispByIMEKeyDown && !bDoModeDispByMouseBttnUp && !bDoModeDispByCtrlUp) {
-					if (ts9 != null)        ts9.IsEnabled = false;
-					if (sl2 != null)        sl2.IsEnabled = false;
-					if (sl3 != null)        sl3.IsEnabled = false;
-					if (sl4 != null)        sl4.IsEnabled = false;
+					if (ts9 != null)	ts9.IsEnabled = false;
+					if (sl2 != null)	sl2.IsEnabled = false;
+					if (sl3 != null)	sl3.IsEnabled = false;
 				}
 				else {
 					if (ts9 != null)	ts9.IsEnabled = true;
 					if (sl2 != null)	sl2.IsEnabled = true;
 					if (sl3 != null)	sl3.IsEnabled = true;
-					if (sl4 != null)	sl4.IsEnabled = true;
 				}
 				if (!bDoModeDispByCtrlUp) {
-					if (sl5 != null)	sl5.IsEnabled = false;
+					if (sl4 != null)	sl4.IsEnabled = false;
 				}
 				else {
-					if (sl5 != null)	sl5.IsEnabled = true;
+					if (sl4 != null)	sl4.IsEnabled = true;
 				}
 				if (ts1.IsOn)	text1.Text = "オン";		else text1.Text = "オフ";
 				if (ts2.IsOn)	text2.Text = "オン";		else text2.Text = "オフ";
@@ -99,18 +107,11 @@ namespace FlushMouseUI3DLL {
 			if (sender == null) { }
 			if (e == null) { }
 			
-			SetGrid();
 			SetComboBox();
 			SetSlider();
 			SetToggleSwitch();
 			m_Sentinel = true;
 			EnableDisableItems(sender, e);
-		}
-
-		private void SetGrid()
-		{
-			if (grid4_1 == null)    grid4_1 = new Grid();
-			if (grid4_2 == null)    grid4_2 = new Grid();
 		}
 
 		private void SetComboBox()
@@ -137,7 +138,7 @@ namespace FlushMouseUI3DLL {
 				if (selectedItem.Name == "Item1") bDisplayFocusWindowIME = true;
 				else if (selectedItem.Name == "Item2") bDisplayFocusWindowIME = false;
 				EnableDisableItems(sender, e);
-				UpdateProfile(SETTINGSEX_APPLY);
+				UpdateProfile(SETTINGSEX_SETTINGS_GENERAL_SETREGISTRY);
 			}
 		}
 
@@ -175,13 +176,13 @@ namespace FlushMouseUI3DLL {
 				if (ts.Name == "ts1") {
 					bDisplayIMEModeOnCursor = !bDisplayIMEModeOnCursor;
 					EnableDisableItems(sender, e);
-					UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
+					UpdateProfile(SETTINGSEX_RELOAD_MOUSECURSOR);
 					return;
 				}
 				else if (ts.Name == "ts2") {
 					bDisplayIMEModeByWindow = !bDisplayIMEModeByWindow;
 					EnableDisableItems(sender, e);
-					UpdateProfile(SETTINGSEX_RELOAD_MOUSE);
+					UpdateProfile(SETTINGSEX_RELOAD_MOUSECURSOR);
 					return;
 				}
 				else if (ts.Name == "ts3") bDisplayIMEModeIMEOFF = !bDisplayIMEModeIMEOFF;
@@ -194,24 +195,20 @@ namespace FlushMouseUI3DLL {
 				else if (ts.Name == "ts10") bIMEModeForced = !bIMEModeForced;
 				else if (ts.Name == "ts11") bEnableEPHelper = !bEnableEPHelper;
 				EnableDisableItems(sender, e);
-				UpdateProfile(SETTINGSEX_APPLY);
+				UpdateProfile(SETTINGSEX_SETTINGS_GENERAL_SETREGISTRY);
 			}
 		}
 
 		private void SetSlider()
 		{
-			if (sl1_1 == null)	sl1_1 = new Slider();
-			if (sl1_2 == null)	sl1_2 = new Slider();
+			if (sl1 == null)	sl1 = new Slider();
 			if (sl2 == null)	sl2 = new Slider();
 			if (sl3 == null)	sl3 = new Slider();
 			if (sl4 == null)	sl4 = new Slider();
-			if (sl5 == null)	sl5 = new Slider();
-			sl1_1.Value = iCursorSize;
-			sl1_2.Value = iIMEModeDistance;
-			sl2.Value = iModeSize;
-			sl3.Value = dwDisplayModeTime / 10;
-			sl4.Value = dwAdditionalWaitTime / 10;
-			sl5.Value = dwWaitWaveTime / 10;
+			sl1.Value = iCursorSize;
+			sl2.Value = dwDisplayModeTime / 10;
+			sl3.Value = dwAdditionalWaitTime / 10;
+			sl4.Value = dwWaitWaveTime / 10;
 		}
 
 		private void Slider_ValueChanged(object sender, RoutedEventArgs e)
@@ -219,14 +216,12 @@ namespace FlushMouseUI3DLL {
 			if (m_Sentinel == false) return;
 			Slider sl = sender as Slider;
 			if (sl != null) {
-				if (sl.Name == "sl1_1")         iCursorSize = (Int32)sl.Value;
-				else if (sl.Name == "sl1_2")    iIMEModeDistance = (Int32)sl.Value;
-				else if (sl.Name == "sl2")      iModeSize = (Int32)sl.Value;
-				else if (sl.Name == "sl3")      dwDisplayModeTime = (Int32)(sl.Value * 10);
-				else if (sl.Name == "sl4")      dwAdditionalWaitTime = (Int32)(sl.Value * 10);
-				else if (sl.Name == "sl5")      dwWaitWaveTime = (Int32)(sl.Value * 10);
+				if (sl.Name == "sl1")		iCursorSize = (Int32)sl.Value;
+				else if (sl.Name == "sl2")	dwDisplayModeTime = (Int32)(sl.Value * 10);
+				else if (sl.Name == "sl3")	dwAdditionalWaitTime = (Int32)(sl.Value * 10);
+				else if (sl.Name == "sl4")	dwWaitWaveTime = (Int32)(sl.Value * 10);
 				EnableDisableItems(sender, e);
-				UpdateProfile(SETTINGSEX_APPLY);
+				UpdateProfile(SETTINGSEX_SETTINGS_GENERAL_SETREGISTRY);
 			}
 		}
 	}

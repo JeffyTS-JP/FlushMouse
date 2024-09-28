@@ -240,29 +240,41 @@ void		Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 {
 	UNREFERENCED_PARAMETER(hWndCtl);
 	UNREFERENCED_PARAMETER(codeNotify);
+	if (Cursor)	Cursor->vStopDrawIMEModeMouseByWndThread();
 	switch (id) {
 	case IDR_TT_MENU:
 		break;
 	case IDR_TT_SETTING:
 		Profile->bGetProfileData();
 		vSettingDialog(hWnd);
-		break;
+		return;
 	case IDR_TT_IMEMODE:
 		Profile->bGetProfileData();
 		vIMEModeDialog(hWnd);
-		break;
+		return;
 	case IDR_TT_SYNTPHELPER:
 		Profile->bGetProfileData();
 		vSynTPHelperDialog(hWnd);
-		break;
+		return;
 	case IDM_ABOUT:
 	case IDR_TT_ABOUT:
 		vAboutDialog(hWnd);
-		break;
+		return;
 	case IDM_EXIT:
 	case IDR_TT_QUIT:
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
-		break;
+		return;
+	}
+	if (Profile->lpstAppRegData->bDisplayIMEModeOnCursor && Profile->lpstAppRegData->bDisplayIMEModeByWindow) {
+		if (Cursor->bStartDrawIMEModeMouseByWndThread()) {
+			return;
+		}
+		vSettingDialogClose();
+		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+		return;
+	}
+	else {
+		Cursor->vStopDrawIMEModeMouseByWndThread();
 	}
 }
 

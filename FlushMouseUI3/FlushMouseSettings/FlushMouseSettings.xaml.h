@@ -24,17 +24,15 @@ extern void GetMonitorDPIandRect(HWND hWnd, LPUINT lpUint,LPRECT lpRect);
 namespace winrt::FlushMouseSettings::implementation
 {
 
-	struct SettingsMain : AppT<SettingsMain>
+	struct App : AppT<App>
 	{
-		SettingsMain();
-		~SettingsMain();
-		
+		App();
+		~App();
+
 		void OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&);
 
 	private:
 		void OnSuspending([[maybe_unused]] IInspectable const& sender, [[maybe_unused]] Windows::ApplicationModel::SuspendingEventArgs const& e);
-
-		HINSTANCE	GetInstanceFromHWND(HWND hWnd);
 
 	private:
 		Microsoft::UI::Xaml::Window windowMain{ nullptr };

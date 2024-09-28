@@ -40,8 +40,10 @@ CProfile::CProfile()
 		ZeroMemory(lpstAppRegData, sizeof(APPREGDATA));
 
 		lpstAppRegData->iCursorSize = 32;												// 表示するマウスカーソルのサイズ
-		lpstAppRegData->iModeSize = 24;													// 表示するIMEモードのサイズ
 		lpstAppRegData->iIMEModeDistance = 32;											// 表示する IME Mode の距離
+		lpstAppRegData->iModeMouseSize = 24;											// マウス左に表示するIMEモードのサイズ
+		lpstAppRegData->iModeCaretSize = 24;											// キャレット左に表示するIMEモードのサイズ
+		lpstAppRegData->iModeByWndSize = 24;											// マウス右下に表示するIMEモードのサイズ
 		lpstAppRegData->dwInThreadSleepTime = 0;										// Thread内の待ち時間(IMECursorChangeThreadのみ)
 		lpstAppRegData->dwWaitWaveTime = 400;											// IME mode displayの waveの待ち時間
 		lpstAppRegData->dwAdditionalWaitTime = 300;										// IME mode displayの 追加待ち時間
@@ -70,6 +72,29 @@ CProfile::CProfile()
 		lpstAppRegData->bDisplayIMEModeByWindow = FALSE;			// マウスカーソルへのIMEモード表示 (Window版)
 		lpstAppRegData->bDisplayIMEModeIMEOFF = FALSE;				// IME OFFの時のIMEモード表示
 		lpstAppRegData->bDisplayFocusWindowIME = FALSE;				// フォーカスウィンドウのIMEモードを表示する(TRUE)/マウスカーソル下のウィンドウのIMEモードを表示する(FALSE)
+		
+		_tcsncpy_s(lpstAppRegData->szNearDrawMouseIMEOFFChar, MAX_IMEMODECHAR, L"A", _TRUNCATE);
+		_tcsncpy_s(lpstAppRegData->szNearDrawMouseHANEISU_IMEONChar, MAX_IMEMODECHAR, L"_A", _TRUNCATE);
+		_tcsncpy_s(lpstAppRegData->szNearDrawMouseHANKANA_IMEONChar, MAX_IMEMODECHAR, L"_ｱ", _TRUNCATE);
+		_tcsncpy_s(lpstAppRegData->szNearDrawMouseZENEISU_IMEONChar, MAX_IMEMODECHAR, L"Ａ", _TRUNCATE);
+		_tcsncpy_s(lpstAppRegData->szNearDrawMouseZENHIRA_IMEONChar, MAX_IMEMODECHAR, L"あ", _TRUNCATE);
+		_tcsncpy_s(lpstAppRegData->szNearDrawMouseZENKANA_IMEONChar, MAX_IMEMODECHAR, L"ア", _TRUNCATE);
+		_tcsncpy_s(lpstAppRegData->szNearDrawCaretIMEOFFChar, MAX_IMEMODECHAR, L"A", _TRUNCATE);
+		_tcsncpy_s(lpstAppRegData->szNearDrawCaretHANEISU_IMEONChar, MAX_IMEMODECHAR, L"_A", _TRUNCATE);
+		_tcsncpy_s(lpstAppRegData->szNearDrawCaretHANKANA_IMEONChar, MAX_IMEMODECHAR, L"_ｱ", _TRUNCATE);
+		_tcsncpy_s(lpstAppRegData->szNearDrawCaretZENEISU_IMEONChar, MAX_IMEMODECHAR, L"Ａ", _TRUNCATE);
+		_tcsncpy_s(lpstAppRegData->szNearDrawCaretZENHIRA_IMEONChar, MAX_IMEMODECHAR, L"あ", _TRUNCATE);
+		_tcsncpy_s(lpstAppRegData->szNearDrawCaretZENKANA_IMEONChar, MAX_IMEMODECHAR, L"ア", _TRUNCATE);
+		_tcsncpy_s(lpstAppRegData->szNearDrawMouseByWndIMEOFFChar, MAX_IMEMODECHAR, L"A", _TRUNCATE);
+		_tcsncpy_s(lpstAppRegData->szNearDrawMouseByWndHANEISU_IMEONChar, MAX_IMEMODECHAR, L"_A", _TRUNCATE);
+		_tcsncpy_s(lpstAppRegData->szNearDrawMouseByWndHANKANA_IMEONChar, MAX_IMEMODECHAR, L"_ｱ", _TRUNCATE);
+		_tcsncpy_s(lpstAppRegData->szNearDrawMouseByWndZENEISU_IMEONChar, MAX_IMEMODECHAR, L"Ａ", _TRUNCATE);
+		_tcsncpy_s(lpstAppRegData->szNearDrawMouseByWndZENHIRA_IMEONChar, MAX_IMEMODECHAR, L"あ", _TRUNCATE);
+		_tcsncpy_s(lpstAppRegData->szNearDrawMouseByWndZENKANA_IMEONChar, MAX_IMEMODECHAR, L"ア", _TRUNCATE);
+
+		_tcsncpy_s(lpstAppRegData->szNearDrawMouseFont, LF_FACESIZE, L"Yu Gothic UI", _TRUNCATE);
+		_tcsncpy_s(lpstAppRegData->szNearDrawCaretFont, LF_FACESIZE, L"Yu Gothic UI", _TRUNCATE);
+		_tcsncpy_s(lpstAppRegData->szNearDrawMouseByWndFont, LF_FACESIZE, L"Yu Gothic UI", _TRUNCATE);
 
 		lpstAppRegData->bDoModeDispByIMEKeyDown = TRUE;				// IMEのモード変更のキーが押されたときにIMEモードを表示する
 		lpstAppRegData->bDoModeDispByMouseBttnUp = TRUE;			// Mouse L/Rボタンが離されたときにIMEモードを表示する
@@ -121,6 +146,7 @@ BOOL		CProfile::bGetProfileData() const
 	BOOL		bRet = FALSE;
 
 	if (!bGetProfileData4Mouse())	goto Cleanup;
+	if (!bGetProfileData4IMEMode())	goto Cleanup;
 	if (!bGetProfileData4SynTPHelper())	goto Cleanup;
 	if (!bGetProfileData4Settings())	goto Cleanup;
 
@@ -140,6 +166,7 @@ BOOL		CProfile::bSetProfileData() const
 	BOOL		bRet = FALSE;
 
 	if (!bSetProfileData4Mouse())	goto Cleanup;
+	if (!bSetProfileData4IMEMode())	goto Cleanup;
 	if (!bSetProfileData4SynTPHelper())	goto Cleanup;
 	if (!bSetProfileData4Settings())	goto Cleanup;
 
@@ -160,7 +187,6 @@ BOOL		CProfile::bFixChangedProfileData() const
 	CRegistry	*CReg = new CRegistry;
 	if (CReg == NULL)	return FALSE;
 
-	// for Bug
 	DWORD	dw = 0;
 	if (CReg->bReadRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("CusrorSize"), (LPDWORD)&dw)) {
 		if (dw != 0) {
@@ -169,7 +195,6 @@ BOOL		CProfile::bFixChangedProfileData() const
 		}
 	}
 
-	// for Ver.3.3
 	if (CReg->bReadRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseZENHIRA_IMEONColor"), (LPDWORD)&dw)) {
 		if (dw == 0) {
 			if (CReg->bReadRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseColor"), (LPDWORD)&dw)) {
@@ -180,6 +205,7 @@ BOOL		CProfile::bFixChangedProfileData() const
 					if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseZENEISU_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseZENEISU_IMEONColor, dw))	goto Cleanup;
 					if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseZENHIRA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseZENHIRA_IMEONColor, dw))	goto Cleanup;
 					if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseZENKANA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseZENKANA_IMEONColor, dw))	goto Cleanup;
+					if (!CReg->bDeleteRegValue(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseColor")))	goto Cleanup;
 				}
 			}
 			if (CReg->bReadRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretColor"), (LPDWORD)&dw)) {
@@ -191,6 +217,7 @@ BOOL		CProfile::bFixChangedProfileData() const
 					if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretZENEISU_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawCaretZENEISU_IMEONColor, dw))	goto Cleanup;
 					if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretZENHIRA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawCaretZENHIRA_IMEONColor, dw))	goto Cleanup;
 					if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretZENKANA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawCaretZENKANA_IMEONColor, dw))	goto Cleanup;
+					if (!CReg->bDeleteRegValue(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretColor")))	goto Cleanup;
 				}
 			}
 			if (CReg->bReadRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearMouseColor"), (LPDWORD)&dw)) {
@@ -201,8 +228,17 @@ BOOL		CProfile::bFixChangedProfileData() const
 					if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndZENEISU_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseByWndZENEISU_IMEONColor, dw))	goto Cleanup;
 					if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndZENHIRA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseByWndZENHIRA_IMEONColor, dw))	goto Cleanup;
 					if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndZENKANA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseByWndZENKANA_IMEONColor, dw))	goto Cleanup;
+					if (!CReg->bDeleteRegValue(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearMouseColor")))	goto Cleanup;
 				}
 			}
+		}
+	}
+	if (CReg->bReadRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeSize"), (LPDWORD)&dw)) {
+		if (dw != 0) {
+			if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeMouseSize"), (LPDWORD)&lpstAppRegData->iModeMouseSize, dw))	goto Cleanup;
+			if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeCaretSize"), (LPDWORD)&lpstAppRegData->iModeCaretSize, dw))	goto Cleanup;
+			if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeByWndSize"), (LPDWORD)&lpstAppRegData->iModeByWndSize, dw))	goto Cleanup;
+			if (!CReg->bDeleteRegValue(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeSize")))	goto Cleanup;
 		}
 	}
 	bRet = TRUE;
@@ -224,30 +260,10 @@ BOOL		CProfile::bGetProfileData4Mouse() const
 	if (CReg == NULL)	return FALSE;
 
 	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("CursorSize"), (LPDWORD)&lpstAppRegData->iCursorSize, lpstAppRegData->iCursorSize))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("IMEModeDistance"), (LPDWORD)&lpstAppRegData->iIMEModeDistance, lpstAppRegData->iIMEModeDistance))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeSize"), (LPDWORD)&lpstAppRegData->iModeSize, lpstAppRegData->iModeSize))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("InThreadSleepTime"), (LPDWORD)&lpstAppRegData->dwInThreadSleepTime, lpstAppRegData->dwInThreadSleepTime))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("WaitWaveTime"), (LPDWORD)&lpstAppRegData->dwWaitWaveTime, lpstAppRegData->dwWaitWaveTime))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("AdditionalWaitTime"), (LPDWORD)&lpstAppRegData->dwAdditionalWaitTime, lpstAppRegData->dwAdditionalWaitTime))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayModeTime"), (LPDWORD)&lpstAppRegData->dwDisplayModeTime, lpstAppRegData->dwDisplayModeTime))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseIMEOFFColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseIMEOFFColor, lpstAppRegData->dwNearDrawMouseIMEOFFColor))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseHANEISU_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseHANEISU_IMEONColor, lpstAppRegData->dwNearDrawMouseHANEISU_IMEONColor))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseHANKANA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseHANKANA_IMEONColor, lpstAppRegData->dwNearDrawMouseHANKANA_IMEONColor))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseZENEISU_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseZENEISU_IMEONColor, lpstAppRegData->dwNearDrawMouseZENEISU_IMEONColor))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseZENHIRA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseZENHIRA_IMEONColor, lpstAppRegData->dwNearDrawMouseZENHIRA_IMEONColor))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseZENKANA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseZENKANA_IMEONColor, lpstAppRegData->dwNearDrawMouseZENKANA_IMEONColor))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretIMEOFFColor"), (LPDWORD)&lpstAppRegData->dwNearDrawCaretIMEOFFColor, lpstAppRegData->dwNearDrawCaretIMEOFFColor))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretHANEISU_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawCaretHANEISU_IMEONColor, lpstAppRegData->dwNearDrawCaretHANEISU_IMEONColor))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretHANKANA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawCaretHANKANA_IMEONColor, lpstAppRegData->dwNearDrawCaretHANKANA_IMEONColor))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretZENEISU_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawCaretZENEISU_IMEONColor, lpstAppRegData->dwNearDrawCaretZENEISU_IMEONColor))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretZENHIRA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawCaretZENHIRA_IMEONColor, lpstAppRegData->dwNearDrawCaretZENHIRA_IMEONColor))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretZENKANA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawCaretZENKANA_IMEONColor, lpstAppRegData->dwNearDrawCaretZENKANA_IMEONColor))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndIMEOFFColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseByWndIMEOFFColor, lpstAppRegData->dwNearDrawMouseByWndIMEOFFColor))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndHANEISU_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseByWndHANEISU_IMEONColor, lpstAppRegData->dwNearDrawMouseByWndHANEISU_IMEONColor))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndHANKANA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseByWndHANKANA_IMEONColor, lpstAppRegData->dwNearDrawMouseByWndHANKANA_IMEONColor))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndZENEISU_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseByWndZENEISU_IMEONColor, lpstAppRegData->dwNearDrawMouseByWndZENEISU_IMEONColor))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndZENHIRA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseByWndZENHIRA_IMEONColor, lpstAppRegData->dwNearDrawMouseByWndZENHIRA_IMEONColor))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndZENKANA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseByWndZENKANA_IMEONColor, lpstAppRegData->dwNearDrawMouseByWndZENKANA_IMEONColor))	goto Cleanup;
 
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeOnCursor"), (LPBOOL)&lpstAppRegData->bDisplayIMEModeOnCursor, lpstAppRegData->bDisplayIMEModeOnCursor))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeByWindow"), (LPBOOL)&lpstAppRegData->bDisplayIMEModeByWindow, lpstAppRegData->bDisplayIMEModeByWindow))	goto Cleanup;
@@ -255,18 +271,17 @@ BOOL		CProfile::bGetProfileData4Mouse() const
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("ForceHiragana"), (LPBOOL)&(lpstAppRegData->bForceHiragana), lpstAppRegData->bForceHiragana))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DenyChangedByApp"), (LPBOOL)&(lpstAppRegData->bDenyChangedByApp), lpstAppRegData->bDenyChangedByApp))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("UseBigArrow"), (LPBOOL)&(lpstAppRegData->bUseBigArrow), lpstAppRegData->bUseBigArrow))	goto Cleanup;
-
+	
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayFocusWindowIME"), (LPBOOL)&(lpstAppRegData->bDisplayFocusWindowIME), lpstAppRegData->bDisplayFocusWindowIME))	goto Cleanup;
-
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByMouseBttnUp"), (LPBOOL)&(lpstAppRegData->bDoModeDispByMouseBttnUp), lpstAppRegData->bDoModeDispByMouseBttnUp))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByIMEKeyDown"), (LPBOOL)&(lpstAppRegData->bDoModeDispByIMEKeyDown), lpstAppRegData->bDoModeDispByIMEKeyDown))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByCtrlUp"), (LPBOOL)&(lpstAppRegData->bDoModeDispByCtrlUp), lpstAppRegData->bDoModeDispByCtrlUp))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("IMEModeForced"), (LPBOOL)&(lpstAppRegData->bIMEModeForced), lpstAppRegData->bIMEModeForced))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("MoveIMEToolbar"), (LPBOOL)&(lpstAppRegData->bMoveIMEToolbar), lpstAppRegData->bMoveIMEToolbar))	goto Cleanup;
-
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("OffChangedFocus"), (LPBOOL)&(lpstAppRegData->bOffChangedFocus), lpstAppRegData->bOffChangedFocus))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DrawNearCaret"), (LPBOOL)&(lpstAppRegData->bDrawNearCaret), lpstAppRegData->bDrawNearCaret))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("EnableEPHelper"), (LPBOOL)&(lpstAppRegData->bEnableEPHelper), lpstAppRegData->bEnableEPHelper))	goto Cleanup;
+
 
 	bRet = TRUE;
 
@@ -287,12 +302,136 @@ BOOL		CProfile::bSetProfileData4Mouse() const
 	if (CReg == NULL)	return FALSE;
 
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("CursorSize"), lpstAppRegData->iCursorSize))	goto Cleanup;
-	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("IMEModeDistance"), lpstAppRegData->iIMEModeDistance))	goto Cleanup;
-	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeSize"), lpstAppRegData->iModeSize))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("InThreadSleepTime"), lpstAppRegData->dwInThreadSleepTime))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("WaitWaveTime"), lpstAppRegData->dwWaitWaveTime))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("AdditionalWaitTime"), lpstAppRegData->dwAdditionalWaitTime))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayModeTime"), lpstAppRegData->dwDisplayModeTime))	goto Cleanup;
+
+	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeOnCursor"), lpstAppRegData->bDisplayIMEModeOnCursor))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeByWindow"), lpstAppRegData->bDisplayIMEModeByWindow))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeIMEOFF"), lpstAppRegData->bDisplayIMEModeIMEOFF))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("ForceHiragana"), lpstAppRegData->bForceHiragana))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DenyChangedByApp"), lpstAppRegData->bDenyChangedByApp))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("UseBigArrow"), lpstAppRegData->bUseBigArrow))	goto Cleanup;
+
+	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayFocusWindowIME"), lpstAppRegData->bDisplayFocusWindowIME))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByIMEKeyDown"), lpstAppRegData->bDoModeDispByIMEKeyDown))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByCtrlUp"), lpstAppRegData->bDoModeDispByCtrlUp))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByMouseBttnUp"), lpstAppRegData->bDoModeDispByMouseBttnUp))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("IMEModeForced"), lpstAppRegData->bIMEModeForced))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("MoveIMEToolbar"), lpstAppRegData->bMoveIMEToolbar))	goto Cleanup;
+
+	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("OffChangedFocus"), lpstAppRegData->bOffChangedFocus))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DrawNearCaret"), lpstAppRegData->bDrawNearCaret))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("EnableEPHelper"), lpstAppRegData->bEnableEPHelper))	goto Cleanup;
+
+	bRet = TRUE;
+
+Cleanup:
+	if (CReg)	delete	CReg;
+	return bRet;
+}
+
+//
+// bGetProfileData4IMEMode()
+//
+BOOL		CProfile::bGetProfileData4IMEMode() const
+{
+	if (lpstAppRegData == NULL) return FALSE;
+
+	BOOL		bRet = FALSE;
+	CRegistry	*CReg = new CRegistry;
+	if (CReg == NULL)	return FALSE;
+
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeMouseSize"), (LPDWORD)&lpstAppRegData->iModeMouseSize, lpstAppRegData->iModeMouseSize))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeCaretSize"), (LPDWORD)&lpstAppRegData->iModeCaretSize, lpstAppRegData->iModeCaretSize))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeByWndSize"), (LPDWORD)&lpstAppRegData->iModeByWndSize, lpstAppRegData->iModeByWndSize))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("IMEModeDistance"), (LPDWORD)&lpstAppRegData->iIMEModeDistance, lpstAppRegData->iIMEModeDistance))	goto Cleanup;
+
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseIMEOFFChar"), lpstAppRegData->szNearDrawMouseIMEOFFChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseHANEISU_IMEONChar"), lpstAppRegData->szNearDrawMouseHANEISU_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseHANKANA_IMEONChar"), lpstAppRegData->szNearDrawMouseHANKANA_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseZENEISU_IMEONChar"), lpstAppRegData->szNearDrawMouseZENEISU_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseZENHIRA_IMEONChar"), lpstAppRegData->szNearDrawMouseZENHIRA_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseZENKANA_IMEONChar"), lpstAppRegData->szNearDrawMouseZENKANA_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretIMEOFFChar"), lpstAppRegData->szNearDrawCaretIMEOFFChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretHANEISU_IMEONChar"), lpstAppRegData->szNearDrawCaretHANEISU_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretHANKANA_IMEONChar"), lpstAppRegData->szNearDrawCaretHANKANA_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretZENEISU_IMEONChar"), lpstAppRegData->szNearDrawCaretZENEISU_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretZENHIRA_IMEONChar"), lpstAppRegData->szNearDrawCaretZENHIRA_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretZENKANA_IMEONChar"), lpstAppRegData->szNearDrawCaretZENKANA_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndIMEOFFChar"), lpstAppRegData->szNearDrawMouseByWndIMEOFFChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndHANEISU_IMEONChar"), lpstAppRegData->szNearDrawMouseByWndHANEISU_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndHANKANA_IMEONChar"), lpstAppRegData->szNearDrawMouseByWndHANKANA_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndZENEISU_IMEONChar"), lpstAppRegData->szNearDrawMouseByWndZENEISU_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndZENHIRA_IMEONChar"), lpstAppRegData->szNearDrawMouseByWndZENHIRA_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndZENKANA_IMEONChar"), lpstAppRegData->szNearDrawMouseByWndZENKANA_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseIMEOFFColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseIMEOFFColor, lpstAppRegData->dwNearDrawMouseIMEOFFColor))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseHANEISU_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseHANEISU_IMEONColor, lpstAppRegData->dwNearDrawMouseHANEISU_IMEONColor))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseHANKANA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseHANKANA_IMEONColor, lpstAppRegData->dwNearDrawMouseHANKANA_IMEONColor))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseZENEISU_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseZENEISU_IMEONColor, lpstAppRegData->dwNearDrawMouseZENEISU_IMEONColor))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseZENHIRA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseZENHIRA_IMEONColor, lpstAppRegData->dwNearDrawMouseZENHIRA_IMEONColor))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseZENKANA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseZENKANA_IMEONColor, lpstAppRegData->dwNearDrawMouseZENKANA_IMEONColor))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretIMEOFFColor"), (LPDWORD)&lpstAppRegData->dwNearDrawCaretIMEOFFColor, lpstAppRegData->dwNearDrawCaretIMEOFFColor))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretHANEISU_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawCaretHANEISU_IMEONColor, lpstAppRegData->dwNearDrawCaretHANEISU_IMEONColor))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretHANKANA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawCaretHANKANA_IMEONColor, lpstAppRegData->dwNearDrawCaretHANKANA_IMEONColor))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretZENEISU_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawCaretZENEISU_IMEONColor, lpstAppRegData->dwNearDrawCaretZENEISU_IMEONColor))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretZENHIRA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawCaretZENHIRA_IMEONColor, lpstAppRegData->dwNearDrawCaretZENHIRA_IMEONColor))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretZENKANA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawCaretZENKANA_IMEONColor, lpstAppRegData->dwNearDrawCaretZENKANA_IMEONColor))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndIMEOFFColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseByWndIMEOFFColor, lpstAppRegData->dwNearDrawMouseByWndIMEOFFColor))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndHANEISU_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseByWndHANEISU_IMEONColor, lpstAppRegData->dwNearDrawMouseByWndHANEISU_IMEONColor))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndHANKANA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseByWndHANKANA_IMEONColor, lpstAppRegData->dwNearDrawMouseByWndHANKANA_IMEONColor))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndZENEISU_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseByWndZENEISU_IMEONColor, lpstAppRegData->dwNearDrawMouseByWndZENEISU_IMEONColor))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndZENHIRA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseByWndZENHIRA_IMEONColor, lpstAppRegData->dwNearDrawMouseByWndZENHIRA_IMEONColor))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndZENKANA_IMEONColor"), (LPDWORD)&lpstAppRegData->dwNearDrawMouseByWndZENKANA_IMEONColor, lpstAppRegData->dwNearDrawMouseByWndZENKANA_IMEONColor))	goto Cleanup;
+
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseIMEOFFFont"), lpstAppRegData->szNearDrawMouseFont, LF_FACESIZE))	goto Cleanup;
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretIMEOFFFont"), lpstAppRegData->szNearDrawCaretFont, LF_FACESIZE))	goto Cleanup;
+	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndIMEOFFFont"), lpstAppRegData->szNearDrawMouseByWndFont, LF_FACESIZE))	goto Cleanup;
+
+	bRet = TRUE;
+
+Cleanup:
+	if (CReg)	delete	CReg;
+	return bRet;
+}
+
+//
+// bSetProfileData4IMEMode()
+//
+BOOL		CProfile::bSetProfileData4IMEMode() const
+{
+	if (lpstAppRegData == NULL) return FALSE;
+
+	BOOL		bRet = FALSE;
+	CRegistry	*CReg = new CRegistry;
+	if (CReg == NULL)	return FALSE;
+
+	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeMouseSize"), lpstAppRegData->iModeMouseSize))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeCaretSize"), lpstAppRegData->iModeCaretSize))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeByWndSize"), lpstAppRegData->iModeByWndSize))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("IMEModeDistance"), lpstAppRegData->iIMEModeDistance))	goto Cleanup;
+
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseIMEOFFChar"), lpstAppRegData->szNearDrawMouseIMEOFFChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseHANEISU_IMEONChar"), lpstAppRegData->szNearDrawMouseHANEISU_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseHANKANA_IMEONChar"), lpstAppRegData->szNearDrawMouseHANKANA_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseZENEISU_IMEONChar"), lpstAppRegData->szNearDrawMouseZENEISU_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseZENHIRA_IMEONChar"), lpstAppRegData->szNearDrawMouseZENHIRA_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseZENKANA_IMEONChar"), lpstAppRegData->szNearDrawMouseZENKANA_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretIMEOFFChar"), lpstAppRegData->szNearDrawCaretIMEOFFChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretHANEISU_IMEONChar"), lpstAppRegData->szNearDrawCaretHANEISU_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretHANKANA_IMEONChar"), lpstAppRegData->szNearDrawCaretHANKANA_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretZENEISU_IMEONChar"), lpstAppRegData->szNearDrawCaretZENEISU_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretZENHIRA_IMEONChar"), lpstAppRegData->szNearDrawCaretZENHIRA_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretZENKANA_IMEONChar"), lpstAppRegData->szNearDrawCaretZENKANA_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndIMEOFFChar"), lpstAppRegData->szNearDrawMouseByWndIMEOFFChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndHANEISU_IMEONChar"), lpstAppRegData->szNearDrawMouseByWndHANEISU_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndHANKANA_IMEONChar"), lpstAppRegData->szNearDrawMouseByWndHANKANA_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndZENEISU_IMEONChar"), lpstAppRegData->szNearDrawMouseByWndZENEISU_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndZENHIRA_IMEONChar"), lpstAppRegData->szNearDrawMouseByWndZENHIRA_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndZENKANA_IMEONChar"), lpstAppRegData->szNearDrawMouseByWndZENKANA_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
+
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseIMEOFFColor"), lpstAppRegData->dwNearDrawMouseIMEOFFColor))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseHANEISU_IMEONColor"), lpstAppRegData->dwNearDrawMouseHANEISU_IMEONColor))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseHANKANA_IMEONColor"), lpstAppRegData->dwNearDrawMouseHANKANA_IMEONColor))	goto Cleanup;
@@ -312,25 +451,9 @@ BOOL		CProfile::bSetProfileData4Mouse() const
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndZENHIRA_IMEONColor"), lpstAppRegData->dwNearDrawMouseByWndZENHIRA_IMEONColor))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndZENKANA_IMEONColor"), lpstAppRegData->dwNearDrawMouseByWndZENKANA_IMEONColor))	goto Cleanup;
 
-	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeOnCursor"), lpstAppRegData->bDisplayIMEModeOnCursor))	goto Cleanup;
-	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeByWindow"), lpstAppRegData->bDisplayIMEModeByWindow))	goto Cleanup;
-	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeIMEOFF"), lpstAppRegData->bDisplayIMEModeIMEOFF))	goto Cleanup;
-	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("ForceHiragana"), lpstAppRegData->bForceHiragana))	goto Cleanup;
-	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DenyChangedByApp"), lpstAppRegData->bDenyChangedByApp))	goto Cleanup;
-	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("UseBigArrow"), lpstAppRegData->bUseBigArrow))	goto Cleanup;
-
-	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayFocusWindowIME"), lpstAppRegData->bDisplayFocusWindowIME))	goto Cleanup;
-
-	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByIMEKeyDown"), lpstAppRegData->bDoModeDispByIMEKeyDown))	goto Cleanup;
-	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByCtrlUp"), lpstAppRegData->bDoModeDispByCtrlUp))	goto Cleanup;
-	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByMouseBttnUp"), lpstAppRegData->bDoModeDispByMouseBttnUp))	goto Cleanup;
-	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("IMEModeForced"), lpstAppRegData->bIMEModeForced))	goto Cleanup;
-	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("MoveIMEToolbar"), lpstAppRegData->bMoveIMEToolbar))	goto Cleanup;
-
-	// BOOL registry in Use FlushMouse & FlushMouseSub
-	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("OffChangedFocus"), lpstAppRegData->bOffChangedFocus))	goto Cleanup;
-	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DrawNearCaret"), lpstAppRegData->bDrawNearCaret))	goto Cleanup;
-	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("EnableEPHelper"), lpstAppRegData->bEnableEPHelper))	goto Cleanup;
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseIMEOFFFont"), lpstAppRegData->szNearDrawMouseFont, LF_FACESIZE))	goto Cleanup;
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawCaretIMEOFFFont"), lpstAppRegData->szNearDrawCaretFont, LF_FACESIZE))	goto Cleanup;
+	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseByWndIMEOFFFont"), lpstAppRegData->szNearDrawMouseByWndFont, LF_FACESIZE))	goto Cleanup;
 
 	bRet = TRUE;
 

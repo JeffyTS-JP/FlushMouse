@@ -169,7 +169,10 @@ copy /Y $(OutDir)$(TargetName)$(TargetExt) $(OutDir)$(TargetName).dat
       <UACUIAccess>false</UACUIAccess>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(OutDir)$(TargetName)$(TargetExt)" $(OutDir)$(TargetName).dat"
+      <Command>copy /Y "$(OutDir)$(TargetName)$(TargetExt)" "$(OutDir)$(TargetName).dat"
+Xcopy /Y "$(OutDir)$(TargetName).dat" "$(SolutionDir)FlushMouse\"
+Xcopy /Y "$(OutDir)$(TargetName).dat" "$(SolutionDir)FlushMouseUI3\FlushMouseUI3\"
+Xcopy /Y "$(OutDir)$(TargetName).dat" "$(SolutionDir)$(Platform)\$(Configuration)\FlushMouseUI3\"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -198,7 +201,10 @@ copy /Y $(OutDir)$(TargetName)$(TargetExt) $(OutDir)$(TargetName).dat
     </Link>
     <PostBuildEvent>
       <Command>Start /min /wait cmd /c "$(SolutionDir)Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
-copy /Y "$(OutDir)$(TargetName)$(TargetExt)" $(OutDir)$(TargetName).dat"
+copy /Y "$(OutDir)$(TargetName)$(TargetExt)" "$(OutDir)$(TargetName).dat"
+Xcopy /Y "$(OutDir)$(TargetName).dat" "$(SolutionDir)FlushMouse\"
+Xcopy /Y "$(OutDir)$(TargetName).dat" "$(SolutionDir)FlushMouseUI3\FlushMouseUI3\"
+Xcopy /Y "$(OutDir)$(TargetName).dat" "$(SolutionDir)$(Platform)\$(Configuration)\FlushMouseUI3\"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

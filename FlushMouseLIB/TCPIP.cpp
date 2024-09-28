@@ -30,6 +30,7 @@
 //
 // Local Data
 //
+static BOOL	bReturn_CheckExistHostname = FALSE;
 
 //
 // Local Prototype Define
@@ -113,6 +114,7 @@ BOOL		bCheckExistHostnameIPv4(LPCTSTR lpszHostname, int iTimeOut)
 
 			if (WSAStartup(MAKEWORD(2, 2), lpWSAData) != 0) {
 				if (lpWSAData)	delete []	lpWSAData;
+				bReturn_CheckExistHostname = FALSE;
 				return FALSE;
 			}
 
@@ -127,16 +129,29 @@ BOOL		bCheckExistHostnameIPv4(LPCTSTR lpszHostname, int iTimeOut)
 				WSACleanup();
 				if (ppResult)	FreeAddrInfo(ppResult);
 				if (lpWSAData)	delete []	lpWSAData;
+				bReturn_CheckExistHostname = FALSE;
 				return FALSE;
+			}
+			if (ppResult && ppResult->ai_addr && (ppResult->ai_addr->sa_family == AF_INET) && (ppResult->ai_addrlen >= 10)) {
+				SOCKADDR_IN		SockAddr_IN{};
+				SockAddr_IN.sin_addr.S_un = ((LPSOCKADDR_IN)(ppResult->ai_addr))->sin_addr.S_un;
+				if (!bIsPrivateIPv4Addr((DWORD)MAKEIPADDRESS(ppResult->ai_addr->sa_data[2], ppResult->ai_addr->sa_data[3], ppResult->ai_addr->sa_data[4], ppResult->ai_addr->sa_data[5]))) {
+					WSACleanup();
+					if (ppResult)	FreeAddrInfo(ppResult);
+					if (lpWSAData)	delete []	lpWSAData;
+					bReturn_CheckExistHostname = FALSE;
+					return FALSE;
+				}
 			}
 			WSACleanup();
 			if (ppResult)	FreeAddrInfo(ppResult);
 			if (lpWSAData)	delete []	lpWSAData;
+			bReturn_CheckExistHostname = TRUE;
 			return TRUE;
 			}, std::move(_promise)).detach();
 
 		if(std::future_status::ready == _future.wait_until(std::chrono::system_clock::now() + std::chrono::milliseconds(iTimeOut))) {
-			return TRUE;
+			return bReturn_CheckExistHostname;
 		}
 	}
 	catch (...) {

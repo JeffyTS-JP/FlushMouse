@@ -178,7 +178,7 @@ BOOL		CRegistry::bReadRegValueString(HKEY hKey, LPCTSTR lpszSubKey, LPCTSTR szVa
 		if ((lStatus = RegOpenKeyEx(hKey, lpszSubKey, 0, KEY_READ | KEY_WOW64_64KEY, &hKeySub)) == ERROR_SUCCESS) {
 			DWORD	dwLen = 0;
 			if ((lStatus = RegQueryValueEx(hKeySub, szValue, NULL, NULL, NULL, &dwLen)) == ERROR_SUCCESS) {
-				if ((dwLen <= 1024) && (dwLen <= dwDataSize)) {
+				if ((dwLen <= 1024) && ((dwLen / sizeof(TCHAR)) <= dwDataSize)) {
 					ZeroMemory(szData, dwDataSize);
 					if ((lStatus = RegQueryValueEx(hKeySub, szValue, NULL, NULL, (LPBYTE)szData, &dwLen)) == ERROR_SUCCESS) {
 						bRet = TRUE;
@@ -204,7 +204,7 @@ BOOL		CRegistry::bGetSetRegValueString(HKEY hKey, LPCTSTR lpszSubKey, LPCTSTR sz
 		if ((lStatus = RegOpenKeyEx(hKey, lpszSubKey, 0, KEY_READ | KEY_WOW64_64KEY, &hKeySub)) == ERROR_SUCCESS) {
 			DWORD	dwLen = 0;
 			if ((lStatus = RegQueryValueEx(hKeySub, szValue, NULL, NULL, NULL, &dwLen)) == ERROR_SUCCESS) {
-				if ((dwLen <= 1024) && (dwLen <= dwDataSize)) {
+				if ((dwLen <= 1024) && ((dwLen / sizeof(TCHAR)) <= dwDataSize)) {
 					ZeroMemory(szData, dwDataSize);
 					if ((lStatus = RegQueryValueEx(hKeySub, szValue, NULL, NULL, (LPBYTE)szData, &dwLen)) == ERROR_SUCCESS) {
 						bRet = TRUE;

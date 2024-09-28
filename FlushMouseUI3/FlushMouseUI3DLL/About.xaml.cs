@@ -16,9 +16,15 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading.Tasks;
+
 using static FlushMouseUI3DLL.Settings;
 
 namespace FlushMouseUI3DLL {
+	public sealed partial class About
+	{
+		private static bool m_Sentinel {  get; set; }
+	}
+	
 	public sealed partial class About : Page {
 
 		public About()
@@ -31,6 +37,7 @@ namespace FlushMouseUI3DLL {
 			if (sender == null) { }
 			if (e == null) { }
 			SetTextBlock();
+			m_Sentinel = true;
 		}
 
 		private void SetTextBlock()
@@ -62,49 +69,55 @@ namespace FlushMouseUI3DLL {
 
 		private async void Button_Click(object sender, RoutedEventArgs e)
 		{
+			if (m_Sentinel == false) return;
 			if (e == null) { }
 			Button btn = sender as Button;
 			if (btn == null) { return; }
 			if (btn.Name == "btn1") {
-				string urlExperimentGroups = "JeffyTS-JP/FlushMouse/releases/latest";
-				Task<string> task = Task<string>.Run(() => GetReleaseVersionOnGitHub(urlExperimentGroups));
-				string result = await task;
-				if (result != null) {
-					string tag = "\"tag_name\":\"";
-					int foundIndex1 = result.IndexOf(tag, StringComparison.OrdinalIgnoreCase);
-					int nextIndex = foundIndex1 + tag.Length;
-					if (nextIndex < result.Length) {
-						int foundIndex2 = result.IndexOf("\",", nextIndex);
-						string gitVersion = "";
-						for (int i = nextIndex; i < foundIndex2; i++) {
-							gitVersion += result[i].ToString();
-						}
-						Assembly assembly = Assembly.GetExecutingAssembly();
-						AssemblyFileVersionAttribute asmFileVersion = (AssemblyFileVersionAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyFileVersionAttribute));
-						string currentVersion = asmFileVersion.Version;
-						if (Compare(gitVersion, currentVersion) >= 1) {
-							try {
-								String lpCaption = "FlushMouse";
-								String lpText = "FlushMouse の新しいバージョンがあります\nVer. " + gitVersion;
-								MessageBox(g_hMainWnd, lpText, lpCaption, (MB_OK | MB_ICONINFORMATION| MB_TOPMOST));
-								return;
-							}
-							catch (Exception) {
-							}
-						}
-						else {
-							try {
-								String lpCaption = "FlushMouse";
-								String lpText = "FlushMouse の新しいバージョンは見つかりませんでした";
-								MessageBox(g_hMainWnd, lpText, lpCaption, (MB_OK | MB_ICONINFORMATION| MB_TOPMOST));
-								return;
-							}
-							catch (Exception) {
-							}
-						}
+				m_Sentinel = false;
+				Task<string> latestVersion = Task<string>.Run(() => GetLatestVersion("JeffyTS-JP/FlushMouse/releases/latest", "\"tag_name\":\""));
+				string result = await latestVersion;
+				string gitVersion = "";
+				gitVersion = result.ToString();
+				Assembly assembly = Assembly.GetExecutingAssembly();
+				AssemblyFileVersionAttribute asmFileVersion = (AssemblyFileVersionAttribute)Attribute.GetCustomAttribute(assembly, typeof(AssemblyFileVersionAttribute));
+				string currentVersion = asmFileVersion.Version;
+				String lpCaption = "";
+				String lpText = "";
+				if (Compare(gitVersion, currentVersion) >= 1) {
+					lpCaption = "FlushMouse";
+					lpText = "FlushMouse の新しいバージョンがあります\nVer. " + gitVersion;
+				}
+				else {
+					lpCaption = "FlushMouse";
+					lpText = "FlushMouse の新しいバージョンは見つかりませんでした";
+				}
+				try {
+					Task<long> messageBox = Task<long>.Run(() => MessageBox(g_hSettingsWnd, lpText, lpCaption, (MB_OK | MB_ICONINFORMATION | MB_TOPMOST)));
+					long _ = await messageBox;
+				}
+				catch (Exception) {
+				}
+				m_Sentinel = true;
+			}
+		}
+
+		private static async Task<string> GetLatestVersion(string urlExperimentGroups, string tag)
+		{
+			Task<string> task = Task<string>.Run(() => GetReleaseVersionOnGitHub(urlExperimentGroups));
+			string _result = await task;
+			string _gitVersion = "";
+			if (_result != null) {
+				int foundIndex1 = _result.IndexOf(tag, StringComparison.OrdinalIgnoreCase);
+				int nextIndex = foundIndex1 + tag.Length;
+				if (nextIndex < _result.Length) {
+					int foundIndex2 = _result.IndexOf("\",", nextIndex);
+					for(int i = nextIndex; i < foundIndex2; i++) {
+						_gitVersion += _result[i].ToString();
 					}
 				}
 			}
+			return _gitVersion;
 		}
 
 		private static int Compare(string current, string target)

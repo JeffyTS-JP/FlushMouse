@@ -83,9 +83,7 @@ VOID		vAboutDialog(HWND hWnd)
 		SendMessage(_hWnd, WM_SETTINGSEX, SETTINGSEX_SETTINGS_CHANGE_PANE, SETTINGSEX_SELECTEDPANE_ABOUT);
 	}
 	else {
-		if (Cursor != NULL) {
-			Cursor->vStopDrawIMEModeMouseByWndThread();
-		}
+		if (Cursor)	Cursor->vStopDrawIMEModeMouseByWndThread();
 		TCHAR	CommandLine[2]{};
 		if (_itow_s(SETTINGSEX_SELECTEDPANE_ABOUT, CommandLine, (sizeof(CommandLine) - sizeof(TCHAR)), 10) != 0)	return;
 
@@ -108,9 +106,7 @@ VOID		vIMEModeDialog(HWND hWnd)
 		SendMessage(_hWnd, WM_SETTINGSEX, SETTINGSEX_SETTINGS_CHANGE_PANE, SETTINGSEX_SELECTEDPANE_IMEMODE);
 	}
 	else {
-		if (Cursor != NULL) {
-			Cursor->vStopDrawIMEModeMouseByWndThread();
-		}
+		if (Cursor)	Cursor->vStopDrawIMEModeMouseByWndThread();
 		TCHAR	CommandLine[2]{};
 		if (_itow_s(SETTINGSEX_SELECTEDPANE_IMEMODE, CommandLine, (sizeof(CommandLine) - sizeof(TCHAR)), 10) != 0)	return;
 
@@ -133,9 +129,7 @@ VOID		vSettingDialog(HWND hWnd)
 		SendMessage(_hWnd, WM_SETTINGSEX, SETTINGSEX_SETTINGS_CHANGE_PANE, SETTINGSEX_SELECTEDPANE_GENERAL);
 	}
 	else {
-		if (Cursor != NULL) {
-			Cursor->vStopDrawIMEModeMouseByWndThread();
-		}
+		if (Cursor)	Cursor->vStopDrawIMEModeMouseByWndThread();
 		TCHAR	CommandLine[2]{};
 		if (_itow_s(SETTINGSEX_SELECTEDPANE_GENERAL, CommandLine, (sizeof(CommandLine) - sizeof(TCHAR)), 10) != 0)	return;
 

@@ -42,10 +42,10 @@
 		<Company>JeffyTS</Company>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-	  <NoWarn>NU5100;CS8785;NETSDK1206;IDE1006;CS0103;CA1416</NoWarn>
+	  <NoWarn>NU5100;CS8785;NETSDK1206;IDE1006;CS0103;CA1416;IDE0079</NoWarn>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-	  <NoWarn>NU5100;CS8785;NETSDK1206;IDE1006;CS0103;CA1416</NoWarn>
+	  <NoWarn>NU5100;CS8785;NETSDK1206;IDE1006;CS0103;CA1416;IDE0079</NoWarn>
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="readme.md" />
