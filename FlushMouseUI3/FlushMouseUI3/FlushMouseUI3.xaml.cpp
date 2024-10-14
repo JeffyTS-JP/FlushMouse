@@ -198,21 +198,17 @@ void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 	int		iNumArgs = 0;
 	LPTSTR	*_lpArgv = CommandLineToArgvW(_lpCmdLine, &iNumArgs);
 	if (iNumArgs != 0) {
-		if (_lpArgv[1]  != _T('\0')) {
-			if ((iRet = iCheckCmdLine((LPCTSTR)_lpArgv) != 1)) {
-				LocalFree(_lpArgv);
-				//return (iRet);
-				return;
-			}
+		if ((iRet = iCheckCmdLine((LPCTSTR)_lpArgv) != 1)) {
+			LocalFree(_lpArgv);
+			PostQuitMessage(0);
+			return;
 		}
 	}
 	LocalFree(_lpArgv);
 	
-	if ((m_hInstance = GetModuleHandle(FLUSHMOUSE_EXE)) == NULL) {
-		if ((m_hInstance = GetModuleHandle(FLUSHMOUSEUI3_EXE)) == NULL) {
-			PostQuitMessage(0);
-			return;
-		}
+	if ((m_hInstance = GetModuleHandle(NULL)) == NULL) {
+		PostQuitMessage(0);
+		return;
 	}
 
 	hMicrosoft_ui_xaml_dll = LoadLibrary(L"Microsoft.ui.xaml.dll");

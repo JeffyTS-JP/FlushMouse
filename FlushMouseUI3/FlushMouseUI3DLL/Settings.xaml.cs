@@ -15,140 +15,15 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
 using Windows.Graphics;
 
-namespace FlushMouseUI3DLL
-{
-	public struct RectDouble
-	{
-		public double X;
-		public double Y;
-		public double Width;
-		public double Height;
-	}
-	
-	public struct SizeDouble
-	{
-		public double Width;
-		public double Height; 
-	}
-	
-#pragma warning disable IDE0251
-	public struct RECT
-	{
-		public int Left, Top, Right, Bottom;
-		public int Width { get { return Right - Left; } }
-		public int Height { get { return Bottom - Top; } }
-	}
-#pragma warning restore IDE0251
+using static FlushMouseUI3DLL.Miscs;
 
+#pragma warning disable IDE0079
+namespace FlushMouseUI3DLL {
 	public partial class Settings
 	{
-		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.I8)]
-		internal static partial Int64 SendMessageW(Int64 hWnd, UInt32 uMsg, Int64 wParam, Int64 lParam);
-		internal const UInt32 WM_DESTROY = (0x0002);
-
-		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = false)]
-		[return: MarshalAs(UnmanagedType.I8)]
-		internal static partial Int64 FindWindowW(String lpClassName, String lpWindowName);
-
-		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		internal static partial bool EnableMenuItem(Int64 hMenu, UInt64 uIDEnableItem, UInt64 uEnable);
-		internal const UInt32 SC_CLOSE = 0x0000F060;
-		internal const UInt32 SC_MINIMIZE = 0x0000F020;
-		internal const UInt32 SC_MAXIMIZE = 0x0000F030;
-		internal const UInt32 SC_RESTORE = 0x0000F120;
-
-		internal const UInt32 MF_DISABLED = 0x00000002;
-
-		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.I8)]
-		internal static partial Int64 GetSystemMenu(Int64 hWnd, [MarshalAs(UnmanagedType.Bool)] bool bRevert);
-
-		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.U4)]
-		internal static partial UInt32 GetDpiForWindow(Int64 hWnd);
-		internal const UInt32 USER_DEFAULT_SCREEN_DPI = 96;
-
-		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.I8)]
-		internal static partial Int64 MonitorFromWindow(Int64 hWnd, UInt32 dwFlags);
-		internal const UInt32 MONITOR_DEFAULTTONULL    = 0x00000000;
-		internal const UInt32 MONITOR_DEFAULTTOPRIMARY = 0x00000001;
-		internal const UInt32 MONITOR_DEFAULTTONEAREST = 0x00000002;
-
-		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto, Pack = 4)]
-		internal class MONITORINFOEXW {
-			public int          cbSize;
-			public RectInt32    rcMonitor;
-			public RectInt32    rcWork;
-			public uint         dwFlags;
-			[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-			public char[] szDevice = new char[32];
-		};
-#pragma warning disable SYSLIB1054
-		[DllImport("User32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-		private static extern bool GetMonitorInfoW(Int64 hMonitor, [In, Out] MONITORINFOEXW lpmi);
-#pragma warning restore SYSLIB1054
-
-		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.I8)]
-		internal static partial Int64 MessageBoxW(Int64 hWnd, string MessageBox, string lpCaption, UInt32 uType);
-		public const UInt32 MB_OK = 0x00000000;
-		public const UInt32 MB_ICONINFORMATION = 0x00000040;
-		public const UInt32 MB_TOPMOST = 0x00040000;
-
-		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.I8)]
-		internal static partial Int64 GetWindowLongPtrW(Int64 hWnd,  Int32 nIndex);
-		internal const Int32 GWL_WNDPROC = (-4);
-		internal const Int32 GWLP_HINSTANCE = (-6);
-		internal const Int32 GWL_STYLE = (-16);
-
-		internal const int HCBT_ACTIVATE = 5;
-
-		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.I8)]
-		internal static partial Int64 DefWindowProcW(Int64 hWnd,  UInt32 nIndex, Int64 wParam, Int64 lParam);
-
-		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.I8)]
-		internal static partial Int64 CallNextHookEx(Int64 hHook,  Int32 nCode, Int64 wParam, Int64 lParam);
-
-		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		internal static partial bool IsIconic(Int64 hWnd);
-
-		[LibraryImport("Kernel32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.I4)]
-		internal static partial Int32 GetCurrentThreadId();
-
-		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.I8)]
-		internal static partial Int64 SetWindowsHookExW(Int64 idHook,  HookProc lpFn, Int64 hMod, Int32 dwThreadId);
-		internal delegate Int64 HookProc(Int32 nCode, Int64 wParam, Int64 lParam);
-		internal const Int32 WH_CBT = (5);
-
-		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		internal static partial bool UnhookWindowsHookEx(Int64 hHook);
-		
-		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		internal static partial bool GetWindowRect(Int64 hWnd, ref RECT lpRect);
-		
-		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		internal static partial bool SetWindowPos(Int64 hWnd, Int64 hWndInsertAfter, long x, long y, long cx, long cy, UInt32 uFlags);
-		internal const Int64 HWND_TOPMOST		= (-1);
-		internal const UInt32 SWP_NOSIZE		= 0x0001;
-		internal const UInt32 SWP_NOZORDER		= 0x0004;
-		internal const UInt32 SWP_NOACTIVATE	= 0x0010;
-
 		internal const String CLASS_FLUSHMOUSE = "FlushMouse-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}";
 		internal const String CLASS_FLUSHMOUSESETTINGS = "FlushMouseSettings-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}";
 		
@@ -266,7 +141,7 @@ namespace FlushMouseUI3DLL
 				SizeDouble sizeDouble;
 				sizeDouble.Width = (int)Window_OpenPaneLength;
 				sizeDouble.Height = (int)Window_CompactPaneLength;
-				CalcWindowSizeByDPI(g_hSettingsWnd, ref sizeDouble);        
+				CalcWindowSizeByDPI(g_hSettingsWnd, sizeDouble);        
 				NaviView.OpenPaneLength = sizeDouble.Width;
 				NaviView.CompactPaneLength = sizeDouble.Height;
 				if ((dwSettingsX == 0) && (dwSettingsY == 0) && (dwSettingsWidth == 0) && (dwSettingsHeight == 0)) {
@@ -277,7 +152,7 @@ namespace FlushMouseUI3DLL
 						m_WindowRectDouble.Width = Window_Width;
 					}
 					m_WindowRectDouble.Height = Window_Height;
-					CalcWindowCentralizeByDesktop(g_hSettingsWnd, ref m_WindowRectDouble);
+					CalcWindowCentralizeByDesktop(g_hSettingsWnd, m_WindowRectDouble);
 				}
 				else if ((dwSettingsWidth < Window_Min_Width) && (dwSettingsHeight < Window_Min_Height)) {
 					m_WindowRectDouble.X = dwSettingsX;
@@ -303,7 +178,7 @@ namespace FlushMouseUI3DLL
 				rect.Width = (int)m_WindowRectDouble.Width;
 				rect.Height = (int)m_WindowRectDouble.Height;
 				m_AppWindow.MoveAndResize(rect);
-				if (CalcWindowAdjustByMonitor(g_hSettingsWnd, ref m_WindowRectDouble) == true) {
+				if (CalcWindowAdjustByMonitor(g_hSettingsWnd, m_WindowRectDouble) == true) {
 					rect.X = (int)m_WindowRectDouble.X;
 					rect.Y = (int)m_WindowRectDouble.Y;
 					rect.Width = (int)m_WindowRectDouble.Width;
@@ -383,7 +258,7 @@ namespace FlushMouseUI3DLL
 				SizeDouble sizeDouble;
 				sizeDouble.Width = Window_OpenPaneLength;
 				sizeDouble.Height = Window_CompactPaneLength;
-				CalcWindowSizeByDPI(g_hSettingsWnd, ref sizeDouble);
+				CalcWindowSizeByDPI(g_hSettingsWnd, sizeDouble);
 				sender.OpenPaneLength = sizeDouble.Width;
 				sender.CompactPaneLength = sizeDouble.Height;
 			}
@@ -408,7 +283,7 @@ namespace FlushMouseUI3DLL
 				SizeDouble sizeDouble;
 				sizeDouble.Width = Window_OpenPaneLength;
 				sizeDouble.Height = Window_CompactPaneLength;
-				CalcWindowSizeByDPI(g_hSettingsWnd, ref sizeDouble);
+				CalcWindowSizeByDPI(g_hSettingsWnd, sizeDouble);
 				sender.OpenPaneLength = sizeDouble.Width;
 			}
 		}
@@ -516,99 +391,9 @@ namespace FlushMouseUI3DLL
 			return iRet;
 		}
 
-		unsafe private static void CalcWindowCentralizeByDesktop(Int64 hWnd, ref RectDouble rectWindowDouble)
-		{
-			Int64   hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
-			if (hMonitor != (Int64)0) {
-				MONITORINFOEXW lpmi = new() { cbSize = (int)Marshal.SizeOf(typeof(MONITORINFOEXW)) };
-				if (GetMonitorInfoW(hMonitor, lpmi)) {
-					SizeDouble sizeDouble;
-					sizeDouble.Width = rectWindowDouble.Width;
-					sizeDouble.Height = rectWindowDouble.Height;
-					CalcWindowSizeByDPI(hWnd, ref sizeDouble);
-					if (sizeDouble.Width >= (double)lpmi.rcWork.Width) {
-						rectWindowDouble.Width = lpmi.rcWork.Width;
-					}
-					else {
-						rectWindowDouble.Width = sizeDouble.Width;
-					}
-					if (sizeDouble.Height >= (double)lpmi.rcWork.Height) {
-						rectWindowDouble.Height = lpmi.rcWork.Height;
-					}
-					else {
-						rectWindowDouble.Height = sizeDouble.Height;
-					}
-					rectWindowDouble.X = (int)(lpmi.rcWork.X + ((double)lpmi.rcWork.Width - (double)lpmi.rcWork.X - rectWindowDouble.Width) / 2.0);
-					rectWindowDouble.Y = (int)(lpmi.rcWork.Y + ((double)lpmi.rcWork.Height - (double)lpmi.rcWork.Y - rectWindowDouble.Height) / 2.0);
-				}
-			}
-		}
-
-		unsafe private static bool CalcWindowAdjustByMonitor(Int64 hWnd, ref RectDouble rectWindowDouble)
-		{
-			Int64   hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
-			if (hMonitor != (Int64)0) {
-				MONITORINFOEXW lpmi = new() { cbSize = (int)Marshal.SizeOf(typeof(MONITORINFOEXW)) };
-				if (GetMonitorInfoW(hMonitor, lpmi)) {
-					if ((rectWindowDouble.X < lpmi.rcWork.X) 
-							|| (lpmi.rcWork.Width > (lpmi.rcWork.Width + rectWindowDouble.Width)) 
-							|| (rectWindowDouble.Y < lpmi.rcWork.Y)
-							|| (lpmi.rcWork.Height < (rectWindowDouble.Y + rectWindowDouble.Height))) {
-						rectWindowDouble.X = (int)(lpmi.rcWork.X + ((double)lpmi.rcWork.Width - (double)lpmi.rcWork.X - rectWindowDouble.Width) / 2.0);
-						rectWindowDouble.Y = (int)(lpmi.rcWork.Y + ((double)lpmi.rcWork.Height - (double)lpmi.rcWork.Y - rectWindowDouble.Height) / 2.0);
-						return true;
-					}
-				}
-			}
-			return false;
-		}
-		
-		unsafe private static void CalcWindowSizeByDPI(Int64 hWnd, ref SizeDouble sizeDouble)
-		{
-			UInt32 dpi = GetDpiForWindow(hWnd);
-			if (dpi != 0) {
-				sizeDouble.Width = ((double)sizeDouble.Width * (double)dpi / (double)USER_DEFAULT_SCREEN_DPI);
-				sizeDouble.Height = ((double)sizeDouble.Height * (double)dpi / (double)USER_DEFAULT_SCREEN_DPI);
-			}
-		}
-
-		private static Int64 hParentWnd = 0;
-		private static Int64 hMessageBoxHook;
-		public static long MessageBox(Int64 hWnd, string MessageBox, string lpCaption, UInt32 uType)
-		{
-			long result = 0;
-			try {
-				Int64 hInstance = GetWindowLongPtrW(hWnd, GWLP_HINSTANCE);
-				Int32 dwThreadID = GetCurrentThreadId();
-				hParentWnd = hWnd;
-				hMessageBoxHook = SetWindowsHookExW(WH_CBT, new(_HookProc), hInstance, dwThreadID);
-				result = MessageBoxW(hWnd, MessageBox, lpCaption, uType);
-			}
-			catch (Exception)  {
-			}
-			return result;
-		}
-
-		private static Int64 _HookProc(Int32 nCode, Int64 wParam, Int64 lParam)
-		{
-			if (nCode == HCBT_ACTIVATE) {
-				RECT rcParent = new();
-				RECT rcMsgBox = new();
-				GetWindowRect(hParentWnd, ref rcParent);
-				GetWindowRect(wParam, ref rcMsgBox);
-
-				Int32 x = rcParent.Left + ((rcParent.Width - rcMsgBox.Width) / 2);
-				Int32 y = rcParent.Top + ((rcParent.Height - rcMsgBox.Height) / 2);
-				SetWindowPos(wParam, HWND_TOPMOST, x, y, rcMsgBox.Width, rcMsgBox.Height, (SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE));
-
-				UnhookWindowsHookEx(hMessageBoxHook);
-				hMessageBoxHook = (Int64)0;
-		}
-			return CallNextHookEx(hMessageBoxHook, nCode, wParam, lParam);
-		}
-
 	}
 }
+#pragma warning restore IDE0079
 
 
 /* = EOF = */

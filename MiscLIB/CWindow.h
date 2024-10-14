@@ -29,6 +29,7 @@ public:
 		_In_ int nWidth, _In_ int nHeight, _In_opt_ HWND hWndParent, _In_opt_ HMENU hMenu);
 	virtual LRESULT WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);		
 
+	HINSTANCE	hGetInstance() const {return _hInstance; }
 	HWND		hGetHWND() const { return _hWnd; }
 	BOOL		bUpdateWindow() const;
 	BOOL		bShowWindow(_In_ int nCmdShow) const;

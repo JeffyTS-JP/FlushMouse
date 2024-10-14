@@ -4,7 +4,7 @@
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0000		2022/03/12  JeffyTS  	New edit.
+// #0000	2022/03/12  JeffyTS  	New edit.
 //
 
 //
@@ -13,6 +13,7 @@
 #pragma once
 #include "CommonDef.h"
 #include "Ime.h"
+#include "CursorSub.h"
 #include "..\FlushMouseCursor\Resource.h"
 #include "..\MiscLIB\CThread.h"
 #include "..\MiscLIB\CWindow.h"
@@ -62,24 +63,6 @@
 //
 // Struct Define
 //
-typedef struct tagMOUSECURSOR {
-	DWORD		id;	
-	UINT		uResourceID;
-	BOOL		bReadReg;
-	TCHAR		szRegValue[MAX_LOADSTRING];
-	TCHAR		szFile[_MAX_PATH];
-} MOUSECURSOR, * PMOUSECURSOR, * LPMOUSECURSOR;
-
-typedef struct tagFLUSHMOUSECURSOR {
-	DWORD		dwIMEMode;
-	TCHAR		szMode[MAX_IMEMODECHAR];	
-	COLORREF	dwColor;
-	TCHAR		szFont[LF_FACESIZE];
-	MOUSECURSOR	stArrow;	
-	MOUSECURSOR	stHand;
-	MOUSECURSOR	stIBeam;	
-} FLUSHMOUSECURSOR, * PFLUSHMOUSECURSOR, * LPFLUSHMOUSECURSOR;
-
 typedef struct tagIMECursorData
 {
 	HWND		hWndObserved;
@@ -116,35 +99,6 @@ typedef struct tagIMECursorData
 } IMECURSORDATA, * PIMECURSORDATA, * LPIMECURSORDATA;
 
 //
-// Class CCursorWindow
-//
-class CCursorWindow : public CWindow
-{
-public:
-	CCursorWindow();
-	~CCursorWindow();
-
-public:
-	BOOL		bRegister(HINSTANCE hInstance, LPCTSTR szWindowClass);
-	VOID		vSetModeStringColorFont(LPCTSTR _lpszIMEMode, COLORREF dwRGB, LPCTSTR _lpszFontFace);
-
-private:
-	LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-
-	BOOL		Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct) const;
-	void		Cls_OnDestroy(HWND hWnd);
-	void		Cls_OnPaint(HWND hWnd);
-
-public:
-
-private:
-	LPTSTR		lpszIMEMode;
-	COLORREF	dwTextColor;
-	COLORREF	dwBackColor;
-	LPTSTR		lpszFontFace;
-};
-
-//
 // Class CCursor
 // 
 class CCursor
@@ -164,17 +118,11 @@ public:
 	BOOL		bStartDrawIMEModeThreadWaitEventForeGround(HWND hWndObserved);
 	BOOL		bStartDrawIMEModeThreadWaitDblClk(HWND hWndObserved);
 
-	BOOL		bShowHideCursor(HWND hWndObserved, BOOL bShow);
 	BOOL		bStartDrawIMEModeMouseByWndThread();
 	VOID		vStopDrawIMEModeMouseByWndThread();
 
 private:
 	BOOL		bStartDrawIMEModeThreadSub(HWND hWndObserved);
-
-	LPTSTR		lpszGetCursorDataName();
-	HMODULE		hCursorDllLoad();
-	BOOL		bCursorDllUnload();
-	BOOL		bSystemCursorLoad();
 
 	BOOL		bRegisterIMECursorChangeThread(HWND hWnd);
 	VOID		vUnRegisterIMECursorChangeThread();
@@ -216,6 +164,8 @@ private:
 	CCursorWindow	*CursorWindow;
 	CCursorWindow	*CaretWindow;
 	CCursorWindow	*MouseWindow;
+
+	CCursorSub		*CursorSub;
 };
 
 

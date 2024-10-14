@@ -180,6 +180,7 @@
     <ClInclude Include="CommonDef.h" />
     <ClInclude Include="CResource.h" />
     <ClInclude Include="Cursor.h" />
+    <ClInclude Include="CursorSub.h" />
     <ClInclude Include="Eventlog.h" />
     <ClInclude Include="FlushMouseLIB.h" />
     <ClInclude Include="FlushMouseSub.h" />
@@ -198,6 +199,7 @@
   <ItemGroup>
     <ClCompile Include="CResource.cpp" />
     <ClCompile Include="Cursor.cpp" />
+    <ClCompile Include="CursorSub.cpp" />
     <ClCompile Include="Eventlog.cpp" />
     <ClCompile Include="FlushMouseLIB.cpp" />
     <ClCompile Include="FlushMouseSub.cpp" />

@@ -38,6 +38,7 @@
 #define FLUSHMOUSE_DLL				L"FlushMouseDLL.dll"
 #define FLUSHMOUSE32_DLL			L"FlushMouseDLL32.dll"
 #define FLUSHMOUSEUI3_DLL			L"FlushMouseUI3DLL.dll"
+#define FLUSHMOUSECURSOR_DAT		L"FlushMouseCursor.dat"
 
 // Window Class
 #define	CLASS_FLUSHMOUSE			L"FlushMouse-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"

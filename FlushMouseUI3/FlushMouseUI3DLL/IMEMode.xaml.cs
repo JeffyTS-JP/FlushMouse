@@ -134,7 +134,7 @@ namespace FlushMouseUI3DLL {
 				tb2_1.IsEnabled = true;		tb2_2.IsEnabled = true;		tb2_3.IsEnabled = true;
 				tb2_4.IsEnabled = true;		tb2_5.IsEnabled = true;		tb2_6.IsEnabled = true;
 			}
-			if (!bDisplayIMEModeOnCursor || !bDisplayIMEModeByWindow) {
+			if (!bDisplayIMEModeOnCursor) {
 				Combo3.IsEnabled = false;
 				sl3.IsEnabled = false;	sl4.IsEnabled = false;
 				Button3_1.IsEnabled = false;	Button3_2.IsEnabled = false;	Button3_3.IsEnabled = false;
@@ -152,7 +152,12 @@ namespace FlushMouseUI3DLL {
 					tb3_1.IsEnabled = true;
 				}
 				Combo3.IsEnabled = true;
-				sl3.IsEnabled = true;	sl4.IsEnabled = true;
+				if (!bDisplayIMEModeByWindow) {
+					sl3.IsEnabled = false;	sl4.IsEnabled = false;
+				}
+				else {
+					sl3.IsEnabled = true;	sl4.IsEnabled = true;
+				}
 				Button3_2.IsEnabled = true;		Button3_3.IsEnabled = true;		Button3_4.IsEnabled = true;
 				Button3_5.IsEnabled = true;		Button3_6.IsEnabled = true;
 				tb3_2.IsEnabled = true;			tb3_3.IsEnabled = true;			tb3_4.IsEnabled = true;

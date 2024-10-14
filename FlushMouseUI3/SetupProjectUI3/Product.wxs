@@ -541,6 +541,9 @@
 			<Component Id="WinUI3_xbf_07" Guid="{B642B2E6-DE1C-489E-99FE-4E11609B0FA3}">
 				<File Id="WinUI3__xbf_07" Name="IMEMode.xbf" Source="$(var.TargetDir01)IMEMode.xbf" />
 			</Component>
+			<Component Id="WinUI3_xbf_08" Guid="{88FDE86C-9A9D-41D5-82BE-831B65BB351B}">
+				<File Id="WinUI3__xbf_08" Name="Miscs.xbf" Source="$(var.TargetDir01)Miscs.xbf" />
+			</Component>
 
 			<!-- WinUI3 DLLs and some Files-->
 			<Component Id="WinUI3_DLLs_01" Guid="{C132F5C7-A802-46F3-B302-8E6E16CBE41B}">

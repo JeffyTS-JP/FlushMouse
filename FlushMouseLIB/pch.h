@@ -52,9 +52,11 @@ typedef unsigned short USHORT;
 #include <hidusage.h>
 #include <hidpi.h>
 #pragma comment(lib, "hid.lib")
-//#include <bit>
 #include <cstdlib>
 #include <stdio.h>
 #include <future>
+
+#include <psapi.h>
+#include <strsafe.h>
 
 #endif //PCH_H

@@ -23,7 +23,7 @@
 	Closed="Window_Closed"
 	>
 
-	<Grid  x:Name="settingsMain" FocusVisualPrimaryBrush="{x:Null}" Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}">
+	<Grid  x:Name="settingsMain" MinWidth="200" MinHeight="100" FocusVisualPrimaryBrush="{x:Null}" Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}">
 		<Rectangle Fill="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}" />
 		<Grid VerticalAlignment="Top">
 			<Grid.RowDefinitions>

@@ -18,6 +18,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 using static FlushMouseUI3DLL.Settings;
+using static FlushMouseUI3DLL.Miscs;
 
 namespace FlushMouseUI3DLL {
 	public sealed partial class About
