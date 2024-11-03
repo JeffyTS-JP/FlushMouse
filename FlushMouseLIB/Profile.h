@@ -38,7 +38,7 @@ typedef struct tagAppRegData
 	DWORD		dwAdditionalWaitTime = 300;
 	DWORD		dwDisplayModeTime = 400;
 	BOOL		bDisplayIMEModeOnCursor = FALSE;
-	BOOL		bDisplayIMEModeByWindow = FALSE;
+	DWORD		dwDisplayIMEModeMethod = 0;
 	BOOL		bDisplayIMEModeIMEOFF = FALSE;
 	BOOL		bForceHiragana = FALSE;
 	BOOL		bDenyChangedByApp = FALSE;

@@ -55,7 +55,7 @@ BOOL		bSettingsEx(HWND hWnd, int iCode, int iSubCode)
 			Cursor->vStopDrawIMEModeMouseByWndThread();
 			vSettingDialogApply();
 			if (!Profile->bSetProfileData())	return FALSE;
-			if (Profile->lpstAppRegData->bDisplayIMEModeOnCursor && Profile->lpstAppRegData->bDisplayIMEModeByWindow) {
+			if (Profile->lpstAppRegData->bDisplayIMEModeOnCursor && (Profile->lpstAppRegData->dwDisplayIMEModeMethod != DisplayIMEModeMethod_RESOURCE)) {
 				Cursor->bStartDrawIMEModeMouseByWndThread();
 			}
 			else {
@@ -65,7 +65,7 @@ BOOL		bSettingsEx(HWND hWnd, int iCode, int iSubCode)
 			return TRUE;
 		case SETTINGSEX_CANCEL:
 			vSettingDialogClose();
-			if (Profile->lpstAppRegData->bDisplayIMEModeOnCursor && Profile->lpstAppRegData->bDisplayIMEModeByWindow) {
+			if (Profile->lpstAppRegData->bDisplayIMEModeOnCursor && (Profile->lpstAppRegData->dwDisplayIMEModeMethod != DisplayIMEModeMethod_RESOURCE)) {
 				Cursor->bStartDrawIMEModeMouseByWndThread();
 			}
 			else {
@@ -91,7 +91,7 @@ BOOL		bSettingsEx(HWND hWnd, int iCode, int iSubCode)
 				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
 				return FALSE;
 			}
-			if (Profile->lpstAppRegData->bDisplayIMEModeOnCursor && Profile->lpstAppRegData->bDisplayIMEModeByWindow) {
+			if (Profile->lpstAppRegData->bDisplayIMEModeOnCursor && (Profile->lpstAppRegData->dwDisplayIMEModeMethod != DisplayIMEModeMethod_RESOURCE)) {
 				Cursor->bStartDrawIMEModeMouseByWndThread();
 			}
 			else {
@@ -101,7 +101,7 @@ BOOL		bSettingsEx(HWND hWnd, int iCode, int iSubCode)
 		case SETTINGSEX_SETTINGS_CHANGE_PANE:
 			return TRUE;
 		case SETTINGSEX_SETTINGS_STARTED:
-			if (Profile->lpstAppRegData->bDisplayIMEModeOnCursor && Profile->lpstAppRegData->bDisplayIMEModeByWindow) {
+			if (Profile->lpstAppRegData->bDisplayIMEModeOnCursor &&(Profile->lpstAppRegData->dwDisplayIMEModeMethod != DisplayIMEModeMethod_RESOURCE)) {
 				if (Cursor->bStartDrawIMEModeMouseByWndThread()) {
 					return TRUE;
 				}

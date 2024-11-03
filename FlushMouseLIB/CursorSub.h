@@ -97,14 +97,14 @@ public:
 	BOOL		bUnLoadCursorData();
 
 	BOOL		bMakeAllCursor(LPFLUSHMOUSECURSOR lpstIMECursorData);
-	BOOL		bMakeOneUnitCursor(int iSrcArrowResID, int iSrcIBeamResID, int iSrcHandResID, DWORD dwIMEMode, LPTSTR szIMEMode, COLORREF dwRGB, LPCTSTR szFontFace);
+	BOOL		bMakeOneUnitCursor(LPFLUSHMOUSECURSOR lpstIMECursorData, int iIMEMode);
 
 private:
 	BOOL		bGetCursorDataFullPath(LPCTSTR lpszCursorDataFileName);
 	BOOL		bGetCursorDataTempFullPath(LPCTSTR lpszCursorDataFileName);
 	BOOL		bCopyFile(LPCTSTR lpszDstPath,  LPCTSTR lpszSrcPath);
 
-	BOOL		_bMakeOneUnitCursor(HMODULE hSrcMod, HANDLE hDstRes, int iSrcArrowResID, int iSrcIBeamResID, int iSrcHandResID, DWORD dwIMEMode, LPTSTR szIMEMode, COLORREF dwRGB, LPCTSTR szFontFace);
+	BOOL		_bMakeOneUnitCursor(HMODULE hSrcMod, HANDLE hDstRes, LPFLUSHMOUSECURSOR lpstIMECursorData, int iIMEMode);
 	BOOL		bMakeCursor(HMODULE hSrcMod, HANDLE hDstRes, int iSrcResID, int iDstResID, DWORD dwIMEMode, LPTSTR szIMEMode, COLORREF dwRGB, LPCTSTR szFontFace);
 	BOOL		bMakeCursorSub(LPRTCURSORHEAD	lpRTCursorHead, LPRTCURSORHEAD lpMakeCursorData, DWORD dwResSize, int cx, int cy, DWORD dwIMEMode, LPTSTR lpszIMEMode, COLORREF dwRGB, LPCTSTR lpszFontFace);
 	LPVOID		_FindResource(HMODULE hModule, int iResID, LPCTSTR ResType, LPDWORD lpdwResSize);

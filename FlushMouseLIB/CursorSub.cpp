@@ -232,56 +232,14 @@ BOOL		CCursorSub::bMakeAllCursor(LPFLUSHMOUSECURSOR lpstIMECursorData)
 	if ((hSrcMod = LoadLibrary(lpszCursorDataFullPath)) == NULL)	goto Cleanup;
 	if ((hDstRes = BeginUpdateResource(lpszCursorDataTempFullPath, FALSE)) == NULL)	goto Cleanup;
 
-	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes,  lpstIMECursorData[IMEMODE_IMEOFF].stArrow.iResourceID,
-		lpstIMECursorData[IMEMODE_IMEOFF].stIBeam.iResourceID,
-		lpstIMECursorData[IMEMODE_IMEOFF].stHand.iResourceID,
-		lpstIMECursorData[IMEMODE_IMEOFF].dwIMEMode,
-		lpstIMECursorData[IMEMODE_IMEOFF].szMode,
-		lpstIMECursorData[IMEMODE_IMEOFF].dwColor,
-		lpstIMECursorData[IMEMODE_IMEOFF].szFont))	goto Cleanup;
-	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes,  lpstIMECursorData[IMEMODE_ZENHIRA_IMEON].stArrow.iResourceID,
-		lpstIMECursorData[IMEMODE_ZENHIRA_IMEON].stIBeam.iResourceID,
-		lpstIMECursorData[IMEMODE_ZENHIRA_IMEON].stHand.iResourceID,
-		lpstIMECursorData[IMEMODE_ZENHIRA_IMEON].dwIMEMode,
-		lpstIMECursorData[IMEMODE_ZENHIRA_IMEON].szMode,
-		lpstIMECursorData[IMEMODE_ZENHIRA_IMEON].dwColor,
-		lpstIMECursorData[IMEMODE_ZENHIRA_IMEON].szFont))	goto Cleanup;
-	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes,  lpstIMECursorData[IMEMODE_HANEISU_IMEON].stArrow.iResourceID,
-		lpstIMECursorData[IMEMODE_HANEISU_IMEON].stIBeam.iResourceID,
-		lpstIMECursorData[IMEMODE_HANEISU_IMEON].stHand.iResourceID,
-		lpstIMECursorData[IMEMODE_HANEISU_IMEON].dwIMEMode,
-		lpstIMECursorData[IMEMODE_HANEISU_IMEON].szMode,
-		lpstIMECursorData[IMEMODE_HANEISU_IMEON].dwColor,
-		lpstIMECursorData[IMEMODE_HANEISU_IMEON].szFont))	goto Cleanup;
-	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes,  lpstIMECursorData[IMEMODE_HANKANA_IMEON].stArrow.iResourceID,
-		lpstIMECursorData[IMEMODE_HANKANA_IMEON].stIBeam.iResourceID,
-		lpstIMECursorData[IMEMODE_HANKANA_IMEON].stHand.iResourceID,
-		lpstIMECursorData[IMEMODE_HANKANA_IMEON].dwIMEMode,
-		lpstIMECursorData[IMEMODE_HANKANA_IMEON].szMode,
-		lpstIMECursorData[IMEMODE_HANKANA_IMEON].dwColor,
-		lpstIMECursorData[IMEMODE_HANKANA_IMEON].szFont))	goto Cleanup;
-	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes,  lpstIMECursorData[IMEMODE_ZENEISU_IMEON].stArrow.iResourceID,
-		lpstIMECursorData[IMEMODE_ZENEISU_IMEON].stIBeam.iResourceID,
-		lpstIMECursorData[IMEMODE_ZENEISU_IMEON].stHand.iResourceID,
-		lpstIMECursorData[IMEMODE_ZENEISU_IMEON].dwIMEMode,
-		lpstIMECursorData[IMEMODE_ZENEISU_IMEON].szMode,
-		lpstIMECursorData[IMEMODE_ZENEISU_IMEON].dwColor,
-		lpstIMECursorData[IMEMODE_ZENEISU_IMEON].szFont))	goto Cleanup;
-	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes,  lpstIMECursorData[IMEMODE_ZENKANA_IMEON].stArrow.iResourceID,
-		lpstIMECursorData[IMEMODE_ZENKANA_IMEON].stIBeam.iResourceID,
-		lpstIMECursorData[IMEMODE_ZENKANA_IMEON].stHand.iResourceID,
-		lpstIMECursorData[IMEMODE_ZENKANA_IMEON].dwIMEMode,
-		lpstIMECursorData[IMEMODE_ZENKANA_IMEON].szMode,
-		lpstIMECursorData[IMEMODE_ZENKANA_IMEON].dwColor,
-		lpstIMECursorData[IMEMODE_ZENKANA_IMEON].szFont))	goto Cleanup;
-	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes,  lpstIMECursorData[IMEMODE_IMEHIDE].stArrow.iResourceID,
-		lpstIMECursorData[IMEMODE_IMEHIDE].stIBeam.iResourceID,
-		lpstIMECursorData[IMEMODE_IMEHIDE].stHand.iResourceID,
-		lpstIMECursorData[IMEMODE_IMEHIDE].dwIMEMode,
-		lpstIMECursorData[IMEMODE_IMEHIDE].szMode,
-		lpstIMECursorData[IMEMODE_IMEHIDE].dwColor,
-		lpstIMECursorData[IMEMODE_IMEHIDE].szFont))	goto Cleanup;
-	
+	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_IMEOFF))	goto Cleanup;
+	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_ZENHIRA_IMEON))	goto Cleanup;
+	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_HANEISU_IMEON))	goto Cleanup;
+	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_HANKANA_IMEON))	goto Cleanup;
+	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_ZENEISU_IMEON))	goto Cleanup;
+	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_ZENKANA_IMEON))	goto Cleanup;
+	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_IMEHIDE))	goto Cleanup;
+
 	if (hDstRes)	if (!EndUpdateResource(hDstRes, FALSE))	goto Cleanup;
 
 	bRet = TRUE;
@@ -297,7 +255,7 @@ Cleanup:
 //
 // bMakeOneUnitCursor();
 //
-BOOL		CCursorSub::bMakeOneUnitCursor(int iSrcArrowResID, int iSrcIBeamResID, int iSrcHandResID, DWORD dwIMEMode, LPTSTR szIMEMode, COLORREF dwRGB, LPCTSTR szFontFace)
+BOOL		CCursorSub::bMakeOneUnitCursor(LPFLUSHMOUSECURSOR lpstIMECursorData, int iIMEMode)
 {
 	HMODULE		hSrcMod;
 	HANDLE		hDstRes;
@@ -305,11 +263,8 @@ BOOL		CCursorSub::bMakeOneUnitCursor(int iSrcArrowResID, int iSrcIBeamResID, int
 
 	if ((hSrcMod = LoadLibrary(lpszCursorDataFullPath)) == NULL)	goto Cleanup;
 	if ((hDstRes = BeginUpdateResource(lpszCursorDataTempFullPath, FALSE)) == NULL)	goto Cleanup;
-
-
-	if (!bMakeCursor(hSrcMod, hDstRes, IDC_HIDE_ARROW, iSrcArrowResID, dwIMEMode, szIMEMode, dwRGB, szFontFace))	goto Cleanup;
-	if (!bMakeCursor(hSrcMod, hDstRes, IDC_HIDE_IBEAM, iSrcIBeamResID, dwIMEMode, szIMEMode, dwRGB, szFontFace))	goto Cleanup;
-	if (!bMakeCursor(hSrcMod, hDstRes, IDC_HIDE_HAND, iSrcHandResID, dwIMEMode, szIMEMode, dwRGB, szFontFace))	goto Cleanup;
+	
+	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, iIMEMode))	goto Cleanup;
 
 	if (hDstRes)	if (!EndUpdateResource(hDstRes, FALSE))	goto Cleanup;
 	
@@ -326,13 +281,25 @@ Cleanup:
 //
 // _bMakeOneUnitCursor();
 //
-BOOL		CCursorSub::_bMakeOneUnitCursor(HMODULE hSrcMod, HANDLE hDstRes, int iSrcArrowResID, int iSrcIBeamResID, int iSrcHandResID, DWORD dwIMEMode, LPTSTR szIMEMode, COLORREF dwRGB, LPCTSTR szFontFace)
+BOOL		CCursorSub::_bMakeOneUnitCursor(HMODULE hSrcMod, HANDLE hDstRes, LPFLUSHMOUSECURSOR lpstIMECursorData, int iIMEMode)
 {
 	BOOL	bRet = FALSE;
 	
-	if (!bMakeCursor(hSrcMod, hDstRes, IDC_HIDE_ARROW, iSrcArrowResID, dwIMEMode, szIMEMode, dwRGB, szFontFace))	goto Cleanup;
-	if (!bMakeCursor(hSrcMod, hDstRes, IDC_HIDE_IBEAM, iSrcIBeamResID, dwIMEMode, szIMEMode, dwRGB, szFontFace))	goto Cleanup;
-	if (!bMakeCursor(hSrcMod, hDstRes, IDC_HIDE_HAND, iSrcHandResID, dwIMEMode, szIMEMode, dwRGB, szFontFace))	goto Cleanup;
+	if (!bMakeCursor(hSrcMod, hDstRes, IDC_HIDE_ARROW,	lpstIMECursorData[iIMEMode].stArrow.iResourceID,
+														lpstIMECursorData[iIMEMode].dwIMEMode,
+														lpstIMECursorData[iIMEMode].szMode,
+														lpstIMECursorData[iIMEMode].dwColor,
+														lpstIMECursorData[iIMEMode].szFont))	goto Cleanup;
+	if (!bMakeCursor(hSrcMod, hDstRes, IDC_HIDE_IBEAM,	lpstIMECursorData[iIMEMode].stIBeam.iResourceID,
+														lpstIMECursorData[iIMEMode].dwIMEMode,
+														lpstIMECursorData[iIMEMode].szMode,
+														lpstIMECursorData[iIMEMode].dwColor,
+														lpstIMECursorData[iIMEMode].szFont))	goto Cleanup;
+	if (!bMakeCursor(hSrcMod, hDstRes, IDC_HIDE_HAND,	lpstIMECursorData[iIMEMode].stHand.iResourceID,
+														lpstIMECursorData[iIMEMode].dwIMEMode,
+														lpstIMECursorData[iIMEMode].szMode,
+														lpstIMECursorData[iIMEMode].dwColor,
+														lpstIMECursorData[iIMEMode].szFont))	goto Cleanup;
 
 	bRet = TRUE;
 	
@@ -445,7 +412,7 @@ BOOL		CCursorSub::bMakeCursorSub(LPRTCURSORHEAD	lpRTCursorHead, LPRTCURSORHEAD l
 	hTextGDIObj = SelectObject(hTextMemDC, hTextBitmap);
 	if ((hTextGDIObj == NULL) || (hTextGDIObj == HGDI_ERROR))	goto Cleanup;
 
-	rc.left = cx / 3 + 2;	rc.right = rc.left + cx * 2 / 3;	rc.top = cy / 3 + 2;	rc.bottom = rc.top + cy * 2 / 3;
+	rc.left = cx / 3 + 2;	rc.right = rc.left + cx * 2 / 3;	rc.top = cy / 3;	rc.bottom = rc.top + cy * 2 / 3 + 2;
 	iXSize = rc.right - rc.left;
 	vAdjustFontXPosition(dwIMEMode, lpszIMEMode, &iXSize, &rc);
 	if (!TextDraw(hTextMemDC, rc, lpszIMEMode, dwRGB, lpszFontFace, FW_NORMAL, FALSE))	goto Cleanup;
@@ -634,6 +601,8 @@ void		CCursorWindow::Cls_OnDestroy(HWND hWnd)
 //
 void		CCursorWindow::Cls_OnPaint(HWND hWnd) const
 {
+	InvalidateRect(hWnd, NULL, TRUE);
+	
 	PAINTSTRUCT	ps{};
 	HDC hDC = BeginPaint(hWnd, &ps);
 	if (hDC != NULL) {
@@ -704,7 +673,7 @@ VOID		vAdjustFontXPosition(DWORD dwIMEMode,LPCTSTR szMode, LPINT lpiXSize, LPREC
 {
 	int		len = (int)wcsnlen_s(szMode, sizeof(szMode));
 	if ((len < 2) && ((dwIMEMode == IMEOFF) || (dwIMEMode == HANEISU_IMEON) || (dwIMEMode == HANKANA_IMEON))) {
-		*lpiXSize = (*lpiXSize * 2) / 3;	lprc->left = lprc->left;	lprc->right = lprc->left + *lpiXSize;
+		*lpiXSize = (*lpiXSize * 2) / 3;	lprc->left = lprc->left + (*lpiXSize / 3);	lprc->right = lprc->left + *lpiXSize;
 	}
 }
 

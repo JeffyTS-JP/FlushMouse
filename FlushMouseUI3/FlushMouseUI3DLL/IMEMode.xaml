@@ -160,7 +160,7 @@
 							</Flyout>
 						</FlyoutBase.AttachedFlyout>
 					</Button>
-					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb1_3" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" MaxLength="2" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
+					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb1_3" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
 				<Grid Margin="0,14,0,0" Grid.Row="7">
 					<Grid.ColumnDefinitions>
@@ -191,7 +191,7 @@
 							</Flyout>
 						</FlyoutBase.AttachedFlyout>
 					</Button>
-					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb1_4" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" MaxLength="2" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
+					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb1_4" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
 				<Grid Margin="0,14,0,0" Grid.Row="8">
 					<Grid.ColumnDefinitions>
@@ -222,7 +222,7 @@
 							</Flyout>
 						</FlyoutBase.AttachedFlyout>
 					</Button>
-					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb1_5" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" MaxLength="2" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
+					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb1_5" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
 				<Grid Margin="0,14,0,0" Grid.Row="9">
 					<Grid.ColumnDefinitions>
@@ -253,7 +253,7 @@
 							</Flyout>
 						</FlyoutBase.AttachedFlyout>
 					</Button>
-					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb1_6" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" MaxLength="2" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
+					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb1_6" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
 			</Grid>
 		</Expander>
@@ -329,7 +329,7 @@
 							</Flyout>
 						</FlyoutBase.AttachedFlyout>
 					</Button>
-					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb2_1" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" MaxLength="2" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
+					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb2_1" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
 				<Grid Margin="0,12,0,0" Grid.Row="5">
 					<Grid.ColumnDefinitions>
@@ -360,7 +360,7 @@
 							</Flyout>
 						</FlyoutBase.AttachedFlyout>
 					</Button>
-					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb2_2" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" MaxLength="2" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
+					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb2_2" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
 				<Grid Margin="0,14,0,0" Grid.Row="6">
 					<Grid.ColumnDefinitions>
@@ -391,7 +391,7 @@
 							</Flyout>
 						</FlyoutBase.AttachedFlyout>
 					</Button>
-					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb2_3" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" MaxLength="2" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
+					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb2_3" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
 				<Grid Margin="0,14,0,0" Grid.Row="7">
 					<Grid.ColumnDefinitions>
@@ -422,7 +422,7 @@
 							</Flyout>
 						</FlyoutBase.AttachedFlyout>
 					</Button>
-					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb2_4" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" MaxLength="2" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
+					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb2_4" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
 				<Grid Margin="0,14,0,0" Grid.Row="8">
 					<Grid.ColumnDefinitions>
@@ -453,7 +453,7 @@
 							</Flyout>
 						</FlyoutBase.AttachedFlyout>
 					</Button>
-					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb2_5" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" MaxLength="2" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
+					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb2_5" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
 				<Grid Margin="0,14,0,0" Grid.Row="9">
 					<Grid.ColumnDefinitions>
@@ -484,7 +484,7 @@
 							</Flyout>
 						</FlyoutBase.AttachedFlyout>
 					</Button>
-					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb2_6" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" MaxLength="2" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
+					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb2_6" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
 			</Grid>
 		</Expander>
@@ -570,7 +570,7 @@
 							</Flyout>
 						</FlyoutBase.AttachedFlyout>
 					</Button>
-					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb3_1" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" MaxLength="2" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
+					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb3_1" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
 				<Grid Margin="0,12,0,0" Grid.Row="6">
 					<Grid.ColumnDefinitions>
@@ -601,7 +601,7 @@
 							</Flyout>
 						</FlyoutBase.AttachedFlyout>
 					</Button>
-					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb3_2" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" MaxLength="2" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
+					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb3_2" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
 				<Grid Margin="0,14,0,0" Grid.Row="7">
 					<Grid.ColumnDefinitions>
@@ -632,7 +632,7 @@
 							</Flyout>
 						</FlyoutBase.AttachedFlyout>
 					</Button>
-					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb3_3" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" MaxLength="2" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
+					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb3_3" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
 				<Grid Margin="0,14,0,0" Grid.Row="8">
 					<Grid.ColumnDefinitions>
@@ -663,7 +663,7 @@
 							</Flyout>
 						</FlyoutBase.AttachedFlyout>
 					</Button>
-					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb3_4" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" MaxLength="2" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
+					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb3_4" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
 				<Grid Margin="0,14,0,0" Grid.Row="9">
 					<Grid.ColumnDefinitions>
@@ -694,7 +694,7 @@
 							</Flyout>
 						</FlyoutBase.AttachedFlyout>
 					</Button>
-					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb3_5" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" MaxLength="2" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
+					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb3_5" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
 				<Grid Margin="0,14,0,0" Grid.Row="10">
 					<Grid.ColumnDefinitions>
@@ -725,7 +725,7 @@
 							</Flyout>
 						</FlyoutBase.AttachedFlyout>
 					</Button>
-					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb3_6" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" MaxLength="2" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
+					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb3_6" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
 			</Grid>
 		</Expander>

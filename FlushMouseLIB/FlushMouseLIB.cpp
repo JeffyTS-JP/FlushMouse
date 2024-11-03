@@ -437,7 +437,7 @@ void		vDestroyWindow(HWND hWnd)
 {
 	if (Profile != NULL) {
 		Profile->lpstAppRegData->bDisplayIMEModeOnCursor = FALSE;
-		Profile->lpstAppRegData->bDisplayIMEModeByWindow = FALSE;
+		Profile->lpstAppRegData->dwDisplayIMEModeMethod = DisplayIMEModeMethod_RESOURCE;
 		Profile->lpstAppRegData->bDoModeDispByMouseBttnUp = FALSE;
 		Profile->lpstAppRegData->bDrawNearCaret = FALSE;
 	}
@@ -598,17 +598,17 @@ static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd)
 		EventHook->hFormerWnd = hForeWnd;
 		if (hWnd != hForeWnd) {
 			HWND	hWndObserved = NULL;
-			CURSORINFO	ci{ci.cbSize = sizeof(CURSORINFO)};
+			CURSORINFO	CursorInfo{CursorInfo.cbSize = sizeof(CURSORINFO)};
 			if ((Profile != NULL) && Profile->lpstAppRegData->bOffChangedFocus) {
 				Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 			}
-			if ((Profile) && Profile->lpstAppRegData->bDoModeDispByMouseBttnUp && GetCursorInfo(&ci)) {
-				if (ci.flags != CURSOR_SHOWING)	return;
+			if ((Profile) && Profile->lpstAppRegData->bDoModeDispByMouseBttnUp && GetCursorInfo(&CursorInfo)) {
+				if (CursorInfo.flags != CURSOR_SHOWING)	return;
 				if (Profile->lpstAppRegData->bDisplayFocusWindowIME) {
 					hWndObserved = hForeWnd;
 				}
 				else {
-					if ((hWndObserved = WindowFromPoint(ci.ptScreenPos)) == NULL)	return;
+					if ((hWndObserved = WindowFromPoint(CursorInfo.ptScreenPos)) == NULL)	return;
 				}
 				if (!Cursor->bStartIMECursorChangeThread(hWndObserved))	return;
 				if (!bCheckDrawIMEModeArea(hWndObserved))	return;

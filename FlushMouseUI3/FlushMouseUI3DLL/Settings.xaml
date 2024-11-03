@@ -50,10 +50,26 @@
 						<Border x:Name="PanelHeader" Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}"/>
 					</NavigationView.PaneHeader>
 					<NavigationView.MenuItems>
-						<NavigationViewItem x:Name="Menu1" Tag="Menu1" Icon="Globe" Content="基本動作設定" />
-						<NavigationViewItem x:Name="Menu2" Tag="Menu2" Icon="FontSize" Content="IME モード表示設定" />
-						<NavigationViewItem x:Name="Menu3" Tag="Menu3" Icon="Rotate" Content="SynTP Helper" />
-						<NavigationViewItem x:Name="Menu4" Tag="Menu4" Icon="Help" Content="バージョン" />
+						<NavigationViewItem x:Name="Menu1" Tag="Menu1" Content="基本動作設定" >
+							<NavigationViewItem.Icon>
+								<FontIcon Glyph="&#xE962;" />
+							</NavigationViewItem.Icon>
+						</NavigationViewItem>
+						<NavigationViewItem x:Name="Menu2" Tag="Menu2" Content="IME モード表示設定" >
+							<NavigationViewItem.Icon>
+								<FontIcon Glyph="&#xE8E9;" />
+							</NavigationViewItem.Icon>
+						</NavigationViewItem>
+						<NavigationViewItem x:Name="Menu3" Tag="Menu3" Content="SynTP Helper">
+							<NavigationViewItem.Icon>
+								<BitmapIcon UriSource="SynTP_Receiver.ico" ShowAsMonochrome="False" />
+							</NavigationViewItem.Icon>
+						</NavigationViewItem>
+						<NavigationViewItem x:Name="Menu4" Tag="Menu4" Content="バージョン" >
+							<NavigationViewItem.Icon>
+								<FontIcon Glyph="&#xE946;" />
+							</NavigationViewItem.Icon>
+						</NavigationViewItem>
 					</NavigationView.MenuItems>
 					<NavigationView.Header>
 						<Border x:Name="Header" Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}"/>

@@ -152,16 +152,16 @@ namespace FlushMouseUI3DLL {
 					tb3_1.IsEnabled = true;
 				}
 				Combo3.IsEnabled = true;
-				if (!bDisplayIMEModeByWindow) {
-					sl3.IsEnabled = false;	sl4.IsEnabled = false;
+				if (dwDisplayIMEModeMethod != DisplayIMEModeMethod_RESOURCE) {
+					sl3.IsEnabled = true; sl4.IsEnabled = true;
 				}
 				else {
-					sl3.IsEnabled = true;	sl4.IsEnabled = true;
+					sl3.IsEnabled = false; sl4.IsEnabled = false;
+					Button3_2.IsEnabled = true; Button3_3.IsEnabled = true; Button3_4.IsEnabled = true;
+					Button3_5.IsEnabled = true; Button3_6.IsEnabled = true;
+					tb3_2.IsEnabled = true; tb3_3.IsEnabled = true; tb3_4.IsEnabled = true;
+					tb3_5.IsEnabled = true; tb3_6.IsEnabled = true;
 				}
-				Button3_2.IsEnabled = true;		Button3_3.IsEnabled = true;		Button3_4.IsEnabled = true;
-				Button3_5.IsEnabled = true;		Button3_6.IsEnabled = true;
-				tb3_2.IsEnabled = true;			tb3_3.IsEnabled = true;			tb3_4.IsEnabled = true;
-				tb3_5.IsEnabled = true;			tb3_6.IsEnabled = true;
 			}
 		}
 
@@ -169,6 +169,7 @@ namespace FlushMouseUI3DLL {
 		{
 			if (sender == null) { }
 			if (e == null) { }
+			m_Sentinel = false;
 			SetColorButton();
 			SetTextBox();
 			SetComboBox();

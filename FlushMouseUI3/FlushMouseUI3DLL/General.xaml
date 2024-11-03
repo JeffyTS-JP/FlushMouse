@@ -55,9 +55,9 @@
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
 			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="200" Text="IME モードの取得方法"/>
-			<ComboBox  Margin="0,-4,-10,0" Grid.Column="1" HorizontalAlignment="Right" Width="420" x:Name="Combo1" Loaded="Combo1_Loaded" SelectionChanged="Combo1_SelectionChanged" Header="" SelectedIndex="1">
-				<ComboBoxItem Name="Item1">フォーカスウィンドウの IME モードを表示する</ComboBoxItem>
-				<ComboBoxItem Name="Item2">マウスカーソル下のウィンドウの IME モードを表示する</ComboBoxItem>
+			<ComboBox  Margin="0,-4,-10,0" Grid.Column="1" HorizontalAlignment="Right" Width="420" x:Name="Combo1" Loaded="Combo_Loaded" SelectionChanged="Combo_SelectionChanged" Header="" SelectedIndex="1">
+				<ComboBoxItem Name="Item1_1">フォーカスウィンドウの IME モードを表示する</ComboBoxItem>
+				<ComboBoxItem Name="Item1_2">マウスカーソル下のウィンドウの IME モードを表示する</ComboBoxItem>
 			</ComboBox>
 		</Grid>
 		<Grid Margin="0,12,0,0" Grid.Row="2">
@@ -65,9 +65,12 @@
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
-			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="500" Text="マウスカーソルの右下の IME モードを描画で表示する"/>
-			<TextBlock Margin="0,0,45,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="text2" Text="オン"/>
-			<ToggleSwitch Margin="0,-8,-115,0" Grid.Column="1" HorizontalAlignment="Right"  x:Name="ts2" Toggled="HandleToggleSwitch" OffContent="" OnContent="" IsOn="False" FlowDirection="LeftToRight"/>
+			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="200" Text="右下の描画方法"/>
+			<ComboBox  Margin="0,-4,-10,0" Grid.Column="1" HorizontalAlignment="Right" Width="420" x:Name="Combo2" Loaded="Combo_Loaded" SelectionChanged="Combo_SelectionChanged" Header="" SelectedIndex="1">
+				<ComboBoxItem Name="Item2_1">リソース方式を使用する</ComboBoxItem>
+				<ComboBoxItem Name="Item2_2">直接描画方式を使用する</ComboBoxItem>
+				<ComboBoxItem Name="Item2_3">リソース方式と直接描画方式を併用する</ComboBoxItem>
+			</ComboBox>
 		</Grid>
 		<Grid Margin="0,6,0,0" Grid.Row="3">
 			<Grid.ColumnDefinitions>
@@ -83,7 +86,7 @@
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
-			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="500" Text="直接入力 (IME OFF) の時も IME モードの表示をする"/>
+			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="500" Text="直接入力 (IME OFF) の時もマウスカーソルに IME モードの表示をする"/>
 			<TextBlock Margin="0,0,45,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="text3" Text="オン"/>
 			<ToggleSwitch Margin="0,-8,-115,0" Grid.Column="1" HorizontalAlignment="Right"  x:Name="ts3" Toggled="HandleToggleSwitch" OffContent="" OnContent="" IsOn="False" FlowDirection="LeftToRight"/>
 		</Grid>
@@ -128,7 +131,7 @@
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
-			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="500" Text="Ctrlキーを離したときに IME モードを表示する"/>
+			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="500" Text="Ctrl キーを離したときに IME モードを表示する"/>
 			<TextBlock Margin="0,0,45,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="text8" Text="オン"/>
 			<ToggleSwitch Margin="0,-8,-115,0" Grid.Column="1" HorizontalAlignment="Right"  x:Name="ts8" Toggled="HandleToggleSwitch" OffContent="" OnContent="" IsOn="False" FlowDirection="LeftToRight"/>
 		</Grid>

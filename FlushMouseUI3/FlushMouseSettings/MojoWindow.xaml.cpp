@@ -128,9 +128,9 @@ void		SettingsExec(HWND hWnd, UINT32 uMsg, INT32 iSelectedPane)
 			m_Settings.dwSettingsHeight(Profile->lpstAppRegData->dwSettingsHeight);
 			
 			m_Settings.bDisplayFocusWindowIME(Profile->lpstAppRegData->bDisplayFocusWindowIME);
-			
+			m_Settings.dwDisplayIMEModeMethod(Profile->lpstAppRegData->dwDisplayIMEModeMethod);
+
 			m_Settings.bDisplayIMEModeOnCursor(Profile->lpstAppRegData->bDisplayIMEModeOnCursor);
-			m_Settings.bDisplayIMEModeByWindow(Profile->lpstAppRegData->bDisplayIMEModeByWindow);
 			m_Settings.bDisplayIMEModeIMEOFF(Profile->lpstAppRegData->bDisplayIMEModeIMEOFF);
 			m_Settings.bOffChangedFocus(Profile->lpstAppRegData->bOffChangedFocus);
 			m_Settings.bForceHiragana(Profile->lpstAppRegData->bForceHiragana);
@@ -286,9 +286,9 @@ void		SettingsApply()
 		Profile->lpstAppRegData->dwSettingsHeight = m_Settings.dwSettingsHeight();
 		
 		Profile->lpstAppRegData->bDisplayFocusWindowIME = m_Settings.bDisplayFocusWindowIME();
-		
+		Profile->lpstAppRegData->dwDisplayIMEModeMethod = m_Settings.dwDisplayIMEModeMethod();
+
 		Profile->lpstAppRegData->bDisplayIMEModeOnCursor = m_Settings.bDisplayIMEModeOnCursor();
-		Profile->lpstAppRegData->bDisplayIMEModeByWindow = m_Settings.bDisplayIMEModeByWindow();
 		Profile->lpstAppRegData->bDisplayIMEModeIMEOFF = m_Settings.bDisplayIMEModeIMEOFF();
 		Profile->lpstAppRegData->bOffChangedFocus = m_Settings.bOffChangedFocus();
 		Profile->lpstAppRegData->bForceHiragana = m_Settings.bForceHiragana();

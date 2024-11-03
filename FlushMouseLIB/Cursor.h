@@ -60,6 +60,10 @@
 #endif // !OCR_PERSON
 #define	OCR_HIDE			32896		// Hide Cursor
 
+#define DisplayIMEModeMethod_RESOURCE		0
+#define DisplayIMEModeMethod_ByWindow		1
+#define DisplayIMEModeMethod_RES_AND_Window	2
+
 //
 // Struct Define
 //
@@ -82,7 +86,7 @@ typedef struct tagIMECursorData
 	DWORD		dwInThreadSleepTime;
 	DWORD		dwDisplayModeTime;
 	BOOL		bDisplayIMEModeOnCursor;
-	BOOL		bDisplayIMEModeByWindow;
+	DWORD		dwDisplayIMEModeMethod;
 	BOOL		bDisplayIMEModeIMEOFF;
 	BOOL		bForceHiragana;
 	BOOL		bDrawNearCaret;
@@ -166,6 +170,12 @@ private:
 	CCursorWindow	*MouseWindow;
 
 	CCursorSub		*CursorSub;
+	
+	HCURSOR			hCursorArrow;
+	HCURSOR			hCursorIBeam;
+	HCURSOR			hCursorHand;
+	HCURSOR			hCursorWait;
+	HCURSOR			hCursorAppStarting;
 };
 
 

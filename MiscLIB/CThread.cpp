@@ -181,6 +181,7 @@ unsigned __stdcall	CThread::uThreadProc(void* pArguments)
 			_endthreadex((unsigned)-3);
 			return FALSE;
 		}
+		Sleep(0);
 	} while (lpstThreadData->bThreadSentinel);
 	_endthreadex(0);
 	return TRUE;

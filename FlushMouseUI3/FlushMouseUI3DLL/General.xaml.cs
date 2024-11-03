@@ -20,7 +20,6 @@ namespace FlushMouseUI3DLL {
 	{
 		public static bool bDisplayFocusWindowIME { get; set; }
 		public static bool bDisplayIMEModeOnCursor { get; set; }
-		public static bool bDisplayIMEModeByWindow { get; set; }
 		public static bool bDisplayIMEModeIMEOFF { get; set; }
 		public static bool bOffChangedFocus { get; set; }
 		public static bool bForceHiragana { get; set; }
@@ -35,6 +34,10 @@ namespace FlushMouseUI3DLL {
 		public static Int32 dwDisplayModeTime { get; set; }
 		public static Int32 dwAdditionalWaitTime { get; set; }
 		public static Int32 dwWaitWaveTime { get; set; }
+		public static Int32 dwDisplayIMEModeMethod { get; set; }
+		internal const Int32 DisplayIMEModeMethod_RESOURCE = 0;
+		internal const Int32 DisplayIMEModeMethod_ByWindow = 1;
+		internal const Int32 DisplayIMEModeMethod_RES_AND_Window = 2;
 	}
 
 	public sealed partial class General
@@ -53,24 +56,19 @@ namespace FlushMouseUI3DLL {
 			if (e == null) { }
 			if (sender != null) {
 				if (!bDisplayIMEModeOnCursor) {
-					if (Combo1 != null) Combo1.IsEnabled = false;
-					if (!bDisplayIMEModeByWindow) {
-						if (sl1 != null)      sl1.IsEnabled = true;
-					}
-					else {
-						if (sl1 != null)      sl1.IsEnabled = false;
-					}
-					if (ts2 != null)    ts2.IsEnabled = false;
+					if (Combo1 != null)		Combo1.IsEnabled = false;
+					if (Combo2 != null)		Combo2.IsEnabled = false;
+					if (sl1 != null)		sl1.IsEnabled = false;
 				}
 				else {
-					if (Combo1 != null) Combo1.IsEnabled = true;
-					if (!bDisplayIMEModeByWindow) {
-						if (sl1 != null)      sl1.IsEnabled = true;
+					if (Combo1 != null)		Combo1.IsEnabled = true;
+					if (Combo2 != null)		Combo2.IsEnabled = true;
+					if (dwDisplayIMEModeMethod == DisplayIMEModeMethod_ByWindow) {
+						if (sl1 != null)	sl1.IsEnabled = false;
 					}
 					else {
-						if (sl1 != null)      sl1.IsEnabled = false;
+						if (sl1 != null)	sl1.IsEnabled = true;
 					}
-					if (ts2 != null)    ts2.IsEnabled = true;
 				}
 				if (!bDoModeDispByIMEKeyDown && !bDoModeDispByMouseBttnUp && !bDoModeDispByCtrlUp) {
 					if (ts9 != null)	ts9.IsEnabled = false;
@@ -89,7 +87,6 @@ namespace FlushMouseUI3DLL {
 					if (sl4 != null)	sl4.IsEnabled = true;
 				}
 				if (ts1.IsOn)	text1.Text = "オン";		else text1.Text = "オフ";
-				if (ts2.IsOn)	text2.Text = "オン";		else text2.Text = "オフ";
 				if (ts3.IsOn)	text3.Text = "オン";		else text3.Text = "オフ";
 				if (ts4.IsOn)	text4.Text = "オン";		else text4.Text = "オフ";
 				if (ts5.IsOn)	text5.Text = "オン";		else text5.Text = "オフ";
@@ -117,35 +114,50 @@ namespace FlushMouseUI3DLL {
 		private void SetComboBox()
 		{
 			if (Combo1 == null) Combo1 = new ComboBox();
+			if (Combo2 == null) Combo2 = new ComboBox();
 			if (Combo1 != null) {
-				if (bDisplayFocusWindowIME) Combo1.SelectedItem = Item1;
-				else Combo1.SelectedItem = Item2;
+				if (bDisplayFocusWindowIME) Combo1.SelectedItem = Item1_1;
+				else Combo1.SelectedItem = Item1_2;
+			}
+			if (Combo2 != null) {
+				if (dwDisplayIMEModeMethod == DisplayIMEModeMethod_RESOURCE) Combo2.SelectedItem = Item2_1;
+				else if (dwDisplayIMEModeMethod == DisplayIMEModeMethod_ByWindow) Combo2.SelectedItem = Item2_2;
+				else if (dwDisplayIMEModeMethod == DisplayIMEModeMethod_RES_AND_Window) Combo2.SelectedItem = Item2_3;
 			}
 		}
 
-		private void Combo1_Loaded(object sender, RoutedEventArgs e)
+		private void Combo_Loaded(object sender, RoutedEventArgs e)
 		{
 			if (sender == null) { }
 			if (e == null) { }
 		}
 
-		private void Combo1_SelectionChanged(object sender, RoutedEventArgs e)
+		private void Combo_SelectionChanged(object sender, RoutedEventArgs e)
 		{
 			if (m_Sentinel == false) return;
 			ComboBox combo = sender as ComboBox;
 			ComboBoxItem selectedItem = (ComboBoxItem)combo.SelectedItem;
 			if (selectedItem != null) {
-				if (selectedItem.Name == "Item1") bDisplayFocusWindowIME = true;
-				else if (selectedItem.Name == "Item2") bDisplayFocusWindowIME = false;
+				if ((selectedItem.Name == "Item1_1") || (selectedItem.Name == "Item1_2")) {
+					if (selectedItem.Name == "Item1_1") bDisplayFocusWindowIME = true;
+					else if (selectedItem.Name == "Item1_2") bDisplayFocusWindowIME = false;
+					EnableDisableItems(sender, e);
+					UpdateProfile(SETTINGSEX_SETTINGS_GENERAL_SETREGISTRY);
+					return;
+				}
+
+				if (selectedItem.Name == "Item2_1") dwDisplayIMEModeMethod = DisplayIMEModeMethod_RESOURCE;
+				else if (selectedItem.Name == "Item2_2") dwDisplayIMEModeMethod = DisplayIMEModeMethod_ByWindow;
+				else if (selectedItem.Name == "Item2_3") dwDisplayIMEModeMethod = DisplayIMEModeMethod_RES_AND_Window;
 				EnableDisableItems(sender, e);
 				UpdateProfile(SETTINGSEX_SETTINGS_GENERAL_SETREGISTRY);
+				UpdateProfile(SETTINGSEX_RELOAD_MOUSECURSOR);
 			}
 		}
 
 		private void SetToggleSwitch()
 		{
 			if (ts1 == null)	ts1 = new ToggleSwitch();
-			if (ts2 == null)	ts2 = new ToggleSwitch();
 			if (ts3 == null)	ts3 = new ToggleSwitch();
 			if (ts4 == null)	ts4 = new ToggleSwitch();
 			if (ts5 == null)	ts5 = new ToggleSwitch();
@@ -156,7 +168,6 @@ namespace FlushMouseUI3DLL {
 			if (ts10 == null)	ts10 = new ToggleSwitch();
 			if (ts11 == null)	ts11 = new ToggleSwitch();
 			ts1.IsOn = bDisplayIMEModeOnCursor;
-			ts2.IsOn = bDisplayIMEModeByWindow;
 			ts3.IsOn = bDisplayIMEModeIMEOFF;
 			ts4.IsOn = bOffChangedFocus;
 			ts5.IsOn = bForceHiragana;
@@ -175,12 +186,6 @@ namespace FlushMouseUI3DLL {
 			if (ts != null) {
 				if (ts.Name == "ts1") {
 					bDisplayIMEModeOnCursor = !bDisplayIMEModeOnCursor;
-					EnableDisableItems(sender, e);
-					UpdateProfile(SETTINGSEX_RELOAD_MOUSECURSOR);
-					return;
-				}
-				else if (ts.Name == "ts2") {
-					bDisplayIMEModeByWindow = !bDisplayIMEModeByWindow;
 					EnableDisableItems(sender, e);
 					UpdateProfile(SETTINGSEX_RELOAD_MOUSECURSOR);
 					return;

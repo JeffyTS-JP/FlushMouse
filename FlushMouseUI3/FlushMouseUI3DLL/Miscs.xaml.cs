@@ -95,21 +95,20 @@ namespace FlushMouseUI3DLL {
 		internal const UInt32 MONITOR_DEFAULTTOPRIMARY = 0x00000001;
 		internal const UInt32 MONITOR_DEFAULTTONEAREST = 0x00000002;
 
-		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto, Pack = 4)]
-		internal class MONITORINFOEXW {
-			public int          cbSize;
-			public RectInt32    rcMonitor;
-			public RectInt32    rcWork;
-			public uint         dwFlags;
-			//public fixed char szDevice[32];
-			[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-			//public char[]     szDevice;
-			public char[] szDevice = new char[32];
+		[StructLayout(LayoutKind.Sequential,CharSet=CharSet.Auto, Pack=4)]
+		internal class MONITORINFOEXW { 
+			public int			cbSize = Marshal.SizeOf(typeof(MONITORINFOEXW));
+			public RectInt32    rcMonitor = new(); 
+			public RectInt32    rcWork = new (); 
+			public int			dwFlags = 0;
+			[MarshalAs(UnmanagedType.ByValArray, SizeConst=32)] 
+			public char[]  szDevice = new char[32];
 		};
 #pragma warning disable SYSLIB1054 
 		[DllImport("User32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
 		internal static extern bool GetMonitorInfoW(Int64 hMonitor, [In, Out] MONITORINFOEXW lpmi);
 #pragma warning restore SYSLIB1054
+		
 		
 		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto, Pack = 4)]
 		internal class WINDOWPLACEMENT {
@@ -197,46 +196,52 @@ namespace FlushMouseUI3DLL {
 			return iRet;
 		}
 
-		public static void CalcWindowCentralizeByDesktop(Int64 hWnd, RectDouble rectWindowDouble)
+		public static void CalcWindowCentralizeByDesktop(Int64 hWnd, RectDouble InRectWindowDouble, out RectDouble OutRectWindowDouble)
 		{
+			OutRectWindowDouble = InRectWindowDouble;
 			Int64   hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
 			if (hMonitor != (Int64)0) {
-				MONITORINFOEXW lpmi = new() { cbSize = (int)Marshal.SizeOf(typeof(MONITORINFOEXW)) };
+				MONITORINFOEXW lpmi = new();
 				if (GetMonitorInfoW(hMonitor, lpmi)) {
 					SizeDouble sizeDouble;
-					sizeDouble.Width = rectWindowDouble.Width;
-					sizeDouble.Height = rectWindowDouble.Height;
-					CalcWindowSizeByDPI(hWnd, sizeDouble);
+					sizeDouble.Width = OutRectWindowDouble.Width;
+					sizeDouble.Height = OutRectWindowDouble.Height;
+					UInt32 dpi = GetDpiForWindow(hWnd);
+					if (dpi != 0) {
+						sizeDouble.Width = ((double)sizeDouble.Width * (double)dpi / (double)USER_DEFAULT_SCREEN_DPI);
+						sizeDouble.Height = ((double)sizeDouble.Height * (double)dpi / (double)USER_DEFAULT_SCREEN_DPI);
+					}
 					if (sizeDouble.Width >= (double)lpmi.rcWork.Width) {
-						rectWindowDouble.Width = lpmi.rcWork.Width;
+						OutRectWindowDouble.Width = lpmi.rcWork.Width;
 					}
 					else {
-						rectWindowDouble.Width = sizeDouble.Width;
+						OutRectWindowDouble.Width = sizeDouble.Width;
 					}
 					if (sizeDouble.Height >= (double)lpmi.rcWork.Height) {
-						rectWindowDouble.Height = lpmi.rcWork.Height;
+						OutRectWindowDouble.Height = (double)lpmi.rcWork.Height;
 					}
 					else {
-						rectWindowDouble.Height = sizeDouble.Height;
+						OutRectWindowDouble.Height = sizeDouble.Height;
 					}
-					rectWindowDouble.X = (int)(lpmi.rcWork.X + ((double)lpmi.rcWork.Width - (double)lpmi.rcWork.X - rectWindowDouble.Width) / 2.0);
-					rectWindowDouble.Y = (int)(lpmi.rcWork.Y + ((double)lpmi.rcWork.Height - (double)lpmi.rcWork.Y - rectWindowDouble.Height) / 2.0);
+					OutRectWindowDouble.X = (int)(lpmi.rcWork.X + ((double)lpmi.rcWork.Width - (double)lpmi.rcWork.X - OutRectWindowDouble.Width) / 2.0);
+					OutRectWindowDouble.Y = (int)(lpmi.rcWork.Y + ((double)lpmi.rcWork.Height - (double)lpmi.rcWork.Y - OutRectWindowDouble.Height) / 2.0);
 				}
 			}
 		}
 
-		public static bool CalcWindowAdjustByMonitor(Int64 hWnd, RectDouble rectWindowDouble)
+		public static bool CalcWindowAdjustByMonitor(Int64 hWnd, RectDouble InRectWindowDouble, out RectDouble OutRectWindowDouble)
 		{
+			OutRectWindowDouble = InRectWindowDouble;
 			Int64   hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
 			if (hMonitor != (Int64)0) {
-				MONITORINFOEXW lpmi = new() { cbSize = (int)Marshal.SizeOf(typeof(MONITORINFOEXW)) };
+				MONITORINFOEXW lpmi = new();
 				if (GetMonitorInfoW(hMonitor, lpmi)) {
-					if ((rectWindowDouble.X < lpmi.rcWork.X) 
-							|| (lpmi.rcWork.Width > (lpmi.rcWork.Width + rectWindowDouble.Width)) 
-							|| (rectWindowDouble.Y < lpmi.rcWork.Y)
-							|| (lpmi.rcWork.Height < (rectWindowDouble.Y + rectWindowDouble.Height))) {
-						rectWindowDouble.X = (int)(lpmi.rcWork.X + ((double)lpmi.rcWork.Width - (double)lpmi.rcWork.X - rectWindowDouble.Width) / 2.0);
-						rectWindowDouble.Y = (int)(lpmi.rcWork.Y + ((double)lpmi.rcWork.Height - (double)lpmi.rcWork.Y - rectWindowDouble.Height) / 2.0);
+					if ((OutRectWindowDouble.X < lpmi.rcWork.X) 
+							|| (lpmi.rcWork.Width > (lpmi.rcWork.Width + OutRectWindowDouble.Width)) 
+							|| (OutRectWindowDouble.Y < lpmi.rcWork.Y)
+							|| (lpmi.rcWork.Height < (OutRectWindowDouble.Y + OutRectWindowDouble.Height))) {
+						OutRectWindowDouble.X = (int)(lpmi.rcWork.X + ((double)lpmi.rcWork.Width - (double)lpmi.rcWork.X - OutRectWindowDouble.Width) / 2.0);
+						OutRectWindowDouble.Y = (int)(lpmi.rcWork.Y + ((double)lpmi.rcWork.Height - (double)lpmi.rcWork.Y - OutRectWindowDouble.Height) / 2.0);
 						return true;
 					}
 				}
@@ -244,15 +249,15 @@ namespace FlushMouseUI3DLL {
 			return false;
 		}
 		
-		public static void CalcWindowSizeByDPI(Int64 hWnd, SizeDouble sizeDouble)
+		public static void CalcWindowSizeByDPI(Int64 hWnd, SizeDouble InSizeDouble, out SizeDouble OutSizeDouble)
 		{
+			OutSizeDouble = InSizeDouble;
 			UInt32 dpi = GetDpiForWindow(hWnd);
 			if (dpi != 0) {
-				sizeDouble.Width = ((double)sizeDouble.Width * (double)dpi / (double)USER_DEFAULT_SCREEN_DPI);
-				sizeDouble.Height = ((double)sizeDouble.Height * (double)dpi / (double)USER_DEFAULT_SCREEN_DPI);
+				OutSizeDouble.Width = ((double)OutSizeDouble.Width * (double)dpi / (double)USER_DEFAULT_SCREEN_DPI);
+				OutSizeDouble.Height = ((double)OutSizeDouble.Height * (double)dpi / (double)USER_DEFAULT_SCREEN_DPI);
 			}
 		}
-
 
 		private static Int64 hParentWnd = 0;
 		private static Int64 hMessageBoxHook;

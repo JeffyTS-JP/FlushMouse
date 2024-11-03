@@ -69,7 +69,7 @@ CProfile::CProfile()
 		lpstAppRegData->dwNearDrawMouseByWndZENKANA_IMEONColor = aRGB(48, 255, 0, 0);	// 全カナ　マウスカーソル右下へのIMEモード表示色 RGB(255, 192, 0) + α (0xf0)
 
 		lpstAppRegData->bDisplayIMEModeOnCursor = TRUE;				// マウスカーソルへのIMEモード表示
-		lpstAppRegData->bDisplayIMEModeByWindow = FALSE;			// マウスカーソルへのIMEモード表示 (Window版)
+		lpstAppRegData->dwDisplayIMEModeMethod = 0;					// マウスカーソルのIMEモード表示方法 (0 = リソース 1 = 直接描画 2 = 併用)
 		lpstAppRegData->bDisplayIMEModeIMEOFF = FALSE;				// IME OFFの時のIMEモード表示
 		lpstAppRegData->bDisplayFocusWindowIME = FALSE;				// フォーカスウィンドウのIMEモードを表示する(TRUE)/マウスカーソル下のウィンドウのIMEモードを表示する(FALSE)
 		
@@ -188,6 +188,7 @@ BOOL		CProfile::bFixChangedProfileData() const
 	if (CReg == NULL)	return FALSE;
 
 	DWORD	dw = 0;
+	BOOL	bl = FALSE;
 	if (CReg->bReadRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("CusrorSize"), (LPDWORD)&dw)) {
 		if (dw != 0) {
 			if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("CursorSize"), (LPDWORD)&lpstAppRegData->iCursorSize, dw))	goto Cleanup;
@@ -241,6 +242,13 @@ BOOL		CProfile::bFixChangedProfileData() const
 			if (!CReg->bDeleteRegValue(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeSize")))	goto Cleanup;
 		}
 	}
+	if (CReg->bReadRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeByWindow"), &bl)) {
+		if (bl)	dw = 1;
+		else dw = 0;
+		if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeMethod"), (LPDWORD)&lpstAppRegData->dwDisplayIMEModeMethod, dw))	goto Cleanup;
+		if (!CReg->bDeleteRegValue(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeByWindow")))	goto Cleanup;
+	}
+
 	bRet = TRUE;
 Cleanup:
 	if (CReg)	delete	CReg;
@@ -264,9 +272,9 @@ BOOL		CProfile::bGetProfileData4Mouse() const
 	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("WaitWaveTime"), (LPDWORD)&lpstAppRegData->dwWaitWaveTime, lpstAppRegData->dwWaitWaveTime))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("AdditionalWaitTime"), (LPDWORD)&lpstAppRegData->dwAdditionalWaitTime, lpstAppRegData->dwAdditionalWaitTime))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayModeTime"), (LPDWORD)&lpstAppRegData->dwDisplayModeTime, lpstAppRegData->dwDisplayModeTime))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeMethod"), (LPDWORD)&lpstAppRegData->dwDisplayIMEModeMethod, lpstAppRegData->dwDisplayIMEModeMethod))	goto Cleanup;
 
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeOnCursor"), (LPBOOL)&lpstAppRegData->bDisplayIMEModeOnCursor, lpstAppRegData->bDisplayIMEModeOnCursor))	goto Cleanup;
-	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeByWindow"), (LPBOOL)&lpstAppRegData->bDisplayIMEModeByWindow, lpstAppRegData->bDisplayIMEModeByWindow))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeIMEOFF"), (LPBOOL)&lpstAppRegData->bDisplayIMEModeIMEOFF, lpstAppRegData->bDisplayIMEModeIMEOFF))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("ForceHiragana"), (LPBOOL)&(lpstAppRegData->bForceHiragana), lpstAppRegData->bForceHiragana))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DenyChangedByApp"), (LPBOOL)&(lpstAppRegData->bDenyChangedByApp), lpstAppRegData->bDenyChangedByApp))	goto Cleanup;
@@ -306,9 +314,9 @@ BOOL		CProfile::bSetProfileData4Mouse() const
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("WaitWaveTime"), lpstAppRegData->dwWaitWaveTime))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("AdditionalWaitTime"), lpstAppRegData->dwAdditionalWaitTime))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayModeTime"), lpstAppRegData->dwDisplayModeTime))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeMethod"), lpstAppRegData->dwDisplayIMEModeMethod))	goto Cleanup;
 
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeOnCursor"), lpstAppRegData->bDisplayIMEModeOnCursor))	goto Cleanup;
-	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeByWindow"), lpstAppRegData->bDisplayIMEModeByWindow))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeIMEOFF"), lpstAppRegData->bDisplayIMEModeIMEOFF))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("ForceHiragana"), lpstAppRegData->bForceHiragana))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DenyChangedByApp"), lpstAppRegData->bDenyChangedByApp))	goto Cleanup;

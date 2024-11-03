@@ -141,7 +141,7 @@ namespace FlushMouseUI3DLL {
 				SizeDouble sizeDouble;
 				sizeDouble.Width = (int)Window_OpenPaneLength;
 				sizeDouble.Height = (int)Window_CompactPaneLength;
-				CalcWindowSizeByDPI(g_hSettingsWnd, sizeDouble);        
+				CalcWindowSizeByDPI(g_hSettingsWnd, sizeDouble, out sizeDouble);        
 				NaviView.OpenPaneLength = sizeDouble.Width;
 				NaviView.CompactPaneLength = sizeDouble.Height;
 				if ((dwSettingsX == 0) && (dwSettingsY == 0) && (dwSettingsWidth == 0) && (dwSettingsHeight == 0)) {
@@ -152,7 +152,7 @@ namespace FlushMouseUI3DLL {
 						m_WindowRectDouble.Width = Window_Width;
 					}
 					m_WindowRectDouble.Height = Window_Height;
-					CalcWindowCentralizeByDesktop(g_hSettingsWnd, m_WindowRectDouble);
+					CalcWindowCentralizeByDesktop(g_hSettingsWnd, m_WindowRectDouble, out m_WindowRectDouble);
 				}
 				else if ((dwSettingsWidth < Window_Min_Width) && (dwSettingsHeight < Window_Min_Height)) {
 					m_WindowRectDouble.X = dwSettingsX;
@@ -178,7 +178,7 @@ namespace FlushMouseUI3DLL {
 				rect.Width = (int)m_WindowRectDouble.Width;
 				rect.Height = (int)m_WindowRectDouble.Height;
 				m_AppWindow.MoveAndResize(rect);
-				if (CalcWindowAdjustByMonitor(g_hSettingsWnd, m_WindowRectDouble) == true) {
+				if (CalcWindowAdjustByMonitor(g_hSettingsWnd, m_WindowRectDouble, out m_WindowRectDouble) == true) {
 					rect.X = (int)m_WindowRectDouble.X;
 					rect.Y = (int)m_WindowRectDouble.Y;
 					rect.Width = (int)m_WindowRectDouble.Width;
@@ -258,7 +258,7 @@ namespace FlushMouseUI3DLL {
 				SizeDouble sizeDouble;
 				sizeDouble.Width = Window_OpenPaneLength;
 				sizeDouble.Height = Window_CompactPaneLength;
-				CalcWindowSizeByDPI(g_hSettingsWnd, sizeDouble);
+				CalcWindowSizeByDPI(g_hSettingsWnd, sizeDouble, out sizeDouble);
 				sender.OpenPaneLength = sizeDouble.Width;
 				sender.CompactPaneLength = sizeDouble.Height;
 			}
@@ -283,7 +283,7 @@ namespace FlushMouseUI3DLL {
 				SizeDouble sizeDouble;
 				sizeDouble.Width = Window_OpenPaneLength;
 				sizeDouble.Height = Window_CompactPaneLength;
-				CalcWindowSizeByDPI(g_hSettingsWnd, sizeDouble);
+				CalcWindowSizeByDPI(g_hSettingsWnd, sizeDouble, out sizeDouble);
 				sender.OpenPaneLength = sizeDouble.Width;
 			}
 		}

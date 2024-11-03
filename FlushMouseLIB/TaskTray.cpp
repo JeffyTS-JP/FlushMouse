@@ -265,7 +265,7 @@ void		Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
 		return;
 	}
-	if (Profile->lpstAppRegData->bDisplayIMEModeOnCursor && Profile->lpstAppRegData->bDisplayIMEModeByWindow) {
+	if (Profile->lpstAppRegData->bDisplayIMEModeOnCursor && (Profile->lpstAppRegData->dwDisplayIMEModeMethod != DisplayIMEModeMethod_RESOURCE)) {
 		if (Cursor->bStartDrawIMEModeMouseByWndThread()) {
 			return;
 		}
