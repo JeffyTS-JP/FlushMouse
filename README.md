@@ -176,7 +176,7 @@
         * Let's note CF-SV1 の場合、TouchPad Width = 528, Height = 528, Edge Area Width = 88, Height = 88 (デフォルト値)です
         * TouchPad Width, Height は、左下を原点とした、Touch Pad のサイズです
         * Edge Area Width, Height は、スクロールが始まって、指を置いているとスクロールが継続するエリアの幅です。お好みで調整してみてください。この値を 0 にすると Edge motion は動作しません。
-    * SynTP_Receiver.exe の場合は、ショートカットを作成し、プロパティを開いて「Your folder path\SynTP_Receiver.exe /Port 50008」 のように UDP Portを指定します
+    * SynTP_Receiver.exe の場合は、ショートカットを作成し、プロパティを開いて「[Your folder path]\SynTP_Receiver.exe /Port 50008」 のように UDP Portを指定します
       * 管理者権限で起動しない場合、タスクマネージャーなど一部のアプリでスクロールしません。ショートカットのプロパティの詳細設定で「管理者権限で実行する」にチェックをするか、タスクスケジューラに、例えば「任意のユーザーのログオン時」に「最上位の特権で実行する」ように登録する方法もあります
       * SynTP_Receiverを終了するためには、タスクマネージャーからタスクの終了を行います
    
@@ -185,7 +185,6 @@
     * いろいろと調べると、他社製はもちろん、Synaptics社の Touch Padでさえも、仕様がいろいろとあるようです。このため、Panasonic社製 Let's note CF-SV1に限定しています (特にプログラム内で制限はしていませんので、動いたらラッキーと思ってください。実機を貸していただければ、対応できるかもしれませんが)
     * スクロールの量や方向などは、私の好みにしています。設定できるようにするのは、今後の課題です
     * Guest OS で、UNIX系については、私は詳しくありませんので、どなたか受信側を書いていただければ。。。
-    * 設定画面は、手を抜いてUI3でも従来のやり方にしています。今後考えます
     * VMware社が Broadcom社に買収され、先日、Player をやめて Workstation Proに移行するとのアナウンスがありました。商用利用ではない場合は、無償とのことです。~~今後、開発環境を整えて、移行を考えたいと思います~~　Ver.2.2.3.1で対応しました
 
     
@@ -246,12 +245,12 @@
   10. NuGet CLI(nuget.exe)を[https://dist.nuget.org/win-x86-commandline/latest/nuget.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)からダウンロードして、FlushMouseをクローンしたフォルダの直下の「NuGet」フォルダ(デフォルトでは C:\Users\User\source\repos\FlushMouse\NuGet です)に入れます
   11. Windowsの 設定 -> システム -> 開発者向け で 開発者モードを ON にします
   12. 次に、ツール -> NuGet パッケージマネージャー -> ソリューションの NuGet パッケージの管理 (Altキーを押しながら続けて T N N) を開き、右側にある歯車(⚙)を選択して、ダイアログを開きます
-  13. まず、右上のプラス(＋)を押してから、下にある「ソース」欄には、nuget.exeを入れた「NuGet」フォルダ(デフォルトでは C:\Users\User\source\repos\FlushMouse\NuGet)を選択して「更新」を押します(名前については適当で構いません)
+  13. まず、右上のプラス(＋)を押してから、下にある「ソース」欄には、nuget.exeを入れた「NuGet」フォルダ(デフォルトでは C:\Users\[User]\source\repos\FlushMouse\NuGet)を選択して「更新」を押します(名前については適当で構いません)
   14. その後 OK を押してダイアログを閉じ、上の歯車の左にある「パッケージソース」を「すべて」に変更します。次に「復元」選択します
 
 * ビルド方法です
   1. ソリューションプラットフォームを必ず「**MixedPlatform**」にしてビルドします (Ctrl + Shift + B)
-  2. ソリューション構成を「Release」でビルドすると、デフォルトでは C:\Users\User\source\repos\FlushMouseにFlushMouse_x64.exe (Ver.1.2 以前は FlushMouse_x64.msi)と、FlushMouseUI3_x64.exeができるのでインストールしてご利用ください
+  2. ソリューション構成を「Release」でビルドすると、デフォルトでは C:\Users\[User]\source\repos\FlushMouseにFlushMouse_x64.exe (Ver.1.2 以前は FlushMouse_x64.msi)と、FlushMouseUI3_x64.exeができるのでインストールしてご利用ください
    * **NuGet を使用しているため、ビルドの依存関係の順番の都合で、「ソリューション エクスプローラー」で FlushMouseUI3DLL を、右クリックして先にビルドする必要が有ります**
 
 
