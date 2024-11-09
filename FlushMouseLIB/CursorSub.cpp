@@ -603,11 +603,11 @@ void		CCursorWindow::Cls_OnPaint(HWND hWnd) const
 {
 	InvalidateRect(hWnd, NULL, TRUE);
 	
+	RECT	rcSize{};
 	PAINTSTRUCT	ps{};
 	HDC hDC = BeginPaint(hWnd, &ps);
 	if (hDC != NULL) {
 		if (SetLayeredWindowAttributes(hWnd, dwBackColor, (dwBackColor >> 24) & 0x000000ff, LWA_COLORKEY | LWA_ALPHA)) {
-			RECT	rcSize{};
 			if (GetClientRect(hWnd, &rcSize)) {
 				HBRUSH	hBrush = NULL;
 				if ((hBrush = CreateSolidBrush(dwBackColor & 0x00ffffff)) != NULL) {								// 背景色を設定
