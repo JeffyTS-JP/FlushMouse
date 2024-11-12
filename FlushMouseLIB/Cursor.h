@@ -175,6 +175,11 @@ private:
 	HCURSOR			hCursorIBeam;
 	HCURSOR			hCursorHand;
 	HCURSOR			hCursorWait;
+	HCURSOR			hCursorSizeNWSE;
+	HCURSOR			hCursorSizeNESW;
+	HCURSOR			hCursorSizeWE;
+	HCURSOR			hCursorSizeNS;
+	HCURSOR			hCursorSizeAll;
 	HCURSOR			hCursorAppStarting;
 };
 

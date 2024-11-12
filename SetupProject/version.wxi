@@ -1,7 +1,7 @@
 <Include>
 	<!-- for wix Setup Project -->
 	<!-- Copyright (C) 2023 JeffyTS -->
-	<?define Version = "3.4.1.2" ?>
+	<?define Version = "3.4.2.4" ?>
 
 	<!-- Common -->
 	<?define ProductName = "FlushMouse" ?>
@@ -16,6 +16,6 @@
 	<!-- Never change ProducdID and ReversedProductID in same application-->
 	<?define ProductID="{A117193D-ABED-461A-93B8-4D7E1E856740}"?>
 	<?define ReversedProductID="D391711ADEBAA164398BD4E7E1587604"?>
-
+	
 </Include>
 

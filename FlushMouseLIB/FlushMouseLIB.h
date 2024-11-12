@@ -27,13 +27,9 @@ extern BOOL			bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 extern int			iCheckCmdLine(LPCTSTR lpCmdLine);
 extern VOID			vDestroyWindow(HWND hWnd);
 extern BOOL			bStartThreadHookTimer(HWND hWnd);
-extern BOOL	 		bCreateProcess(LPCTSTR lpszExecName, LPTSTR lpCommandLine);
 
 extern void			Cls_OnLButtonDownEx(HWND hWnd, int x, int y, HWND hForeground);
 extern void			Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground);
-
-extern BOOL			bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, BOOL bIMEModeForcedChange, LPHKL lpNewHKL, LPHKL lpPreviousHKL);
-extern BOOL			bCheckExistingJPIME();
 
 extern VOID			vMessageBox(HWND hWnd, UINT uID, UINT uType);
 extern VOID			vAboutDialog(HWND hWnd);

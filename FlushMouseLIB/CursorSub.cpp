@@ -601,8 +601,6 @@ void		CCursorWindow::Cls_OnDestroy(HWND hWnd)
 //
 void		CCursorWindow::Cls_OnPaint(HWND hWnd) const
 {
-	InvalidateRect(hWnd, NULL, TRUE);
-	
 	RECT	rcSize{};
 	PAINTSTRUCT	ps{};
 	HDC hDC = BeginPaint(hWnd, &ps);

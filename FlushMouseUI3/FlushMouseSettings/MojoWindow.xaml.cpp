@@ -231,6 +231,7 @@ void		SettingsExec(HWND hWnd, UINT32 uMsg, INT32 iSelectedPane)
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
 			vMessageBox(hWnd, IDS_SETTINGDLG_FAIL, MessageBoxTYPE);
 			SettingsClose();
+			PostQuitMessage(-1);
 		}
 	}
 	else {

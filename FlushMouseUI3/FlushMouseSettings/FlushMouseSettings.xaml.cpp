@@ -215,7 +215,7 @@ void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 	int		iNumArgs = 0;
 	LPTSTR	*_lpArgv = CommandLineToArgvW(_lpCmdLine, &iNumArgs);
 	if (iNumArgs != 0) {
-		if (_lpArgv[1]  != _T('\0')) {
+		if (_lpArgv[1]  != NULL) {
 			if (CompareStringOrdinal(_lpArgv[1], -1, L"1", -1, TRUE) == CSTR_EQUAL) {
 				iSelectedPane = SETTINGSEX_SELECTEDPANE_GENERAL;
 			}

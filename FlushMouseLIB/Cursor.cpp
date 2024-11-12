@@ -138,6 +138,11 @@ CCursor::CCursor()
 	hCursorArrow = LoadCursor(NULL, IDC_ARROW);
 	hCursorIBeam = LoadCursor(NULL, IDC_IBEAM);
 	hCursorWait = LoadCursor(NULL, IDC_WAIT);
+	hCursorSizeNWSE = LoadCursor(NULL, IDC_SIZENWSE);
+	hCursorSizeNESW = LoadCursor(NULL, IDC_SIZENESW);
+	hCursorSizeWE = LoadCursor(NULL, IDC_SIZEWE);
+	hCursorSizeNS = LoadCursor(NULL, IDC_SIZENS);
+	hCursorSizeAll = LoadCursor(NULL, IDC_SIZEALL);
 	hCursorHand = LoadCursor(NULL, IDC_HAND);
 	hCursorAppStarting = LoadCursor(NULL, IDC_APPSTARTING);
 }
@@ -490,6 +495,7 @@ BOOL		CCursor::bIMECursorChangeRoutine(LPVOID lpvParam)
 			bRet = FALSE;
 		}
 	}
+	Sleep(100);
 	return bRet;
 }
 
@@ -611,50 +617,23 @@ BOOL		CCursor::bIMEModeMouseByWndThreadRoutine(LPVOID lpvParam)
 			}
 			CURSORINFO	CursorInfoCurrent{CursorInfoCurrent.cbSize = sizeof(CURSORINFO)};
 			if (!GetCursorInfo(&CursorInfoCurrent))	return FALSE;
-			pt.x = CursorInfoCurrent.ptScreenPos.x;	pt.y = CursorInfoCurrent.ptScreenPos.y;
 			if (((pt.x == CursorInfo.ptScreenPos.x) && (pt.y == CursorInfo.ptScreenPos.y) && (CursorInfo.flags != CURSOR_SHOWING))) {
-				Sleep(0);
+				Sleep(100);
 				continue;
 			}
+			pt.x = CursorInfoCurrent.ptScreenPos.x;	pt.y = CursorInfoCurrent.ptScreenPos.y;
 			dwIMEModeMouse = Cime->dwIMEMode(lpstCursorData->hWndObserved, lpstCursorData->bForceHiragana);
-			if ((dwIMEModeMouse == IMEHIDE) || (dwIMEModeMouse == IMEOFF)) {
-				if (lpstCursorData->bDisplayIMEModeIMEOFF)  dwIMEModeMouse = IMEOFF;
+			if ((dwIMEModeMouse == IMEOFF) || (dwIMEModeMouse == IMEHIDE)) {
+				if (lpstCursorData->bDisplayIMEModeIMEOFF)	dwIMEModeMouse = IMEOFF;
 				else dwIMEModeMouse = IMEHIDE;
 			}
-			if (lpstCursorData->dwDisplayIMEModeMethod == DisplayIMEModeMethod_RES_AND_Window) {
-				if ((CursorInfoCurrent.hCursor ==This->hCursorArrow) || (CursorInfoCurrent.hCursor == This->hCursorIBeam) || (CursorInfoCurrent.hCursor == This->hCursorHand)) {
-					This->bIsIMECursorChanged(lpstCursorData);
-					if ((lpstCursorData->dwIMEModeCursor == IMEOFF) || (lpstCursorData->dwIMEModeCursor == IMEHIDE)) {
-						if (lpstCursorData->bDisplayIMEModeIMEOFF)	lpstCursorData->dwIMEModeCursor = IMEOFF;
-						else lpstCursorData->dwIMEModeCursor = IMEHIDE;
-					}
-					if (!This->bChangeFlushMouseCursor(lpstCursorData->dwIMEModeCursor, lpstCursorData)) {
-						//bRet = FALSE;
-						Sleep(0);
-						continue;
-					}
-				}
-				else {
-					if (!This->bChangeFlushMouseCursor(IMEHIDE, lpstCursorData)) {
-						//bRet = FALSE;
-						Sleep(0);
-						continue;
-					}
-				}
-				if ((CursorInfoCurrent.hCursor == This->hCursorArrow) || (CursorInfoCurrent.hCursor == This->hCursorIBeam) || (CursorInfoCurrent.hCursor == This->hCursorHand)
-					|| (CursorInfoCurrent.hCursor == This->hCursorWait) || (CursorInfoCurrent.hCursor == This->hCursorAppStarting)) {
-					dwIMEModeMouse = IMEHIDE;
-				}
-			}
-			else {
-				if (!This->bChangeFlushMouseCursor(IMEHIDE, lpstCursorData)) {
-					//bRet = FALSE;
-					Sleep(0);
-					continue;
-				}
+			if (((CursorInfoCurrent.hCursor == This->hCursorWait) || (CursorInfoCurrent.hCursor == This->hCursorAppStarting)
+				|| (CursorInfoCurrent.hCursor == This->hCursorSizeNWSE) || (CursorInfoCurrent.hCursor == This->hCursorSizeNESW)
+				|| (CursorInfoCurrent.hCursor == This->hCursorSizeWE) || (CursorInfoCurrent.hCursor == This->hCursorSizeNS)
+				|| (CursorInfoCurrent.hCursor == This->hCursorSizeAll))) {
+				dwIMEModeMouse = IMEHIDE;
 			}
 			iMouse = This->iGetCursorID(dwIMEModeMouse, lpstCursorData->lpstNearDrawMouseByWndCursor);
-			This->MouseWindow->vSetModeStringColorFont(lpstCursorData->lpstNearDrawMouseByWndCursor[iMouse].szMode, lpstCursorData->lpstNearDrawMouseByWndCursor[iMouse].dwColor, lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF].szFont);
 			pt.x = pt.x + lpstCursorData->iModeByWndSize + lpstCursorData->iIMEModeDistance;
 			pt.y = pt.y + lpstCursorData->iModeByWndSize + lpstCursorData->iIMEModeDistance;
 			rcMouse.left = pt.x;	rcMouse.top = pt.y;
@@ -665,21 +644,44 @@ BOOL		CCursor::bIMEModeMouseByWndThreadRoutine(LPVOID lpvParam)
 			rcMouse.left = rcMouse.left + iMouseSizeX / 2;	rcMouse.right = rcMouse.right + iMouseSizeX;
 			rcMouse.top = rcMouse.top - iMouseSizeY / 2;	rcMouse.bottom = rcMouse.bottom  + iMouseSizeY;
 			vAdjustFontXPosition(dwIMEModeMouse, lpstCursorData->lpstNearDrawCaretCursor[iMouse].szMode, &iMouseSizeX, &rcMouse);
-
+			if (lpstCursorData->dwDisplayIMEModeMethod == DisplayIMEModeMethod_RES_AND_Window) {
+				if ((CursorInfoCurrent.hCursor ==This->hCursorArrow) || (CursorInfoCurrent.hCursor == This->hCursorIBeam) || (CursorInfoCurrent.hCursor == This->hCursorHand)) {
+					This->bIsIMECursorChanged(lpstCursorData);
+					if ((lpstCursorData->dwIMEModeCursor == IMEOFF) || (lpstCursorData->dwIMEModeCursor == IMEHIDE)) {
+						if (lpstCursorData->bDisplayIMEModeIMEOFF)	lpstCursorData->dwIMEModeCursor = IMEOFF;
+						else lpstCursorData->dwIMEModeCursor = IMEHIDE;
+					}
+					if (dwIMEModeMouse != IMEHIDE) {
+						This->MouseWindow->vSetModeStringColorFont(lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF].szMode, lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF].dwColor, lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF].szFont);
+						if (!This->MouseWindow->bSetWindowPos(HWND_BOTTOM, rcMouse.left, rcMouse.top, iMouseSizeX, iMouseSizeY, (SWP_HIDEWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS)))	return FALSE;
+					}
+					if (!This->bChangeFlushMouseCursor(lpstCursorData->dwIMEModeCursor, lpstCursorData))	return FALSE;
+					Sleep(100);
+					continue;
+				}
+				else {
+					if (!This->bChangeFlushMouseCursor(IMEHIDE, lpstCursorData))	return FALSE;
+				}
+			}
+			else {
+				if (!This->bChangeFlushMouseCursor(IMEHIDE, lpstCursorData))	return FALSE;
+			}
+			if (dwIMEModeMouse != dwIMEModeMousePrev) {
+				dwIMEModeMousePrev = dwIMEModeMouse;
+				This->MouseWindow->vSetModeStringColorFont(lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEHIDE].szMode, lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF].dwColor, lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF].szFont);
+				if (!This->MouseWindow->bSetWindowPos(HWND_BOTTOM, rcMouse.left, rcMouse.top, iMouseSizeX, iMouseSizeY, (SWP_HIDEWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS)))	return FALSE;
+			}
 			if (GetKeyState(VK_CAPITAL) & 0x0001) _bCapsLock = TRUE;	else _bCapsLock = FALSE;
 			if (bCapsLock != _bCapsLock) {
 				if (!This->MouseWindow->bInvalidateRect(NULL, FALSE))	return FALSE;
 				if (!This->MouseWindow->bUpdateWindow())	return FALSE;
 				bCapsLock = _bCapsLock;
 			}
-			if (dwIMEModeMouse != dwIMEModeMousePrev) {
-				dwIMEModeMousePrev = dwIMEModeMouse;
-				if (!This->MouseWindow->bSetWindowPos(HWND_BOTTOM, rcMouse.left, rcMouse.top, iMouseSizeX, iMouseSizeY, (SWP_HIDEWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS)))	return FALSE;
-				Sleep(10);
-			}
+			This->MouseWindow->vSetModeStringColorFont(lpstCursorData->lpstNearDrawMouseByWndCursor[iMouse].szMode, lpstCursorData->lpstNearDrawMouseByWndCursor[iMouse].dwColor, lpstCursorData->lpstNearDrawMouseByWndCursor[iMouse].szFont);
 			if (!This->MouseWindow->bSetWindowPos(HWND_TOPMOST, rcMouse.left, rcMouse.top, iMouseSizeX, iMouseSizeY, (SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS)))	return FALSE;
+			Sleep(10);
 		}
-		Sleep(0);
+		else Sleep(100);
 	} while(lpstCursorData->bIMEModeByWindowThreadSentinel);
 	if (!This->MouseWindow->bSetWindowPos(HWND_BOTTOM, 0, 0, 0, 0, (SWP_HIDEWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS | SWP_NOMOVE | SWP_NOSIZE)))	return FALSE;
 	return TRUE;
@@ -709,7 +711,10 @@ BOOL WINAPI	CCursor::bDrawIMEModeRoutine(LPVOID lpvParam)
 
 	CURSORINFO	CursorInfo{CursorInfo.cbSize = sizeof(CURSORINFO)};
 	if (!GetCursorInfo(&CursorInfo))	return FALSE;
-	if ((CursorInfo.hCursor == This->hCursorWait) || (CursorInfo.hCursor == This->hCursorAppStarting))	return TRUE;
+	if (((CursorInfo.hCursor == This->hCursorWait) || (CursorInfo.hCursor == This->hCursorAppStarting)
+		|| (CursorInfo.hCursor == This->hCursorSizeNWSE) || (CursorInfo.hCursor == This->hCursorSizeNESW)
+		|| (CursorInfo.hCursor == This->hCursorSizeWE) || (CursorInfo.hCursor == This->hCursorSizeNS)
+		|| (CursorInfo.hCursor == This->hCursorSizeAll)))	return TRUE;
 
 	BOOL	bRet = TRUE;
 

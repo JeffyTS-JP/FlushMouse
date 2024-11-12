@@ -32,6 +32,13 @@ extern BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage
 extern BOOL		bStopSynTPHelper();
 extern BOOL		bCheckDrawIMEModeArea(HWND hWndObserved);
 
+extern BOOL		bKBisEP();
+extern BOOL		bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, BOOL bIMEModeForcedChange, LPHKL lpNewHKL, LPHKL lpPreviousHKL);
+extern BOOL		bCheckExistingJPIME();
+extern BOOL		bChromium_Helper(HWND hForeWnd);
+
+extern BOOL	 	bCreateProcess(LPCTSTR lpszExecName, LPTSTR lpCommandLine);
+
 //
 // class CMouseRawInput
 //
