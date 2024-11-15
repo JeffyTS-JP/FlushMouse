@@ -601,8 +601,7 @@ BOOL		CCursor::bIMEModeMouseByWndThreadRoutine(LPVOID lpvParam)
 	RECT	rcMouse{};
 	int		iMouse = 0;
 	int		iMouseSizeX = 0, iMouseSizeY = 0;
-	DWORD	dwIMEModeMouse = IMEHIDE;
-	DWORD	dwIMEModeMousePrev = IMEHIDE;
+	DWORD	dwIMEModeMouse = IMEHIDE, _dwIMEModeMouse = IMEHIDE;
 	BOOL	bCapsLock = FALSE, _bCapsLock = FALSE;
 	MSG		msg{};
 	CURSORINFO	CursorInfo{CursorInfo.cbSize = sizeof(CURSORINFO)};
@@ -652,8 +651,8 @@ BOOL		CCursor::bIMEModeMouseByWndThreadRoutine(LPVOID lpvParam)
 						else lpstCursorData->dwIMEModeCursor = IMEHIDE;
 					}
 					if (dwIMEModeMouse != IMEHIDE) {
-						This->MouseWindow->vSetModeStringColorFont(lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF].szMode, lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF].dwColor, lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF].szFont);
-						if (!This->MouseWindow->bSetWindowPos(HWND_BOTTOM, rcMouse.left, rcMouse.top, iMouseSizeX, iMouseSizeY, (SWP_HIDEWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS)))	return FALSE;
+						This->MouseWindow->vSetModeStringColorFont(lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEHIDE].szMode, lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEHIDE].dwColor, lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEHIDE].szFont);
+						if (!This->MouseWindow->bSetWindowPos(HWND_NOTOPMOST, rcMouse.left, rcMouse.top, iMouseSizeX, iMouseSizeY, (SWP_HIDEWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS | SWP_NOREDRAW)))	return FALSE;
 					}
 					if (!This->bChangeFlushMouseCursor(lpstCursorData->dwIMEModeCursor, lpstCursorData))	return FALSE;
 					Sleep(100);
@@ -666,16 +665,11 @@ BOOL		CCursor::bIMEModeMouseByWndThreadRoutine(LPVOID lpvParam)
 			else {
 				if (!This->bChangeFlushMouseCursor(IMEHIDE, lpstCursorData))	return FALSE;
 			}
-			if (dwIMEModeMouse != dwIMEModeMousePrev) {
-				dwIMEModeMousePrev = dwIMEModeMouse;
-				This->MouseWindow->vSetModeStringColorFont(lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEHIDE].szMode, lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF].dwColor, lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF].szFont);
-				if (!This->MouseWindow->bSetWindowPos(HWND_BOTTOM, rcMouse.left, rcMouse.top, iMouseSizeX, iMouseSizeY, (SWP_HIDEWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS)))	return FALSE;
-			}
-			if (GetKeyState(VK_CAPITAL) & 0x0001) _bCapsLock = TRUE;	else _bCapsLock = FALSE;
-			if (bCapsLock != _bCapsLock) {
-				if (!This->MouseWindow->bInvalidateRect(NULL, FALSE))	return FALSE;
-				if (!This->MouseWindow->bUpdateWindow())	return FALSE;
-				bCapsLock = _bCapsLock;
+			if (GetKeyState(VK_CAPITAL) & 0x0001) bCapsLock = TRUE;	else bCapsLock = FALSE;
+			if ((dwIMEModeMouse != _dwIMEModeMouse) || (bCapsLock != _bCapsLock)) {
+				if (!This->MouseWindow->bSetWindowPos(HWND_NOTOPMOST, rcMouse.left, rcMouse.top, iMouseSizeX, iMouseSizeY, (SWP_HIDEWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS | SWP_NOREDRAW)))	return FALSE;
+				_bCapsLock = bCapsLock;
+				_dwIMEModeMouse = dwIMEModeMouse;
 			}
 			This->MouseWindow->vSetModeStringColorFont(lpstCursorData->lpstNearDrawMouseByWndCursor[iMouse].szMode, lpstCursorData->lpstNearDrawMouseByWndCursor[iMouse].dwColor, lpstCursorData->lpstNearDrawMouseByWndCursor[iMouse].szFont);
 			if (!This->MouseWindow->bSetWindowPos(HWND_TOPMOST, rcMouse.left, rcMouse.top, iMouseSizeX, iMouseSizeY, (SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS)))	return FALSE;

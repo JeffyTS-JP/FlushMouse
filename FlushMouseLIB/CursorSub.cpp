@@ -596,6 +596,18 @@ void		CCursorWindow::Cls_OnDestroy(HWND hWnd)
 }
 
 //
+// WM_ERASEBKGND
+// Cls_OnEraseBkgnd()
+//
+BOOL		CCursorWindow::Cls_OnEraseBkgnd(HWND hWnd, HDC hDC)
+{
+	UNREFERENCED_PARAMETER(hWnd);
+	UNREFERENCED_PARAMETER(hDC);
+
+	return TRUE;
+}
+
+//
 // WM_PAINT
 // Cls_OnPaint()
 //
