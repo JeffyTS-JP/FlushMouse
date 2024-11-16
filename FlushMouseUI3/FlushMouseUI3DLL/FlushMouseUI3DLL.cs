@@ -9,9 +9,9 @@
 
 using System.Reflection;
 
-[assembly: AssemblyVersion("3.4.3.1")]
-[assembly: AssemblyFileVersion("3.4.3.1")]
-[assembly: AssemblyInformationalVersionAttribute("3.4.3.1")]
+[assembly: AssemblyVersion("3.4.4.3")]
+[assembly: AssemblyFileVersion("3.4.4.3")]
+[assembly: AssemblyInformationalVersionAttribute("3.4.4.3")]
 
 [assembly: AssemblyCompanyAttribute("JeffyTS")]
 [assembly: AssemblyCopyrightAttribute("Copyright (C) 2022 - 2024 JeffyTS")]

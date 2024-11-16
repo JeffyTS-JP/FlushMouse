@@ -287,9 +287,10 @@ void		Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg)
 	if (id != NOTIFYICONDATA_ID) {
 		return;
 	}
+	if (!Profile)	return;
 	switch (uMsg) {
 	case WM_LBUTTONDOWN:
-		if ((Profile != NULL) && Profile->lpstAppRegData->bOffChangedFocus) {
+		if (Profile->lpstAppRegData->bOffChangedFocus) {
 			Cime->vIMEOpenCloseForced(hWnd, IMECLOSE);
 		}
 		[[fallthrough]];	
