@@ -116,8 +116,9 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_o
 	if (!bSetHeapInformation())	return FALSE;
 	
 	Resource = new CResource(FLUSHMOUSE_EXE);
-	if (Resource->hLoad() == NULL) {
+	if (!Resource || !Resource->hLoad()) {
 		if (Resource)	delete	Resource;
+		Resource = NULL;
 		return FALSE;
 	}
 	
@@ -194,7 +195,7 @@ int			iCheckCmdLine(LPCTSTR lpCmdLine)
 						return (0);
 					}
 					Resource = new CResource(FLUSHMOUSE_EXE);
-					if (Resource->hLoad() != NULL) {
+					if (!Resource || !Resource->hLoad()) {
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
 						vMessageBox(NULL, IDS_ALREADYRUN, MessageBoxTYPE);
 						if (Resource)	delete	Resource;
@@ -335,14 +336,14 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 	}
 
 	Cime = new CIME;
-	if (Cime == NULL) {
+	if (!Cime) {
 		vMessageBox(hWnd, IDS_CANTLOADREG, MessageBoxTYPE);
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		return FALSE;
 	}
 	
 	Profile = new CProfile;
-	if (Profile != NULL) {
+	if (Profile) {
 		if (!Profile->bFixChangedProfileData()) {
 			vMessageBox(hWnd, IDS_CANTLOADREG, MessageBoxTYPE);
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
@@ -362,7 +363,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 	RawInputDevice[0].hwndTarget = hWnd;	RawInputDevice[0].dwFlags = (RIDEV_INPUTSINK | RIDEV_DEVNOTIFY);
 	RawInputDevice[0].usUsagePage =  HID_USAGE_PAGE_GENERIC;	RawInputDevice[0].usUsage = HID_USAGE_GENERIC_MOUSE;
 	MouseRawInput = new CMouseRawInput();
-	if (MouseRawInput != NULL) {
+	if (MouseRawInput) {
 		if (!MouseRawInput->bRegisterRawInputDevices(RawInputDevice, uiNumDevices)) {
 			vMessageBox(hWnd, IDS_NOTREGISTERMS, MessageBoxTYPE);
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);	// Quit
@@ -1032,7 +1033,7 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 	
 	if (Cursor == NULL) {
 		Cursor = new CCursor;
-		if (!Cursor->bInitialize(hWnd)) {
+		if (!Cursor || !Cursor->bInitialize(hWnd)) {
 			vMessageBox(hWnd, IDS_CANTLOADCURSOR, MessageBoxTYPE);
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			return FALSE;
@@ -1041,14 +1042,14 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 
 	if (FlushMouseHook == NULL) {
 		FlushMouseHook = new CFlushMouseHook;
-		if (!FlushMouseHook->bHookSet(hWnd, FLUSHMOUSE_DLL, FLUSHMOUSE32_EXE)) {
+		if (!FlushMouseHook || !FlushMouseHook->bHookSet(hWnd, FLUSHMOUSE_DLL, FLUSHMOUSE32_EXE)) {
 			vMessageBox(hWnd, IDS_NOTREGISTERHOOK, MessageBoxTYPE);
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			return FALSE;
 		}
 	}
 
-	if ((Profile == NULL) || !bSetEnableIMEModeForcedLL64(Profile->lpstAppRegData->bIMEModeForced)) {
+	if (!Profile || !bSetEnableIMEModeForcedLL64(Profile->lpstAppRegData->bIMEModeForced)) {
 		vMessageBox(hWnd, IDS_NOTREGISTERHOOK, MessageBoxTYPE);
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		return FALSE;
@@ -1057,7 +1058,7 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 
 	if (EventHook == NULL) {
 		EventHook = new CEventHook;
-		if (!EventHook->bEventSet()) {
+		if (!EventHook || !EventHook->bEventSet()) {
 			vMessageBox(hWnd, IDS_NOTRREGISTEVH, MessageBoxTYPE);
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			return FALSE;
@@ -1065,7 +1066,7 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 	}
 
 	HWND	hFindWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
-	if ((hFindWnd != NULL) && Profile != NULL) {
+	if ((hFindWnd) && Profile) {
 		if (Profile->lpstAppRegData->bEnableEPHelper) {
 			SendMessage(hFindWnd, WM_CHECKEXISTINGJPIMEEX, (WPARAM)Profile->lpstAppRegData->bEnableEPHelper, (LPARAM)NULL);
 		}
@@ -1144,7 +1145,7 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 			Sleep(1000);
 			if (FlushMouseHook == NULL) {
 				FlushMouseHook = new CFlushMouseHook;
-				if (!FlushMouseHook->bHookSet(hWnd, FLUSHMOUSE_DLL, FLUSHMOUSE32_EXE)) {
+				if (!FlushMouseHook || !FlushMouseHook->bHookSet(hWnd, FLUSHMOUSE_DLL, FLUSHMOUSE32_EXE)) {
 					PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 				}
 			}

@@ -112,6 +112,15 @@ BOOL	CThread::bSetThreadPriority(int nPriority) const
 }
 
 //
+// hGetHandle()
+//
+HANDLE	CThread::hGetHandle() const
+{
+	if (lpstThreadData != NULL)	return lpstThreadData->hThread;
+	else return NULL;
+}
+
+//
 // vUnregister()
 //
 VOID 	CThread::vUnregister()

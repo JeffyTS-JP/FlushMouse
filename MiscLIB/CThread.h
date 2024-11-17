@@ -47,6 +47,7 @@ public:
 	BOOL	bCheckSentinel() const;
 	BOOL	bSetSentinel(BOOL bSentinel);
 	BOOL	bSetThreadPriority(int nPriority) const;
+	HANDLE	hGetHandle() const;
 
 private:
 	VOID 	vUnregister();

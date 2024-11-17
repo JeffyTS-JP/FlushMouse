@@ -12,12 +12,10 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 
 using System;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
 using Windows.System;
 
 using static FlushMouseUI3DLL.Settings;
-
+using static FlushMouseUI3DLL.Miscs;
 
 namespace FlushMouseUI3DLL {
 	public sealed partial class Settings
@@ -100,13 +98,13 @@ namespace FlushMouseUI3DLL {
 						if (tb2 != null)	tb2.IsEnabled = true;
 						if (tb3 != null)	tb3.IsEnabled = true;
 						if (tb4 != null)	tb4.IsEnabled = true;
-						if (tb6 != null)	tb6.IsEnabled = true;
+						if (tb7 != null)	tb7.IsEnabled = true;
 						if ((dwSynTPHelper1 == SYNTPH_SENDERIPV4) || (dwSynTPHelper1 == SYNTPH_SENDERIPV4_START)) {
 							if (tb5_1 != null)	tb5_1.IsEnabled = true;
 							if (tb5_2 != null)	tb5_2.IsEnabled = true;
 							if (tb5_3 != null)	tb5_3.IsEnabled = true;
 							if (tb5_4 != null)	tb5_4.IsEnabled = true;
-							if (tb6 != null)	tb6.IsEnabled = true;
+							if (tb6 != null)	tb6.IsEnabled = false;
 						}
 						else if ((dwSynTPHelper1 == SYNTPH_SENDERHOSNAMEIPV4) || (dwSynTPHelper1 == SYNTPH_SENDERHOSNAMEIPV4_START)) {
 							if (tb5_1 != null)	tb5_1.IsEnabled = false;
@@ -334,55 +332,55 @@ namespace FlushMouseUI3DLL {
 			tb7.Text = dwSynTPPortNo1.ToString();
 		}
 
-#pragma warning disable SYSLIB1045
 		private void tb_LostFocus(object sender, RoutedEventArgs e) {
 			if (m_Sentinel == false) return;
 			if (e == null) { }
 			TextBox tb = sender as TextBox;
-			Regex regex = new("^[0-9]*$");
-			Int32 i;
 			if (tb != null) {
 				if (tb == tb1) {
-					if (!regex.IsMatch(tb.Text)) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; } 
-					i = Convert.ToInt32(tb.Text); if ((0 <= i) && (i <= 9999)) dwSynTPPadX = i; else { tb.Undo(); tb.Focus(FocusState.Programmatic); }
+					if (CheckNumeric(tb.Text, 0, 9999) == false) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
+					else dwSynTPPadX = Convert.ToInt32(tb.Text);
 				}
 				else if (tb == tb2) {
-					if (!regex.IsMatch(tb.Text)) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
-					i = Convert.ToInt32(tb.Text); if ((0 <= i) && (i <= 9999)) dwSynTPPadY = i; else { tb.Undo(); tb.Focus(FocusState.Programmatic); }
+					if (CheckNumeric(tb.Text, 0, 9999) == false) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
+					else dwSynTPPadY = Convert.ToInt32(tb.Text);
 				}
 				else if (tb == tb3) {
-					if (!regex.IsMatch(tb.Text)) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
-					i = Convert.ToInt32(tb.Text); if ((0 <= i) && (i <= 9999)) dwSynTPEdgeX = i; else { tb.Undo(); tb.Focus(FocusState.Programmatic); }
+					if (CheckNumeric(tb.Text, 0, 9999) == false) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
+					else dwSynTPEdgeX = Convert.ToInt32(tb.Text);
 				}
 				else if (tb == tb4) {
-					if (!regex.IsMatch(tb.Text)) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
-					i = Convert.ToInt32(tb.Text); if ((0 <= i) && (i <= 9999)) dwSynTPEdgeY = i; else { tb.Undo(); tb.Focus(FocusState.Programmatic); }
+					if (CheckNumeric(tb.Text, 0, 9999) == false) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
+					else dwSynTPEdgeY = Convert.ToInt32(tb.Text);
 				}
 				else if (tb == tb5_1) {
-					if (!regex.IsMatch(tb.Text)) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
-					i = Convert.ToInt32(tb.Text); if ((0 <= i) && (i <= 255)) szSynTPSendIPAddr1_1 = tb.Text; else { tb.Undo(); tb.Focus(FocusState.Programmatic); }
+					if (CheckNumeric(tb.Text, 0, 255) == false) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
+					else szSynTPSendIPAddr1_1 = tb.Text;
 				}
 				else if (tb == tb5_2) {
-					if (!regex.IsMatch(tb.Text)) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
-					i = Convert.ToInt32(tb.Text); if ((0 <= i) && (i <= 255)) szSynTPSendIPAddr1_2 = tb.Text; else { tb.Undo(); tb.Focus(FocusState.Programmatic); }
+					if (CheckNumeric(tb.Text, 0, 255) == false) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
+					else szSynTPSendIPAddr1_2 = tb.Text;
 				}
 				else if (tb == tb5_3) {
-					if (!regex.IsMatch(tb.Text)) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
-					i = Convert.ToInt32(tb.Text); if ((0 <= i) && (i <= 255)) szSynTPSendIPAddr1_3 = tb.Text; else { tb.Undo(); tb.Focus(FocusState.Programmatic); }
+					if (CheckNumeric(tb.Text, 0, 255) == false) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
+					else szSynTPSendIPAddr1_3 = tb.Text;
 				}
-				else if (tb == tb5_4) {	
-					if (!regex.IsMatch(tb.Text)) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
-					i = Convert.ToInt32(tb.Text); if ((0 <= i) && (i <= 255)) szSynTPSendIPAddr1_4 = tb.Text; else { tb.Undo(); tb.Focus(FocusState.Programmatic); }
+				else if (tb == tb5_4) {
+					if (CheckNumeric(tb.Text, 0, 255) == false) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
+					else szSynTPSendIPAddr1_4 = tb.Text;
 				}
-				else if (tb == tb6) { szSynTPSendHostname1 = tb6.Text; }
+				else if (tb == tb6) {
+					if (CheckHostname(tb.Text) == false) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
+					else szSynTPSendHostname1 = tb.Text;
+				}
 				else if (tb == tb7) {
-					if (!regex.IsMatch(tb.Text)) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
-					i = Convert.ToInt32(tb.Text); if ((50000 <= i) && (i <= 59999)) dwSynTPPortNo1 = i; else { tb.Undo(); tb.Focus(FocusState.Programmatic); }
+					if (CheckNumeric(tb.Text, 50000, 59999) == false) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
+					else dwSynTPPortNo1 = Convert.ToInt32(tb.Text);
 				}
+				//EnableDisableItems(sender, e);
 				UpdateProfile(SETTINGSEX_SYNTP_SETREGISRY);
 			}
 		}
-#pragma warning restore SYSLIB1045
 		
 		private void tb_GotFocus(object sender, RoutedEventArgs e) {
 			if (e == null) { }

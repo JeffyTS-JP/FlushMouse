@@ -14,7 +14,6 @@ using Microsoft.UI.Xaml.Media;
 
 using System;
 using System.Drawing;
-using System.Diagnostics;
 using System.Text;
 
 using static FlushMouseUI3DLL.Settings;

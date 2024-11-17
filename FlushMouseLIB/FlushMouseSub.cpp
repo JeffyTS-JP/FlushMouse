@@ -911,7 +911,7 @@ BOOL	 	bCreateProcess(LPCTSTR lpszExecName, LPTSTR lpCommandLine)
 			size_t	size = 0x7fff;
 			size = wcsnlen_s(lpCommandLine, size);
 			if ((0 < size) && (size < (size_t)((size_t)0x7fff - (size_t)dwSize - sizeof(TCHAR)))) {
-				size = dwSize + size + sizeof(TCHAR);
+				size = (size_t)dwSize + size + 2;
 				LPTSTR	_lpCommandLine = new TCHAR[size];
 				if (_lpCommandLine) {
 					ZeroMemory(_lpCommandLine, size);

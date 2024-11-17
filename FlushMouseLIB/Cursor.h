@@ -141,7 +141,9 @@ private:
 	BOOL		bDrawIMEModeOnDisplay(LPIMECURSORDATA lpstCursorData);
 	BOOL		bCalcDisplayModeRect(int iModeSizeX, int iModeSizeY, LPRECT lpRect);
 	HWND		hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPIMECURSORDATA lpstCursorData, BOOL bAttachThreadInput);
+	BOOL		bAccessibleObjectFromWindowAsync(HWND hWnd, DWORD dwId, REFIID riId, void **ppvObject);
 	BOOL		bAdjustModeSizeByMonitorDPI(int iModeSizeX, int iModeSizeY, LPRECT lprcCaret);
+	BOOL		bAdjustModeSizeByMonitorDPIAsync(int iModeSizeX, int iModeSizeY, LPRECT lprcCaret);
 	BOOL		bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData);
 	static BOOL	CALLBACK	bIconDrawEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam);
 	static BOOL WINAPI		bDrawIMEModeRoutine(LPVOID lpvParam);
@@ -168,7 +170,8 @@ private:
 	CCursorWindow	*CursorWindow;
 	CCursorWindow	*CaretWindow;
 	CCursorWindow	*MouseWindow;
-
+	DWORD			dwIMEModeMouseWindow;
+	ULONGLONG		uuMouseWindowTick;
 	CCursorSub		*CursorSub;
 	
 	HCURSOR			hCursorArrow;

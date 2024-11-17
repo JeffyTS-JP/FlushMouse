@@ -14,7 +14,6 @@ using Microsoft.UI.Xaml.Controls;
 
 using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 
 using Windows.Graphics;
 
@@ -390,7 +389,6 @@ namespace FlushMouseUI3DLL {
 			}
 			return iRet;
 		}
-
 	}
 }
 #pragma warning restore IDE0079

@@ -58,7 +58,7 @@ BOOL	CWindow::bRegisterClass(_In_ LPWNDCLASS lpWndClass)
 
 	if (RegisterClass(_lpWndClass) == 0) {
 		err = GetLastError();
-		if (err == 1410)		return TRUE;
+		if (err == ERROR_CLASS_ALREADY_EXISTS)		return TRUE;
 		else goto error_cleanup;
 	}
 	return TRUE;
@@ -87,7 +87,7 @@ BOOL	CWindow::bRegisterClassEx(_In_ LPWNDCLASSEX lpWndClassEx)
 
 	if (RegisterClassEx(_lpWndClassEx) == 0) {
 		err = GetLastError();
-		if (err == 1410)		return TRUE;
+		if (err == ERROR_CLASS_ALREADY_EXISTS)		return TRUE;
 		else goto error_cleanup;
 	}
 	return TRUE;

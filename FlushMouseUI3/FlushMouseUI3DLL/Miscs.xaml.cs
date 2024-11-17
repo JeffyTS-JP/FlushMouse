@@ -9,10 +9,9 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 using Windows.Graphics;
-
-using static FlushMouseUI3DLL.Settings;
 
 #pragma warning disable IDE0079
 namespace FlushMouseUI3DLL {
@@ -45,7 +44,7 @@ namespace FlushMouseUI3DLL {
 	}
 #pragma warning restore IDE0251
 		
-	public partial class Settings
+	public partial class Miscs
 	{
 		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.I8)]
@@ -181,21 +180,6 @@ namespace FlushMouseUI3DLL {
 	
 	public sealed partial class Miscs
 	{
-		public static Int64 UpdateProfile(Int64 iSettingsEX)
-		{
-			Int64 iRet = 0;
-			if (g_hMainWnd != 0) {
-				iRet = SendMessageW(g_hMainWnd, g_uMsg, iSettingsEX, 0);
-				if (iRet == 0) return iRet;
-			}
-			Int64 _hWnd = FindWindowW(CLASS_FLUSHMOUSE, null);
-			if ((_hWnd != 0) && (_hWnd != g_hMainWnd)) {
-				SendMessageW(_hWnd, g_uMsg, SETTINGSEX_RELOAD_REGISTRY, 0);
-				iRet = SendMessageW(_hWnd, g_uMsg, iSettingsEX, 0);
-			}
-			return iRet;
-		}
-
 		public static void CalcWindowCentralizeByDesktop(Int64 hWnd, RectDouble InRectWindowDouble, out RectDouble OutRectWindowDouble)
 		{
 			OutRectWindowDouble = InRectWindowDouble;
@@ -290,10 +274,30 @@ namespace FlushMouseUI3DLL {
 
 				UnhookWindowsHookEx(hMessageBoxHook);
 				hMessageBoxHook = (Int64)0;
-		}
+			}
 			return CallNextHookEx(hMessageBoxHook, nCode, wParam, lParam);
 		}
 
+#pragma warning disable SYSLIB1045
+		public static bool	CheckNumeric(String text, Int32 Min, Int32 Max)
+		{
+			Regex regex = new("^[0-9]*$");
+			Int32 i;
+			if (text != null) {
+				if (regex.IsMatch(text)) {
+					i = Convert.ToInt32(text);
+					if ((Min <= i) && (i <= Max)) return true;
+				}
+			}
+			return false;
+		}
+#pragma warning restore SYSLIB1045
+		
+		public static bool	CheckHostname(String text)
+		{
+			if (Uri.CheckHostName(text) != UriHostNameType.Unknown) return true;
+			return false;
+		}
 	}
 }
 #pragma warning restore IDE0079
