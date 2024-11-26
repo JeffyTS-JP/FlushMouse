@@ -18,7 +18,7 @@
    * ***ということで、今後も暇を見つけて、機能向上を目指していきますのでよろしくお願いします***
 
 * **(既知の問題)**
-   * MSVCP140.dll が古くて動かない場合があるようです。その場合には Microsoft社の[こちら](https://aka.ms/vs/17/release/vc_redist.x64.exe)からダウンロードしてインストールしてください。Microsoft社の説明は[こちら](https://learn.microsoft.com/ja-jp/cpp/windows/latest-supported-vc-redist?view=msvc-170)ですこちらで再頒布するようにするかは今後検討します
+   * MSVCP140.dll が古くて動かない場合があるようです。その場合には Microsoft社の[こちら](https://aka.ms/vs/17/release/vc_redist.x64.exe)からダウンロードしてインストールしてください。Microsoft社の説明は[こちら](https://learn.microsoft.com/ja-jp/cpp/windows/latest-supported-vc-redist?view=msvc-170)です。こちらで再頒布するようにするかは今後検討します
    * Ver.3 からの デスクトップ版の UI3 で動く設定画面や、UI3 版の本体において、アプリ終了時にメモリーリークしていることがわかっています (動的に増えていくメモリーリークではありません)
    * プログラム的には、WinMain に入ってくるまでと、抜けた後の処理でリークしているようです (Ver.3.2 から WinMain を使っていませんが同様の症状がでます)。このため、当方に直す方法はなく、Microsoft の SDK 内の問題であり、アプリやシステムには影響はないものと考えています
 
