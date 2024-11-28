@@ -95,7 +95,7 @@
       <CompileAsManaged>false</CompileAsManaged>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <ExceptionHandling>Sync</ExceptionHandling>
-      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <AdditionalOptions>/Zc:throwingNew- %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -145,7 +145,7 @@
       <CompileAsManaged>false</CompileAsManaged>
       <ExceptionHandling>Sync</ExceptionHandling>
       <AdditionalOptions>/Zc:throwingNew- %(AdditionalOptions)</AdditionalOptions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -184,6 +184,7 @@ Start /wait /min cmd /c "$(SolutionDir)Sign_Modules.bat" $(OutDir)$(TargetName)$
       <AdditionalOptions>/Zc:throwingNew- %(AdditionalOptions)</AdditionalOptions>
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <AdditionalDependencies>nothrownew.obj;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
@@ -194,6 +195,7 @@ Start /wait /min cmd /c "$(SolutionDir)Sign_Modules.bat" $(OutDir)$(TargetName)$
       <AdditionalOptions>/Zc:throwingNew- %(AdditionalOptions)</AdditionalOptions>
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <AdditionalDependencies>nothrownew.obj;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>

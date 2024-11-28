@@ -195,11 +195,11 @@ int			iCheckCmdLine(LPCTSTR lpCmdLine)
 						return (0);
 					}
 					Resource = new CResource(FLUSHMOUSE_EXE);
-					if (!Resource || !Resource->hLoad()) {
+					if (!Resource || Resource->hLoad()) {
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
 						vMessageBox(NULL, IDS_ALREADYRUN, MessageBoxTYPE);
-						if (Resource)	delete	Resource;
 					}
+					if (Resource)	delete	Resource;
 					return (-1);
 				}
 			}

@@ -101,6 +101,7 @@ static BOOL	bIsPrivateIPv4Addr(DWORD dwIPv4Addr)
 BOOL		bCheckExistHostnameIPv4(LPCTSTR lpszHostname, int iTimeOut)
 {
 	if (lpszHostname == NULL)	return FALSE;
+	if (wcsnlen_s(lpszHostname, sizeof(lpszHostname)) <= 0)	return FALSE;
 
 	std::future<BOOL> _future;
 	std::promise<BOOL> _promise;

@@ -130,7 +130,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SupportJustMyCode>true</SupportJustMyCode>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -175,6 +175,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DebugInformationFormat>None</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -209,6 +210,9 @@
     <ResourceCompile Include="FlushMouseDLL32.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FlushMouseLIB\FlushMouseLIB.vcxproj">
+      <Project>{24085cf0-ec19-4a1c-9ddf-1c04a571ed57}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\MiscLIB32\MiscLIB32.vcxproj">
       <Project>{3d3f632c-75bb-4830-aa8e-0871c6aa1a72}</Project>
     </ProjectReference>

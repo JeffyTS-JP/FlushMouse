@@ -176,6 +176,11 @@ namespace FlushMouseUI3DLL {
 		internal const UInt32 SWP_NOSIZE		= 0x0001;
 		internal const UInt32 SWP_NOZORDER		= 0x0004;
 		internal const UInt32 SWP_NOACTIVATE	= 0x0010;
+		
+		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		internal static partial bool MessageBeep(UInt32 uType);
+		internal const UInt32 MB_ICONWARNING	=  0x00000030;
 	}
 	
 	public sealed partial class Miscs

@@ -92,7 +92,7 @@
 			Key="SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedhost"
 			Value="Version"
 			Variable="SharedhostVersion" />
-		
+
 		<Variable Name="AddDesktopShortcut" bal:Overridable="yes" Value="1" />
 		<Variable Name="AddDesktopShortcutVariable" bal:Overridable="yes" Value="[AddDesktopShortcut]" />
 		<Variable Name="RegisterStartMenu" bal:Overridable="yes" Value="1" />

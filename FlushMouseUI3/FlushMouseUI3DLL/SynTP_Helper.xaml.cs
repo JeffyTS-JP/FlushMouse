@@ -338,46 +338,55 @@ namespace FlushMouseUI3DLL {
 			TextBox tb = sender as TextBox;
 			if (tb != null) {
 				if (tb == tb1) {
-					if (CheckNumeric(tb.Text, 0, 9999) == false) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
+					if (tb.Text.Length == 0) { MessageBeep(MB_ICONWARNING); tb.Text = dwSynTPPadX.ToString(); tb.Focus(FocusState.Programmatic); }
+					if (CheckNumeric(tb.Text, 0, 9999) == false) { MessageBeep(MB_ICONWARNING); tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
 					else dwSynTPPadX = Convert.ToInt32(tb.Text);
 				}
 				else if (tb == tb2) {
-					if (CheckNumeric(tb.Text, 0, 9999) == false) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
+					if (tb.Text.Length == 0) { MessageBeep(MB_ICONWARNING); tb.Text = dwSynTPPadY.ToString(); tb.Focus(FocusState.Programmatic); }
+					if (CheckNumeric(tb.Text, 0, 9999) == false) { MessageBeep(MB_ICONWARNING); tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
 					else dwSynTPPadY = Convert.ToInt32(tb.Text);
 				}
 				else if (tb == tb3) {
-					if (CheckNumeric(tb.Text, 0, 9999) == false) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
+					if (tb.Text.Length == 0) { MessageBeep(MB_ICONWARNING); tb.Text = dwSynTPEdgeX.ToString(); tb.Focus(FocusState.Programmatic); }
+					if (CheckNumeric(tb.Text, 0, 9999) == false) { MessageBeep(MB_ICONWARNING); tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
 					else dwSynTPEdgeX = Convert.ToInt32(tb.Text);
 				}
 				else if (tb == tb4) {
-					if (CheckNumeric(tb.Text, 0, 9999) == false) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
+					if (tb.Text.Length == 0) { MessageBeep(MB_ICONWARNING); tb.Text = dwSynTPEdgeY.ToString(); tb.Focus(FocusState.Programmatic); }
+					if (CheckNumeric(tb.Text, 0, 9999) == false) { MessageBeep(MB_ICONWARNING); tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
 					else dwSynTPEdgeY = Convert.ToInt32(tb.Text);
 				}
 				else if (tb == tb5_1) {
-					if (CheckNumeric(tb.Text, 0, 255) == false) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
+					if (tb.Text.Length == 0) { MessageBeep(MB_ICONWARNING); if (szSynTPSendIPAddr1_1 == null) tb.Text = "0"; else tb.Text = szSynTPSendIPAddr1_1; tb.Focus(FocusState.Programmatic);}
+					if (CheckNumeric(tb.Text, 0, 255) == false) { MessageBeep(MB_ICONWARNING); tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
 					else szSynTPSendIPAddr1_1 = tb.Text;
 				}
 				else if (tb == tb5_2) {
-					if (CheckNumeric(tb.Text, 0, 255) == false) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
+					if (tb.Text.Length == 0) { MessageBeep(MB_ICONWARNING); if (szSynTPSendIPAddr1_2 == null) tb.Text = "0"; else tb.Text = szSynTPSendIPAddr1_2; tb.Focus(FocusState.Programmatic); }
+					if (CheckNumeric(tb.Text, 0, 255) == false) { MessageBeep(MB_ICONWARNING); tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
 					else szSynTPSendIPAddr1_2 = tb.Text;
 				}
 				else if (tb == tb5_3) {
-					if (CheckNumeric(tb.Text, 0, 255) == false) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
+					if (tb.Text.Length == 0) { MessageBeep(MB_ICONWARNING); if (szSynTPSendIPAddr1_3 == null) tb.Text = "0"; else tb.Text = szSynTPSendIPAddr1_3; tb.Focus(FocusState.Programmatic); }
+					if (CheckNumeric(tb.Text, 0, 255) == false) { MessageBeep(MB_ICONWARNING); tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
 					else szSynTPSendIPAddr1_3 = tb.Text;
 				}
 				else if (tb == tb5_4) {
-					if (CheckNumeric(tb.Text, 0, 255) == false) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
+					if (tb.Text.Length == 0) { MessageBeep(MB_ICONWARNING); if (szSynTPSendIPAddr1_4 == null) tb.Text = "0"; else tb.Text = szSynTPSendIPAddr1_4; tb.Focus(FocusState.Programmatic); }
+					if (CheckNumeric(tb.Text, 0, 255) == false) { MessageBeep(MB_ICONWARNING); tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
 					else szSynTPSendIPAddr1_4 = tb.Text;
 				}
 				else if (tb == tb6) {
-					if (CheckHostname(tb.Text) == false) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
+					if (tb.Text.Length == 0) { if ((szSynTPSendHostname1 != null) && (szSynTPSendHostname1.Length != 0)) { tb.Text = szSynTPSendHostname1; tb.Focus(FocusState.Programmatic); } return; }
+					if (CheckHostname(tb.Text) == false) { MessageBeep(MB_ICONWARNING); tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
 					else szSynTPSendHostname1 = tb.Text;
 				}
 				else if (tb == tb7) {
-					if (CheckNumeric(tb.Text, 50000, 59999) == false) { tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
+					if (tb.Text.Length == 0) { MessageBeep(MB_ICONWARNING); tb.Text = dwSynTPPortNo1.ToString(); tb.Focus(FocusState.Programmatic); }
+					if (CheckNumeric(tb.Text, 50000, 59999) == false) { MessageBeep(MB_ICONWARNING); tb.Undo(); tb.Focus(FocusState.Programmatic); return; }
 					else dwSynTPPortNo1 = Convert.ToInt32(tb.Text);
 				}
-				//EnableDisableItems(sender, e);
 				UpdateProfile(SETTINGSEX_SYNTP_SETREGISRY);
 			}
 		}
