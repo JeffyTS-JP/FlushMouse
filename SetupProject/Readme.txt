@@ -1,5 +1,5 @@
 ﻿FlushMouse FlushMouseUI3
-	Copyright © 2022 - JeffyTS (X (Twitter)  @JeffyTSonTW)
+	Copyright © 1983 - JeffyTS (X (Twitter)  @JeffyTSonTW)
 
 	Files
 		%ProgramFiles%\JeffyTS\FlushMouse

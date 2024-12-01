@@ -9,12 +9,12 @@
 
 using System.Reflection;
 
-[assembly: AssemblyVersion("3.4.6.3")]
-[assembly: AssemblyFileVersion("3.4.6.3")]
-[assembly: AssemblyInformationalVersionAttribute("3.4.6.3")]
+[assembly: AssemblyVersion("3.4.7.7")]
+[assembly: AssemblyFileVersion("3.4.7.7")]
+[assembly: AssemblyInformationalVersionAttribute("3.4.7.7")]
 
 [assembly: AssemblyCompanyAttribute("JeffyTS")]
-[assembly: AssemblyCopyrightAttribute("Copyright (C) 2022 - 2024 JeffyTS")]
+[assembly: AssemblyCopyrightAttribute("Copyright (C) 1993 - 2024 JeffyTS")]
 [assembly: AssemblyDescriptionAttribute("FlushMouseUI3DLL")]
 [assembly: AssemblyProductAttribute("FlushMouse")]
 [assembly: AssemblyTitleAttribute("FlushMouse (MOUSE and IME Utility)")]

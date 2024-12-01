@@ -16,21 +16,40 @@
 //
 // Global Data
 //
-extern HWND		hAboutDlg;
-extern HWND		hSettingDlg;
-extern HWND		hSynTPHelperDlg;
 
 //
 // Global Prototype Define
 //
-extern BOOL 	bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitile);
-extern BOOL		bCheckTaskTrayMessage(HWND hWnd, UINT message);
-extern BOOL		bReCreateTaskTrayWindow(HWND hWnd);
-extern BOOL		bDestroyTaskTrayWindow(HWND hWnd);
-extern BOOL		bGetTaskTrayWindowRect(HWND hWnd, LPRECT lpRect);
-extern void		Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify);
-extern void		Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg);
-extern BOOL		bDisplayBalloon(HWND hWnd, DWORD dwInfoFlags, LPCTSTR szInfoTitle, LPCTSTR szInfo);
+
+//
+// Class CTaskTray
+// 
+class CTaskTray
+{
+public:
+	CTaskTray(HWND hWnd);
+	~CTaskTray();
+
+public:
+	BOOL		bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle) const;
+	BOOL		bReCreateTaskTrayWindow(HWND hWnd) const;
+	BOOL		bDestroyTaskTrayWindow(HWND hWnd) const;
+	BOOL		bGetTaskTrayWindowRect(HWND hWnd, LPRECT lpRect) const;
+	int			iCheckTaskTrayMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	BOOL		bDisplayBalloon(HWND hWnd, DWORD dwInfoFlags, LPCTSTR szInfoTitle, LPCTSTR szInfo);
+	BOOL		bModifyToolHints(HWND hWnd, LPCTSTR lpszToolHints) const;
+
+private:
+	BOOL		bCreateGUID(LPGUID lpGUID);
+	void		Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify);
+	void		Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg);
+
+public:
+
+private:
+	GUID		TaskTrayGUID;  
+	UINT		uTaskbarCreatedMessage;
+};
 
 
 /* = EOF = */

@@ -341,7 +341,7 @@ BOOL		bDestroyTaskTrayWindow(HWND hWnd)
 	NOTIFYICONDATA nIco{};
 	nIco.cbSize = sizeof(NOTIFYICONDATA);
 	nIco.hWnd = hParentWnd;
-	nIco.uID = NOTIFYICONDATA_ID;
+	nIco.uID = HandleToULong(hParentWnd);
 	nIco.guidItem = GUID_NULL;
 	nIco.uFlags = 0;
 	try {

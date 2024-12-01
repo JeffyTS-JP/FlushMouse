@@ -124,7 +124,6 @@ DWORD		CIME::dwIMEMode(HWND hWndObserved, BOOL bForceHiragana)
 	if (hWndObserved != NULL) {
 		HWND    hIMWnd = NULL;
 		HKL		hkl = NULL;
-		DWORD	dwInputLocale = 0;
 		DWORD   dwConvertMode = 0;
 		if ((hIMWnd = ImmGetDefaultIMEWnd(hWndObserved)) != NULL) {
 			if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETOPENSTATUS, NULL) != 0) {
@@ -161,10 +160,8 @@ DWORD		CIME::dwIMEMode(HWND hWndObserved, BOOL bForceHiragana)
 						dwConvertMode = ZENHIRA_IMEON;
 					}
 					if ((hkl = hklGetInputLocale(hWndObserved)) != (HKL)0) {
-						if ((dwInputLocale = dwGetInputLocale()) != 0) {
-							if ((hkl = (HKL)(((UINT64)hkl & KB_MASK) | (dwInputLocale & LANG_MASK))) != JP_IME) {
-								dwConvertMode = IMEOFF;
-							}
+						if (hkl != JP_IME) {
+							dwConvertMode = IMEOFF;
 						}
 					}
 					return dwConvertMode;
@@ -308,18 +305,16 @@ HKL		CIME::hklGetInputLocale(HWND hWndObserved)
 	DWORD	dwProcessID = 0;
 	DWORD	dwThreadID = 0;
 	HKL		hkl = NULL;
-	DWORD	dwInputLocale = 0;
+	if (!hWndObserved)	return (HKL)0;
 	if ((dwThreadID = GetWindowThreadProcessId(hWndObserved, &dwProcessID)) != 0) {
 		if ((hkl = GetKeyboardLayout(dwThreadID)) != NULL) {
 			int	iKeyboardType = GetKeyboardType(1);
 			if ((iKeyboardType != 2) || (hkl != JP_IME))	hkl = US_ENG;
-			hkl = (HKL)(((UINT64)hkl & KB_MASK) | (dwInputLocale & LANG_MASK));
 			return hkl;
 		}
 	}
 	return (HKL)0;
-#undef SUBKEY
-#undef VALUE
 }
+
 
 /* = EOF = */

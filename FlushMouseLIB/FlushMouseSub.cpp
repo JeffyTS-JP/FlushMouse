@@ -139,7 +139,7 @@ BOOL		bSettingsEx(HWND hWnd, int iCode, int iSubCode)
 		case SETTINGSEX_SYNTP_STOP:
 			vSettingDialogApply();
 			if (!Profile->bGetProfileData4SynTPHelper())	return FALSE;
-			return bStopSynTPHelper();
+			return bStopSynTPHelper(hWnd);
 		case SETTINGSEX_SYNTP_IS_STARTED:
 			if (!Profile->bGetProfileData4SynTPHelper())	return FALSE;
 			if (SynTP)	return TRUE;
@@ -157,7 +157,7 @@ BOOL		bSettingsEx(HWND hWnd, int iCode, int iSubCode)
 //
 BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
 {
-	if (!Profile)	return FALSE;
+	if (!Profile || !TaskTray)	return FALSE;
 	Profile->lpstAppRegData->bSynTPStarted1 = FALSE;
 	if (SynTP == NULL)	SynTP = new CSynTP(Profile->lpstAppRegData->dwSynTPPadX, Profile->lpstAppRegData->dwSynTPPadY, Profile->lpstAppRegData->dwSynTPEdgeX, Profile->lpstAppRegData->dwSynTPEdgeY);
 	if (SynTP) {
@@ -174,14 +174,14 @@ BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
 				else {
 					if (bShowMessage) {
 						LoadString(Resource->hLoad(), IDS_CANTSYTPHELPER, szInfo, MAX_LOADSTRING);
-						bDisplayBalloon(hWnd, NIIF_WARNING, NULL, szInfo);
+						TaskTray->bDisplayBalloon(hWnd, NIIF_WARNING, NULL, szInfo);
 					}
 				}
 			}
 			else {
 				if (bShowMessage) {
 					LoadString(Resource->hLoad(), IDS_NOTPRIVATEADDR, szInfo, MAX_LOADSTRING);
-					bDisplayBalloon(hWnd, NIIF_WARNING, NULL, szInfo);
+					TaskTray->bDisplayBalloon(hWnd, NIIF_WARNING, NULL, szInfo);
 				}
 			}
 			delete SynTP;
@@ -200,14 +200,14 @@ BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
 				else {
 					if (bShowMessage) {
 						LoadString(Resource->hLoad(), IDS_CANTSYTPHELPER, szInfo, MAX_LOADSTRING);
-						bDisplayBalloon(hWnd, NIIF_WARNING, NULL, szInfo);
+						TaskTray->bDisplayBalloon(hWnd, NIIF_WARNING, NULL, szInfo);
 					}
 				}
 			}
 			else {
 				if (bShowMessage) {
 					LoadString(Resource->hLoad(), IDS_NOTHOSTNAME, szInfo, MAX_LOADSTRING);
-					bDisplayBalloon(hWnd, NIIF_WARNING, NULL, szInfo);
+					TaskTray->bDisplayBalloon(hWnd, NIIF_WARNING, NULL, szInfo);
 				}
 			}
 			delete SynTP;
@@ -225,7 +225,7 @@ BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
 			else {
 				if (bShowMessage) {
 					LoadString(Resource->hLoad(), IDS_CANTSYTPHELPER, szInfo, MAX_LOADSTRING);
-					bDisplayBalloon(hWnd, NIIF_WARNING, NULL, szInfo);
+					TaskTray->bDisplayBalloon(hWnd, NIIF_WARNING, NULL, szInfo);
 				}
 			}
 			delete SynTP;
@@ -234,13 +234,29 @@ BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
 		}
 	}
 	Profile->bSetProfileData();
+	if (Profile->lpstAppRegData->bSynTPStarted1) {
+		LPTSTR	lpszToolHints = new TCHAR[MAX_LOADSTRING];
+		if (lpszToolHints) {
+			ZeroMemory(lpszToolHints, MAX_LOADSTRING);
+			_tcsncpy_s(lpszToolHints, MAX_LOADSTRING, szTitle, _TRUNCATE);
+			LPTSTR	lpszBuff = new TCHAR[MAX_LOADSTRING];
+			if (lpszBuff) {
+				ZeroMemory(lpszBuff, MAX_LOADSTRING);
+				LoadString(Resource->hLoad(), IDS_SYNTPRUNNING, lpszBuff, MAX_LOADSTRING);
+				_tcsncat_s(lpszToolHints, MAX_LOADSTRING, lpszBuff, _TRUNCATE);
+				TaskTray->bModifyToolHints(hWnd,lpszToolHints);
+				delete []	lpszBuff;
+			}
+			delete []	lpszToolHints;
+		}
+	}
 	return Profile->lpstAppRegData->bSynTPStarted1;
 }
 
 //
 // bStopSynTPHelper()
 //
-BOOL		bStopSynTPHelper()
+BOOL		bStopSynTPHelper(HWND hWnd)
 {
 	if (SynTP) {
 		SynTP->vStopReceiver();
@@ -250,6 +266,7 @@ BOOL		bStopSynTPHelper()
 		if (Profile) {
 			Profile->lpstAppRegData->bSynTPStarted1 = FALSE;
 			Profile->bSetProfileData();
+			if (!Profile->lpstAppRegData->bSynTPStarted1)	TaskTray->bModifyToolHints(hWnd, szTitle);
 			return TRUE;
 		}
 		return TRUE;
@@ -268,8 +285,10 @@ BOOL		bCheckDrawIMEModeArea(HWND hWndObserved)
 	if (GetCursorPos(&pt)) {
 		if (WindowFromPoint(pt) != NULL) {
 			RECT	rc{};
-			if (bGetTaskTrayWindowRect(hMainWnd, &rc) != FALSE) {
-				if (((pt.x >= rc.left) && (pt.x <= rc.right)) || ((pt.y <= rc.top) && (pt.y >= rc.bottom)))	return FALSE;	// Clicked on Notify Icon
+			if (TaskTray) {
+				if (TaskTray->bGetTaskTrayWindowRect(hMainWnd, &rc)) {
+					if (((pt.x >= rc.left) && (pt.x <= rc.right)) || ((pt.y <= rc.top) && (pt.y >= rc.bottom)))	return FALSE;	// Clicked on Notify Icon
+				}
 			}
 		}
 		return TRUE;
@@ -346,13 +365,15 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(Type);
 	UNREFERENCED_PARAMETER(lpSetting);
+	
+	if (!TaskTray)	return TRUE;
 	switch (Type) {
 	case PBT_APMSUSPEND:
 		break;
 	case PBT_APMRESUMEAUTOMATIC:
 		break;
 	case PBT_APMRESUMESUSPEND:
-		bDestroyTaskTrayWindow(hWnd);
+		TaskTray->bDestroyTaskTrayWindow(hWnd);
 		break;
 	case PBT_POWERSETTINGCHANGE:
 		break;
@@ -361,10 +382,10 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 			if (GetSystemPowerStatus(&PowerStatus)) {
 				switch (PowerStatus.ACLineStatus) {
 				case 0:
-					bDestroyTaskTrayWindow(hWnd);
+					TaskTray->bDestroyTaskTrayWindow(hWnd);	
 					break;
 				case 1:
-					bDestroyTaskTrayWindow(hWnd);
+					TaskTray->bDestroyTaskTrayWindow(hWnd);	
 					break;
 				default:
 					break;

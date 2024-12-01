@@ -15,7 +15,6 @@
 #include "FlushMouseLIB.h"
 #include "FlushMouseSub.h"
 #include "Cursor.h"
-#include "TaskTray.h"
 #include "Profile.h"
 #include "Resource.h"
 #include "Eventlog.h"
@@ -44,6 +43,7 @@ CProfile	*Profile = NULL;
 CCursor		*Cursor = NULL;	
 CResource	*Resource = NULL;
 CIME		*Cime = NULL;
+CTaskTray	*TaskTray = NULL;
 CSynTP		*SynTP = NULL;
 
 BOOL		bIMEInConverting = FALSE;
@@ -293,7 +293,6 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 	switch (message) {
 		HANDLE_MSG(hWnd, WM_CREATE, Cls_OnCreate);
 		HANDLE_MSG(hWnd, WM_DESTROY, Cls_OnDestroy);
-		HANDLE_MSG(hWnd, WM_COMMAND, Cls_OnCommand);
 		HANDLE_MSG(hWnd, WM_INPUT, Cls_OnInput);
 
 		HANDLE_MSG(hWnd, WM_SETTINGSEX, Cls_OnSettingsEx);
@@ -302,16 +301,15 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		HANDLE_MSG(hWnd, WM_CHECKIMESTARTCONVEX, Cls_OnCheckIMEStartConvertingEx);
 		HANDLE_MSG(hWnd, WM_CHECKEXISTINGJPIMEEX, Cls_OnCheckExistingJPIMEEx);
 		HANDLE_MSG(hWnd, WM_SYSKEYDOWNUPEX, Cls_OnSysKeyDownUpEx);
-
-		HANDLE_MSG(hWnd, WM_TASKTRAYEX, Cls_OnTaskTrayEx);
 			break;
 
 		default:
-			if (!bCheckTaskTrayMessage(hWnd, message)) {
+			if (TaskTray) {
+				if (TaskTray->iCheckTaskTrayMessage(hWnd, message, wParam, lParam) != 0) {
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
-				vMessageBox(hWnd, IDS_NOTREGISTERTT, MessageBoxTYPE);
-				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-				break;
+					vMessageBox(hWnd, IDS_NOTREGISTERTT, MessageBoxTYPE);
+					PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+				}
 			}
 			break;
 	}
@@ -381,22 +379,30 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		bForExplorerPatcherSWS(GetForegroundWindow(), TRUE, TRUE, NULL, NULL);
 	}
 
-	HICON	hIcon = NULL;
-	if ((hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE))) != NULL) {
-		if (bCreateTaskTrayWindow(hWnd, hIcon, szTitle) == FALSE) {
-			try {
-				vMessageBox(hWnd, IDS_NOTREGISTERTT, MessageBoxTYPE);
+	TaskTray = new CTaskTray(hWnd);
+	if (TaskTray) {
+		HICON	hIcon = NULL;
+		if ((hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE))) != NULL) {
+			BOOL	bRet = FALSE;
+			for (int i = 0; i < 30; i++) {	//Retry 30 times
+				if ((bRet = TaskTray->bCreateTaskTrayWindow(hWnd, hIcon, szTitle)))	break;
+				Sleep(1000);
 			}
-			catch (...) {
+			if (!bRet) {
+				try {
+					vMessageBox(hWnd, IDS_NOTREGISTERTT, MessageBoxTYPE);
+				}
+				catch (...) {
+				}
+				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+				return FALSE;
 			}
+		}
+		else {
+			vMessageBox(hWnd, IDS_NOTREGISTERTT, MessageBoxTYPE);
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			return FALSE;
 		}
-	}
-	else {
-		vMessageBox(hWnd, IDS_NOTREGISTERTT, MessageBoxTYPE);
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-		return FALSE;
 	}
 
 	if (Profile != NULL) {
@@ -478,7 +484,11 @@ void		vDestroyWindow(HWND hWnd)
 		Cime = NULL;
 	}
 	SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
-	if (!bDestroyTaskTrayWindow(hWnd)) {
+	if (TaskTray != NULL) {
+		if (!TaskTray->bDestroyTaskTrayWindow(hWnd)) {
+		}
+		delete TaskTray;
+		TaskTray = NULL;
 	}
 }
 

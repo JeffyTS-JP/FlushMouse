@@ -37,6 +37,7 @@
 #define IDS_NOTPRIVATEADDR              215
 #define IDS_NOTHOSTNAME                 216
 #define IDS_SETTINGDLG_FAIL             217
+#define IDS_SYNTPRUNNING                218
 #define IDC_STOP                        1101
 #define ID_POPUPMENU_ABOUT              30000
 #define ID_POPUPMENU_FLUSHMOUSE         30001

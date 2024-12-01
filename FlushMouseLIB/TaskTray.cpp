@@ -48,20 +48,48 @@ static UINT		uTaskbarCreatedMessage = 0;
 //
 
 //
+// Class CTaskTray
+// 
+CTaskTray::CTaskTray(HWND hWnd)
+{
+	if (!bCreateGUID(&TaskTrayGUID)) {
+		TaskTrayGUID = GUID_NULL;
+		return;
+	}
+
+	if ((uTaskbarCreatedMessage = RegisterWindowMessage(_T("FlushMouseTaskTray-{CA959312-1F82-45E8-AC7B-6F1F6CDD19C4}"))) == 0) {
+		uTaskbarCreatedMessage = 0;
+		return;
+	}
+	CHANGEFILTERSTRUCT	cf{};
+	cf.cbSize = sizeof(CHANGEFILTERSTRUCT);
+	if (!ChangeWindowMessageFilterEx(hWnd, uTaskbarCreatedMessage, MSGFLT_ALLOW, &cf)) {
+		uTaskbarCreatedMessage = 0;
+	}
+}
+
+CTaskTray::~CTaskTray()
+{
+
+}
+
+//
 // bCreateTaskTrayWindow()
 //
-BOOL		bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle)
+BOOL		CTaskTray::bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle) const
 {
+	if ((TaskTrayGUID == GUID_NULL) || (uTaskbarCreatedMessage == 0))	return FALSE;
+	
 	NOTIFYICONDATA   nIco{};
 	nIco.cbSize = sizeof(NOTIFYICONDATA);
 	nIco.hWnd = hWnd;
-	nIco.uID = NOTIFYICONDATA_ID;
-	nIco.guidItem = GUID_NULL;
-	nIco.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
+	nIco.uID = HandleToULong(hWnd);
+	nIco.guidItem = TaskTrayGUID;
 	nIco.uCallbackMessage = WM_TASKTRAYEX;
 	nIco.dwState = NIS_HIDDEN | NIS_SHAREDICON;
 	nIco.dwInfoFlags = NIIF_USER | NIIF_LARGE_ICON | NIIF_NOSOUND;
 	nIco.uVersion = NOTIFYICON_VERSION_4;
+	nIco.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP | NIF_GUID;
 	nIco.hIcon = hIcon;
 	_tcsncpy_s(nIco.szTip, ARRAYSIZE(nIco.szTip), lpszTitle, _TRUNCATE);
 	try {
@@ -73,7 +101,7 @@ BOOL		bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle)
 			if (err == ERROR_TIMEOUT) {
 				Sleep(2000);
 				try {
-					throw Shell_NotifyIcon(NIM_ADD, &nIco);
+					throw Shell_NotifyIcon(NIM_MODIFY, &nIco);
 				}
 				catch (BOOL bRet) {
 					if (!bRet) {
@@ -110,48 +138,30 @@ BOOL		bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle)
 	catch (...) {
 		return FALSE;
 	}
-
-	if ((uTaskbarCreatedMessage = RegisterWindowMessage(_T("TaskbarCreated"))) == 0) {
-		bDestroyTaskTrayWindow(hWnd);
-		return FALSE;
-	}
-	bTaskTray = TRUE;
-	return TRUE;
-}
-
-//
-// bCheckTaskTrayMessage()
-//
-BOOL		bCheckTaskTrayMessage(HWND hWnd, UINT message)
-{
-	if (message == uTaskbarCreatedMessage) {	
-		if (bDestroyTaskTrayWindow(hWnd)) {
-			bTaskTray = FALSE;
-		}
-		if (bReCreateTaskTrayWindow(hWnd)) {
-			return TRUE;
-		}
-		else return FALSE;
-	}
 	return TRUE;
 }
 
 //
 // bReCreateTaskTrayWindow()
 //
-BOOL		bReCreateTaskTrayWindow(HWND hWnd)
+BOOL		CTaskTray::bReCreateTaskTrayWindow(HWND hWnd) const
 {
+	if (bDestroyTaskTrayWindow(hWnd)) {
+	}
 	HICON	hIcon = NULL;
 	if ((hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE))) != NULL) {
-		if (bCreateTaskTrayWindow(hWnd, hIcon, szTitle)) {
-			bTaskTray = TRUE;
+		BOOL	bRet = FALSE;
+		for (int i = 0; i < 3; i++) {	//Retry 3 times
+			if ((bRet = bCreateTaskTrayWindow(hWnd, hIcon, szTitle)))	break;
+			Sleep(1000);
+		}
+		if (bRet) {
 			if (!Cursor->bReloadCursor()) {
 				bReportEvent(MSG_THREAD_HOOK_TIMER_RESTART_FAILED, APPLICATION_CATEGORY);
 			}
 		}
 		else {
-			if (bDestroyTaskTrayWindow(hWnd)) {
-				bTaskTray = FALSE;
+			if (!bDestroyTaskTrayWindow(hWnd)) {
 			}
 			bReportEvent(MSG_TASKTRAY_REGISTER_FAILD, APPLICATION_CATEGORY);
 			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
@@ -166,81 +176,88 @@ BOOL		bReCreateTaskTrayWindow(HWND hWnd)
 //
 // bDestroyTaskTrayWindow()
 // 
-BOOL		bDestroyTaskTrayWindow(HWND hWnd)
+BOOL		CTaskTray::bDestroyTaskTrayWindow(HWND hWnd) const
 {
-	if (bTaskTray != FALSE) {
-		NOTIFYICONDATA nIco{};
-		nIco.cbSize = sizeof(NOTIFYICONDATA);
-		nIco.hWnd = hWnd;
-		nIco.uID = NOTIFYICONDATA_ID;
-		nIco.guidItem = GUID_NULL;
-		nIco.uFlags = 0;
-		try {
-			throw Shell_NotifyIcon(NIM_DELETE, &nIco);
+	NOTIFYICONDATA nIco{};
+	nIco.cbSize = sizeof(NOTIFYICONDATA);
+	nIco.hWnd = hWnd;
+	nIco.uID = HandleToULong(hWnd);
+	nIco.guidItem = TaskTrayGUID;
+	nIco.uFlags = NIF_GUID;
+	try {
+		throw Shell_NotifyIcon(NIM_DELETE, &nIco);
+	}
+	catch (BOOL bRet) {
+		if (bRet) {
+			return TRUE;
 		}
-		catch (BOOL bRet) {
-			if (bRet) {
-				bTaskTray = FALSE;
-				return TRUE;
-			}
-			else {
-				return FALSE;
-			}
-		}
-		catch (...) {
+		else {
 			return FALSE;
 		}
 	}
-	bTaskTray = FALSE;
-	return TRUE;
+	catch (...) {
+		return FALSE;
+	}
 }
 
 //
 // bGetTaskTrayWindowRect()
 // 
-BOOL		bGetTaskTrayWindowRect(HWND hWnd, LPRECT lpRect)
+BOOL		CTaskTray::bGetTaskTrayWindowRect(HWND hWnd, LPRECT lpRect) const
 {
-	if (bTaskTray != FALSE) {
-		NOTIFYICONIDENTIFIER	nii{};
-		nii.cbSize = sizeof(NOTIFYICONIDENTIFIER);
-		nii.hWnd = hWnd;
-		nii.uID = NOTIFYICONDATA_ID;
-		nii.guidItem = GUID_NULL;
-#ifdef _DEBUG
-		HRESULT	hResult = E_FAIL;
-		if ((hResult = Shell_NotifyIconGetRect(&nii, lpRect)) != S_OK) {
+	NOTIFYICONIDENTIFIER	nii{};
+	nii.cbSize = sizeof(NOTIFYICONIDENTIFIER);
+	nii.hWnd = hWnd;
+	nii.uID = HandleToULong(hWnd);
+	nii.guidItem = TaskTrayGUID;
+	try {
+		throw Shell_NotifyIconGetRect(&nii, lpRect);
+	}
+	catch (HRESULT	hResult) {
+		if (hResult != S_OK) {
 			return FALSE;
 		}
 		return TRUE;
 	}
-#else
-		try {
-			throw Shell_NotifyIconGetRect(&nii, lpRect);
-		}
-		catch (HRESULT	hResult) {
-			if (hResult != S_OK) {
-				return FALSE;
+	catch (...) {
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+		return FALSE;
+	}
+}
+
+//
+// iCheckTaskTrayMessage()
+//
+int		CTaskTray::iCheckTaskTrayMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message) {
+		HANDLE_MSG(hWnd, WM_COMMAND, Cls_OnCommand);
+		HANDLE_MSG(hWnd, WM_TASKTRAYEX, Cls_OnTaskTrayEx);
+
+	default:
+		if (message == uTaskbarCreatedMessage) {	
+			if (bDestroyTaskTrayWindow(hWnd)) {
+				//bTaskTray = FALSE;
+				if (bReCreateTaskTrayWindow(hWnd)) {
+					return 0;
+				}
+				else return 1;
 			}
-			return TRUE;
-		}
-		catch (...) {
-			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-			return FALSE;
 		}
 	}
-#endif // _DEBUG
-	return FALSE;
+	return 0;
 }
 
 //
 // WM_COMMAND
 // Cls_OnCommand()
 //
-void		Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
+void		CTaskTray::Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 {
 	UNREFERENCED_PARAMETER(hWndCtl);
 	UNREFERENCED_PARAMETER(codeNotify);
-	if (Cursor)	Cursor->vStopDrawIMEModeMouseByWndThread();
+	if (!Profile || !Cursor)	return;
+	Cursor->vStopDrawIMEModeMouseByWndThread();
 	switch (id) {
 	case IDR_TT_MENU:
 		break;
@@ -282,22 +299,22 @@ void		Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 // WM_TASKTRAYEX
 // Cls_OnTaskTrayEx()
 //
-void		Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg)
+void		CTaskTray::Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg)
 {
-	if (id != NOTIFYICONDATA_ID) {
+	if (id != HandleToULong(hWnd)) {
 		return;
 	}
-	if (!Profile)	return;
+	if (!Profile || !Cime || !Resource)	return;
 	switch (uMsg) {
 	case WM_LBUTTONDOWN:
 		if (Profile->lpstAppRegData->bOffChangedFocus) {
 			Cime->vIMEOpenCloseForced(hWnd, IMECLOSE);
 		}
-		[[fallthrough]];	
+		[[fallthrough]];
 	case WM_RBUTTONDOWN:
 		POINT pt{};
 		GetCursorPos(&pt);
-		HMENU hMenu = LoadMenu(Resource->hLoad(), MAKEINTRESOURCE(IDR_TT_MENU));
+		HMENU hMenu = LoadMenu(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TT_MENU));
 		HMENU hSubMenu = GetSubMenu(hMenu, 0);
 		SetForegroundWindow(hWnd);
 		APPBARDATA stAppBarData{};
@@ -306,24 +323,25 @@ void		Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg)
 		SHAppBarMessage(ABM_GETTASKBARPOS, &stAppBarData);
 		UINT	uFlags = 0;
 		switch (stAppBarData.uEdge) {
-			case ABE_TOP:
-				uFlags = TPM_RIGHTALIGN | TPM_TOPALIGN;
-				if (pt.y < stAppBarData.rc.bottom)	pt.y = stAppBarData.rc.bottom;
-				break;
-			case ABE_BOTTOM:
-				uFlags = TPM_RIGHTALIGN | TPM_BOTTOMALIGN;
-				if (pt.y > stAppBarData.rc.top)	pt.y = stAppBarData.rc.top;
-				break;
-			case ABE_LEFT:
-				uFlags = TPM_LEFTALIGN | TPM_BOTTOMALIGN;
-				if (pt.x < stAppBarData.rc.right)	pt.x = stAppBarData.rc.right;
-				break;
-			case ABE_RIGHT:
-				uFlags = TPM_RIGHTALIGN | TPM_BOTTOMALIGN;
-				if (pt.x > stAppBarData.rc.left)		pt.x = stAppBarData.rc.left;
-				break;
+		case ABE_TOP:
+			uFlags = TPM_RIGHTALIGN | TPM_TOPALIGN;
+			if (pt.y < stAppBarData.rc.bottom)	pt.y = stAppBarData.rc.bottom;
+			break;
+		case ABE_BOTTOM:
+			uFlags = TPM_RIGHTALIGN | TPM_BOTTOMALIGN;
+			if (pt.y > stAppBarData.rc.top)	pt.y = stAppBarData.rc.top;
+			break;
+		case ABE_LEFT:
+			uFlags = TPM_LEFTALIGN | TPM_BOTTOMALIGN;
+			if (pt.x < stAppBarData.rc.right)	pt.x = stAppBarData.rc.right;
+			break;
+		case ABE_RIGHT:
+			uFlags = TPM_RIGHTALIGN | TPM_BOTTOMALIGN;
+			if (pt.x > stAppBarData.rc.left)		pt.x = stAppBarData.rc.left;
+			break;
 		}
 		TrackPopupMenu(hSubMenu, uFlags, pt.x, pt.y, 0, hWnd, NULL);
+		PostMessage(hWnd, WM_NULL, 0, 0);
 		break;
 	}
 	return;
@@ -332,7 +350,7 @@ void		Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg)
 //
 // bDisplayBalloon()
 //
-BOOL		bDisplayBalloon(HWND hWnd, DWORD dwInfoFlags, LPCTSTR szInfoTitle, LPCTSTR szInfo)
+BOOL		CTaskTray::bDisplayBalloon(HWND hWnd, DWORD dwInfoFlags, LPCTSTR szInfoTitle, LPCTSTR szInfo)
 {
 	std::future<BOOL> _future;
 	std::promise<BOOL> _promise;
@@ -342,13 +360,13 @@ BOOL		bDisplayBalloon(HWND hWnd, DWORD dwInfoFlags, LPCTSTR szInfoTitle, LPCTSTR
 			NOTIFYICONDATA	nIco{};
 			nIco.cbSize = sizeof(NOTIFYICONDATA);
 			nIco.hWnd = hWnd;
-			nIco.uID = NOTIFYICONDATA_ID;
-			nIco.guidItem = GUID_NULL;
+			nIco.uID = HandleToULong(hWnd);
+			nIco.guidItem = TaskTrayGUID;
 			nIco.dwState = NIS_HIDDEN | NIS_SHAREDICON;
 			nIco.dwInfoFlags = dwInfoFlags;
 			nIco.hIcon = NULL;
 			nIco.uVersion = NOTIFYICON_VERSION_4;
-			nIco.uFlags = NIF_INFO;
+			nIco.uFlags = NIF_INFO | NIF_GUID;
 
 			if (szInfoTitle)	_tcsncpy_s(nIco.szInfoTitle, ARRAYSIZE(nIco.szInfoTitle), szInfoTitle, _TRUNCATE);
 			if (szInfo)			_tcsncpy_s(nIco.szInfo, ARRAYSIZE(nIco.szInfo), szInfo, _TRUNCATE);
@@ -376,6 +394,56 @@ BOOL		bDisplayBalloon(HWND hWnd, DWORD dwInfoFlags, LPCTSTR szInfoTitle, LPCTSTR
 	catch (...) {
 	}
 	return FALSE;
+}
+
+//
+// bModifyToolHints()
+//
+BOOL		CTaskTray::bModifyToolHints(HWND hWnd, LPCTSTR lpszToolHints) const
+{
+	NOTIFYICONDATA	nIco{};
+	nIco.cbSize = sizeof(NOTIFYICONDATA);
+	nIco.hWnd = hWnd;
+	nIco.uID = HandleToULong(hWnd);
+	nIco.guidItem = TaskTrayGUID;
+	nIco.dwState = NIS_HIDDEN | NIS_SHAREDICON;
+	nIco.hIcon = NULL;
+	nIco.uVersion = NOTIFYICON_VERSION_4;
+	nIco.uFlags = NIF_TIP | NIF_GUID;
+
+	if (lpszToolHints)	_tcsncpy_s(nIco.szTip, ARRAYSIZE(nIco.szTip), lpszToolHints, _TRUNCATE);
+
+	for (int i = 0; i < 10; i++) {
+		try {
+			throw Shell_NotifyIcon(NIM_MODIFY, &nIco);
+		}
+		catch (BOOL bRet) {
+			if (bRet) {
+				return TRUE;
+			}
+			else {
+			}
+		}
+		catch (...) {
+		}
+		Sleep(1000);
+	}
+	return FALSE;
+}
+
+//
+// bCreateGUID()
+//
+BOOL		CTaskTray::bCreateGUID(LPGUID lpGUID)
+{
+	BOOL	bRet = FALSE;
+	if(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED) == S_OK){
+		if (CoCreateGuid(lpGUID) == S_OK) {
+			if (*lpGUID != GUID_NULL)	bRet = TRUE;
+		}
+		CoUninitialize();
+	}  
+	return bRet;
 }
 
 

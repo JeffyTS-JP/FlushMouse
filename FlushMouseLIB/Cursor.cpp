@@ -28,17 +28,16 @@
 //
 // Define
 //
-// IME Cursor Change Thread
-#define IMECURSORCHANGETHREADID		1
+constexpr auto IMECURSORCHANGETHREADID = 1;
 #define IMECURSORCHANGETHREADNAME	_T("IMECursorChangeThread")
-// Draw IME Mode near by Mouse cursor Thread
-#define	DRAWIMEMODETHREADID			2
+
+constexpr auto DRAWIMEMODETHREADID = 2;
 #define	DRAWIMEMODETHREADNAME		_T("DrawIMEModeThread")
-// Draw IME Mode near by Caret cursor Thread
-#define	DRAWIMEMODECARETTHREADID	3
+
+constexpr auto DRAWIMEMODECARETTHREADID = 3;
 #define	DRAWIMEMODECARETTHREADNAME	_T("DrawIMEModeCaretThread")
-// Draw IME Mode near by Mouse cursor right down Thread
-#define	DRAWIMEMODEMOUSETHREADID	4
+
+constexpr auto DRAWIMEMODEMOUSETHREADID = 4;
 #define	DRAWIMEMODEMOUSETHREADNAME	_T("DrawIMEModeMouseThread")
 
 //

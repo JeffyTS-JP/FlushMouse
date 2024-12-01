@@ -49,7 +49,7 @@
 					<ColumnDefinition Width="*"/>
 					<ColumnDefinition Width="*"/>
 				</Grid.ColumnDefinitions>
-				<TextBlock Margin="0,0,0,0" Grid.Column="0" Text="Copyright © 2022 -" FontSize="14"/>
+				<TextBlock Margin="0,0,0,0" Grid.Column="0" Text="Copyright © 1993 -" FontSize="14"/>
 				<TextBlock Margin="5,0,0,0" Grid.Column="1" x:Name="Copyright" Loaded="Copyright_Loaded" Text="" FontSize="14"/>
 				<TextBlock Margin="10,0,0,0" Grid.Column="2" Text="JeffyTS." FontSize="14"/>
 			</Grid>

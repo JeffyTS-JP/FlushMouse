@@ -14,6 +14,7 @@
 #include "Cursor.h"
 #include "FlushMouseSub.h"
 #include "CResource.h"
+#include "TaskTray.h"
 #include "SynTP.h"
 
 //
@@ -52,6 +53,7 @@ extern CProfile		*Profile;
 extern CCursor		*Cursor;
 extern CResource	*Resource;
 extern CIME			*Cime;
+extern CTaskTray	*TaskTray;
 extern CSynTP		*SynTP;
 
 extern BOOL			bIMEInConverting;
