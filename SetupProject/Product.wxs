@@ -468,26 +468,14 @@
 			<Component Id="$(var.MainExeFileName)" Guid="{25BEEEA7-583D-4C15-9566-FFA42716A1C9}">
 				<File Id="$(var.MainExeFileName)" Name="$(var.MainExeFileName)" Source="$(var.TargetDir01)$(var.MainExeFileName)" />
 			</Component>
-			<Component Id="$(var.ProductName).pdb" Guid="{11E774D2-7F89-4883-9B5F-83B6E47D4443}">
-				<File Id="$(var.ProductName).pdb" Name="$(var.ProductName).pdb" Source="$(var.TargetDir01)$(var.ProductName).pdb" />
-			</Component>
 			<Component Id="$(var.ProductName)DLL.dll" Guid="{3C81EF6B-D231-4739-8361-496FE5BE93D3}">
 				<File Id="$(var.ProductName)DLL.dll" Name="$(var.ProductName)DLL.dll" Source="$(var.TargetDir01)$(var.ProductName)DLL.dll" />
-			</Component>
-			<Component Id="$(var.ProductName)DLL.pdb" Guid="{0C46B93A-7F44-4C7E-B0E4-D6589EDA5660}">
-				<File Id="$(var.ProductName)DLL.pdb" Name="$(var.ProductName)DLL.pdb" Source="$(var.TargetDir01)$(var.ProductName)DLL.pdb" />
 			</Component>
 			<Component Id="$(var.ProductName)32.exe" Guid="{CB3543F9-1CA7-4773-9105-CB1BD98F49FD}">
 				<File Id="$(var.ProductName)32.exe" Name="$(var.ProductName)32.exe" Source="$(var.TargetDir02)$(var.ProductName)32.exe" />
 			</Component>
-			<Component Id="$(var.ProductName)32.pdb" Guid="{2160C49D-BB23-45AB-9CC5-8622CC71EA11}">
-				<File Id="$(var.ProductName)32.pdb" Name="$(var.ProductName)32.pdb" Source="$(var.TargetDir02)$(var.ProductName)32.pdb" />
-			</Component>
 			<Component Id="$(var.ProductName)DLL32.dll" Guid="{CCBA3647-0988-463A-89E4-0BFD5EA13DA0}">
 				<File Id="$(var.ProductName)DLL32.dll" Name="$(var.ProductName)DLL32.dll" Source="$(var.TargetDir02)$(var.ProductName)DLL32.dll" />
-			</Component>
-			<Component Id="$(var.ProductName)DLL32.pdb" Guid="{B77F426B-9E02-46FA-9678-ECB222278CD9}">
-				<File Id="$(var.ProductName)DLL32.pdb" Name="$(var.ProductName)DLL32.pdb" Source="$(var.TargetDir02)$(var.ProductName)DLL32.pdb" />
 			</Component>
 			<Component Id="Register_TaskScheduler.xml" Guid="{3FA0C6AB-6E9C-4B55-BE44-A02A3B6A0C3E}">
 				<File Id="Register_TaskScheduler.xml" Name="Register_TaskScheduler.xml" Source="$(var.TargetDir04)Register_TaskScheduler.xml" />
@@ -538,9 +526,6 @@
 			<Component Id="FlushMouseSettings_03" Guid="{96F45754-9156-4E4B-A148-EC0CAE1FB877}">
 				<File Id="FlushMouseSettings_03" Name="$(var.FlushMouseSettings).pri" Source="$(var.TargetDir05)$(var.FlushMouseSettings).pri" />
 			</Component>
-			<Component Id="FlushMouseSettings_04" Guid="{1D422D98-FF1F-40B9-9DB3-6682E42B2303}">
-				<File Id="FlushMouseSettings_04" Name="$(var.FlushMouseSettings).pdb" Source="$(var.TargetDir05)$(var.FlushMouseSettings).pdb" />
-			</Component>
 			<Component Id="FlushMouseSettings_05" Guid="{9214B8C1-A36E-4D5C-BF11-6334CE712691}">
 				<File Id="FlushMouseSettings_05" Name="$(var.FlushMouseSettings).xbf" Source="$(var.TargetDir05)$(var.FlushMouseSettings).xbf" />
 			</Component>
@@ -549,9 +534,6 @@
 			<!-- DLL -->
 			<Component Id="WinUI3_DLL_01" Guid="{9F85333C-F9D6-4166-8DF3-F1E001DFB240}">
 				<File Id="WinUI3__DLL_01" Name="FlushMouseUI3DLL.dll" Source="$(var.TargetDir05)FlushMouseUI3DLL.dll" />
-			</Component>
-			<Component Id="WinUI3_DLL_02" Guid="{59BD4C6B-226C-426E-8D91-0123921ACCEB}">
-				<File Id="WinUI3__DLL_02" Name="FlushMouseUI3DLL.pdb" Source="$(var.TargetDir05)FlushMouseUI3DLL.pdb" />
 			</Component>
 			<!-- Icon -->
 			<Component Id="WinUI3_Icon_01" Guid="{592E3E6A-D526-4FBB-AB23-2E259DB76A05}">

@@ -23,8 +23,7 @@
 	Closed="Window_Closed"
 	>
 
-	<Grid  x:Name="settingsMain" MinWidth="200" MinHeight="100" FocusVisualPrimaryBrush="{x:Null}" Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}">
-		<Rectangle Fill="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}" />
+	<Grid  x:Name="settingsMain" MinWidth="200" MinHeight="100" >
 		<Grid VerticalAlignment="Top">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="40"/>
@@ -39,12 +38,11 @@
 			</Grid>
 			<Grid Grid.Row="1">
 				<NavigationView x:Name="navigationView" 
-							Loading="navigationView_Loading" PaneDisplayMode="Left" 
+							Loading="navigationView_Loading" PaneDisplayMode="Left" Height="910"
 							IsSettingsVisible="False" IsBackButtonVisible="Collapsed" IsPaneOpen="True" 
 							PaneClosing="navigationView_PaneClosing" PaneClosed="navigationView_PaneClosed"
 							PaneOpening="navigationView_PaneOpening" PaneOpened="navigationView_PaneOpened"
 							BackRequested="navigationView_BackRequested" SelectionChanged="navigationView_SelectionChanged"
-							Height="910" Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}"
 							OpenPaneLength="{Binding Value, Mode=TwoWay}" CompactPaneLength="{Binding Value, Mode=TwoWay}">
 					<NavigationView.PaneHeader>
 						<Border x:Name="PanelHeader" Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}"/>
@@ -72,10 +70,10 @@
 						</NavigationViewItem>
 					</NavigationView.MenuItems>
 					<NavigationView.Header>
-						<Border x:Name="Header" Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}"/>
+						<Border x:Name="Header" />
 					</NavigationView.Header>
 					<NavigationView.Resources>
-						<SolidColorBrush x:Key="NavigationViewContentBackground" Color="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}" />
+						<SolidColorBrush x:Key="NavigationViewContentBackground" />
 					</NavigationView.Resources>
 					<ScrollViewer x:Name="scrollViewer"
 						ZoomMode="Disabled" IsTabStop="True"
@@ -83,8 +81,7 @@
 						VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Auto">
 						<Frame x:Name="contentFrame" Margin="0,0,40,40"
 								Loaded="contentFrame_Loaded"
-								HorizontalAlignment="Left" VerticalAlignment="Top"
-								Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush	}">
+								HorizontalAlignment="Left" VerticalAlignment="Top">
 						</Frame>
 					</ScrollViewer>
 				</NavigationView>

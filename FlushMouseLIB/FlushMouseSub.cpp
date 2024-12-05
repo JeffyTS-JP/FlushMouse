@@ -407,7 +407,7 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 }
 
 //
-// class CFocusEvent
+// class CEventHook
 //
 //
 CEventHook::CEventHook()

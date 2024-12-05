@@ -40,14 +40,10 @@
 // 
 CIME::CIME()
 {
-	lpstVirtualDesktop = new VIRTUALDESKTOP[sizeof(VIRTUALDESKTOP)];
-	if (lpstVirtualDesktop != NULL) {
-	}
 }
+
 CIME::~CIME()
 {
-	if (lpstVirtualDesktop != NULL)	delete[]	lpstVirtualDesktop;
-	lpstVirtualDesktop = NULL;
 }
 
 //
@@ -205,76 +201,6 @@ BOOL CALLBACK CIME::bEnumChildProcActivateIME(HWND hWnd, LPARAM lParam)
 		}
 	}
 	return TRUE;
-}
-
-
-//
-// bGetVirtualDesktopSize()
-//
-BOOL			CIME::bGetVirtualDesktopSize() const
-{
-	BOOL		bRet = FALSE;
-	if (lpstVirtualDesktop != NULL) {
-		ZeroMemory(lpstVirtualDesktop, sizeof(VIRTUALDESKTOP));
-		if (EnumDisplayMonitors(NULL, NULL, (MONITORENUMPROC)&bGetVirtualDesktopSizeEnumProc, (LPARAM)lpstVirtualDesktop) != 0) {
-			bRet = TRUE;
-		}
-		else {
-			_Post_equals_last_error_ DWORD	err = GetLastError();
-			if ((err == ERROR_INVALID_PARAMETER) || (err == ERROR_SUCCESS)) {
-				bRet = TRUE;
-			}
-			else if (err == ERROR_ACCESS_DENIED) {
-				// error but be able to On Sleep
-				bRet = TRUE;
-			}
-		}
-	}
-	return bRet;
-}
-
-//
-// bGetVirtualDesktopSizeEnumProc()
-//
-BOOL		CIME::bGetVirtualDesktopSizeEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam)
-{
-	UNREFERENCED_PARAMETER(hDC);
-	UNREFERENCED_PARAMETER(lprcClip);
-	LPVIRTUALDESKTOP	lpstVirtualDesktop = (LPVIRTUALDESKTOP)lParam;
-	//CIME* This = reinterpret_cast<CIME*>(lParam);
-	MONITORINFO	stMonInfo{};	stMonInfo.cbSize = sizeof(MONITORINFO);
-	if (GetMonitorInfo(hMonitor, &stMonInfo) != 0) {
-		if (stMonInfo.rcMonitor.left <= lpstVirtualDesktop->rcMonitorSize.left)		lpstVirtualDesktop->rcMonitorSize.left = stMonInfo.rcMonitor.left;
-		if (stMonInfo.rcMonitor.right >= lpstVirtualDesktop->rcMonitorSize.right)	lpstVirtualDesktop->rcMonitorSize.right = stMonInfo.rcMonitor.right;
-		if (stMonInfo.rcMonitor.top <= lpstVirtualDesktop->rcMonitorSize.top)		lpstVirtualDesktop->rcMonitorSize.top = stMonInfo.rcMonitor.top;
-		if (stMonInfo.rcMonitor.bottom >= lpstVirtualDesktop->rcMonitorSize.bottom)	lpstVirtualDesktop->rcMonitorSize.bottom = stMonInfo.rcMonitor.bottom;
-		++lpstVirtualDesktop->iNumOfMonitors;
-		return TRUE;
-	}
-	return FALSE;
-}
-
-//
-// bIsNewIME()
-// 
-//
-BOOL		CIME::bIsNewIME()
-{
-#define SUBKEY	_T("Software\\Microsoft\\input\\tsf\\tsf3override\\{03b5835f-f03c-411b-9ce2-aa23e1171e36}")
-#define VALUE	_T("NoTsf3Override2")
-	CRegistry* CReg = new CRegistry;
-	if (CReg) {
-		DWORD	dwCTF = 0;
-		if (!CReg->bReadSystemRegValueDWORD(HKEY_CURRENT_USER, SUBKEY, VALUE, &dwCTF)) {
-			dwCTF = 0;
-		}
-		delete	CReg;
-		if (dwCTF != 0)	return FALSE;
-		else			return TRUE;
-	}
-	return FALSE;
-#undef SUBKEY
-#undef VALUE
 }
 
 //

@@ -633,16 +633,13 @@ BOOL		CCursor::bIMEModeMouseByWndThreadRoutine(LPVOID lpvParam)
 		This->uuMouseWindowTick = GetTickCount64();
 		if (lpstCursorData->bDisplayIMEModeOnCursor) {
 			CURSORINFO	CursorInfoCurrent{CursorInfoCurrent.cbSize = sizeof(CURSORINFO)};
-			if (!GetCursorInfo(&CursorInfoCurrent) || ((pt.x == CursorInfo.ptScreenPos.x) && (pt.y == CursorInfo.ptScreenPos.y) && (CursorInfo.flags != CURSOR_SHOWING))) {
-				Sleep(100);
+			if (!GetCursorInfo(&CursorInfoCurrent))	goto Cleanup;
+			if (((pt.x == CursorInfo.ptScreenPos.x) && (pt.y == CursorInfo.ptScreenPos.y)) && (CursorInfo.flags != CURSOR_SHOWING)) {
+				Sleep(500);
 				continue;
 			}
 			pt.x = CursorInfoCurrent.ptScreenPos.x;	pt.y = CursorInfoCurrent.ptScreenPos.y;
 			dwIMEModeMouse = Cime->dwIMEMode(lpstCursorData->hWndObserved, lpstCursorData->bForceHiragana);
-			if ((dwIMEModeMouse == IMEOFF) || (dwIMEModeMouse == IMEHIDE)) {
-				if (lpstCursorData->bDisplayIMEModeIMEOFF)	dwIMEModeMouse = IMEOFF;
-				else dwIMEModeMouse = IMEHIDE;
-			}
 			bIsBusyCursor = FALSE;
 			if ((CursorInfoCurrent.hCursor == This->hCursorWait) || (CursorInfoCurrent.hCursor == This->hCursorAppStarting)) {
 				bIsBusyCursor = TRUE;
@@ -653,34 +650,43 @@ BOOL		CCursor::bIMEModeMouseByWndThreadRoutine(LPVOID lpvParam)
 				|| (CursorInfoCurrent.hCursor == This->hCursorSizeAll))) {
 				dwIMEModeMouse = IMEHIDE;
 			}
+			else if ((dwIMEModeMouse == IMEOFF) || (dwIMEModeMouse == IMEHIDE)) {
+				if (lpstCursorData->bDisplayIMEModeIMEOFF)	dwIMEModeMouse = IMEOFF;
+				else dwIMEModeMouse = IMEHIDE;
+			}
 			iMouse = This->iGetCursorID(dwIMEModeMouse, lpstCursorData->lpstNearDrawMouseByWndCursor);
-			pt.x = pt.x + lpstCursorData->iModeByWndSize + lpstCursorData->iIMEModeDistance;
-			pt.y = pt.y + lpstCursorData->iModeByWndSize + lpstCursorData->iIMEModeDistance;
-			rcMouse.left = pt.x;	rcMouse.top = pt.y;
-			rcMouse.right = pt.x + lpstCursorData->iModeByWndSize;
-			rcMouse.bottom = pt.y + lpstCursorData->iModeByWndSize;
-			if (!This->bAdjustModeSizeByMonitorDPIAsync(lpstCursorData->iModeByWndSize, lpstCursorData->iModeByWndSize, &rcMouse))	break;
-			if (!This->bAdjustModeSizeByMonitorDPI(lpstCursorData->iModeByWndSize, lpstCursorData->iModeByWndSize, &rcMouse))	goto Cleanup;
-			iMouseSizeX = rcMouse.right - rcMouse.left; iMouseSizeY = rcMouse.bottom - rcMouse.top;
-			rcMouse.left = rcMouse.left + iMouseSizeX / 2;	rcMouse.right = rcMouse.right + iMouseSizeX;
-			rcMouse.top = rcMouse.top - iMouseSizeY / 2;	rcMouse.bottom = rcMouse.bottom  + iMouseSizeY;
-			vAdjustFontXPosition(dwIMEModeMouse, lpstCursorData->lpstNearDrawCaretCursor[iMouse].szMode, &iMouseSizeX, &rcMouse);
 			This->bIsIMECursorChanged(lpstCursorData);
 			if ((lpstCursorData->dwIMEModeCursor == IMEOFF) || (lpstCursorData->dwIMEModeCursor == IMEHIDE)) {
 				if (lpstCursorData->bDisplayIMEModeIMEOFF)	lpstCursorData->dwIMEModeCursor = IMEOFF;
 				else lpstCursorData->dwIMEModeCursor = IMEHIDE;
 			}
-			if (lpstCursorData->dwDisplayIMEModeMethod == DisplayIMEModeMethod_RESOURCE) {
+			if (((CursorInfoCurrent.hCursor == This->hCursorArrow) || (CursorInfoCurrent.hCursor == This->hCursorIBeam)
+					|| (CursorInfoCurrent.hCursor == This->hCursorHand))
+					&& (lpstCursorData->dwDisplayIMEModeMethod == DisplayIMEModeMethod_RES_AND_Window)) {
+				if (!This->MouseWindow->bSetWindowPos(HWND_NOTOPMOST, 0, 0, 0, 0, (SWP_DEFERERASE | SWP_HIDEWINDOW | SWP_NOACTIVATE)))	goto Cleanup;
 				if (!This->bChangeFlushMouseCursor(lpstCursorData->dwIMEModeCursor, lpstCursorData))	goto Cleanup;
+				Sleep(100);
 				break;
 			}
 			else {
-				if ((CursorInfoCurrent.hCursor ==This->hCursorArrow) || (CursorInfoCurrent.hCursor == This->hCursorIBeam) || (CursorInfoCurrent.hCursor == This->hCursorHand)) {
+				pt.x = pt.x + lpstCursorData->iModeByWndSize + lpstCursorData->iIMEModeDistance;
+				pt.y = pt.y + lpstCursorData->iModeByWndSize + lpstCursorData->iIMEModeDistance;
+				rcMouse.left = pt.x;	rcMouse.top = pt.y;
+				rcMouse.right = pt.x + lpstCursorData->iModeByWndSize;
+				rcMouse.bottom = pt.y + lpstCursorData->iModeByWndSize;
+				if (!This->bAdjustModeSizeByMonitorDPIAsync(lpstCursorData->iModeByWndSize, lpstCursorData->iModeByWndSize, &rcMouse))	break;
+				if (!This->bAdjustModeSizeByMonitorDPI(lpstCursorData->iModeByWndSize, lpstCursorData->iModeByWndSize, &rcMouse))	goto Cleanup;
+				iMouseSizeX = rcMouse.right - rcMouse.left; iMouseSizeY = rcMouse.bottom - rcMouse.top;
+				rcMouse.left = rcMouse.left + iMouseSizeX / 2;	rcMouse.right = rcMouse.right + iMouseSizeX;
+				rcMouse.top = rcMouse.top - iMouseSizeY / 2;	rcMouse.bottom = rcMouse.bottom  + iMouseSizeY;
+				vAdjustFontXPosition(dwIMEModeMouse, lpstCursorData->lpstNearDrawCaretCursor[iMouse].szMode, &iMouseSizeX, &rcMouse);
+				if ((CursorInfoCurrent.hCursor == This->hCursorArrow) || (CursorInfoCurrent.hCursor == This->hCursorIBeam) || (CursorInfoCurrent.hCursor == This->hCursorHand)) {
 					if (lpstCursorData->dwIMEModeCursor != IMEHIDE) {
 						This->MouseWindow->vSetModeStringColorFont(lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEHIDE].szMode, lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEHIDE].dwColor, lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEHIDE].szFont);
 						if (!This->MouseWindow->bSetWindowPos(HWND_NOTOPMOST, 0, 0, 0, 0, (SWP_DEFERERASE | SWP_HIDEWINDOW | SWP_NOACTIVATE)))	goto Cleanup;
 					}
 					if (!This->bChangeFlushMouseCursor(lpstCursorData->dwIMEModeCursor, lpstCursorData))	goto Cleanup;
+					Sleep(100);
 					break;
 				}
 				if (GetKeyState(VK_CAPITAL) & 0x0001) bCapsLock = TRUE;	else bCapsLock = FALSE;
@@ -698,6 +704,7 @@ BOOL		CCursor::bIMEModeMouseByWndThreadRoutine(LPVOID lpvParam)
 		if (bIsBusyCursor)	Sleep(200);
 		else Sleep(10);
 	} while(lpstCursorData->bIMEModeByWindowThreadSentinel);
+	lpstCursorData->bIMEModeByWindowThreadSentinel = FALSE;
 	return TRUE;
 Cleanup:
 	This->bReloadCursor();

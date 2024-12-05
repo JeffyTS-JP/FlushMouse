@@ -30,6 +30,7 @@ namespace FlushMouseUI3DLL {
 
 		public About()
 		{
+			m_Sentinel = false;
 			InitializeComponent();
 		}
 

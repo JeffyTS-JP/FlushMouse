@@ -30,11 +30,6 @@
 //
 // Struct Define
 //
-typedef struct tagVirtualDesktop
-{
-	RECT	rcMonitorSize;
-	int		iNumOfMonitors;
-} VIRTUALDESKTOP, * PVIRTUALDESKTOP, * LPVIRTUALDESKTOP;
 
 //
 // Class CIME
@@ -51,20 +46,15 @@ public:
 	VOID		vIMEConvertModeChangeForced(HWND hWndObserved, DWORD dwConvertMode);
 	DWORD		dwIMEMode(HWND hWndObserved, BOOL bForceHiragana);
 	VOID		vActivateIME(HWND hWndObserved);
-	BOOL		bGetVirtualDesktopSize() const;
-	BOOL		bIsNewIME();
 	DWORD		dwGetInputLocale();
 	HKL			hklGetInputLocale(HWND hWndObserved);
 
 private:
-	static BOOL bGetVirtualDesktopSizeEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam);
-
 	static BOOL CALLBACK bEnumChildProcIMEOpenClose(HWND hWnd, LPARAM lParam);
 	static BOOL CALLBACK bEnumChildProcIMEConvertMode(HWND hWnd, LPARAM lParam);
 	static BOOL CALLBACK bEnumChildProcActivateIME(HWND hWnd, LPARAM lParam);
 
 private:
-	LPVIRTUALDESKTOP	lpstVirtualDesktop;
 };
 
 

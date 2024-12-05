@@ -40,14 +40,13 @@ public:
 	BOOL		bModifyToolHints(HWND hWnd, LPCTSTR lpszToolHints) const;
 
 private:
-	BOOL		bCreateGUID(LPGUID lpGUID);
 	void		Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify);
 	void		Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg);
 
 public:
 
 private:
-	GUID		TaskTrayGUID;  
+	UINT		uTaskTrayID;
 	UINT		uTaskbarCreatedMessage;
 };
 

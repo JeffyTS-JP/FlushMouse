@@ -512,15 +512,12 @@ void Cls_OnLButtonDownEx(HWND hWnd, int x, int y, HWND hForeground)
 	UNREFERENCED_PARAMETER(y);
 	UNREFERENCED_PARAMETER(hForeground);
 	if (!Profile)	return;
-	TCHAR	szBuffer[_MAX_PATH]{};
-	if (GetClassName(hForeground, szBuffer, _MAX_PATH) != 0) {
-		if (bCheckExistingJPIME() && (Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
-			if (Profile->lpstAppRegData->bEnableEPHelper) {
-				bForExplorerPatcherSWS(hForeground, FALSE, FALSE, NULL, NULL);
-			}
-			if (Profile->lpstAppRegData->bIMEModeForced) {
-				if (!bChromium_Helper(hForeground))	return;
-			}
+	if (bCheckExistingJPIME() && (Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
+		if (Profile->lpstAppRegData->bEnableEPHelper) {
+			bForExplorerPatcherSWS(hForeground, FALSE, FALSE, NULL, NULL);
+		}
+		if (Profile->lpstAppRegData->bIMEModeForced) {
+			if (!bChromium_Helper(hForeground))	return;
 		}
 	}
 	return;

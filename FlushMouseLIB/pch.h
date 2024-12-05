@@ -26,7 +26,6 @@
 #include <nb30.h>
 #include <rpc.h>
 #endif
-#include <shellapi.h>
 #ifndef _MAC
 #include <winperf.h>
 #endif

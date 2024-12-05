@@ -40,7 +40,6 @@ HWND			hSynTPHelperDlg = NULL;
 //
 // Local Data
 //
-static BOOL		bTaskTray = FALSE;
 static UINT		uTaskbarCreatedMessage = 0;
 
 //
@@ -52,11 +51,9 @@ static UINT		uTaskbarCreatedMessage = 0;
 // 
 CTaskTray::CTaskTray(HWND hWnd)
 {
-	if (!bCreateGUID(&TaskTrayGUID)) {
-		TaskTrayGUID = GUID_NULL;
-		return;
-	}
-
+	uTaskTrayID = 0;
+	uTaskbarCreatedMessage = 0;
+	if ((uTaskTrayID = HandleToULong(hWnd)) == 0)	return;
 	if ((uTaskbarCreatedMessage = RegisterWindowMessage(_T("FlushMouseTaskTray-{CA959312-1F82-45E8-AC7B-6F1F6CDD19C4}"))) == 0) {
 		uTaskbarCreatedMessage = 0;
 		return;
@@ -78,18 +75,18 @@ CTaskTray::~CTaskTray()
 //
 BOOL		CTaskTray::bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle) const
 {
-	if ((TaskTrayGUID == GUID_NULL) || (uTaskbarCreatedMessage == 0))	return FALSE;
-	
+	if ((uTaskTrayID == 0) || (uTaskbarCreatedMessage == 0))	return FALSE;
+
 	NOTIFYICONDATA   nIco{};
 	nIco.cbSize = sizeof(NOTIFYICONDATA);
 	nIco.hWnd = hWnd;
-	nIco.uID = HandleToULong(hWnd);
-	nIco.guidItem = TaskTrayGUID;
+	nIco.uID = uTaskTrayID;
+	nIco.guidItem = GUID_NULL;
 	nIco.uCallbackMessage = WM_TASKTRAYEX;
 	nIco.dwState = NIS_HIDDEN | NIS_SHAREDICON;
 	nIco.dwInfoFlags = NIIF_USER | NIIF_LARGE_ICON | NIIF_NOSOUND;
 	nIco.uVersion = NOTIFYICON_VERSION_4;
-	nIco.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP | NIF_GUID;
+	nIco.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
 	nIco.hIcon = hIcon;
 	_tcsncpy_s(nIco.szTip, ARRAYSIZE(nIco.szTip), lpszTitle, _TRUNCATE);
 	try {
@@ -181,9 +178,8 @@ BOOL		CTaskTray::bDestroyTaskTrayWindow(HWND hWnd) const
 	NOTIFYICONDATA nIco{};
 	nIco.cbSize = sizeof(NOTIFYICONDATA);
 	nIco.hWnd = hWnd;
-	nIco.uID = HandleToULong(hWnd);
-	nIco.guidItem = TaskTrayGUID;
-	nIco.uFlags = NIF_GUID;
+	nIco.uID = uTaskTrayID;
+	nIco.guidItem = GUID_NULL;
 	try {
 		throw Shell_NotifyIcon(NIM_DELETE, &nIco);
 	}
@@ -208,8 +204,8 @@ BOOL		CTaskTray::bGetTaskTrayWindowRect(HWND hWnd, LPRECT lpRect) const
 	NOTIFYICONIDENTIFIER	nii{};
 	nii.cbSize = sizeof(NOTIFYICONIDENTIFIER);
 	nii.hWnd = hWnd;
-	nii.uID = HandleToULong(hWnd);
-	nii.guidItem = TaskTrayGUID;
+	nii.uID = uTaskTrayID;
+	nii.guidItem = GUID_NULL;
 	try {
 		throw Shell_NotifyIconGetRect(&nii, lpRect);
 	}
@@ -237,7 +233,6 @@ int		CTaskTray::iCheckTaskTrayMessage(HWND hWnd, UINT message, WPARAM wParam, LP
 	default:
 		if (message == uTaskbarCreatedMessage) {	
 			if (bDestroyTaskTrayWindow(hWnd)) {
-				//bTaskTray = FALSE;
 				if (bReCreateTaskTrayWindow(hWnd)) {
 					return 0;
 				}
@@ -360,13 +355,13 @@ BOOL		CTaskTray::bDisplayBalloon(HWND hWnd, DWORD dwInfoFlags, LPCTSTR szInfoTit
 			NOTIFYICONDATA	nIco{};
 			nIco.cbSize = sizeof(NOTIFYICONDATA);
 			nIco.hWnd = hWnd;
-			nIco.uID = HandleToULong(hWnd);
-			nIco.guidItem = TaskTrayGUID;
+			nIco.uID = uTaskTrayID;
+			nIco.guidItem = GUID_NULL;
 			nIco.dwState = NIS_HIDDEN | NIS_SHAREDICON;
 			nIco.dwInfoFlags = dwInfoFlags;
 			nIco.hIcon = NULL;
 			nIco.uVersion = NOTIFYICON_VERSION_4;
-			nIco.uFlags = NIF_INFO | NIF_GUID;
+			nIco.uFlags = NIF_INFO;
 
 			if (szInfoTitle)	_tcsncpy_s(nIco.szInfoTitle, ARRAYSIZE(nIco.szInfoTitle), szInfoTitle, _TRUNCATE);
 			if (szInfo)			_tcsncpy_s(nIco.szInfo, ARRAYSIZE(nIco.szInfo), szInfo, _TRUNCATE);
@@ -404,12 +399,12 @@ BOOL		CTaskTray::bModifyToolHints(HWND hWnd, LPCTSTR lpszToolHints) const
 	NOTIFYICONDATA	nIco{};
 	nIco.cbSize = sizeof(NOTIFYICONDATA);
 	nIco.hWnd = hWnd;
-	nIco.uID = HandleToULong(hWnd);
-	nIco.guidItem = TaskTrayGUID;
+	nIco.uID = uTaskTrayID;
+	nIco.guidItem = GUID_NULL;
 	nIco.dwState = NIS_HIDDEN | NIS_SHAREDICON;
 	nIco.hIcon = NULL;
 	nIco.uVersion = NOTIFYICON_VERSION_4;
-	nIco.uFlags = NIF_TIP | NIF_GUID;
+	nIco.uFlags = NIF_TIP;
 
 	if (lpszToolHints)	_tcsncpy_s(nIco.szTip, ARRAYSIZE(nIco.szTip), lpszToolHints, _TRUNCATE);
 
@@ -429,21 +424,6 @@ BOOL		CTaskTray::bModifyToolHints(HWND hWnd, LPCTSTR lpszToolHints) const
 		Sleep(1000);
 	}
 	return FALSE;
-}
-
-//
-// bCreateGUID()
-//
-BOOL		CTaskTray::bCreateGUID(LPGUID lpGUID)
-{
-	BOOL	bRet = FALSE;
-	if(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED) == S_OK){
-		if (CoCreateGuid(lpGUID) == S_OK) {
-			if (*lpGUID != GUID_NULL)	bRet = TRUE;
-		}
-		CoUninitialize();
-	}  
-	return bRet;
 }
 
 

@@ -21,7 +21,7 @@
 	NavigationCacheMode="Required"
 	>
 
-	<Grid  Margin="100,20,20,20" x:Name="About_Panel" Loaded="About_Loaded" HorizontalAlignment="Left" VerticalAlignment="Top">
+	<Grid Margin="100,20,20,20" x:Name="About_Panel" Loaded="About_Loaded" HorizontalAlignment="Left" VerticalAlignment="Top">
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="48"/>
 			<ColumnDefinition Width="*"/>
@@ -88,7 +88,7 @@
 				<TextBlock Margin="0,0,0,0" Grid.Column="1" Text="@JeffyTSonTW" FontSize="14"/>
 			</Grid>
 			<Grid Margin="0,14,0,0" Grid.Row="6">
-				<Button Margin="-10,0,0,0" x:Name="btn1" Click="Button_Click" Content="最新バージョンを確認する" BorderThickness="0" Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}" Foreground="RoyalBlue"/>
+				<Button Margin="-10,0,0,0" x:Name="btn1" Click="Button_Click" Content="最新バージョンを確認する" Foreground="RoyalBlue" BorderThickness="0" />
 			</Grid>
 			<Grid Margin="0,10,0,0" Grid.Row="7">
 			</Grid>
