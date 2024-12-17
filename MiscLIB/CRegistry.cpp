@@ -21,12 +21,10 @@
 //
 CRegistry::CRegistry()
 {
-	// NOP
 }
 
 CRegistry::~CRegistry()
 {
-	// NOP
 }
 
 //

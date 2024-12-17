@@ -150,12 +150,10 @@
   <String Id="MaintenanceTypeDlgRemoveText" Overridable="yes">[ProductName] をコンピューターから削除します。</String>
   <String Id="MaintenanceTypeDlgRemoveDisabledText" Overridable="yes">[ProductName] は削除できません。</String>
   <String Id="MaintenanceTypeDlgRepairText" Overridable="yes">現在のインストールに存在するエラーを修復します。不足したファイルや壊れたファイル、ショートカット、およびレジストリ エントリを回復して修復します。</String>
-  <!--@@@String Id="MaintenanceTypeDlgRepairDisabledText" Overridable="yes">[ProductName] は修復できません。</String-->
   <String Id="MaintenanceTypeDlgRepairDisabledText" Overridable="yes">[ProductName] には修復の機能はありません。</String>
 
-	<String Id="MaintenanceWelcomeDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
+  <String Id="MaintenanceWelcomeDlg_Title" Overridable="yes">[ProductName] セットアップ</String>
   <String Id="MaintenanceWelcomeDlgBitmap" Overridable="yes">WixUI_Bmp_Dialog</String>
-  <!--@@@String Id="MaintenanceWelcomeDlgDescription" Overridable="yes">このセットアップ ウィザードによって [ProductName] のインストールの変更、修復、または削除が出来ます。続行する場合は［次へ］を、セットアップ ウィザードを終了する場合は［キャンセル］をクリックしてください。</String-->
   <String Id="MaintenanceWelcomeDlgDescription" Overridable="yes">このセットアップ ウィザードによって [ProductName] のインストールの変更、修復、または削除が出来ます。続行する場合は［次へ］を、セットアップ ウィザードを終了する場合は［キャンセル］をクリックしてください。削除後、再度インストール場合はもう一度セットアップを実行してください</String>
   <String Id="MaintenanceWelcomeDlgTitle" Overridable="yes">{\WixUI_Font_Bigger}[ProductName] のセットアップ ウィザードへようこそ。</String>
 
@@ -165,7 +163,6 @@
   <String Id="MsiRMFilesInUseDescription" Overridable="yes">更新する必要のあるファイルが現在使用されています。</String>
   <String Id="MsiRMFilesInUseTitle" Overridable="yes">{\WixUI_Font_Title}使用中のファイル</String>
   <String Id="MsiRMFilesInUseUseRM" Overridable="yes">プログラムの終了と再開を試みる(&amp;C)。</String>
-  <!--@@@String Id="MsiRMFilesInUseDontUseRM" Overridable="yes">プログラムを終了しない(&amp;D)。 Windows の再起動が必要になります。</String-->
   <String Id="MsiRMFilesInUseDontUseRM" Overridable="yes">プログラムを終了しない(&amp;D)。 Windows の再起動が必要な場合があります。</String>
 
   <String Id="OutOfDiskDlg_Title" Overridable="yes">[ProductName] セットアップ</String>

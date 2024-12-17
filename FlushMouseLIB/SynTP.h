@@ -20,7 +20,7 @@
 //
 // Define
 // 
-#define	SYNTP_DATA_BUFFER_SIZE		8						// "X/Y -/+0000"
+#define	SYNTP_DATA_BUFFER_SIZE				8				// "X/Y -/+0000"
 
 #define SYNTPH_DISABLE						0x00			// disable
 #define SYNTPH_SENDERIPV4					0x01			// sender (IPv4)

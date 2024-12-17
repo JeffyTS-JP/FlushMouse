@@ -159,7 +159,7 @@ static int			iCheckCmdLine(LPCTSTR lpCmdLine)
 {
 	int			argc = 0;
 	LPCTSTR*	lpRet = lpCheckCmdLine(lpCmdLine, &argc);
-	if ((lpRet == NULL) && (argc == 0))	return (-1);	// No command line args
+	if ((lpRet == NULL) && (argc == 0))	return (-1);
 	for (int i = 0; i < argc; i++) {
 		if (lpRet == NULL)	break;
 		if ((*lpRet[i] != L'\0') && (CompareStringOrdinal(lpRet[i], -1, L"/Port", -1, TRUE) == CSTR_EQUAL)) {
@@ -318,12 +318,12 @@ static void		vMessageBox(HINSTANCE hInstance, HWND hWnd, UINT uID, UINT uType)
 				return;
 			}
 			catch (...) {
-				return;					// error
+				return;
 			}
 		}
 	}
 	catch (...) {
-		return;							// error
+		return;
 	}
 }
 

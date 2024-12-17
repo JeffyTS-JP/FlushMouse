@@ -344,7 +344,7 @@ static BOOL		bSetHeapInformation()
 		ULONG	HeapInformation = 2;
 		if (!HeapSetInformation(hHeap, HeapCompatibilityInformation, &HeapInformation, sizeof(ULONG))) {
 			_Post_equals_last_error_ DWORD err = GetLastError();
-			if (err != ERROR_INVALID_PARAMETER) {	// 87 (0x57)
+			if (err != ERROR_INVALID_PARAMETER) {
 				return FALSE;
 			}
 		}

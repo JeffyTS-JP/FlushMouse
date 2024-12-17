@@ -118,7 +118,7 @@ BOOL		CCursorSub::bUnLoadCursorData()
 //
 BOOL		CCursorSub::bGetCursorDataFullPath(LPCTSTR lpszCursorDataFileName)
 {
-#define FLUSHMOUSECURSORDIR			L"\\JeffyTS\\FlushMouse\\"	// Cursor data dir
+#define FLUSHMOUSECURSORDIR			L"\\JeffyTS\\FlushMouse\\"
 	
 	LPTSTR	lpszBuffer = new TCHAR[_MAX_PATH];
 	if (lpszBuffer) {
@@ -509,8 +509,6 @@ BOOL		CCursorWindow::bRegister(HINSTANCE hInstance, LPCTSTR szWindowClassName)
 {
 	if (hInstance == NULL)	return FALSE;
 
-	//vSetTextColor(dwRGB);
-
 #define CLASSSTYLE (CS_HREDRAW | CS_VREDRAW | CS_NOCLOSE)
 	WNDCLASSEX wcex{};
 	wcex.cbSize = sizeof(WNDCLASSEX);
@@ -620,7 +618,7 @@ void		CCursorWindow::Cls_OnPaint(HWND hWnd) const
 		if (SetLayeredWindowAttributes(hWnd, dwBackColor, (dwBackColor >> 24) & 0x000000ff, LWA_COLORKEY | LWA_ALPHA)) {
 			if (GetClientRect(hWnd, &rcSize)) {
 				HBRUSH	hBrush = NULL;
-				if ((hBrush = CreateSolidBrush(dwBackColor & 0x00ffffff)) != NULL) {								// 背景色を設定
+				if ((hBrush = CreateSolidBrush(dwBackColor & 0x00ffffff)) != NULL) {
 					if (SelectObject(hDC, hBrush) != HGDI_ERROR) {
 						if (FillRect(hDC, &rcSize, hBrush) != 0) {
 							DWORD	dwUnderline = 0;

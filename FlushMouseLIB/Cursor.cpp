@@ -206,8 +206,9 @@ BOOL			CCursor::bInitialize(HWND hWnd)
 BOOL			CCursor::bReloadCursor()
 {
 	vStopDrawIMEModeMouseByWndThread();
+	vUnRegisterDrawIMEModeMouseByWndThread();
 	if (stIMECursorData.dwDisplayIMEModeMethod == DisplayIMEModeMethod_RESOURCE) {
-		SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);			// System Cursorに戻す
+		SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
 	}
 
 	if (!CursorSub->bUnLoadCursorData())	return FALSE;
@@ -605,8 +606,8 @@ BOOL		CCursor::bStartDrawIMEModeMouseByWndThread()
 //
 VOID		CCursor::vStopDrawIMEModeMouseByWndThread()
 {
-	if (MouseWindow != NULL)		MouseWindow->bShowWindow(SW_HIDE);
 	stIMECursorData.bIMEModeByWindowThreadSentinel = FALSE;
+	if (MouseWindow != NULL)		MouseWindow->bShowWindow(SW_HIDE);
 }
 
 //
@@ -669,17 +670,6 @@ BOOL		CCursor::bIMEModeMouseByWndThreadRoutine(LPVOID lpvParam)
 				break;
 			}
 			else {
-				pt.x = pt.x + lpstCursorData->iModeByWndSize + lpstCursorData->iIMEModeDistance;
-				pt.y = pt.y + lpstCursorData->iModeByWndSize + lpstCursorData->iIMEModeDistance;
-				rcMouse.left = pt.x;	rcMouse.top = pt.y;
-				rcMouse.right = pt.x + lpstCursorData->iModeByWndSize;
-				rcMouse.bottom = pt.y + lpstCursorData->iModeByWndSize;
-				if (!This->bAdjustModeSizeByMonitorDPIAsync(lpstCursorData->iModeByWndSize, lpstCursorData->iModeByWndSize, &rcMouse))	break;
-				if (!This->bAdjustModeSizeByMonitorDPI(lpstCursorData->iModeByWndSize, lpstCursorData->iModeByWndSize, &rcMouse))	goto Cleanup;
-				iMouseSizeX = rcMouse.right - rcMouse.left; iMouseSizeY = rcMouse.bottom - rcMouse.top;
-				rcMouse.left = rcMouse.left + iMouseSizeX / 2;	rcMouse.right = rcMouse.right + iMouseSizeX;
-				rcMouse.top = rcMouse.top - iMouseSizeY / 2;	rcMouse.bottom = rcMouse.bottom  + iMouseSizeY;
-				vAdjustFontXPosition(dwIMEModeMouse, lpstCursorData->lpstNearDrawCaretCursor[iMouse].szMode, &iMouseSizeX, &rcMouse);
 				if ((CursorInfoCurrent.hCursor == This->hCursorArrow) || (CursorInfoCurrent.hCursor == This->hCursorIBeam) || (CursorInfoCurrent.hCursor == This->hCursorHand)) {
 					if (lpstCursorData->dwIMEModeCursor != IMEHIDE) {
 						This->MouseWindow->vSetModeStringColorFont(lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEHIDE].szMode, lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEHIDE].dwColor, lpstCursorData->lpstNearDrawMouseByWndCursor[IMEMODE_IMEHIDE].szFont);
@@ -696,6 +686,17 @@ BOOL		CCursor::bIMEModeMouseByWndThreadRoutine(LPVOID lpvParam)
 					Sleep(100);
 				}
 				This->MouseWindow->vSetModeStringColorFont(lpstCursorData->lpstNearDrawMouseByWndCursor[iMouse].szMode, lpstCursorData->lpstNearDrawMouseByWndCursor[iMouse].dwColor, lpstCursorData->lpstNearDrawMouseByWndCursor[iMouse].szFont);
+				pt.x = pt.x + lpstCursorData->iModeByWndSize + lpstCursorData->iIMEModeDistance;
+				pt.y = pt.y + lpstCursorData->iModeByWndSize + lpstCursorData->iIMEModeDistance;
+				rcMouse.left = pt.x;	rcMouse.top = pt.y;
+				rcMouse.right = pt.x + lpstCursorData->iModeByWndSize;
+				rcMouse.bottom = pt.y + lpstCursorData->iModeByWndSize;
+				if (!This->bAdjustModeSizeByMonitorDPIAsync())	break;
+				if (!This->bAdjustModeSizeByMonitorDPI(lpstCursorData->iModeByWndSize, lpstCursorData->iModeByWndSize, &rcMouse))	goto Cleanup;
+				iMouseSizeX = rcMouse.right - rcMouse.left; iMouseSizeY = rcMouse.bottom - rcMouse.top;
+				rcMouse.left = rcMouse.left + iMouseSizeX / 2;	rcMouse.right = rcMouse.right + iMouseSizeX;
+				rcMouse.top = rcMouse.top - iMouseSizeY / 2;	rcMouse.bottom = rcMouse.bottom  + iMouseSizeY;
+				vAdjustFontXPosition(dwIMEModeMouse, lpstCursorData->lpstNearDrawCaretCursor[iMouse].szMode, &iMouseSizeX, &rcMouse);
 				if (!This->MouseWindow->bSetWindowPos(HWND_TOPMOST, rcMouse.left, rcMouse.top, iMouseSizeX, iMouseSizeY, (SWP_SHOWWINDOW | SWP_NOACTIVATE)))	goto Cleanup;
 			}
 			This->dwIMEModeMouseWindow = dwIMEModeMouse;
@@ -1018,10 +1019,8 @@ BOOL		CCursor::bAdjustModeSizeByMonitorDPI(int iModeSizeX, int iModeSizeY, LPREC
 //
 // bAdjustModeSizeByMonitorDPIAsync()
 //
-BOOL		CCursor::bAdjustModeSizeByMonitorDPIAsync(int iModeSizeX, int iModeSizeY, LPRECT lpRect)
+BOOL		CCursor::bAdjustModeSizeByMonitorDPIAsync()
 {
-	UNREFERENCED_PARAMETER(lpRect);
-
 #define	TIMEOUT	10
 	std::future<BOOL> _future;
 	std::promise<BOOL> _promise;
@@ -1029,7 +1028,7 @@ BOOL		CCursor::bAdjustModeSizeByMonitorDPIAsync(int iModeSizeX, int iModeSizeY, 
 	try {
 		std::thread([&](std::promise<BOOL> _promise) {
 			RECT	rc{};
-			bAdjustModeSizeByMonitorDPI(iModeSizeX, iModeSizeY, &rc);
+			bAdjustModeSizeByMonitorDPI(32, 32, &rc);
 		}, std::move(_promise)).detach();
 
 		if(std::future_status::ready == _future.wait_until(std::chrono::system_clock::now() + std::chrono::milliseconds(TIMEOUT))) {

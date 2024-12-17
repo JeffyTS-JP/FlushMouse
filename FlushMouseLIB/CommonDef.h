@@ -65,6 +65,9 @@
 #define US_IME		(HKL)(KB_US | LANG_IME)
 #define US_ENG		(HKL)(KB_US | LANG_ENG)
 
+// for Shell_NotifyIcon
+#define	NOTIFYICONDATA_ID				0x684B9604
+
 typedef struct tagPOINTD
 {
 	double	x;

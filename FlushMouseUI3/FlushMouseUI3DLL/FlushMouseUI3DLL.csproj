@@ -85,19 +85,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="C:\Users\takafumi\.nuget\packages\microsoft.windows.cswinrt\2.0.4\hosting\x64\native\WinRT.Host.dll" />
+	  <None Remove="%USERPROFILE%\.nuget\packages\microsoft.windows.cswinrt\2.0.4\hosting\x64\native\WinRT.Host.dll" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="C:\Users\takafumi\.nuget\packages\microsoft.windows.cswinrt\2.0.4\hosting\x64\native\WinRT.Host.dll" />
+	  <None Remove="%USERPROFILE%\.nuget\packages\microsoft.windows.cswinrt\2.0.4\hosting\x64\native\WinRT.Host.dll" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="C:\Users\takafumi\.nuget\packages\microsoft.windows.cswinrt\2.0.4\hosting\x64\native\en-US\WinRT.Host.dll.mui" />
+	  <None Remove="%USERPROFILE%\.nuget\packages\microsoft.windows.cswinrt\2.0.4\hosting\x64\native\en-US\WinRT.Host.dll.mui" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="C:\Users\takafumi\.nuget\packages\microsoft.windows.cswinrt\2.0.4\lib\net8.0\WinRT.Host.Shim.dll" />
+	  <None Remove="%USERPROFILE%\.nuget\packages\microsoft.windows.cswinrt\2.0.4\lib\net8.0\WinRT.Host.Shim.dll" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -89,7 +89,7 @@ static void				vMessageBox(HWND hWnd, UINT uID, UINT uType);
 //
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)					// MessageBox style
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
@@ -110,7 +110,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	if ((hWnd = FindWindow(CLASS_FLUSHMOUSE32, NULL)) != NULL) {
 		SetFocus(GetLastActivePopup(hWnd));
 		PostMessage(hWnd, WM_DESTROY, NULL, NULL);
-		for (int i = 3; i > 0; i--) {
+		for (int i = 10; i > 0; i--) {
 			Sleep(500);
 			if ((hWnd = FindWindow(CLASS_FLUSHMOUSE32, NULL)) != NULL) {
 				SetFocus(GetLastActivePopup(hWnd));
@@ -313,18 +313,10 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 	UNREFERENCED_PARAMETER(dwTime);
 
 	if (uTimerID == nCheckProcTimerID) {
-		if (FindWindow(CLASS_FLUSHMOUSE, NULL) == NULL) {
-			if (uCheckProcTimer != NULL) {
-				if (KillTimer(hWnd, nCheckProcTimerID)) {
-					uCheckProcTimer = NULL;
-				}
-			}
-			if (PowerNotification != NULL) {
-				delete PowerNotification;
-				PowerNotification = NULL;
-			}
+		HWND	_hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
+		if (!_hWnd || (_hWnd != hParentWnd)) {
 			if (hParentWnd)	bDestroyTaskTrayWindow(hParentWnd);
-			bReportEvent(MSG_DELAYED_RESTART_FLUSHMOUSE_EVENT, APPLICATION32_CATEGORY);
+			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION32_CATEGORY);
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		}
 	}
@@ -341,7 +333,7 @@ BOOL		bDestroyTaskTrayWindow(HWND hWnd)
 	NOTIFYICONDATA nIco{};
 	nIco.cbSize = sizeof(NOTIFYICONDATA);
 	nIco.hWnd = hParentWnd;
-	nIco.uID = HandleToULong(hParentWnd);
+	nIco.uID = NOTIFYICONDATA_ID;
 	nIco.guidItem = GUID_NULL;
 	nIco.uFlags = 0;
 	try {
@@ -441,13 +433,18 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(Type);
 	UNREFERENCED_PARAMETER(lpSetting);
+
+	HWND	_hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
 	switch (Type) {
 	case PBT_APMSUSPEND:
+		if (hParentWnd)	bDestroyTaskTrayWindow(hParentWnd);
 		break;
 	case PBT_APMRESUMEAUTOMATIC:
+		if (!_hWnd || (_hWnd != hParentWnd)) {
+			if (hParentWnd)	bDestroyTaskTrayWindow(hParentWnd);
+		}
 		break;
 	case PBT_APMRESUMESUSPEND:
-		bReportEvent(MSG_PBT_APMRESUMESUSPEND, POWERNOTIFICATION_CATEGORY);
 		break;
 	case PBT_POWERSETTINGCHANGE:
 		break;
@@ -457,24 +454,16 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 			switch (PowerStatus.ACLineStatus) {
 			case 0:
 				if (hParentWnd)	bDestroyTaskTrayWindow(hParentWnd);
-				bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_OFF, POWERNOTIFICATION_CATEGORY);
+				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION32_CATEGORY);
 				break;
 			case 1:
-				bReportEvent(MSG_PBT_APMPOWERSTATUSCHANGE_AC_ON, POWERNOTIFICATION_CATEGORY);
+				if (!_hWnd || (_hWnd != hParentWnd)) {
+					if (hParentWnd)	bDestroyTaskTrayWindow(hParentWnd);
+				}
+				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION32_CATEGORY);
 				break;
 			default:
 				break;
-			}
-		}
-		if (lpSetting != NULL) {
-			PPOWERBROADCAST_SETTING	lpPwrSetting = (POWERBROADCAST_SETTING*)lpSetting;
-			if ((lpPwrSetting->PowerSetting == GUID_CONSOLE_DISPLAY_STATE)
-				|| (lpPwrSetting->PowerSetting == GUID_MONITOR_POWER_ON)
-				|| (lpPwrSetting->PowerSetting == GUID_SESSION_DISPLAY_STATUS)) {
-				if (lpPwrSetting->Data[0] == 0) {
-				}
-				else {
-				}
 			}
 		}
 	}

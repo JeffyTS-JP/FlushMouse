@@ -45,7 +45,7 @@
 							BackRequested="navigationView_BackRequested" SelectionChanged="navigationView_SelectionChanged"
 							OpenPaneLength="{Binding Value, Mode=TwoWay}" CompactPaneLength="{Binding Value, Mode=TwoWay}">
 					<NavigationView.PaneHeader>
-						<Border x:Name="PanelHeader" Background="{ThemeResource SystemControlChromeHighAcrylicWindowMediumBrush}"/>
+						<Border x:Name="PanelHeader" />
 					</NavigationView.PaneHeader>
 					<NavigationView.MenuItems>
 						<NavigationViewItem x:Name="Menu1" Tag="Menu1" Content="基本動作設定" >

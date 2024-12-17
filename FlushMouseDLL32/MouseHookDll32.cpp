@@ -101,7 +101,6 @@ static LRESULT CALLBACK lpMouseHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 				}
 			}
 			catch (...) {
-				//
 			}
 		}
 		break;

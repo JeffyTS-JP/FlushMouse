@@ -51,9 +51,8 @@ static UINT		uTaskbarCreatedMessage = 0;
 // 
 CTaskTray::CTaskTray(HWND hWnd)
 {
-	uTaskTrayID = 0;
 	uTaskbarCreatedMessage = 0;
-	if ((uTaskTrayID = HandleToULong(hWnd)) == 0)	return;
+	uTaskTrayID = NOTIFYICONDATA_ID;
 	if ((uTaskbarCreatedMessage = RegisterWindowMessage(_T("FlushMouseTaskTray-{CA959312-1F82-45E8-AC7B-6F1F6CDD19C4}"))) == 0) {
 		uTaskbarCreatedMessage = 0;
 		return;
@@ -148,7 +147,7 @@ BOOL		CTaskTray::bReCreateTaskTrayWindow(HWND hWnd) const
 	HICON	hIcon = NULL;
 	if ((hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE))) != NULL) {
 		BOOL	bRet = FALSE;
-		for (int i = 0; i < 3; i++) {	//Retry 3 times
+		for (int i = 0; i < 3; i++) {
 			if ((bRet = bCreateTaskTrayWindow(hWnd, hIcon, szTitle)))	break;
 			Sleep(1000);
 		}
@@ -296,7 +295,7 @@ void		CTaskTray::Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 //
 void		CTaskTray::Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg)
 {
-	if (id != HandleToULong(hWnd)) {
+	if (id != NOTIFYICONDATA_ID) {
 		return;
 	}
 	if (!Profile || !Cime || !Resource)	return;

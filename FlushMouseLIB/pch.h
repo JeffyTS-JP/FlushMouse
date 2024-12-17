@@ -57,5 +57,7 @@ typedef unsigned short USHORT;
 
 #include <psapi.h>
 #include <strsafe.h>
+#include <wtsapi32.h>
+#pragma comment(lib, "Wtsapi32.lib")
 
 #endif //PCH_H

@@ -86,7 +86,7 @@ BOOL 	CThread::bStart()
 //
 BOOL	CThread::bCheckSentinel() const
 {
-	if ((lpstThreadData == NULL) || (lpstThreadData->lpstSA == NULL) || (lpstThreadData->hEvent == NULL) || (lpstThreadData->hThread == NULL))	return FALSE;		// error
+	if ((lpstThreadData == NULL) || (lpstThreadData->lpstSA == NULL) || (lpstThreadData->hEvent == NULL) || (lpstThreadData->hThread == NULL))	return FALSE;
 	return lpstThreadData->bThreadSentinel;
 }
 
@@ -95,7 +95,7 @@ BOOL	CThread::bCheckSentinel() const
 //
 BOOL	CThread::bSetSentinel(BOOL bSentinel)
 {
-	if ((lpstThreadData == NULL) || (lpstThreadData->lpstSA == NULL) || (lpstThreadData->hEvent == NULL) || (lpstThreadData->hThread == NULL))	return FALSE;		// error
+	if ((lpstThreadData == NULL) || (lpstThreadData->lpstSA == NULL) || (lpstThreadData->hEvent == NULL) || (lpstThreadData->hThread == NULL))	return FALSE;
 	BOOL	bRet = lpstThreadData->bThreadSentinel;
 	lpstThreadData->bThreadSentinel = bSentinel;
 	return bRet;
@@ -106,7 +106,7 @@ BOOL	CThread::bSetSentinel(BOOL bSentinel)
 //
 BOOL	CThread::bSetThreadPriority(int nPriority) const
 {
-	if ((lpstThreadData == NULL) || (lpstThreadData->lpstSA == NULL) || (lpstThreadData->hEvent == NULL) || (lpstThreadData->hThread == NULL))	return FALSE;		// error
+	if ((lpstThreadData == NULL) || (lpstThreadData->lpstSA == NULL) || (lpstThreadData->hEvent == NULL) || (lpstThreadData->hThread == NULL))	return FALSE;
 	if (SetThreadPriority(lpstThreadData->hThread, nPriority) != 0)	return TRUE;
 	return FALSE;
 }

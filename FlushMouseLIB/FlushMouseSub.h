@@ -53,6 +53,23 @@ private:
 };
 
 //
+// class CPowerNotification
+//
+class CPowerNotification
+{
+public:
+	CPowerNotification(HWND hWnd);
+	~CPowerNotification();
+
+	BOOL		PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting);
+
+private:
+	HPOWERNOTIFY	hSuspendResumeNotification;
+	HPOWERNOTIFY	hPowerSettingNotification;
+	GUID			guidPowerSettingNotification;
+};
+
+//
 // class CEventHook
 //
 class CEventHook
@@ -77,23 +94,6 @@ private:
 };
 
 //
-// class CPowerNotification
-//
-class CPowerNotification
-{
-public:
-	CPowerNotification(HWND hWnd);
-	~CPowerNotification();
-
-	BOOL		PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting);
-
-private:
-	HPOWERNOTIFY	hSuspendResumeNotification;
-	HPOWERNOTIFY	hPowerSettingNotification;
-	GUID			guidPowerSettingNotification;
-};
-
-//
 // class CFlushMouseHook
 //
 class CFlushMouseHook
@@ -103,6 +103,7 @@ public:
 	~CFlushMouseHook();
 	BOOL		bHookSet(HWND hWnd, LPCTSTR lpszDll64Name, LPCTSTR lpszExec32Name);
 	BOOL		bHookUnset();
+	BOOL		bHookUnset64() const;
 
 private:
 	BOOL		bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name);

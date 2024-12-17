@@ -287,7 +287,7 @@ BOOL		bCheckDrawIMEModeArea(HWND hWndObserved)
 			RECT	rc{};
 			if (TaskTray) {
 				if (TaskTray->bGetTaskTrayWindowRect(hMainWnd, &rc)) {
-					if (((pt.x >= rc.left) && (pt.x <= rc.right)) || ((pt.y <= rc.top) && (pt.y >= rc.bottom)))	return FALSE;	// Clicked on Notify Icon
+					if (((pt.x >= rc.left) && (pt.x <= rc.right)) || ((pt.y <= rc.top) && (pt.y >= rc.bottom)))	return FALSE;
 				}
 			}
 		}
@@ -329,10 +329,11 @@ void	CMouseRawInput::vRawInputMouseHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT 
 
 //
 // class CPowerNotification
-// CPowerNotification()
 //
 CPowerNotification::CPowerNotification(HWND hWnd)
 {
+	hSuspendResumeNotification = NULL;
+	hPowerSettingNotification = NULL;;
 	guidPowerSettingNotification = GUID_NULL;
 	if ((hSuspendResumeNotification = RegisterSuspendResumeNotification(hWnd, DEVICE_NOTIFY_WINDOW_HANDLE)) == NULL) {
 	}
@@ -340,9 +341,6 @@ CPowerNotification::CPowerNotification(HWND hWnd)
 	}
 }
 
-//
-// ~CPowerNotification()
-//
 CPowerNotification::~CPowerNotification()
 {
 	if (hPowerSettingNotification != NULL) {
@@ -363,34 +361,32 @@ CPowerNotification::~CPowerNotification()
 BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting)
 {
 	UNREFERENCED_PARAMETER(hWnd);
-	UNREFERENCED_PARAMETER(Type);
-	UNREFERENCED_PARAMETER(lpSetting);
 	
-	if (!TaskTray)	return TRUE;
+	TCHAR	CommandLine[] = L"/Start";
 	switch (Type) {
 	case PBT_APMSUSPEND:
 		break;
 	case PBT_APMRESUMEAUTOMATIC:
 		break;
 	case PBT_APMRESUMESUSPEND:
-		TaskTray->bDestroyTaskTrayWindow(hWnd);
+		bCreateProcess(FLUSHMOUSE_EXE, CommandLine);
 		break;
 	case PBT_POWERSETTINGCHANGE:
 		break;
 	case PBT_APMPOWERSTATUSCHANGE:
-			SYSTEM_POWER_STATUS	PowerStatus{};
-			if (GetSystemPowerStatus(&PowerStatus)) {
-				switch (PowerStatus.ACLineStatus) {
-				case 0:
-					TaskTray->bDestroyTaskTrayWindow(hWnd);	
-					break;
-				case 1:
-					TaskTray->bDestroyTaskTrayWindow(hWnd);	
-					break;
-				default:
-					break;
-				}
+		SYSTEM_POWER_STATUS	PowerStatus{};
+		if (GetSystemPowerStatus(&PowerStatus)) {
+			switch (PowerStatus.ACLineStatus) {
+			case 0:
+				bCreateProcess(FLUSHMOUSE_EXE, CommandLine);
+				break;
+			case 1:
+				bCreateProcess(FLUSHMOUSE_EXE, CommandLine);
+				break;
+			default:
+				break;
 			}
+		}
 		if (lpSetting != NULL) {
 			PPOWERBROADCAST_SETTING	lpPwrSetting = (POWERBROADCAST_SETTING*)lpSetting;
 			if ((lpPwrSetting->PowerSetting == GUID_CONSOLE_DISPLAY_STATE)
@@ -464,7 +460,6 @@ BOOL		CEventHook::bEventUnset()
 	if (hEventHook) {
 		if (UnhookWinEvent(hEventHook)) {
 			hEventHook = NULL;
-			//dwIMEEvent = 0;
 		}
 	}
 	if ((hEventHookIME == NULL) && (hEventHook == NULL))	return TRUE;
@@ -566,6 +561,17 @@ BOOL			CFlushMouseHook::bHookSet(HWND hWnd, LPCTSTR lpszDll64Name, LPCTSTR lpszE
 BOOL		CFlushMouseHook::bHookUnset()
 {
 	if (bHook32Dll)			bHook32DllStop();
+	if (bShellHook64)		bShellHookUnset();
+	if (bKeyboardHookLL64)	vKeyboardHookLLUnset();
+	if (bGlobalHook64)		bGlobalHookUnset();
+	return TRUE;
+}
+
+//
+// bHookUnset64()
+//
+BOOL		CFlushMouseHook::bHookUnset64() const
+{
 	if (bShellHook64)		bShellHookUnset();
 	if (bKeyboardHookLL64)	vKeyboardHookLLUnset();
 	if (bGlobalHook64)		bGlobalHookUnset();
@@ -941,7 +947,6 @@ BOOL	 	bCreateProcess(LPCTSTR lpszExecName, LPTSTR lpCommandLine)
 					STARTUPINFO	StartupInfo{};		StartupInfo.cb = sizeof(STARTUPINFO);
 #define	CREATIONFLAGS	0
 					if (CreateProcess(NULL, _lpCommandLine, NULL, NULL, FALSE, CREATIONFLAGS, NULL, NULL, &StartupInfo, &ProcessInfomation) != FALSE) {
-						//WaitForSingleObject(ProcessInfomation.hProcess, INFINITE);
 						CloseHandle(ProcessInfomation.hProcess);
 						CloseHandle(ProcessInfomation.hThread);
 						bRet = TRUE;

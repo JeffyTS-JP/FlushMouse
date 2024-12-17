@@ -100,12 +100,12 @@ static LRESULT CALLBACK lpGlobalHookProc(int nCode, WPARAM wParam, LPARAM lParam
 	LPCWPRETSTRUCT	lpCW = (LPCWPRETSTRUCT)lParam;
 	if (nCode == HC_ACTION) {
 		switch (lpCW->message) {
-		case WM_IME_STARTCOMPOSITION:		// 0x010D
+		case WM_IME_STARTCOMPOSITION:
 			if (lpCW->lResult != 0) {
 				SendMessage(hWndGLParent, WM_CHECKIMESTARTCONVEX, (WPARAM)TRUE, (LPARAM)0);
 			}
 			return CallNextHookEx(NULL, nCode, wParam, lParam);
-		case WM_IME_ENDCOMPOSITION:			// 0x010E
+		case WM_IME_ENDCOMPOSITION:
 			if (lpCW->lResult != 0) {
 				SendMessage(hWndGLParent, WM_CHECKIMESTARTCONVEX, (WPARAM)FALSE, (LPARAM)0);
 			}

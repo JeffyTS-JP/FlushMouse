@@ -82,11 +82,11 @@ Installer Events
 MessageId=0x05
 SymbolicName=Shortcut_CATEGORY
 Language=English
-Sortcut Events
+Shortcut Events
 .
 
 Language=Japanese
-Sortcut Events
+Shortcut Events
 .
 
 MessageId=0x06
@@ -416,6 +416,30 @@ Changed the display state to OFF (APM).
 
 Language=Japanese
 Changed the display state to OFF (APM).
+.
+
+MessageId=0x0209
+Severity=Informational
+Facility=Application
+SymbolicName=MSG_WTSSESSION_CHANGE_SESSION_LOCK
+Language=English
+Changed session to Lock (WTS).
+.
+
+Language=Japanese
+Changed session to Lock (WTS).
+.
+
+MessageId=0x020A
+Severity=Informational
+Facility=Application
+SymbolicName=MSG_WTSSESSION_CHANGE_SESSION_UNLOCK
+Language=English
+Changed session to Unlock (WTS).
+.
+
+Language=Japanese
+Changed session to Unlock (WTS).
 .
 
 

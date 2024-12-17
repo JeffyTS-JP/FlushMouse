@@ -104,7 +104,7 @@
 //
 // MessageText:
 //
-// Sortcut Events
+// Shortcut Events
 //
 #define Shortcut_CATEGORY                ((DWORD)0x00000005L)
 
@@ -353,5 +353,23 @@
 // Changed the display state to OFF (APM).
 //
 #define MSG_PBT_APMPOWERSTATUSCHANGE_DISPLAY_OFF ((DWORD)0x40000208L)
+
+//
+// MessageId: MSG_WTSSESSION_CHANGE_SESSION_LOCK
+//
+// MessageText:
+//
+// Changed session to Lock (WTS).
+//
+#define MSG_WTSSESSION_CHANGE_SESSION_LOCK ((DWORD)0x40000209L)
+
+//
+// MessageId: MSG_WTSSESSION_CHANGE_SESSION_UNLOCK
+//
+// MessageText:
+//
+// Changed session to Unlock (WTS).
+//
+#define MSG_WTSSESSION_CHANGE_SESSION_UNLOCK ((DWORD)0x4000020AL)
 
 ///* = EOF = */

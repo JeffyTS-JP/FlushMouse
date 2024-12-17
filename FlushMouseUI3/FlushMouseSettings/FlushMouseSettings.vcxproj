@@ -25,32 +25,23 @@
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformMinVersion>10.0.19041.0</WindowsTargetPlatformMinVersion>
     <UseWinUI>true</UseWinUI>
-    <!-- @@@ https://docs.microsoft.com/ja-JP/windows/apps/winui/winui3/create-your-first-winui3-app#non-msix-packaged-create-a-new-project-for-a-non-msix-packaged-c-or-c-winui-3-desktop-app -->
     <AppxPackage>false</AppxPackage>
     <WindowsPackageType>None</WindowsPackageType>
-    <!--@@@ start https://learn.microsoft.com/ja-jp/windows/apps/package-and-deploy/project-properties -->
     <WindowsAppSdkBootstrapInitialize>false</WindowsAppSdkBootstrapInitialize>
     <WindowsAppSdkUndockedRegFreeWinRTInitialize>false</WindowsAppSdkUndockedRegFreeWinRTInitialize>
-    <!-- @@@ emd -->
     <!--WindowsAppSDKBootstrapAutoInitializeOptions_Default>true</WindowsAppSDKBootstrapAutoInitializeOptions_Default-->
     <!--WindowsAppSDKBootstrapAutoInitializeOptions_None>true</WindowsAppSDKBootstrapAutoInitializeOptions_None-->
     <WindowsAppSDKBootstrapAutoInitializeOptions_OnError_DebugBreak_IfDebuggerAttached>true</WindowsAppSDKBootstrapAutoInitializeOptions_OnError_DebugBreak_IfDebuggerAttached>
-    <!-- @@@ -->
-    <!-- @@@ https://tera1707.com/entry/2022/07/29/043705 -->
     <SelfContained>true</SelfContained>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-    <!-- @@@ -->
-    <!-- @@@ for Windows APP SDK Ver. 1.5 -->
     <ShouldComputeInputPris>true</ShouldComputeInputPris>
   </PropertyGroup>
-  <!-- @@@ -->
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
     </AppxManifest>
   </ItemGroup>
-  <!-- @@@ -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -112,8 +103,6 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
     <ClCompile>
-      <!-- @@@ https://docs.microsoft.com/ja-jp/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/guides/applifecycle -->
-      <!-- @@@ 障害が発生しているモジュール名: MSVCP140.dll、バージョン: 14.36.32532.0、タイム スタンプ: 0x04a30cf0 例外コード: 0xc0000005 -->
       <!--PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions-->
       <PreprocessorDefinitions>_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|arm64'">Default</ConformanceMode>
@@ -157,7 +146,6 @@ Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configu
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
     <ClCompile>
-      <!-- @@@ https://docs.microsoft.com/ja-jp/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/guides/applifecycle-->
       <!--PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions-->
       <PreprocessorDefinitions>_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Release|arm64'">Default</ConformanceMode>
@@ -275,8 +263,6 @@ Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configu
       <Project>{ccaf431f-ce8e-4879-9b1f-3f1df4ac2269}</Project>
     </ProjectReference>
   </ItemGroup>
-  <!--@@@-->
-  <!--@@@-->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.25231-preview\build\Microsoft.Windows.SDK.BuildTools.targets" Condition="Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.25231-preview\build\Microsoft.Windows.SDK.BuildTools.targets')" />
