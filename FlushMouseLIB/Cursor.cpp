@@ -646,9 +646,9 @@ BOOL		CCursor::bIMEModeMouseByWndThreadRoutine(LPVOID lpvParam)
 				bIsBusyCursor = TRUE;
 				dwIMEModeMouse = IMEHIDE;
 			}
-			else if (((CursorInfoCurrent.hCursor == This->hCursorSizeNWSE) || (CursorInfoCurrent.hCursor == This->hCursorSizeNESW)
+			else if ((CursorInfoCurrent.hCursor == This->hCursorSizeNWSE) || (CursorInfoCurrent.hCursor == This->hCursorSizeNESW)
 				|| (CursorInfoCurrent.hCursor == This->hCursorSizeWE) || (CursorInfoCurrent.hCursor == This->hCursorSizeNS)
-				|| (CursorInfoCurrent.hCursor == This->hCursorSizeAll))) {
+				|| (CursorInfoCurrent.hCursor == This->hCursorSizeAll) || (CursorInfo.flags != CURSOR_SHOWING)) {
 				dwIMEModeMouse = IMEHIDE;
 			}
 			else if ((dwIMEModeMouse == IMEOFF) || (dwIMEModeMouse == IMEHIDE)) {
@@ -1237,7 +1237,7 @@ BOOL		CCursor::bSetSystemCursor(LPMOUSECURSOR lpstMC, int iCursorSizeX, int iCur
 		if (err == ERROR_MOD_NOT_FOUND) {
 			if (CursorSub)	CursorSub->bUnLoadCursorData();
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
-			vMessageBox(hMainWnd, IDS_CANTCHANGECURSOR, MessageBoxTYPE);
+			vMessageBox(hMainWnd, IDS_CANTCHANGECURSOR, MessageBoxTYPE, __func__, __LINE__);
 			PostMessage(hMainWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			return FALSE;
 		}

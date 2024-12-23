@@ -109,6 +109,7 @@ BOOL		CTaskTray::bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle
 							}
 							catch (BOOL bRet) {
 								if (!bRet) {
+									bReportEvent(MSG_TASKTRAY_REGISTER_FAILD, APPLICATION_CATEGORY);
 									return FALSE;
 								}
 							}
@@ -117,9 +118,9 @@ BOOL		CTaskTray::bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle
 							}
 						}
 						else {
+							bReportEvent(MSG_TASKTRAY_REGISTER_FAILD, APPLICATION_CATEGORY);
 							return FALSE;
 						}
-						return FALSE;
 					}
 				}
 				catch (...) {
@@ -127,6 +128,7 @@ BOOL		CTaskTray::bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle
 				}
 			}
 			else {
+				bReportEvent(MSG_TASKTRAY_REGISTER_FAILD, APPLICATION_CATEGORY);
 				return FALSE;
 			}
 		}
@@ -145,6 +147,15 @@ BOOL		CTaskTray::bReCreateTaskTrayWindow(HWND hWnd) const
 	if (bDestroyTaskTrayWindow(hWnd)) {
 	}
 	HICON	hIcon = NULL;
+	if ((hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_SMALL))) != NULL) {
+		for (int i = 0; i < 3; i++) {
+			if (bCreateTaskTrayWindow(hWnd, hIcon, szTitle))	break;
+			Sleep(1000);
+		}
+	}
+	else {
+		return FALSE;
+	}
 	if ((hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE))) != NULL) {
 		BOOL	bRet = FALSE;
 		for (int i = 0; i < 3; i++) {

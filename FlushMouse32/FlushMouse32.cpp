@@ -82,7 +82,7 @@ static LRESULT			Cls_OnPowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETT
 static VOID CALLBACK	vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
 static BOOL				bReportEvent(DWORD dwEventID, WORD wCategory);
 static BOOL				bDestroyTaskTrayWindow(HWND hWnd);
-static void				vMessageBox(HWND hWnd, UINT uID, UINT uType);
+static void				vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine);
 
 //
 // wWinMain()
@@ -116,7 +116,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 				SetFocus(GetLastActivePopup(hWnd));
 				PostMessage(hWnd, WM_DESTROY, NULL, NULL);
 				if (i == 1) {
-					vMessageBox(NULL, IDS_ALREADYRUN, MessageBoxTYPE);
+					vMessageBox(NULL, IDS_ALREADYRUN, MessageBoxTYPE, NULL, 0);
 					return (-1);
 				}
 			}
@@ -126,7 +126,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 	if (*lpCmdLine == _T('\0')) {
 		if ((hParentWnd = FindWindow(CLASS_FLUSHMOUSE, NULL)) == NULL) {
-			vMessageBox(NULL, IDS_NOTFORKBY64, MessageBoxTYPE);
+			vMessageBox(NULL, IDS_NOTFORKBY64, MessageBoxTYPE, NULL, 0);
 			return (-1);
 		}
 	}
@@ -250,7 +250,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 	
 	PowerNotification = new CPowerNotification(hWnd);
 	if (PowerNotification == NULL) {
-		vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE);
+		vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE, __func__, __LINE__);
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		return FALSE;
 	}
@@ -259,14 +259,14 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 	if (SetUserObjectInformation(GetCurrentProcess(), UOI_TIMERPROC_EXCEPTION_SUPPRESSION, &bBool, sizeof(BOOL)) != FALSE) {
 		if (uCheckProcTimer == NULL) {
 			if ((uCheckProcTimer = SetTimer(hWnd, nCheckProcTimerID, nCheckProcTimerTickValue, (TIMERPROC)&vCheckProcTimerProc)) == 0) {
-				vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE);
+				vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE, __func__, __LINE__);
 				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 				return FALSE;
 			}
 		}
 	}
 	else {
-		vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE);
+		vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE, __func__, __LINE__);
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		return FALSE;
 	}
@@ -315,6 +315,7 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 	if (uTimerID == nCheckProcTimerID) {
 		HWND	_hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
 		if (!_hWnd || (_hWnd != hParentWnd)) {
+			bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION32_CATEGORY);
 			if (hParentWnd)	bDestroyTaskTrayWindow(hParentWnd);
 			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION32_CATEGORY);
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
@@ -371,14 +372,20 @@ static BOOL	bReportEvent(DWORD dwEventID, WORD wCategory)
 //
 // vMessageBox()
 //
-static void vMessageBox(HWND hWnd, UINT uID, UINT uType)
+static void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine)
 {
-	TCHAR       lpText[MAX_LOADSTRING];
+	TCHAR	_lpFunc[MAX_LOADSTRING]{};
+	TCHAR	lpText[(MAX_LOADSTRING * 2)]{};
+
 	try {
 		throw LoadString(hInst, uID, lpText, MAX_LOADSTRING);
 	}
 	catch (int i) {
 		if (i != 0) {
+			if (lpFunc && (dwLine != 0)) {
+				MultiByteToWideChar (CP_ACP, 0, lpFunc, -1, _lpFunc, MAX_LOADSTRING);
+				_sntprintf_s(lpText, (MAX_LOADSTRING * 2), _TRUNCATE, L"%s\n\n (%s : %d : %08X)", lpText, _lpFunc, dwLine, GetLastError());
+			}
 			try {
 				throw MessageBox(hWnd, lpText, szTitle, uType);
 			}
@@ -386,7 +393,7 @@ static void vMessageBox(HWND hWnd, UINT uID, UINT uType)
 				return;
 			}
 			catch (...) {
-				return;
+				return;	
 			}
 		}
 	}
@@ -454,13 +461,11 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 			switch (PowerStatus.ACLineStatus) {
 			case 0:
 				if (hParentWnd)	bDestroyTaskTrayWindow(hParentWnd);
-				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION32_CATEGORY);
 				break;
 			case 1:
 				if (!_hWnd || (_hWnd != hParentWnd)) {
 					if (hParentWnd)	bDestroyTaskTrayWindow(hParentWnd);
 				}
-				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION32_CATEGORY);
 				break;
 			default:
 				break;
