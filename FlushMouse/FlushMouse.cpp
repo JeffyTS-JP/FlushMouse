@@ -72,6 +72,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	_ASSERTE(_CrtCheckMemory());
 #endif
 	
+	SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
+
 	int	iRet = 0;
 	if ((iRet = iCheckCmdLine(lpCmdLine)) != 1) {
 		return (iRet);

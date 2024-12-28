@@ -94,12 +94,7 @@ namespace FlushMouseUI3DLL {
 					lpCaption = "FlushMouse";
 					lpText = "FlushMouse の新しいバージョンは見つかりませんでした";
 				}
-				try {
-					Task<long> messageBox = Task<long>.Run(() => MessageBox(g_hSettingsWnd, lpText, lpCaption, (MB_OK | MB_ICONINFORMATION | MB_TOPMOST)));
-					long _ = await messageBox;
-				}
-				catch (Exception) {
-				}
+				MessageBox(g_hSettingsWnd, lpText, lpCaption, (MB_OK | MB_ICONINFORMATION | MB_TOPMOST));
 				m_Sentinel = true;
 			}
 		}

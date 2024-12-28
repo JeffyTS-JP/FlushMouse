@@ -274,6 +274,15 @@
 #define MSG_DETECT_FLUSHMOUSE_STOP       ((DWORD)0x00008103L)
 
 //
+// MessageId: MSG_FLUSHMOUSE_ALREADY_RUN
+//
+// MessageText:
+//
+// FlushMouse already run.
+//
+#define MSG_FLUSHMOUSE_ALREADY_RUN       ((DWORD)0x00008104L)
+
+//
 // MessageId: MSG_PBT_APMSUSPEND
 //
 // MessageText:

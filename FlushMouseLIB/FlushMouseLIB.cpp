@@ -188,28 +188,18 @@ int			iCheckCmdLine(LPCTSTR lpCmdLine)
 		SetFocus(GetLastActivePopup(hWnd));
 		PostMessage(hWnd, WM_DESTROY, NULL, NULL);
 		for (int i = 10; i > 0; i--) {
-			Sleep(500);
+			Sleep(1000);
 			if ((hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL)) != NULL) {
 				SetFocus(GetLastActivePopup(hWnd));
 				PostMessage(hWnd, WM_DESTROY, NULL, NULL);
 				if (i == 1) {
-					if ((*lpCmdLine != _T('\0')) && (CompareStringOrdinal(lpCmdLine, -1, L"/Quit", -1, TRUE) == CSTR_EQUAL)) {
-						bReportEvent(MSG_QUIT_FLUSHMOUSE_EVENT, Shortcut_CATEGORY);
-						return (0);
-					}
-					Resource = new CResource(FLUSHMOUSE_EXE);
-					if (!Resource || Resource->hLoad()) {
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
-						vMessageBox(NULL, IDS_ALREADYRUN, MessageBoxTYPE, NULL, 0);
-					}
-					if (Resource)	delete	Resource;
+					bReportEvent(MSG_FLUSHMOUSE_ALREADY_RUN, APPLICATION_CATEGORY);
 					return (-1);
 				}
 			}
 		}
 	}
 	if ((*lpCmdLine != _T('\0')) && (CompareStringOrdinal(lpCmdLine, -1, L"/Quit", -1, TRUE) == CSTR_EQUAL)) {
-		bReportEvent(MSG_QUIT_FLUSHMOUSE_EVENT, Shortcut_CATEGORY);
 		return (0);
 	}
 	return (1);
@@ -1087,7 +1077,8 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 	if (FlushMouseHook == NULL) {
 		FlushMouseHook = new CFlushMouseHook;
 		if (!FlushMouseHook || !FlushMouseHook->bHookSet(hWnd, FLUSHMOUSE_DLL, FLUSHMOUSE32_EXE)) {
-			if (GetLastError() == ERROR_MOD_NOT_FOUND) {
+			DWORD	dwErr = GetLastError();
+			if ((dwErr == ERROR_MOD_NOT_FOUND) || (dwErr == ERROR_SHARING_VIOLATION)) {
 				Sleep(3000);
 				if (!FlushMouseHook || !FlushMouseHook->bHookSet(hWnd, FLUSHMOUSE_DLL, FLUSHMOUSE32_EXE)) {
 					bReportEvent(MSG_THREAD_HOOK_TIMER_START_FAILED, APPLICATION_CATEGORY);
@@ -1209,6 +1200,7 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 	if (uTimerID == nCheckProcTimerID) {
 		if (FindWindow(CLASS_FLUSHMOUSE32, NULL) == NULL) {
 			bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION_CATEGORY);
+			SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
 			if (FlushMouseHook != NULL) {
 				delete	FlushMouseHook;
 				FlushMouseHook = NULL;

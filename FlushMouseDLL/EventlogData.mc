@@ -294,10 +294,6 @@ Language=Japanese
 Register TaskTray Failed.
 .
 
-Language=Japanese
-Registered TaskTray.
-.
-
 MessageId=0x8103
 Severity=Success
 Facility=Application
@@ -308,6 +304,18 @@ Detected Stopping FlushMouse Process.
 
 Language=Japanese
 Detected Stopping FlushMouse Process.
+.
+
+MessageId=0x8104
+Severity=Success
+Facility=Application
+SymbolicName=MSG_FLUSHMOUSE_ALREADY_RUN
+Language=English
+FlushMouse already run.
+.
+
+Language=Japanese
+FlushMouseはすでに起動しています。
 .
 
 MessageId=0x0200

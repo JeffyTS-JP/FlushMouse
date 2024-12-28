@@ -5,13 +5,10 @@
 
 #### リリース情報
 
-* **2024/12/25　　Version 3.4.10.3 を リリースしました**
+* **2025/01/10　　Version 3.4.11.5 を リリースしました**
 
 * **(主な変更点)**
-   * コードサイニングが正常に行われていなかったので再リリースします。機能的には特に問題はありませんが、 こちらのバージョンに差替えてください。お手数をおかけします
-   * マウスカーソルが消えているときの処理を見直しました
-   * エラーが発生したときの処理と、メッセージ表示を改良しました
-   * 一部のアプリケーションで IME モードの誤表示が発生するのを修正しました
+   * 異常終了したときの起動方法を見直しました
    * その他、細かなバグの修正や機能改善をしました
    
 #### DEMO
@@ -33,8 +30,8 @@
 
 #### Copyright
    * Copyright (C) 1993 - JeffyTS. All rights reserved.
-   * FlushMouse を最初に作成したのは、1993年でしたが、使い物になるようなものではありませんでした。その後、2022年に偶然見つけて開発を続けています
    * 詳しくはインストール時に表示される「ソフトウェア使用許諾契約」をお読みください。
+   * FlushMouse を最初に作成したのは、1993年でしたが、使い物になるようなものではありませんでした。その後、2022年に偶然見つけて開発を続けています
 
 #### プライバシーポリシー
    * デスクトップ版、UI3版共に個人情報の収集などは一切行っていません
@@ -257,11 +254,11 @@
   7. 拡張機能 -> 検索で　WiXと入力し「 WiX v3 - Visual Studio 2022 Extension」を選択して、Visual Studioを終了するとインストールが始まります
   8. .NET Framework SDK 8 を[https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-8.0.101-windows-x64-installer](https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-8.0.101-windows-x64-installer)からダウンロードしてインストールします
   9. Visual Studioを再起動して、リポジトリのクローン -> リポジトリの場所に [https://github.com/JeffyTS-JP/FlushMouse.git](https://github.com/JeffyTS-JP/FlushMouse.git)　を入力してクローンします
-  10. NuGet CLI(nuget.exe)を[https://dist.nuget.org/win-x86-commandline/latest/nuget.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)からダウンロードして、FlushMouseをクローンしたフォルダの直下の「NuGet」フォルダ(デフォルトでは C:\Users\User\source\repos\FlushMouse\NuGet です)に入れます
+  10. NuGet CLI(nuget.exe)を[https://dist.nuget.org/win-x86-commandline/latest/nuget.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)からダウンロードして、FlushMouseをクローンしたフォルダの直下の「NuGet」フォルダ(デフォルトでは C:\Users\\[User]\source\repos\FlushMouse\NuGet です)に入れます
   11. Windowsの 設定 -> システム -> 開発者向け で 開発者モードを ON にします
   12. 次に、ツール -> NuGet パッケージマネージャー -> ソリューションの NuGet パッケージの管理 (Altキーを押しながら続けて T N N) を開き、右側にある歯車(⚙)を選択して、ダイアログを開きます
   13. まず、右上のプラス(＋)を押してから、下にある「ソース」欄には、nuget.exeを入れた「NuGet」フォルダ(デフォルトでは C:\Users\\[User]\source\repos\FlushMouse\NuGet)を選択して「更新」を押します(名前については適当で構いません)
-  14. その後 OK を押してダイアログを閉じ、上の歯車の左にある「パッケージソース」を「すべて」に変更します。次に「復元」選択します
+  14. その後 OK を押してダイアログを閉じ、上の歯車の左にある「パッケージソース」を「すべて」に変更します。次に「復元」を選択します
 
 * ビルド方法です
   1. ソリューションプラットフォームを必ず「**MixedPlatform**」にしてビルドします (Ctrl + Shift + B)

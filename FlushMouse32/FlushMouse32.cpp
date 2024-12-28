@@ -384,7 +384,7 @@ static void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dw
 		if (i != 0) {
 			if (lpFunc && (dwLine != 0)) {
 				MultiByteToWideChar (CP_ACP, 0, lpFunc, -1, _lpFunc, MAX_LOADSTRING);
-				_sntprintf_s(lpText, (MAX_LOADSTRING * 2), _TRUNCATE, L"%s\n\n (%s : %d : %08X)", lpText, _lpFunc, dwLine, GetLastError());
+				_sntprintf_s(lpText, (MAX_LOADSTRING * 2), _TRUNCATE, L"%s\n\n (%s : %d : 0x%08X)", lpText, _lpFunc, dwLine, GetLastError());
 			}
 			try {
 				throw MessageBox(hWnd, lpText, szTitle, uType);

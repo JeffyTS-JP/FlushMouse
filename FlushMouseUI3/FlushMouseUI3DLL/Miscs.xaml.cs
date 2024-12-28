@@ -8,8 +8,10 @@
 //
 
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 using Windows.Graphics;
 
@@ -140,6 +142,7 @@ namespace FlushMouseUI3DLL {
 		[return: MarshalAs(UnmanagedType.I8)]
 		internal static partial Int64 MessageBoxW(Int64 hWnd, string MessageBox, string lpCaption, UInt32 uType);
 		internal const UInt32 MB_OK = 0x00000000;
+		internal const UInt32 MB_ICONSTOP= 0x00000010;
 		internal const UInt32 MB_ICONINFORMATION = 0x00000040;
 		internal const UInt32 MB_TOPMOST = 0x00040000;
 
@@ -270,9 +273,20 @@ namespace FlushMouseUI3DLL {
 			}
 		}
 
+		public static async void MessageBox(Int64 hWnd, String lpText, String lpCaption, UInt32 uType)
+		{
+			try {
+				Task<long> messageBox = Task<long>.Run(() => _MessageBox(hWnd, lpText, lpCaption, uType));
+				long _ = await messageBox;
+			}
+			catch (Exception) {
+				Debug.WriteLine("Message :");
+			}
+		}
+
 		private static Int64 hParentWnd = 0;
 		private static Int64 hMessageBoxHook;
-		public static long MessageBox(Int64 hWnd, string MessageBox, string lpCaption, UInt32 uType)
+		private static long _MessageBox(Int64 hWnd, string lpText, string lpCaption, UInt32 uType)
 		{
 			long result = 0;
 			try
@@ -281,7 +295,7 @@ namespace FlushMouseUI3DLL {
 				Int32 dwThreadID = GetCurrentThreadId();
 				hParentWnd = hWnd;
 				hMessageBoxHook = SetWindowsHookExW(WH_CBT, new(_HookProc), hInstance, dwThreadID);
-				result = MessageBoxW(hWnd, MessageBox, lpCaption, uType);
+				result = MessageBoxW(hWnd, lpText, lpCaption, uType);
 			}
 			catch (Exception)
 			{
