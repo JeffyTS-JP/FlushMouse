@@ -44,6 +44,8 @@ CProfile::CProfile()
 		lpstAppRegData->iModeMouseSize = 24;											// マウス左に表示するIMEモードのサイズ
 		lpstAppRegData->iModeCaretSize = 24;											// キャレット左に表示するIMEモードのサイズ
 		lpstAppRegData->iModeByWndSize = 24;											// マウス右下に表示するIMEモードのサイズ
+		lpstAppRegData->iModeMouseDistanceX = -24;										// マウス左からの表示距離
+		lpstAppRegData->iModeCaretDistanceX = -12;										// キャレットからの表示距離
 		lpstAppRegData->dwInThreadSleepTime = 0;										// Thread内の待ち時間(IMECursorChangeThreadのみ)
 		lpstAppRegData->dwWaitWaveTime = 400;											// IME mode displayの waveの待ち時間
 		lpstAppRegData->dwAdditionalWaitTime = 300;										// IME mode displayの 追加待ち時間
@@ -355,6 +357,8 @@ BOOL		CProfile::bGetProfileData4IMEMode() const
 	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeCaretSize"), (LPDWORD)&lpstAppRegData->iModeCaretSize, lpstAppRegData->iModeCaretSize))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeByWndSize"), (LPDWORD)&lpstAppRegData->iModeByWndSize, lpstAppRegData->iModeByWndSize))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("IMEModeDistance"), (LPDWORD)&lpstAppRegData->iIMEModeDistance, lpstAppRegData->iIMEModeDistance))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeMouseDistanceX"), (LPDWORD)&lpstAppRegData->iModeMouseDistanceX, lpstAppRegData->iModeMouseDistanceX))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeCaretDistanceX"), (LPDWORD)&lpstAppRegData->iModeCaretDistanceX, lpstAppRegData->iModeCaretDistanceX))	goto Cleanup;
 
 	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseIMEOFFChar"), lpstAppRegData->szNearDrawMouseIMEOFFChar, MAX_IMEMODECHAR))	goto Cleanup;
 	if (!CReg->bGetSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseHANEISU_IMEONChar"), lpstAppRegData->szNearDrawMouseHANEISU_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;
@@ -420,6 +424,8 @@ BOOL		CProfile::bSetProfileData4IMEMode() const
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeCaretSize"), lpstAppRegData->iModeCaretSize))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeByWndSize"), lpstAppRegData->iModeByWndSize))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("IMEModeDistance"), lpstAppRegData->iIMEModeDistance))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeMouseDistanceX"), lpstAppRegData->iModeMouseDistanceX))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("ModeCaretDistanceX"), lpstAppRegData->iModeCaretDistanceX))	goto Cleanup;
 
 	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseIMEOFFChar"), lpstAppRegData->szNearDrawMouseIMEOFFChar, MAX_IMEMODECHAR))	goto Cleanup;
 	if (!CReg->bSetRegValueString(PROFILE_HKEY, PROFILE_SUBKEY, _T("NearDrawMouseHANEISU_IMEONChar"), lpstAppRegData->szNearDrawMouseHANEISU_IMEONChar, MAX_IMEMODECHAR))	goto Cleanup;

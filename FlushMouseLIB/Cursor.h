@@ -83,6 +83,8 @@ typedef struct tagIMECursorData
 	int			iModeMouseSize;
 	int			iModeCaretSize;
 	int			iModeByWndSize;
+	int			iModeMouseDistanceX;
+	int			iModeCaretDistanceX;
 	DWORD		dwInThreadSleepTime;
 	DWORD		dwDisplayModeTime;
 	BOOL		bDisplayIMEModeOnCursor;
@@ -139,7 +141,7 @@ private:
 	BOOL		bRegisterDrawIMEModeThread(HWND hWndObserved);
 	BOOL		bIsIMECursorChanged(LPIMECURSORDATA lpstCursorData);
 	BOOL		bDrawIMEModeOnDisplay(LPIMECURSORDATA lpstCursorData);
-	BOOL		bCalcDisplayModeRect(int iModeSizeX, int iModeSizeY, LPRECT lpRect);
+	BOOL		bCalcDisplayModeRect(LPINT iModeSizeX, LPINT iModeSizeY, LPRECT lpRect);
 	HWND		hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPIMECURSORDATA lpstCursorData, BOOL bAttachThreadInput);
 	BOOL		bAccessibleObjectFromWindowAsync(HWND hWnd, DWORD dwId, REFIID riId, void **ppvObject);
 	BOOL		bAdjustModeSizeByMonitorDPI(int iModeSizeX, int iModeSizeY, LPRECT lprcCaret);

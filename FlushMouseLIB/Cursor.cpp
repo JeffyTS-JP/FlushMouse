@@ -273,6 +273,8 @@ VOID			CCursor::vSetParamFromRegistry()
 		stIMECursorData.iModeMouseSize = Profile->lpstAppRegData->iModeMouseSize;
 		stIMECursorData.iModeCaretSize = Profile->lpstAppRegData->iModeCaretSize;
 		stIMECursorData.iModeByWndSize = Profile->lpstAppRegData->iModeByWndSize;
+		stIMECursorData.iModeMouseDistanceX = Profile->lpstAppRegData->iModeMouseDistanceX;
+		stIMECursorData.iModeCaretDistanceX = Profile->lpstAppRegData->iModeCaretDistanceX;
 		stIMECursorData.dwInThreadSleepTime = Profile->lpstAppRegData->dwInThreadSleepTime;
 		stIMECursorData.dwDisplayModeTime = Profile->lpstAppRegData->dwDisplayModeTime;
 		stIMECursorData.bDisplayFocusWindowIME = Profile->lpstAppRegData->bDisplayFocusWindowIME;
@@ -734,7 +736,7 @@ BOOL WINAPI	CCursor::bDrawIMEModeRoutine(LPVOID lpvParam)
 	LPIMECURSORDATA	lpstCursorData = (LPIMECURSORDATA)lpvParam;
 	CCursor	*This = reinterpret_cast<CCursor*>(lpvParam);
 
-	CURSORINFO	CursorInfo{CursorInfo.cbSize = sizeof(CURSORINFO)};
+	CURSORINFO	CursorInfo{ CursorInfo.cbSize = sizeof(CURSORINFO) };
 	if (!GetCursorInfo(&CursorInfo))	return FALSE;
 	if (((CursorInfo.hCursor == This->hCursorWait) || (CursorInfo.hCursor == This->hCursorAppStarting)
 		|| (CursorInfo.hCursor == This->hCursorSizeNWSE) || (CursorInfo.hCursor == This->hCursorSizeNESW)
@@ -782,7 +784,8 @@ BOOL		CCursor::bDrawIMEModeOnDisplay(LPIMECURSORDATA lpstCursorData)
 	BOOL	bRet = FALSE;
 	RECT	rc{};
 	lpstCursorData->bIMECursorChangeThreadSentinel = TRUE;
-	if (bCalcDisplayModeRect(lpstCursorData->iModeMouseSize, lpstCursorData->iModeMouseSize, &rc)) {
+	int	iModeSizeX = lpstCursorData->iModeMouseSize, iModeSizeY = lpstCursorData->iModeMouseSize;
+	if (bCalcDisplayModeRect(&iModeSizeX, &iModeSizeY, &rc)) {
 		if (EnumDisplayMonitors(NULL, &rc, (MONITORENUMPROC)&bIconDrawEnumProc, (LPARAM)lpstCursorData) != 0) {
 			bRet = TRUE;
 		}
@@ -823,7 +826,7 @@ BOOL		CCursor::bIconDrawEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, L
 //
 // bCalcDisplayModeRect()
 //
-BOOL		CCursor::bCalcDisplayModeRect(int iModeSizeX, int iModeSizeY, LPRECT lpRect)
+BOOL		CCursor::bCalcDisplayModeRect(LPINT iModeSizeX, LPINT iModeSizeY, LPRECT lpRect)
 {
 	POINT	pt{};
 	if (GetCursorPos(&pt)) {
@@ -831,11 +834,10 @@ BOOL		CCursor::bCalcDisplayModeRect(int iModeSizeX, int iModeSizeY, LPRECT lpRec
 		if ((hMonitor = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST)) != NULL) {
 			UINT	dpiX = 0, dpiY = 0;
 			if ((GetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY)) == S_OK) {
-				int iIconSizeX = 0, iIconSizeY = 0;
-				iIconSizeX = iModeSizeX * (dpiX + USER_DEFAULT_SCREEN_DPI - 1) / USER_DEFAULT_SCREEN_DPI + 1;
-				iIconSizeY = iModeSizeY * (dpiY + USER_DEFAULT_SCREEN_DPI - 1) / USER_DEFAULT_SCREEN_DPI + 1;
-				lpRect->left = pt.x - ((iIconSizeX * 3 + 1) / 2);	lpRect->right = lpRect->left + iIconSizeX;
-				lpRect->top = pt.y - ((iIconSizeY + 1) / 2);		lpRect->bottom = lpRect->top + iIconSizeY;
+				*iModeSizeX = *iModeSizeX * (dpiX + USER_DEFAULT_SCREEN_DPI - 1) / USER_DEFAULT_SCREEN_DPI + 1;
+				*iModeSizeY = *iModeSizeY * (dpiY + USER_DEFAULT_SCREEN_DPI - 1) / USER_DEFAULT_SCREEN_DPI + 1;
+				lpRect->left = pt.x;	lpRect->right = lpRect->left + *iModeSizeX;
+				lpRect->top = pt.y;	lpRect->bottom = lpRect->top + *iModeSizeY;
 				return TRUE;
 			}
 		}
@@ -901,8 +903,6 @@ HWND		CCursor::hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPIMECURS
 											if (_IAccessible) {
 												if ((hResult = _IAccessible->accLocation(&pt.x, &pt.y, &sz.cx, &sz.cy, *lpVariant)) == S_OK) {
 													_IAccessible->Release();
-													lpstCursorData->rcCaret.left = pt.x;	lpstCursorData->rcCaret.top = pt.y;
-													lpstCursorData->rcCaret.right = pt.x + sz.cx;	lpstCursorData->rcCaret.bottom = pt.y + sz.cy;
 													if ((pt.x == 0) && (pt.y == 0) && (sz.cx == 0) && (sz.cy == 0)) {
 														lpstCursorData->rcCaret.left = 0;	lpstCursorData->rcCaret.right = 0;
 														lpstCursorData->rcCaret.top = 0;	lpstCursorData->rcCaret.bottom = 0;
@@ -910,6 +910,8 @@ HWND		CCursor::hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPIMECURS
 													}
 													else {
 														hWnd = lpGuiThreadInfo->hwndFocus;
+														lpstCursorData->rcCaret.left = pt.x;	lpstCursorData->rcCaret.top = pt.y;
+														lpstCursorData->rcCaret.right = pt.x + sz.cx;	lpstCursorData->rcCaret.bottom = pt.y + sz.cy;
 													}
 												}
 											}
@@ -1082,19 +1084,21 @@ BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData)
 					bFoundCaret = FALSE;
 				}
 				else {
+					iCaretSizeX = rcCaret.right - rcCaret.left, iCaretSizeY = rcCaret.bottom - rcCaret.top;
+#define MERGIN_X	8
+#define MERGIN_Y	-3
+					rcCaret.left = rcCaret.left + lpstCursorData->iModeCaretDistanceX + MERGIN_X;
+					rcCaret.right = rcCaret.left + iCaretSizeX;
+					rcCaret.top = lpstCursorData->rcCaret.top + ((lpstCursorData->rcCaret.bottom - lpstCursorData->rcCaret.top) / 2) - ((iCaretSizeY) / 2) + MERGIN_Y;
+					rcCaret.bottom = rcCaret.bottom + iCaretSizeY;
+#undef MERGIN_X
+#undef MERGIN_Y
 					dwIMEModeCaret = Cime->dwIMEMode(hCaretWnd, lpstCursorData->bForceHiragana);
 					iCaret = iGetCursorID(dwIMEModeCaret, lpstCursorData->lpstNearDrawCaretCursor);
 					if (iCaret == 0) dwIMEModeCaret = IMEOFF;
+					vAdjustFontXPosition(dwIMEModeCaret, lpstCursorData->lpstNearDrawCaretCursor[iCaret].szMode, &iCaretSizeX, &rcCaret);
 					CaretWindow->vSetModeStringColorFont(lpstCursorData->lpstNearDrawCaretCursor[iCaret].szMode, lpstCursorData->lpstNearDrawCaretCursor[iCaret].dwColor, lpstCursorData->lpstNearDrawCaretCursor[IMEMODE_IMEOFF].szFont);
 
-					iCaretSizeX = rcCaret.right - rcCaret.left, iCaretSizeY = rcCaret.bottom - rcCaret.top;
-#define MERGIN_X	1
-#define MERGIN_Y	1
-					rcCaret.left = rcCaret.left - MERGIN_X;
-					rcCaret.top = rcCaret.top -MERGIN_Y;
-#undef MERGIN_X
-#undef MERGIN_Y
-					vAdjustFontXPosition(dwIMEModeCaret, lpstCursorData->lpstNearDrawCaretCursor[iCaret].szMode, &iCaretSizeX, &rcCaret);
 					if (CaretWindow->bSetWindowPos(HWND_TOPMOST, rcCaret.left, rcCaret.top, iCaretSizeX, iCaretSizeY, (SWP_SHOWWINDOW | SWP_NOACTIVATE))) {
 						bFoundCaret = TRUE;
 					}
@@ -1132,8 +1136,16 @@ BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData)
 			break;
 		}
 		if (bFoundCaret == FALSE) {
-			if (bCalcDisplayModeRect(lpstCursorData->iModeMouseSize, lpstCursorData->iModeMouseSize, &rcCursor)) {
-				iCursorSizeX = rcCursor.right - rcCursor.left; iCursorSizeY = rcCursor.bottom - rcCursor.top;
+			iCursorSizeX = lpstCursorData->iModeMouseSize, iCursorSizeY = lpstCursorData->iModeMouseSize;
+			if (bCalcDisplayModeRect(&iCursorSizeX, &iCursorSizeY, &rcCursor)) {
+#define MERGIN_X	2
+#define MERGIN_Y	0
+				rcCursor.right = rcCursor.right - iCursorSizeX + lpstCursorData->iModeMouseDistanceX - MERGIN_X;
+				rcCursor.left = rcCursor.left - iCursorSizeX + lpstCursorData->iModeMouseDistanceX - MERGIN_X;
+				rcCursor.bottom = rcCursor.bottom - (iCursorSizeY / 2) + MERGIN_Y;
+				rcCursor.top = rcCursor.top - (iCursorSizeY / 2) + MERGIN_Y;
+#undef MERGIN_X
+#undef MERGIN_Y
 				vAdjustFontXPosition(dwIMEModeCursor, lpstCursorData->lpstNearDrawCaretCursor[iCursor].szMode, &iCursorSizeX, &rcCursor);
 				if (!lpstCursorData->bIMECursorChangeThreadSentinel) {
 					bRet = TRUE;

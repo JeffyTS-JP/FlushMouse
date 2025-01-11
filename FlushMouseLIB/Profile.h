@@ -33,6 +33,8 @@ typedef struct tagAppRegData
 	int			iModeMouseSize = 24;
 	int			iModeCaretSize = 24;
 	int			iModeByWndSize = 24;
+	int			iModeMouseDistanceX = -24;
+	int			iModeCaretDistanceX = -12;
 	DWORD		dwInThreadSleepTime = 0;
 	DWORD		dwWaitWaveTime = 400;
 	DWORD		dwAdditionalWaitTime = 300;

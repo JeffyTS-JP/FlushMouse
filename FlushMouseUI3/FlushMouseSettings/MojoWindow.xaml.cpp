@@ -146,6 +146,8 @@ void		SettingsExec(HWND hWnd, UINT32 uMsg, INT32 iSelectedPane)
 			m_Settings.iModeMouseSize(Profile->lpstAppRegData->iModeMouseSize);
 			m_Settings.iModeCaretSize(Profile->lpstAppRegData->iModeCaretSize);
 			m_Settings.iModeByWndSize(Profile->lpstAppRegData->iModeByWndSize);
+			m_Settings.iModeMouseDistanceX(Profile->lpstAppRegData->iModeMouseDistanceX);
+			m_Settings.iModeCaretDistanceX(Profile->lpstAppRegData->iModeCaretDistanceX);
 			m_Settings.dwDisplayModeTime(Profile->lpstAppRegData->dwDisplayModeTime);
 			m_Settings.dwAdditionalWaitTime(Profile->lpstAppRegData->dwAdditionalWaitTime);
 			m_Settings.dwWaitWaveTime(Profile->lpstAppRegData->dwWaitWaveTime);
@@ -305,6 +307,8 @@ void		SettingsApply()
 		Profile->lpstAppRegData->iModeMouseSize = m_Settings.iModeMouseSize();
 		Profile->lpstAppRegData->iModeCaretSize = m_Settings.iModeCaretSize();
 		Profile->lpstAppRegData->iModeByWndSize = m_Settings.iModeByWndSize();
+		Profile->lpstAppRegData->iModeMouseDistanceX = m_Settings.iModeMouseDistanceX();
+		Profile->lpstAppRegData->iModeCaretDistanceX = m_Settings.iModeCaretDistanceX();
 		Profile->lpstAppRegData->dwDisplayModeTime = m_Settings.dwDisplayModeTime();
 		Profile->lpstAppRegData->dwAdditionalWaitTime = m_Settings.dwAdditionalWaitTime();
 		Profile->lpstAppRegData->dwWaitWaveTime = m_Settings.dwWaitWaveTime();

@@ -40,6 +40,7 @@
 					<RowDefinition Height="*"/>
 					<RowDefinition Height="*"/>
 					<RowDefinition Height="*"/>
+					<RowDefinition Height="*"/>
 				</Grid.RowDefinitions>
 				<Grid Margin="0,14,0,0" Grid.Row="1">
 					<Grid.ColumnDefinitions>
@@ -55,11 +56,20 @@
 						<ColumnDefinition Width="*"/>
 						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
+					<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="180" Text="マウスカーソルからの距離"/>
+					<Slider Margin="20,-4,0,0" Grid.Column="1" HorizontalAlignment="Left" Width="400" x:Name="sl2" ValueChanged="Slider_ValueChanged"
+									Minimum="-50" Maximum="0" StepFrequency="1" SmallChange="1" Value="-24" TickFrequency="10" TickPlacement="Outside" SnapsTo="StepValues"/>
+				</Grid>
+				<Grid Margin="0,14,0,0" Grid.Row="3">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
 					<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="180" Text="フォント"/>
 					<ComboBox  Margin="-110,-4,0,0" Grid.Column="1" HorizontalAlignment="Left" Width="240" x:Name="Combo1" SelectionChanged="Combo_SelectionChanged" Header="" SelectedIndex="0">
 					</ComboBox>
 				</Grid>
-				<Grid Margin="0,14,0,0" Grid.Row="3">
+				<Grid Margin="0,14,0,0" Grid.Row="4">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*"/>
 						<ColumnDefinition Width="*"/>
@@ -69,7 +79,7 @@
 					<TextBlock Margin="70,4,0,0" Grid.Column="1"  HorizontalAlignment="Left" Text="色の変更"/>
 					<TextBlock Margin="60,4,0,0" Grid.Column="2"  HorizontalAlignment="Left" Text="文字の変更"/>
 				</Grid>
-				<Grid Margin="0,16,0,0" Grid.Row="4">
+				<Grid Margin="0,16,0,0" Grid.Row="5">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*"/>
 						<ColumnDefinition Width="*"/>
@@ -100,7 +110,7 @@
 					</Button>
 					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb1_1" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
-				<Grid Margin="0,12,0,0" Grid.Row="5">
+				<Grid Margin="0,12,0,0" Grid.Row="6">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*"/>
 						<ColumnDefinition Width="*"/>
@@ -131,7 +141,7 @@
 					</Button>
 					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb1_2" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
-				<Grid Margin="0,14,0,0" Grid.Row="6">
+				<Grid Margin="0,14,0,0" Grid.Row="7">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*"/>
 						<ColumnDefinition Width="*"/>
@@ -162,7 +172,7 @@
 					</Button>
 					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb1_3" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
-				<Grid Margin="0,14,0,0" Grid.Row="7">
+				<Grid Margin="0,14,0,0" Grid.Row="8">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*"/>
 						<ColumnDefinition Width="*"/>
@@ -193,7 +203,7 @@
 					</Button>
 					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb1_4" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
-				<Grid Margin="0,14,0,0" Grid.Row="8">
+				<Grid Margin="0,14,0,0" Grid.Row="9">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*"/>
 						<ColumnDefinition Width="*"/>
@@ -224,7 +234,7 @@
 					</Button>
 					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb1_5" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
-				<Grid Margin="0,14,0,0" Grid.Row="9">
+				<Grid Margin="0,14,0,0" Grid.Row="10">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*"/>
 						<ColumnDefinition Width="*"/>
@@ -271,6 +281,7 @@
 					<RowDefinition Height="*"/>
 					<RowDefinition Height="*"/>
 					<RowDefinition Height="*"/>
+					<RowDefinition Height="*"/>
 				</Grid.RowDefinitions>
 				<Grid Margin="0,14,0,0" Grid.Row="1">
 					<Grid.ColumnDefinitions>
@@ -278,10 +289,19 @@
 						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
 					<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="180" Text="IME モード表示のサイズ"/>
-					<Slider Margin="20,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl2" ValueChanged="Slider_ValueChanged"
+					<Slider Margin="20,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl3" ValueChanged="Slider_ValueChanged"
 									Minimum="8" Maximum="80" StepFrequency="1" SmallChange="1" Value="24" TickFrequency="8" TickPlacement="Outside" SnapsTo="StepValues"/>
 				</Grid>
 				<Grid Margin="0,14,0,0" Grid.Row="2">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+					<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="180" Text="キャレットからの距離"/>
+					<Slider Margin="20,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl4" ValueChanged="Slider_ValueChanged"
+									Minimum="-50" Maximum="0" StepFrequency="1" SmallChange="1" Value="-12" TickFrequency="10" TickPlacement="Outside" SnapsTo="StepValues"/>
+				</Grid>
+				<Grid Margin="0,14,0,0" Grid.Row="3">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*"/>
 						<ColumnDefinition Width="*"/>
@@ -290,7 +310,7 @@
 					<ComboBox  Margin="-110,-4,0,0" Grid.Column="1" HorizontalAlignment="Left" Width="240" x:Name="Combo2" SelectionChanged="Combo_SelectionChanged" Header="" SelectedIndex="0">
 					</ComboBox>
 				</Grid>
-				<Grid Margin="0,14,0,0" Grid.Row="3">
+				<Grid Margin="0,14,0,0" Grid.Row="4">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*"/>
 						<ColumnDefinition Width="*"/>
@@ -300,7 +320,7 @@
 					<TextBlock Margin="70,4,0,0" Grid.Column="1"  HorizontalAlignment="Left" Text="色の変更"/>
 					<TextBlock Margin="60,4,0,0" Grid.Column="2"  HorizontalAlignment="Left" Text="文字の変更"/>
 				</Grid>
-				<Grid Margin="0,16,0,0" Grid.Row="4">
+				<Grid Margin="0,16,0,0" Grid.Row="5">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*"/>
 						<ColumnDefinition Width="*"/>
@@ -331,7 +351,7 @@
 					</Button>
 					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb2_1" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
-				<Grid Margin="0,12,0,0" Grid.Row="5">
+				<Grid Margin="0,12,0,0" Grid.Row="6">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*"/>
 						<ColumnDefinition Width="*"/>
@@ -362,7 +382,7 @@
 					</Button>
 					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb2_2" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
-				<Grid Margin="0,14,0,0" Grid.Row="6">
+				<Grid Margin="0,14,0,0" Grid.Row="7">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*"/>
 						<ColumnDefinition Width="*"/>
@@ -393,7 +413,7 @@
 					</Button>
 					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb2_3" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
-				<Grid Margin="0,14,0,0" Grid.Row="7">
+				<Grid Margin="0,14,0,0" Grid.Row="8">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*"/>
 						<ColumnDefinition Width="*"/>
@@ -424,7 +444,7 @@
 					</Button>
 					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb2_4" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
-				<Grid Margin="0,14,0,0" Grid.Row="8">
+				<Grid Margin="0,14,0,0" Grid.Row="9">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*"/>
 						<ColumnDefinition Width="*"/>
@@ -455,7 +475,7 @@
 					</Button>
 					<TextBox Margin="0,0,0,0" Grid.Column="2" x:Name="tb2_5" GettingFocus="tb_GotFocus" LostFocus="tb_LostFocus" Width="14" AcceptsReturn="False" TextWrapping="NoWrap" AllowFocusWhenDisabled="False" Background="White" TextAlignment="Center" />
 				</Grid>
-				<Grid Margin="0,14,0,0" Grid.Row="9">
+				<Grid Margin="0,14,0,0" Grid.Row="10">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*"/>
 						<ColumnDefinition Width="*"/>
@@ -510,7 +530,7 @@
 						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
 					<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="180" Text="IME モード表示のサイズ"/>
-					<Slider Margin="20,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl3" ValueChanged="Slider_ValueChanged"
+					<Slider Margin="20,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl5" ValueChanged="Slider_ValueChanged"
 									Minimum="8" Maximum="80" StepFrequency="1" SmallChange="1" Value="24" TickFrequency="8" TickPlacement="Outside" SnapsTo="StepValues"/>
 				</Grid>
 				<Grid Margin="0,14,0,0" Grid.Row="2">
@@ -519,7 +539,7 @@
 						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
 					<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="200" Text="マウスカーソルからの距離"/>
-					<Slider Margin="0,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl4" ValueChanged="Slider_ValueChanged"
+					<Slider Margin="0,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl6" ValueChanged="Slider_ValueChanged"
 									Minimum="0" Maximum="80" StepFrequency="1" SmallChange="1" Value="32" TickFrequency="8" TickPlacement="Outside" SnapsTo="StepValues"/>
 				</Grid>
 				<Grid Margin="0,14,0,0" Grid.Row="3">

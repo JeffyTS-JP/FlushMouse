@@ -25,6 +25,8 @@ namespace FlushMouseUI3DLL {
 		public static Int32 iModeCaretSize { get; set; }
 		public static Int32 iModeByWndSize { get; set; }
 		public static Int32 iIMEModeDistance { get; set; }
+		public static Int32 iModeMouseDistanceX { get; set; }
+		public static Int32 iModeCaretDistanceX { get; set; }
 
 		public static String szNearDrawMouseIMEOFFChar { get; set; }
 		public static String szNearDrawMouseHANEISU_IMEONChar { get; set; }
@@ -103,7 +105,7 @@ namespace FlushMouseUI3DLL {
 			}
 			if (!bDoModeDispByIMEKeyDown && !bDoModeDispByMouseBttnUp && !bDoModeDispByCtrlUp) {
 				Combo1.IsEnabled = false;
-				sl1.IsEnabled = false;
+				sl1.IsEnabled = false;          sl2.IsEnabled = false;
 				Button1_2.IsEnabled = false;	Button1_3.IsEnabled = false;	Button1_4.IsEnabled = false;
 				Button1_5.IsEnabled = false;	Button1_6.IsEnabled = false;
 				tb1_2.IsEnabled = false;		tb1_3.IsEnabled = false;		tb1_4.IsEnabled = false;
@@ -111,7 +113,7 @@ namespace FlushMouseUI3DLL {
 			}
 			else {
 				Combo1.IsEnabled = true;
-				sl1.IsEnabled = true;
+				sl1.IsEnabled = true;           sl2.IsEnabled = true;
 				Button1_2.IsEnabled = true;		Button1_3.IsEnabled = true;		Button1_4.IsEnabled = true;
 				Button1_5.IsEnabled = true;		Button1_6.IsEnabled = true;
 				tb1_2.IsEnabled = true;			tb1_3.IsEnabled = true;			tb1_4.IsEnabled = true;
@@ -119,23 +121,22 @@ namespace FlushMouseUI3DLL {
 			}
 			if ((!bDoModeDispByIMEKeyDown && !bDoModeDispByMouseBttnUp && !bDoModeDispByCtrlUp) || !bDrawNearCaret) {
 				Combo2.IsEnabled = false;
-				sl2.IsEnabled = false;
+				sl3.IsEnabled = false;			sl4.IsEnabled = false;
 				Button2_1.IsEnabled = false;	Button2_2.IsEnabled = false;	Button2_3.IsEnabled = false;
 				Button2_4.IsEnabled = false;	Button2_5.IsEnabled = false;	Button2_6.IsEnabled = false;
 				tb2_1.IsEnabled = false;		tb2_2.IsEnabled = false;		tb2_3.IsEnabled = false;
 				tb2_4.IsEnabled = false;		tb2_5.IsEnabled = false;		tb2_6.IsEnabled = false;
 			}
 			else {
-				Combo2.IsEnabled = true;
-				sl2.IsEnabled = true;
+				sl3.IsEnabled = true;			sl4.IsEnabled = true;
 				Button2_1.IsEnabled = true;		Button2_2.IsEnabled = true;		Button2_3.IsEnabled = true;
 				Button2_4.IsEnabled = true;		Button2_5.IsEnabled = true;		Button2_6.IsEnabled = true;
-				tb2_1.IsEnabled = true;		tb2_2.IsEnabled = true;		tb2_3.IsEnabled = true;
-				tb2_4.IsEnabled = true;		tb2_5.IsEnabled = true;		tb2_6.IsEnabled = true;
+				tb2_1.IsEnabled = true;			tb2_2.IsEnabled = true;			tb2_3.IsEnabled = true;
+				tb2_4.IsEnabled = true;			tb2_5.IsEnabled = true;			tb2_6.IsEnabled = true;
 			}
 			if (!bDisplayIMEModeOnCursor) {
 				Combo3.IsEnabled = false;
-				sl3.IsEnabled = false;	sl4.IsEnabled = false;
+				sl5.IsEnabled = false;			sl6.IsEnabled = false;
 				Button3_1.IsEnabled = false;	Button3_2.IsEnabled = false;	Button3_3.IsEnabled = false;
 				Button3_4.IsEnabled = false;	Button3_5.IsEnabled = false;	Button3_6.IsEnabled = false;
 				tb3_1.IsEnabled = false;		tb3_2.IsEnabled = false;		tb3_3.IsEnabled = false;
@@ -152,14 +153,14 @@ namespace FlushMouseUI3DLL {
 				}
 				Combo3.IsEnabled = true;
 				if (dwDisplayIMEModeMethod != DisplayIMEModeMethod_RESOURCE) {
-					sl3.IsEnabled = true; sl4.IsEnabled = true;
+					sl5.IsEnabled = true;		sl6.IsEnabled = true;
 				}
 				else {
-					sl3.IsEnabled = false; sl4.IsEnabled = false;
-					Button3_2.IsEnabled = true; Button3_3.IsEnabled = true; Button3_4.IsEnabled = true;
+					sl5.IsEnabled = false;		sl6.IsEnabled = false;
+					Button3_2.IsEnabled = true; Button3_3.IsEnabled = true;		Button3_4.IsEnabled = true;
 					Button3_5.IsEnabled = true; Button3_6.IsEnabled = true;
-					tb3_2.IsEnabled = true; tb3_3.IsEnabled = true; tb3_4.IsEnabled = true;
-					tb3_5.IsEnabled = true; tb3_6.IsEnabled = true;
+					tb3_2.IsEnabled = true;		tb3_3.IsEnabled = true;			tb3_4.IsEnabled = true;
+					tb3_5.IsEnabled = true;		tb3_6.IsEnabled = true;
 				}
 			}
 		}
@@ -183,10 +184,14 @@ namespace FlushMouseUI3DLL {
 			if (sl2 == null)	sl2 = new Slider();
 			if (sl3 == null)	sl3 = new Slider();
 			if (sl4 == null)	sl4 = new Slider();
+			if (sl5 == null)    sl5 = new Slider();
+			if (sl6 == null)    sl6 = new Slider();
 			sl1.Value = iModeMouseSize;
-			sl2.Value = iModeCaretSize;
-			sl3.Value = iModeByWndSize;
-			sl4.Value = iIMEModeDistance - 8;
+			sl2.Value = iModeMouseDistanceX;
+			sl3.Value = iModeCaretSize;
+			sl4.Value = iModeCaretDistanceX;
+			sl5.Value = iModeByWndSize;
+			sl6.Value = iIMEModeDistance - 8;
 		}
 
 		private void Slider_ValueChanged(object sender, RoutedEventArgs e)
@@ -194,10 +199,12 @@ namespace FlushMouseUI3DLL {
 			if (m_Sentinel == false) return;
 			Slider sl = sender as Slider;
 			if (sl != null) {
-				if (sl.Name == "sl1")			iModeMouseSize = (Int32)sl.Value;
-				else if (sl.Name == "sl2")		iModeCaretSize = (Int32)sl.Value;
-				else if (sl.Name == "sl3")		iModeByWndSize = (Int32)sl.Value;
-				else if (sl.Name == "sl4")		iIMEModeDistance = (Int32)sl.Value + 8;
+				if (sl.Name == "sl1")           iModeMouseSize = (Int32)sl.Value;
+				else if (sl.Name == "sl2")      iModeMouseDistanceX = (Int32)sl.Value;
+				else if (sl.Name == "sl3")      iModeCaretSize = (Int32)sl.Value;
+				else if (sl.Name == "sl4")      iModeCaretDistanceX = (Int32)sl.Value;
+				else if (sl.Name == "sl5")      iModeByWndSize = (Int32)sl.Value;
+				else if (sl.Name == "sl6")      iIMEModeDistance = (Int32)sl.Value + 8;
 				EnableDisableItems(sender, e);
 				UpdateProfile(SETTINGSEX_SETTINGS_IMEMODE_SETREGISTRY);
 			}
@@ -343,7 +350,7 @@ namespace FlushMouseUI3DLL {
 		}
 
 		public static string CheckStrings(string text)
-        {
+		{
 			int len = text.Length;
 			string _text = "";
 			if (len <= 1) _text = text;
@@ -355,7 +362,7 @@ namespace FlushMouseUI3DLL {
 				}
 			}
 			return _text;
-        }
+		}
 		
 		private void SetColorButton()
 		{

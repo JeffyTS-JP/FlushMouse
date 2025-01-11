@@ -1,0 +1,10 @@
+ * 最近(2023/07以降)、OSDNが、不安定なようですので、 [https://github.com/JeffyTS-JP/FlushMouse] の方をチェックしていただいたほうが良いかもしれません[[BR]]
+   * Github のページ[[BR]]
+   * [[Thumb(github.png)]][[BR]]
+   * ① リリースファイルはこちらのリンクです  [https://github.com/JeffyTS-JP/FlushMouse/releases][[BR]]
+   * ② 説明はこちらのリンクです  [https://github.com/JeffyTS-JP/FlushMouse?tab=readme-ov-file#flushmouse][[BR]]
+
+ * 上記のような事情で、OSDNでは当面の間、(うまくアクセスできたときに)リリース情報とバイナリのみ更新します(ソースと下部の説明はは古いままになりますがご容赦ください)
+ 
+ 
+ 

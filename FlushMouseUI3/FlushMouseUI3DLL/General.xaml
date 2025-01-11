@@ -140,7 +140,7 @@
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
-			<TextBlock Margin="0,-8,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="500" Text="IME モードをできるだけキャレットの左に表示する&#10;　　(キャレット位置を判定できない場合はマウスカーソル左に表示します)"/>
+			<TextBlock Margin="0,-8,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="500" Text="IME モードをキャレット(テキストカーソル)左に表示する&#10;　　(キャレット位置を判定できない場合はマウスカーソル左に表示します)"/>
 			<TextBlock Margin="0,0,45,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="text9" Text="オン"/>
 			<ToggleSwitch Margin="0,-8,-115,0" Grid.Column="1" HorizontalAlignment="Right"  x:Name="ts9" Toggled="HandleToggleSwitch" OffContent="" OnContent="" IsOn="False" FlowDirection="LeftToRight"/>
 		</Grid>

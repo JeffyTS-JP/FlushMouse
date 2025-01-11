@@ -633,7 +633,7 @@ static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd)
 		EventHook->hFormerWnd = hForeWnd;
 		if (hWnd != hForeWnd) {
 			HWND	hWndObserved = NULL;
-			CURSORINFO	CursorInfo{CursorInfo.cbSize = sizeof(CURSORINFO)};
+			CURSORINFO	CursorInfo{ CursorInfo.cbSize = sizeof(CURSORINFO) };
 			if (Profile->lpstAppRegData->bOffChangedFocus) {
 				Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 			}
