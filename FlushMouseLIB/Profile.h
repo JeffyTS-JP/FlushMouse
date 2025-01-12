@@ -155,4 +155,5 @@ class CProfile
 		LPAPPREGDATA	lpstAppRegData;
 };
 
+
 /* = EOF = */
