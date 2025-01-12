@@ -390,5 +390,4 @@ void		SettingsClose()
 }
 
 
-
 /* = EOF = */

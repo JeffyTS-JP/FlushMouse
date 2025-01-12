@@ -19,6 +19,7 @@
 	mc:Ignorable="d"
 	NavigationCacheMode="Required"
 	>
+
 	<Grid Margin="60,20,0,0" x:Name="General_Panel" Loaded="General_Loaded" HorizontalAlignment="Left" VerticalAlignment="Top">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="*"/>
