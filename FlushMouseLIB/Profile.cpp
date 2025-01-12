@@ -18,7 +18,6 @@
 //
 // Define
 //
-// \HKEY_CURRENT_USER\SOFTWARE\JeffyTS\FlushMouse
 #define PROFILE_HKEY		HKEY_CURRENT_USER
 #define PROFILE_SUBKEY		_T("SOFTWARE\\JeffyTS\\FlushMouse")
 

@@ -19,7 +19,6 @@
 	mc:Ignorable="d"
 	NavigationCacheMode="Required"
 	>
-
 	<Grid Loaded="IMEMode_Loaded" Margin="60,20,20,20" x:Name="IMEMode_Panel" HorizontalAlignment="Left" VerticalAlignment="Top">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="*"/>

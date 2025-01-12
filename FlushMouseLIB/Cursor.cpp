@@ -101,23 +101,22 @@ CCursor::CCursor()
 	stIMECursorData.bDrawNearCaret = FALSE;
 	stIMECursorData.lpszLoadDatName = NULL;
 	stIMECursorData.lpstNearDrawMouseCursor = new FLUSHMOUSECURSOR[sizeof(stFlushMouseCursor)];
+	
+	errno_t err = 0;
 	if (stIMECursorData.lpstNearDrawMouseCursor) {
 		ZeroMemory(stIMECursorData.lpstNearDrawMouseCursor, sizeof(stFlushMouseCursor));
-		errno_t err = 0;
 		if ((err = memcpy_s(stIMECursorData.lpstNearDrawMouseCursor, sizeof(stFlushMouseCursor), stFlushMouseCursor, sizeof(stFlushMouseCursor))) != 0) {
 		}
 	}
 	stIMECursorData.lpstNearDrawCaretCursor = new FLUSHMOUSECURSOR[sizeof(stFlushMouseCursor)];
 	if (stIMECursorData.lpstNearDrawCaretCursor) {
 		ZeroMemory(stIMECursorData.lpstNearDrawCaretCursor, sizeof(stFlushMouseCursor));
-		errno_t err = 0;
 		if ((err = memcpy_s(stIMECursorData.lpstNearDrawCaretCursor, sizeof(stFlushMouseCursor), stFlushMouseCursor, sizeof(stFlushMouseCursor))) != 0) {
 		}
 	}
 	stIMECursorData.lpstNearDrawMouseByWndCursor = new FLUSHMOUSECURSOR[sizeof(stFlushMouseCursor)];
 	if (stIMECursorData.lpstNearDrawMouseByWndCursor) {
 		ZeroMemory(stIMECursorData.lpstNearDrawMouseByWndCursor, sizeof(stFlushMouseCursor));
-		errno_t err = 0;
 		if ((err = memcpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor, sizeof(stFlushMouseCursor), stFlushMouseCursor, sizeof(stFlushMouseCursor))) != 0) {
 		}
 	}

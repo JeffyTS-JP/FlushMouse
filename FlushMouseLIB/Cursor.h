@@ -109,83 +109,83 @@ typedef struct tagIMECursorData
 // 
 class CCursor
 {
-public:
-	CCursor();
-	~CCursor();
+	public:
+		CCursor();
+		~CCursor();
 
-public:
-	BOOL		bInitialize(HWND hWnd);
-	BOOL		bReloadCursor();
-	VOID		vSetParamFromRegistry();
-	BOOL		bStartIMECursorChangeThread(HWND hWndObserved);
-	BOOL		bStartDrawIMEModeThread(HWND hWndObserved);
-	BOOL		bStartDrawIMEModeThreadWait(HWND hWndObserved);
-	BOOL		bStartDrawIMEModeThreadWaitWave(HWND hWndObserved);
-	BOOL		bStartDrawIMEModeThreadWaitEventForeGround(HWND hWndObserved);
-	BOOL		bStartDrawIMEModeThreadWaitDblClk(HWND hWndObserved);
+	public:
+		BOOL		bInitialize(HWND hWnd);
+		BOOL		bReloadCursor();
+		VOID		vSetParamFromRegistry();
+		BOOL		bStartIMECursorChangeThread(HWND hWndObserved);
+		BOOL		bStartDrawIMEModeThread(HWND hWndObserved);
+		BOOL		bStartDrawIMEModeThreadWait(HWND hWndObserved);
+		BOOL		bStartDrawIMEModeThreadWaitWave(HWND hWndObserved);
+		BOOL		bStartDrawIMEModeThreadWaitEventForeGround(HWND hWndObserved);
+		BOOL		bStartDrawIMEModeThreadWaitDblClk(HWND hWndObserved);
 
-	BOOL		bStartDrawIMEModeMouseByWndThread();
-	VOID		vStopDrawIMEModeMouseByWndThread();
+		BOOL		bStartDrawIMEModeMouseByWndThread();
+		VOID		vStopDrawIMEModeMouseByWndThread();
 
-private:
-	BOOL		bStartDrawIMEModeThreadSub(HWND hWndObserved);
+	private:
+		BOOL		bStartDrawIMEModeThreadSub(HWND hWndObserved);
 
-	BOOL		bRegisterIMECursorChangeThread(HWND hWnd);
-	VOID		vUnRegisterIMECursorChangeThread();
-	static BOOL WINAPI		bIMECursorChangeRoutine(LPVOID lpvParam);
+		BOOL		bRegisterIMECursorChangeThread(HWND hWnd);
+		VOID		vUnRegisterIMECursorChangeThread();
+		static BOOL WINAPI		bIMECursorChangeRoutine(LPVOID lpvParam);
 
-	BOOL		bRegisterDrawIMEModeMouseByWndThread(HWND hWnd);
-	VOID		vUnRegisterDrawIMEModeMouseByWndThread();
-	static BOOL WINAPI	bIMEModeMouseByWndThreadRoutine(LPVOID lpvParam);
+		BOOL		bRegisterDrawIMEModeMouseByWndThread(HWND hWnd);
+		VOID		vUnRegisterDrawIMEModeMouseByWndThread();
+		static BOOL WINAPI	bIMEModeMouseByWndThreadRoutine(LPVOID lpvParam);
 
-	BOOL		bRegisterDrawIMEModeThread(HWND hWndObserved);
-	BOOL		bIsIMECursorChanged(LPIMECURSORDATA lpstCursorData);
-	BOOL		bDrawIMEModeOnDisplay(LPIMECURSORDATA lpstCursorData);
-	BOOL		bCalcDisplayModeRect(LPINT iModeSizeX, LPINT iModeSizeY, LPRECT lpRect);
-	HWND		hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPIMECURSORDATA lpstCursorData, BOOL bAttachThreadInput);
-	BOOL		bAccessibleObjectFromWindowAsync(HWND hWnd, DWORD dwId, REFIID riId, void **ppvObject);
-	BOOL		bAdjustModeSizeByMonitorDPI(int iModeSizeX, int iModeSizeY, LPRECT lprcCaret);
-	BOOL		bAdjustModeSizeByMonitorDPIAsync();
-	BOOL		bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData);
-	static BOOL	CALLBACK	bIconDrawEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam);
-	static BOOL WINAPI		bDrawIMEModeRoutine(LPVOID lpvParam);
-	int			iGetCursorID(DWORD dwIMEMode, LPFLUSHMOUSECURSOR lpstCursorData);
+		BOOL		bRegisterDrawIMEModeThread(HWND hWndObserved);
+		BOOL		bIsIMECursorChanged(LPIMECURSORDATA lpstCursorData);
+		BOOL		bDrawIMEModeOnDisplay(LPIMECURSORDATA lpstCursorData);
+		BOOL		bCalcDisplayModeRect(LPINT iModeSizeX, LPINT iModeSizeY, LPRECT lpRect);
+		HWND		hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPIMECURSORDATA lpstCursorData, BOOL bAttachThreadInput);
+		BOOL		bAccessibleObjectFromWindowAsync(HWND hWnd, DWORD dwId, REFIID riId, void **ppvObject);
+		BOOL		bAdjustModeSizeByMonitorDPI(int iModeSizeX, int iModeSizeY, LPRECT lprcCaret);
+		BOOL		bAdjustModeSizeByMonitorDPIAsync();
+		BOOL		bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData);
+		static BOOL	CALLBACK	bIconDrawEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam);
+		static BOOL WINAPI		bDrawIMEModeRoutine(LPVOID lpvParam);
+		int			iGetCursorID(DWORD dwIMEMode, LPFLUSHMOUSECURSOR lpstCursorData);
 
-	BOOL		bGetMouseRegValue(LPCTSTR szValue, LPTSTR szFile);
-	BOOL		bChangeFlushMouseCursor(UINT uCurID, LPIMECURSORDATA lpstCursorData);
-	BOOL		bSetSystemCursor(LPMOUSECURSOR lpstMC, int iCursorSizeX, int iCursorSizeY);
+		BOOL		bGetMouseRegValue(LPCTSTR szValue, LPTSTR szFile);
+		BOOL		bChangeFlushMouseCursor(UINT uCurID, LPIMECURSORDATA lpstCursorData);
+		BOOL		bSetSystemCursor(LPMOUSECURSOR lpstMC, int iCursorSizeX, int iCursorSizeY);
 
-public:
+	public:
 
-private:
-	IMECURSORDATA	stIMECursorData;
+	private:
+		IMECURSORDATA	stIMECursorData;
 
-	HWND			hMainWnd;
-	HMODULE			hCursorData;
-	int				iCursorDataLoadCount;
+		HWND			hMainWnd;
+		HMODULE			hCursorData;
+		int				iCursorDataLoadCount;
 
-	CThread			*IMECursorChangeThread;
-	CThread			*DrawIMEModeThread;
-	CThread			*DrawIMEModeCaretThread;
-	CThread			*DrawIMEModeMouseByWndThread;
+		CThread			*IMECursorChangeThread;
+		CThread			*DrawIMEModeThread;
+		CThread			*DrawIMEModeCaretThread;
+		CThread			*DrawIMEModeMouseByWndThread;
 
-	CCursorWindow	*CursorWindow;
-	CCursorWindow	*CaretWindow;
-	CCursorWindow	*MouseWindow;
-	DWORD			dwIMEModeMouseWindow;
-	ULONGLONG		uuMouseWindowTick;
-	CCursorSub		*CursorSub;
+		CCursorWindow	*CursorWindow;
+		CCursorWindow	*CaretWindow;
+		CCursorWindow	*MouseWindow;
+		DWORD			dwIMEModeMouseWindow;
+		ULONGLONG		uuMouseWindowTick;
+		CCursorSub		*CursorSub;
 	
-	HCURSOR			hCursorArrow;
-	HCURSOR			hCursorIBeam;
-	HCURSOR			hCursorHand;
-	HCURSOR			hCursorWait;
-	HCURSOR			hCursorSizeNWSE;
-	HCURSOR			hCursorSizeNESW;
-	HCURSOR			hCursorSizeWE;
-	HCURSOR			hCursorSizeNS;
-	HCURSOR			hCursorSizeAll;
-	HCURSOR			hCursorAppStarting;
+		HCURSOR			hCursorArrow;
+		HCURSOR			hCursorIBeam;
+		HCURSOR			hCursorHand;
+		HCURSOR			hCursorWait;
+		HCURSOR			hCursorSizeNWSE;
+		HCURSOR			hCursorSizeNESW;
+		HCURSOR			hCursorSizeWE;
+		HCURSOR			hCursorSizeNS;
+		HCURSOR			hCursorSizeAll;
+		HCURSOR			hCursorAppStarting;
 };
 
 

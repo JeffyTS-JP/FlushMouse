@@ -242,5 +242,4 @@ void App::OnSuspending([[maybe_unused]] IInspectable const& sender, [[maybe_unus
 }
 
 
-
 /* = EOF = */

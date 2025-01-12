@@ -83,7 +83,6 @@ namespace FlushMouseUI3DLL {
 
 	public sealed partial class IMEMode : Page
 	{
-
 		public IMEMode()
 		{
 			m_Sentinel = false;

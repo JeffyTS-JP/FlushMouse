@@ -135,24 +135,24 @@ typedef struct tagAppRegData
 //
 class CProfile
 {
-public:
-				CProfile();
-				~CProfile();
-	BOOL		bGetProfileData() const;
-	BOOL		bSetProfileData() const;
+	public:
+					CProfile();
+					~CProfile();
+		BOOL		bGetProfileData() const;
+		BOOL		bSetProfileData() const;
 
-	BOOL		bFixChangedProfileData() const;
-	BOOL		bGetProfileData4Mouse() const;
-	BOOL		bSetProfileData4Mouse() const;
-	BOOL		bGetProfileData4IMEMode() const;
-	BOOL		bSetProfileData4IMEMode() const;
-	BOOL		bGetProfileData4SynTPHelper() const;
-	BOOL		bSetProfileData4SynTPHelper() const;
-	BOOL		bGetProfileData4Settings() const;
-	BOOL		bSetProfileData4Settings() const;
+		BOOL		bFixChangedProfileData() const;
+		BOOL		bGetProfileData4Mouse() const;
+		BOOL		bSetProfileData4Mouse() const;
+		BOOL		bGetProfileData4IMEMode() const;
+		BOOL		bSetProfileData4IMEMode() const;
+		BOOL		bGetProfileData4SynTPHelper() const;
+		BOOL		bSetProfileData4SynTPHelper() const;
+		BOOL		bGetProfileData4Settings() const;
+		BOOL		bSetProfileData4Settings() const;
 
-public:
-	LPAPPREGDATA	lpstAppRegData;
+	public:
+		LPAPPREGDATA	lpstAppRegData;
 };
 
 /* = EOF = */
