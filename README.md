@@ -265,4 +265,3 @@
   2. ソリューション構成を「Release」でビルドすると、デフォルトでは C:\Users\\[User]\source\repos\FlushMouseにFlushMouse_x64.exe (Ver.1.2 以前は FlushMouse_x64.msi)と、FlushMouseUI3_x64.exeができるのでインストールしてご利用ください
    * **NuGet を使用しているため、ビルドの依存関係の順番の都合で、「ソリューション エクスプローラー」で FlushMouseUI3DLL を、右クリックして先にリビルドする必要が有ります**
 
-
