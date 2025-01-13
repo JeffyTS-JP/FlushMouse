@@ -75,7 +75,7 @@
 				<TextBlock Margin="0,0,0,0" Grid.Column="0" Text="GitHub" FontSize="14"/>
 				<RichTextBlock Margin="0,0,0,0" Grid.Column="1" FontFamily="Segoe MDL2 Assets" Padding="0" IsTabStop="False" FontSize="14">
 					<Paragraph>
-						<Hyperlink xml:space="preserve" NavigateUri="https://github.com/JeffyTS-JP/FlushMouse/" IsTabStop="False" Foreground="RoyalBlue">FlushMouse&#xE8AD; </Hyperlink>
+						<Hyperlink xml:space="preserve" NavigateUri="https://GitHub.com/JeffyTS-JP/FlushMouse/" IsTabStop="False" Foreground="RoyalBlue">FlushMouse&#xE8AD; </Hyperlink>
 					</Paragraph>
 				</RichTextBlock>
 			</Grid>

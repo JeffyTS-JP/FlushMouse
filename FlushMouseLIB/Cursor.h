@@ -64,6 +64,10 @@
 #define DisplayIMEModeMethod_ByWindow		1
 #define DisplayIMEModeMethod_RES_AND_Window	2
 
+#define	CLASS_CURSORWINDOW		_T("FlushMouseCursorWindow-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}")
+#define	CLASS_CARETWINDOW		_T("FlushMouseCaretWindow-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}")
+#define	CLASS_MOUSEWINDOW		_T("FlushMouseMouseWindow-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}")
+
 //
 // Struct Define
 //

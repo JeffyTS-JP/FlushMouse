@@ -1,18 +1,18 @@
 
 # FlushMouse
-|![Icon](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/FlushMouse.png)|**システムトレイ(タスクトレイ)に常駐して、マウスカーソルやキャレットに IMEモードの表示をするユーティリティです<br>FlushMouse is a software developed by JeffyTS. It is a mouse gesture tool that allows you to perform various operations by drawing gestures with your mouse. (by Bing)**|
+|![Icon](https://GitHub.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/FlushMouse.png)|**システムトレイ(タスクトレイ)に常駐して、マウスカーソルやキャレットに IMEモードの表示をするユーティリティです<br>FlushMouse is a software developed by JeffyTS. It is a mouse gesture tool that allows you to perform various operations by drawing gestures with your mouse. (by Bing)**|
 | :---: | :--- |
 
 #### リリース情報
 
-* **2025/01/13　　Version 3.5.0.5 を リリースしました**
+* **2025/01/24　　Version 3.5.1.4 を リリースしました**
 
 * **(主な変更点)**
-   * マウスカーソルとキャレットの左への IME モードの表示位置を左右に調整できるようにしました
+   * 直接描画と併用のモードでバグがありましたので修正しました
    * その他、細かなバグの修正や機能改善をしました
    
 #### DEMO
-![demo](https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/FlushMouseDemo.gif)
+![demo](https://GitHub.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/FlushMouseDemo.gif)
 
 #### 対応OS
    * Windows 10 / 11 64bit  (Latest Release Versionで検証しています。24H2 に対応しました(今のところ検証は仮想マシン内のみです))
@@ -37,14 +37,14 @@
    * デスクトップ版、UI3版共に個人情報の収集などは一切行っていません
      * ネットワークへのアクセスとして、インストール時のランタイムのダウンロードと、バージョン情報にGitHubへのリンクがあります
      * また、Ver.3 から最新のバージョンを確認できるようにしましたので、その際にネットワークへのアクセスがあります
-     * Ver.2.2 から Synaptics社製タッチパッドと、VMware Workstation / Playerへの対応として、ネットワークにアクセスします (詳しくは[下記](https://github.com/JeffyTS-JP/FlushMouse/tree/master?tab=readme-ov-file#syntp_helper%E6%A9%9F%E8%83%BD-synaptics%E7%A4%BE%E8%A3%BD%E3%82%BF%E3%83%83%E3%83%81%E3%83%91%E3%83%83%E3%83%89%E3%81%A8vmware-player%E3%81%A7%E3%81%AE-two-finger-scroll-%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)をご覧ください)
+     * Ver.2.2 から Synaptics社製タッチパッドと、VMware Workstation / Playerへの対応として、ネットワークにアクセスします (詳しくは[下記](https://GitHub.com/JeffyTS-JP/FlushMouse/tree/master?tab=readme-ov-file#syntp_helper%E6%A9%9F%E8%83%BD-synaptics%E7%A4%BE%E8%A3%BD%E3%82%BF%E3%83%83%E3%83%81%E3%83%91%E3%83%83%E3%83%89%E3%81%A8vmware-player%E3%81%A7%E3%81%AE-two-finger-scroll-%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)をご覧ください)
      * Ver.3.3 から、直接描画ではないときの、マウスカーソルのリソースをプログラム的に作成しますので、テンポラリーファイルへの書き込みがあります
 
 #### インストール / アンインストール
    * Windows Installer (exe)形式になっています。実行してインストールしてください
    * アンインストールは「設定」の「アプリと機能」、または「コントロールパネル」の「プログラムと機能」からできます
      * または、同じバージョンのインストーラーがあればそれをもう一度実行してもアンインストールできます。この場合は、本プログラムの設定(レジストリ)を削除するかどうかを選べます(デフォルトでは残すようにしてあります)
-   * Ver.2 から、WinUI3に対応しました。プログラム構成については、[下記](https://github.com/JeffyTS-JP/FlushMouse?tab=readme-ov-file#%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0%E6%A7%8B%E6%88%90)をご参照ください
+   * Ver.2 から、WinUI3に対応しました。プログラム構成については、[下記](https://GitHub.com/JeffyTS-JP/FlushMouse?tab=readme-ov-file#%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0%E6%A7%8B%E6%88%90)をご参照ください
      * なお、デスクトップ版と、UI3版の共存はできません。切り替える場合は、いったんアンインストールしてください (設定は共通ですので、レジストリを消す必要はありません)
 
 #### 使い方
@@ -66,9 +66,9 @@
 | :---: | :---: | :---: | :---: |
 |リソース方式を使用する|矢印、Ｉビーム、ハンドのみ IME モードをリソースで表示します|CPUの消費量が少なくて済みます|3種類のマウスカーソル形状がお仕着せになります|
 |直接描画方式を使用する|マウスカーソルの右下へ直接描画します|システム設定のカーソルが使用できます|システムがビジーの時は描画が遅れます|
-|リソース方式と直接描画方式を併用する|矢印、Ｉビーム、ハンドをリソースで表示し、残りは直接描画します|ほとんどのケースでリソースで表示することになりますので遅れも目立たないと思います|2方式を併用してますのでのマウスサイズなどの設定が少々面倒ですが[こちら](https://github.com/JeffyTS-JP/FlushMouse?tab=readme-ov-file#%E8%A8%AD%E5%AE%9A%E3%81%AE%E3%83%92%E3%83%B3%E3%83%88)を参考にしてみてください|
+|リソース方式と直接描画方式を併用する|矢印、Ｉビーム、ハンドをリソースで表示し、残りは直接描画します|ほとんどのケースでリソースで表示することになりますので遅れも目立たないと思います|2方式を併用してますのでのマウスサイズなどの設定が少々面倒ですが[こちら](https://GitHub.com/JeffyTS-JP/FlushMouse?tab=readme-ov-file#%E8%A8%AD%E5%AE%9A%E3%81%AE%E3%83%92%E3%83%B3%E3%83%88)を参考にしてみてください|
    
-<img src="https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/Cursors.png" width="80%">
+<img src="https://GitHub.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/Cursors.png" width="80%">
 
 #### 設定のヒント
    * Ver.3.1 以降では、「右下の描画方法」で、「直接描画方式を使用する」を選択している場合には、システムのカーソルをそのまま使用しますので、下記設定は不要です (その他の方式の場合に行ってください)
@@ -84,13 +84,13 @@
    * 設定ダイアログ画面は右下のシステムトレイ(タスクトレイ)の「∧」マークの中にある FlushMouseのアイコンをクリックすることで表示します
    * Ver.3から、デスクトップアプリ版、UI3版共に同じ設定画面が表示されます
 
-<img src="https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SettingDlg3.png" width="50%">
+<img src="https://GitHub.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SettingDlg3.png" width="50%">
 
    * **IMEモードの取得方法**
      * 「マウスカーソル下のウィンドウのIMEモードを表示する」 / 「フォーカスウィンドウのIMEモードを表示する」から選べます
      * 設定→時刻と言語→言語→キーボードの「入力方式の切り替え」や、旧IMEのプロパティにある「IME入力モード切替の通知の画面中央に表示する」と関わってきますので、ご自分の設定に合わせて好みな方を選択してください。なお、アプリや入力欄によっては IME のモードを返さない場合があります。この場合は IME OFFとして取り扱います。これは制限事項となります。ご了承ください
    * **右下の描画方法 (Ver.3.4 以降)**
-     * [上記](https://github.com/JeffyTS-JP/FlushMouse?tab=readme-ov-file#%E3%83%9E%E3%82%A6%E3%82%B9%E3%82%AB%E3%83%BC%E3%82%BD%E3%83%AB)のマウスカーソルの項目をご参照ください
+     * [上記](https://GitHub.com/JeffyTS-JP/FlushMouse?tab=readme-ov-file#%E3%83%9E%E3%82%A6%E3%82%B9%E3%82%AB%E3%83%BC%E3%82%BD%E3%83%AB)のマウスカーソルの項目をご参照ください
    * **直接入力 (IME OFF) の時も IME モードの表示をする (Ver.3.1 以降)**
      * 変換モードではない、すなわち直接入力(IME OFF)の時も、マウスカーソル左と右下に IME モードを表示します
    * **IME関連キーがクリックされたときにIMEモードを表示する**
@@ -99,7 +99,7 @@
      * アプリによってはキャレットの位置が取得できなかったり、表示位置がおかしくなることがあります(これは制限事項となります)。ただし、位置が取得できない場合は、マウスカーソルの左に表示します
    * **IME 関連キーのサポートを有効にする**
    * **ExplorerPatcher Simple Window Switcher Helperを有効にする**
-     * 上記 2項目は [こちらの説明](https://github.com/JeffyTS-JP/FlushMouse/tree/master?tab=readme-ov-file#ime-%E9%96%A2%E9%80%A3%E3%82%AD%E3%83%BC%E3%81%AE%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88-%E3%81%A8-explorerpatcher-simple-window-switcher-helper-%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)をご覧ください
+     * 上記 2項目は [こちらの説明](https://GitHub.com/JeffyTS-JP/FlushMouse/tree/master?tab=readme-ov-file#ime-%E9%96%A2%E9%80%A3%E3%82%AD%E3%83%BC%E3%81%AE%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88-%E3%81%A8-explorerpatcher-simple-window-switcher-helper-%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)をご覧ください
    * **モード表示の時間**
      * マウスカーソルの左に「あ」「ア」「Ａ」「_ｱ」「_A」を表示をしている時間を調整できます
    * **モード表示までの時間**
@@ -107,21 +107,21 @@
    * **Ctrl キーを離してからモードを表示するまでの時間**
      * 設定の「マウスのプロパティ」にある、「Ctrlキーを押すとポインターの位置を表示する」をONにしているとき、この表示と重なるのを避けるためにモードを表示するまでの時間を調整できます
 
-<img src="https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/IMEModeDlg3.png" width="50%">
+<img src="https://GitHub.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/IMEModeDlg3.png" width="50%">
 
-   * Ver.3.2 から、マウスカーソルの左、キャレットの左、マウスカーソルの右下の、モード表示のサイズ、フォント、色、表示文字を変更できます
-   * また、「直接描画方式を使用する」場合、マウスカーソル右下の表示位置の距離を変更できます(正確にはホットスポットからの距離です)。お好みで設定してください
+   * Ver.3.2 から、マウスカーソルの左、キャレットの左、マウスカーソルの右下の、モード表示のサイズ、フォント、色、表示文字を変更できます。Ver.3.5 からマウスカーソルとキャレット左の水平方向の表示位置を調整できます
+   * 「直接描画方式を使用する」場合、マウスカーソル右下の表示位置の距離を変更できます(正確にはホットスポットからの距離です)。お好みで設定してください
    * 「リソース方式を使用する」と「リソース方式と直接描画方式を併用する」の場合、「矢印」「Ｉビーム」「ハンド」での表示位置の距離は変更できません
    * 表示する文字は、記号などでも設定できますので、お好みで変更してみてください
    * フォントは「Yu Gothic UI (デフォルト)」「Meiryo UI」「MS Gothic」「Consolas」の４種類です。選択したフォントによっては表示が切れたりしますが、現時点では仕様となります。ご了承ください
 
    * バージョン画面
 
-<img src="https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/VersionDlg3.png" width="50%">
+<img src="https://GitHub.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/VersionDlg3.png" width="50%">
 
 
 #### IME 関連キーのサポート と ExplorerPatcher Simple Window Switcher Helper について
-  * まず、[ExplorerPatcher](https://github.com/valinet) の作者であるValentin-Gabrielに謝意を伝えます　Thanks, Valentin-Gabriel !
+  * まず、[ExplorerPatcher](https://GitHub.com/valinet) の作者であるValentin-Gabrielに謝意を伝えます　Thanks, Valentin-Gabriel !
   * さて、マルチモニターの環境でSimple Window Switcherを有効にすると、Alt + Tabでマウスカーソルのあるカレントモニターのウィンドウだけを切り替えられて非常に便利です。もちろん他にも便利な機能があります
 
   * しかし、[Valinetのブログ](https://valinet.ro/2021/11/18/Functional-Windows-10-flyouts-on-Windows-11.html)を読むとわかるのですが、英語キーボード(101/102/104キーボード)のドライバーをロードして実現しています。このため、日本語キーボード(106/109)メインの我々にはちょっと困ったことになってしまいます。例えば、漢字(半角/全角)キーで「 ` 」が入力されてしまったり、「@」マークなどの記号の位置が変わってしまったり。何より日本語変換ができません。そこで、FlushMouseに、強制的に「US / ENG」を排除する機能を加えました
@@ -166,14 +166,14 @@
     * Guest OS は、主に Windows 11 Pro (Version 23H2)
     
   * 機能概要
-    * 上記環境で、Wheel Padの　Two Finger Scroll、および Wheel Pad 沿いを回転するようになぞることでのスクロール(右端が起点)を可能にしました
+    * 上記環境で、Wheel Padの Two Finger Scroll、および Wheel Pad 沿いを回転するようになぞることでのスクロール(右端が起点)を可能にしました
 
   * 仕組み (内部動作)
     * Host OS で、Wheel Padの動作を RawInputを使用して受取り、UDPを使用して、Guest OSに送ります。Guest OS では送られてきたデータを SendInputで WM_MOUSE(H)WHEEL として出力しています
   
   * 設定画面
 
-<img src="https://github.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SynTPDlg3.png" width="50%">
+<img src="https://GitHub.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/SynTPDlg3.png" width="50%">
 
   * 使用方法
     * Host には、FlushMouse をインストールしてください
@@ -248,12 +248,12 @@
   1. まず、Visual Studio **Installer** (2022 本体ではなく**Installer**です。Windowsキーを押して「vis」と入力すると候補に出てきます)を起動します
   2. 変更を選んで、 「C++ によるデスクトップ開発」にチェックを入れます。次に「言語パック」タブで日本語にチェックを入れます。その後、右下の変更ボタンで、インストールを行います
   3. 次に、WiXを使用するために、Windowsの設定 -> アプリ -> オプション機能 -> Windowsのその他の機能 -> Windowsの機能の有効化または無効化 -> .NET Framework 3.5.1(.NET 2.0及び3.0を含む)にチェックを入れてOKを押して、インストール、再起動します
-  4. [https://github.com/wixtoolset/wix3](https://github.com/wixtoolset/wix3) から、Wix311.exeをダウンロードしてインストールします
+  4. [https://GitHub.com/wixtoolset/wix3](https://GitHub.com/wixtoolset/wix3) から、Wix311.exeをダウンロードしてインストールします
   5. Visual Studioを起動して 右下の「コードなし」で起動します
   6. Tools -> Options -> Environment -> International Settings をクリックして、Languageを日本語にします
   7. 拡張機能 -> 検索で　WiXと入力し「 WiX v3 - Visual Studio 2022 Extension」を選択して、Visual Studioを終了するとインストールが始まります
   8. .NET Framework SDK 8 を[https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-8.0.101-windows-x64-installer](https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-8.0.101-windows-x64-installer)からダウンロードしてインストールします
-  9. Visual Studioを再起動して、リポジトリのクローン -> リポジトリの場所に [https://github.com/JeffyTS-JP/FlushMouse.git](https://github.com/JeffyTS-JP/FlushMouse.git)　を入力してクローンします
+  9. Visual Studioを再起動して、リポジトリのクローン -> リポジトリの場所に [https://GitHub.com/JeffyTS-JP/FlushMouse.git](https://GitHub.com/JeffyTS-JP/FlushMouse.git)　を入力してクローンします
   10. NuGet CLI(nuget.exe)を[https://dist.nuget.org/win-x86-commandline/latest/nuget.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)からダウンロードして、FlushMouseをクローンしたフォルダの直下の「NuGet」フォルダ(デフォルトでは C:\Users\\[User]\source\repos\FlushMouse\NuGet です)に入れます
   11. Windowsの 設定 -> システム -> 開発者向け で 開発者モードを ON にします
   12. 次に、ツール -> NuGet パッケージマネージャー -> ソリューションの NuGet パッケージの管理 (Altキーを押しながら続けて T N N) を開き、右側にある歯車(⚙)を選択して、ダイアログを開きます
@@ -263,5 +263,5 @@
 * ビルド方法です
   1. ソリューションプラットフォームを必ず「**MixedPlatform**」にしてビルドします (Ctrl + Shift + B)
   2. ソリューション構成を「Release」でビルドすると、デフォルトでは C:\Users\\[User]\source\repos\FlushMouseにFlushMouse_x64.exe (Ver.1.2 以前は FlushMouse_x64.msi)と、FlushMouseUI3_x64.exeができるのでインストールしてご利用ください
-   * **NuGet を使用しているため、ビルドの依存関係の順番の都合で、「ソリューション エクスプローラー」で FlushMouseUI3DLL を、右クリックして先にリビルドする必要が有ります**
+   * **NuGet を使用しているため、ビルドの依存関係の都合で、「ソリューション エクスプローラー」で FlushMouseUI3DLL を、右クリックして先にリビルドする必要が有ります**
 

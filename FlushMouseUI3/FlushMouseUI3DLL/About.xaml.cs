@@ -139,7 +139,7 @@ namespace FlushMouseUI3DLL {
 			if (urlExperimentGroups == null) { return null; }
 			try {
 				client.DefaultRequestHeaders.Clear();
-				if (client.BaseAddress == null) client.BaseAddress = new Uri(@"https://api.github.com/repos/");
+				if (client.BaseAddress == null) client.BaseAddress = new Uri(@"https://api.GitHub.com/repos/");
 				if (client.DefaultRequestHeaders == null) {
 					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 				}

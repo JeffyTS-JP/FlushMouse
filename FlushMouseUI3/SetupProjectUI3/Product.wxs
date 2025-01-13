@@ -56,9 +56,9 @@
 		<!-- Other Info. -->
 		<Property Id="ARPCOMMENTS" Value="Mouse and IME UTY" />
 		<Property Id="ARPCONTACT" Value="Twitter @JeffyTSonTW" />
-		<Property Id="ARPHELPLINK" Value="https://github.com/JeffyTS-JP/FlushMouse" />
-		<Property Id="ARPURLINFOABOUT" Value="https://github.com/JeffyTS-JP/FlushMouse" />
-		<Property Id="ARPURLUPDATEINFO" Value="https://github.com/JeffyTS-JP/FlushMouse/releases" />
+		<Property Id="ARPHELPLINK" Value="https://GitHub.com/JeffyTS-JP/FlushMouse" />
+		<Property Id="ARPURLINFOABOUT" Value="https://GitHub.com/JeffyTS-JP/FlushMouse" />
+		<Property Id="ARPURLUPDATEINFO" Value="https://GitHub.com/JeffyTS-JP/FlushMouse/releases" />
 		<Property Id="ARPINSTALLLOCATION" Value="&quot;%ProgramFiles%\$(var.Manufacturer)\$(var.ProductName)&quot;" />
 		
 		<Property Id="ARPNOMODIFY" Value="1" Secure="no" />

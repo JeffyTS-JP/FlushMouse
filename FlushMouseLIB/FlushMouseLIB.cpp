@@ -99,6 +99,7 @@ static void		Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, U
 // Sub
 static VOID CALLBACK		vCheckFocusTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
 static VOID CALLBACK		vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
+static BOOL		bNotInTaskBar(LPCTSTR lpClassName);
 
 //
 //  bWinMain()
@@ -1213,14 +1214,44 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 						Sleep(3000);
 						if (!FlushMouseHook || !FlushMouseHook->bHookSet(hWnd, FLUSHMOUSE_DLL, FLUSHMOUSE32_EXE)) {
 							bReportEvent(MSG_THREAD_HOOK_TIMER_RESTART_FAILED, APPLICATION_CATEGORY);
+							bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
 							PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 						}
 					}
 				}
 			}
 		}
+		if (bNotInTaskBar(CLASS_FLUSHMOUSE)) {
+			if (bNotInTaskBar(CLASS_CURSORWINDOW)) {
+				if (bNotInTaskBar(CLASS_CARETWINDOW)) {
+					if (bNotInTaskBar(CLASS_MOUSEWINDOW)) {
+						return;
+					}
 
+				}
+
+			}
+		}
+		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 	}
+}
+
+//
+// bNotInTaskBar()
+//
+static BOOL bNotInTaskBar(LPCTSTR lpClassName)
+{
+	HWND	_hWnd = NULL;
+	LONG	ExStyle = 0;
+	if ((_hWnd = FindWindow(lpClassName, NULL)) != NULL) {
+		if (!(GetWindowLong(_hWnd, GWL_STYLE) & WS_VISIBLE))	return TRUE;
+		if (((ExStyle = GetWindowLong(_hWnd, GWL_EXSTYLE) & WS_EX_TOOLWINDOW)))	return TRUE;
+		if (ExStyle & WS_EX_NOREDIRECTIONBITMAP)	return TRUE;
+		if (!(GetWindow(_hWnd, GW_OWNER) && (!(ExStyle & WS_EX_APPWINDOW) || IsIconic(_hWnd))))	return TRUE;
+		return FALSE;
+	}
+	return TRUE;
 }
 
 
