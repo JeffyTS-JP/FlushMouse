@@ -1,4 +1,4 @@
-//
+﻿//
 // FlushMouseUI3DLL.cs
 //      Copyright (C) 2023 JeffyTS
 //
@@ -9,9 +9,9 @@
 
 using System.Reflection;
 
-[assembly: AssemblyVersion("3.5.1.4")]
-[assembly: AssemblyFileVersion("3.5.1.4")]
-[assembly: AssemblyInformationalVersionAttribute("3.5.1.4")]
+[assembly: AssemblyVersion("3.5.2.2")]
+[assembly: AssemblyFileVersion("3.5.2.2")]
+[assembly: AssemblyInformationalVersionAttribute("3.5.2.2")]
 
 [assembly: AssemblyCompanyAttribute("JeffyTS")]
 [assembly: AssemblyCopyrightAttribute("Copyright (C) 1993 - 2024 JeffyTS")]

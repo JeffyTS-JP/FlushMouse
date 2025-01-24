@@ -205,6 +205,7 @@ Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouseDLL32.pdb" "$(OutDir)"
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AssemblerOutput>All</AssemblerOutput>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -216,6 +217,7 @@ Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouseDLL32.pdb" "$(OutDir)"
       <UACExecutionLevel>AsInvoker</UACExecutionLevel>
       <UACUIAccess>false</UACUIAccess>
       <EnableUAC>false</EnableUAC>
+      <GenerateMapFile>true</GenerateMapFile>
     </Link>
     <PostBuildEvent>
       <Command>Start /wait /min cmd /c "$(SolutionDir)Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)

@@ -414,7 +414,7 @@ BOOL		CCursorSub::bMakeCursorSub(LPRTCURSORHEAD	lpRTCursorHead, LPRTCURSORHEAD l
 
 	rc.left = cx / 3 + 2;	rc.right = rc.left + cx * 2 / 3;	rc.top = cy / 3;	rc.bottom = rc.top + cy * 2 / 3 + 2;
 	iXSize = rc.right - rc.left;
-	vAdjustFontXPosition(dwIMEMode, lpszIMEMode, &iXSize, &rc);
+	vAdjustFontXRightPosition(dwIMEMode, lpszIMEMode, &iXSize, &rc);
 	if (!TextDraw(hTextMemDC, rc, lpszIMEMode, dwRGB, lpszFontFace, FW_NORMAL, FALSE))	goto Cleanup;
 
 	ReverseDataTopDown((LPDWORD)lpTextBits, cx, cy);
@@ -675,12 +675,29 @@ BOOL		TextDraw(HDC hDC, RECT rcSize, LPTSTR szIMEMode, COLORREF dwRGB, LPCTSTR s
 }
 
 //
-// vAdjustFontXPosition()
+// vAdjustFontXLeftPosition()
 //
-VOID		vAdjustFontXPosition(DWORD dwIMEMode,LPCTSTR szMode, LPINT lpiXSize, LPRECT lprc)
+VOID		vAdjustFontXLeftPosition(DWORD dwIMEMode,LPCTSTR szMode, LPINT lpiXSize, LPRECT lprc)
 {
 	int		len = (int)wcsnlen_s(szMode, sizeof(szMode));
 	if ((len < 2) && ((dwIMEMode == IMEOFF) || (dwIMEMode == HANEISU_IMEON) || (dwIMEMode == HANKANA_IMEON))) {
+		*lpiXSize = (*lpiXSize * 2) / 3;	lprc->left = lprc->left + (*lpiXSize / 3);	lprc->right = lprc->left + *lpiXSize;
+	}
+	else if (len == 2) {
+		*lpiXSize = (*lpiXSize * 2) / 3;	lprc->left = lprc->left + (*lpiXSize / 3);	lprc->right = lprc->left + *lpiXSize;
+	}
+}
+
+//
+// vAdjustFontXRightPosition()
+//
+VOID		vAdjustFontXRightPosition(DWORD dwIMEMode,LPCTSTR szMode, LPINT lpiXSize, LPRECT lprc)
+{
+	int		len = (int)wcsnlen_s(szMode, sizeof(szMode));
+	if ((len < 2) && ((dwIMEMode == IMEOFF) || (dwIMEMode == HANEISU_IMEON) || (dwIMEMode == HANKANA_IMEON))) {
+		*lpiXSize = (*lpiXSize * 2) / 3;	lprc->left = lprc->left + (*lpiXSize / 8);	lprc->right = lprc->left + *lpiXSize;
+	}
+	else if (len == 2) {
 		*lpiXSize = (*lpiXSize * 2) / 3;	lprc->left = lprc->left + (*lpiXSize / 3);	lprc->right = lprc->left + *lpiXSize;
 	}
 }

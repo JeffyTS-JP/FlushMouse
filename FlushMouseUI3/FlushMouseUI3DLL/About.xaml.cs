@@ -88,11 +88,11 @@ namespace FlushMouseUI3DLL {
 				String lpText = "";
 				if (Compare(gitVersion, currentVersion) >= 1) {
 					lpCaption = "FlushMouse";
-					lpText = "FlushMouse の新しいバージョンがあります\nVer. " + gitVersion;
+					lpText = "FlushMouse 縺ｮ譁ｰ縺励＞繝舌�ｼ繧ｸ繝ｧ繝ｳ縺後≠繧翫∪縺兔nVer. " + gitVersion;
 				}
 				else {
 					lpCaption = "FlushMouse";
-					lpText = "FlushMouse の新しいバージョンは見つかりませんでした";
+					lpText = "FlushMouse 縺ｮ譁ｰ縺励＞繝舌�ｼ繧ｸ繝ｧ繝ｳ縺ｯ隕九▽縺九ｊ縺ｾ縺帙ｓ縺ｧ縺励◆";
 				}
 				MessageBox(g_hSettingsWnd, lpText, lpCaption, (MB_OK | MB_ICONINFORMATION | MB_TOPMOST));
 				m_Sentinel = true;

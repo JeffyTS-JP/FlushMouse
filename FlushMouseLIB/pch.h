@@ -54,6 +54,8 @@ typedef unsigned short USHORT;
 #include <cstdlib>
 #include <stdio.h>
 #include <future>
+#include <iostream>
+#include <chrono>
 
 #include <psapi.h>
 #include <strsafe.h>

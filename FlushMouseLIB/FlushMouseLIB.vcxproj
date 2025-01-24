@@ -169,6 +169,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/Zc:throwingNew- %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AssemblerOutput>All</AssemblerOutput>
     </ClCompile>
     <Link>
       <SubSystem>

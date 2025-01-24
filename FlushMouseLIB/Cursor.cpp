@@ -219,37 +219,37 @@ BOOL			CCursor::bReloadCursor()
 
 	if (!CursorSub->hLoadCursorData())	return FALSE;
 
-	if (CursorWindow == NULL) {
+	if (!CursorWindow) {
 		CursorWindow = new CCursorWindow;
 		if (CursorWindow == NULL)	return FALSE;
 		if (!CursorWindow->bRegister((HINSTANCE)GetWindowLongPtr(hMainWnd, GWLP_HINSTANCE), CLASS_CURSORWINDOW))		return FALSE;
 	}
 	CursorWindow->vSetModeStringColorFont(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEHIDE].szMode, stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF].dwColor, stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF].szFont);
 	
-	if (CaretWindow == NULL) {
+	if (!CaretWindow) {
 		CaretWindow = new CCursorWindow;
 		if (CaretWindow == NULL)	return FALSE;
 		if (!CaretWindow->bRegister((HINSTANCE)GetWindowLongPtr(hMainWnd, GWLP_HINSTANCE), CLASS_CARETWINDOW))	return FALSE;
 	}
 	CaretWindow->vSetModeStringColorFont(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEOFF].szMode, stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEOFF].dwColor, stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEOFF].szFont);
 	
-	if (MouseWindow != NULL) {
+	if (MouseWindow) {
 		delete	MouseWindow;
 		MouseWindow = NULL;
 	}
-	if (MouseWindow == NULL) {
+	if (!MouseWindow) {
 		MouseWindow = new CCursorWindow;
 		if (MouseWindow == NULL)	return FALSE;
 		if (!MouseWindow->bRegister((HINSTANCE)GetWindowLongPtr(hMainWnd, GWLP_HINSTANCE), CLASS_MOUSEWINDOW))	return FALSE;
 	}
 	MouseWindow->vSetModeStringColorFont(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEHIDE].szMode, stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF].dwColor, stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF].szFont);
 	
-	if (DrawIMEModeCaretThread == NULL) {
+	if (!DrawIMEModeCaretThread) {
 		DrawIMEModeCaretThread = new CThread;
 		if (DrawIMEModeCaretThread == NULL)	return FALSE;
 	}
 	
-	if (DrawIMEModeThread == NULL) {
+	if (!DrawIMEModeThread) {
 		DrawIMEModeThread = new CThread;
 		if (DrawIMEModeThread != NULL) {
 			if (!bRegisterDrawIMEModeThread(hMainWnd))	return FALSE;
@@ -266,7 +266,7 @@ BOOL			CCursor::bReloadCursor()
 //
 VOID			CCursor::vSetParamFromRegistry()
 {
-	if (Profile != NULL) {
+	if (Profile && Profile->lpstAppRegData) {
 		stIMECursorData.iCursorSize = Profile->lpstAppRegData->iCursorSize;
 		stIMECursorData.iIMEModeDistance = Profile->lpstAppRegData->iIMEModeDistance;
 		stIMECursorData.iModeMouseSize = Profile->lpstAppRegData->iModeMouseSize;
@@ -362,7 +362,7 @@ BOOL		CCursor::bStartIMECursorChangeThread(HWND hWndObserved)
 //
 BOOL		CCursor::bStartDrawIMEModeThread(HWND hWndObserved)
 {
-	vSetParamFromRegistry();
+	if (!Profile)	return FALSE;
 	stIMECursorData.bDrawIMEModeWait = FALSE;
 	stIMECursorData.dwWaitTime = 0;
 	return bStartDrawIMEModeThreadSub(hWndObserved);
@@ -373,9 +373,8 @@ BOOL		CCursor::bStartDrawIMEModeThread(HWND hWndObserved)
 //
 BOOL		CCursor::bStartDrawIMEModeThreadWait(HWND hWndObserved)
 {
-	vSetParamFromRegistry();
+	if (!Profile)	return FALSE;
 	stIMECursorData.bDrawIMEModeWait = TRUE;
-	if (Profile == NULL)	return FALSE;
 	stIMECursorData.dwWaitTime = Profile->lpstAppRegData->dwAdditionalWaitTime;
 	return bStartDrawIMEModeThreadSub(hWndObserved);
 }
@@ -385,10 +384,9 @@ BOOL		CCursor::bStartDrawIMEModeThreadWait(HWND hWndObserved)
 //
 BOOL		CCursor::bStartDrawIMEModeThreadWaitWave(HWND hWndObserved)
 {
-	vSetParamFromRegistry();
+	if (!Profile)	return FALSE;
 	stIMECursorData.bDrawIMEModeWait = TRUE;
 	stIMECursorData.bDrawNearCaret = FALSE;
-	if (Profile == NULL)	return FALSE;
 	stIMECursorData.dwWaitTime = Profile->lpstAppRegData->dwWaitWaveTime;
 	stIMECursorData.bDrawNearCaret = Profile->lpstAppRegData->bDrawNearCaret;
 	return bStartDrawIMEModeThreadSub(hWndObserved);
@@ -399,9 +397,8 @@ BOOL		CCursor::bStartDrawIMEModeThreadWaitWave(HWND hWndObserved)
 //
 BOOL		CCursor::bStartDrawIMEModeThreadWaitEventForeGround(HWND hWndObserved)
 {
-	vSetParamFromRegistry();
+	if (!Profile)	return FALSE;
 	stIMECursorData.bDrawIMEModeWait = TRUE;
-	if (Profile == NULL)	return FALSE;
 	stIMECursorData.dwWaitTime = Profile->lpstAppRegData->dwAdditionalWaitTime;
 	stIMECursorData.bIMECursorChangeThreadSentinel = FALSE;
 	return bStartDrawIMEModeThreadSub(hWndObserved);
@@ -412,9 +409,8 @@ BOOL		CCursor::bStartDrawIMEModeThreadWaitEventForeGround(HWND hWndObserved)
 //
 BOOL		CCursor::bStartDrawIMEModeThreadWaitDblClk(HWND hWndObserved)
 {
-	vSetParamFromRegistry();
+	if (!Profile)	return FALSE;
 	stIMECursorData.bDrawIMEModeWait = TRUE;
-	if (Profile == NULL)	return FALSE;
 	stIMECursorData.dwWaitTime = Profile->lpstAppRegData->dwAdditionalWaitTime;
 	return bStartDrawIMEModeThreadSub(hWndObserved);
 }
@@ -424,7 +420,8 @@ BOOL		CCursor::bStartDrawIMEModeThreadWaitDblClk(HWND hWndObserved)
 //
 BOOL		CCursor::bStartDrawIMEModeThreadSub(HWND hWndObserved)
 {
-	if ((Cursor == NULL) || (DrawIMEModeThread == NULL))	return FALSE;
+	if (!Cursor || !DrawIMEModeThread || !Profile)	return FALSE;
+	vSetParamFromRegistry();
 	stIMECursorData.hWndObserved = hWndObserved;
 	DrawIMEModeThread->bSetSentinel(FALSE);
 	if (stIMECursorData.bDrawNearCaret)	stIMECursorData.hWndCaret = hGetCaretPosByAccessibleObjectFromWindow(GetForegroundWindow(), &stIMECursorData, FALSE);
@@ -509,7 +506,7 @@ BOOL		CCursor::bIMECursorChangeRoutine(LPVOID lpvParam)
 //
 BOOL		CCursor::bRegisterDrawIMEModeMouseByWndThread(HWND hWnd)
 {
-	if (!MouseWindow)	return FALSE;
+	if (!MouseWindow || !Profile)	return FALSE;
 	vSetParamFromRegistry();
 	if (DrawIMEModeMouseByWndThread != NULL) {
 		delete DrawIMEModeMouseByWndThread;
@@ -687,7 +684,7 @@ BOOL		CCursor::bIMEModeMouseByWndThreadRoutine(LPVOID lpvParam)
 			rcMouse.top = rcMouse.top - iMouseSizeY / 4 + MARGIN_Y;	rcMouse.bottom = rcMouse.bottom  + iMouseSizeY;
 #undef MARGIN_X
 #undef MARGIN_Y
-			vAdjustFontXPosition(dwIMEModeMouse, lpstCursorData->lpstNearDrawCaretCursor[iMouse].szMode, &iMouseSizeX, &rcMouse);
+			vAdjustFontXRightPosition(dwIMEModeMouse, lpstCursorData->lpstNearDrawCaretCursor[iMouse].szMode, &iMouseSizeX, &rcMouse);
 			if (dwIMEModeMouse != IMEHIDE){
 				if (!This->MouseWindow->bSetWindowPos(HWND_TOPMOST, rcMouse.left, rcMouse.top, iMouseSizeX, iMouseSizeY, (SWP_SHOWWINDOW | SWP_NOACTIVATE)))	goto Cleanup;
 			}
@@ -1088,7 +1085,7 @@ BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData)
 					dwIMEModeCaret = Cime->dwIMEMode(hCaretWnd, lpstCursorData->bForceHiragana);
 					iCaret = iGetCursorID(dwIMEModeCaret, lpstCursorData->lpstNearDrawCaretCursor);
 					if (iCaret == 0) dwIMEModeCaret = IMEOFF;
-					vAdjustFontXPosition(dwIMEModeCaret, lpstCursorData->lpstNearDrawCaretCursor[iCaret].szMode, &iCaretSizeX, &rcCaret);
+					vAdjustFontXLeftPosition(dwIMEModeCaret, lpstCursorData->lpstNearDrawCaretCursor[iCaret].szMode, &iCaretSizeX, &rcCaret);
 					CaretWindow->vSetModeStringColorFont(lpstCursorData->lpstNearDrawCaretCursor[iCaret].szMode, lpstCursorData->lpstNearDrawCaretCursor[iCaret].dwColor, lpstCursorData->lpstNearDrawCaretCursor[IMEMODE_IMEOFF].szFont);
 
 					if (CaretWindow->bSetWindowPos(HWND_TOPMOST, rcCaret.left, rcCaret.top, iCaretSizeX, iCaretSizeY, (SWP_SHOWWINDOW | SWP_NOACTIVATE))) {
@@ -1138,7 +1135,7 @@ BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData)
 				rcCursor.top = rcCursor.top - (iCursorSizeY / 2) + MERGIN_Y;
 #undef MERGIN_X
 #undef MERGIN_Y
-				vAdjustFontXPosition(dwIMEModeCursor, lpstCursorData->lpstNearDrawCaretCursor[iCursor].szMode, &iCursorSizeX, &rcCursor);
+				vAdjustFontXLeftPosition(dwIMEModeCursor, lpstCursorData->lpstNearDrawCaretCursor[iCursor].szMode, &iCursorSizeX, &rcCursor);
 				if (!lpstCursorData->bIMECursorChangeThreadSentinel) {
 					bRet = TRUE;
 					break;

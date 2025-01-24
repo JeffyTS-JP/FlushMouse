@@ -212,12 +212,12 @@ namespace FlushMouseUI3DLL {
 				if (selectedItem != null) {
 					System.Type pageType = null;
 					if ((string)selectedItem.Tag == "Menu1") {
-						sender.Header = "Šî–{“®ìİ’è";
+						sender.Header = "åŸºæœ¬å‹•ä½œè¨­å®š";
 						if (m_General == null) { m_General = new General(); }
 						pageType = m_General.GetType();
 					}
 					else if ((string)selectedItem.Tag == "Menu2") {
-						sender.Header = "IME ƒ‚[ƒh•\¦İ’è";
+						sender.Header = "IME ãƒ¢ãƒ¼ãƒ‰è¡¨ç¤ºè¨­å®š";
 						if (m_IMEMode == null) { m_IMEMode = new IMEMode(); }
 						pageType = m_IMEMode.GetType();
 					}
@@ -227,7 +227,7 @@ namespace FlushMouseUI3DLL {
 						pageType = m_SynTP_Helper.GetType();
 					}
 					else if ((string)selectedItem.Tag == "Menu4") {
-						sender.Header = "ƒo[ƒWƒ‡ƒ“";
+						sender.Header = "ãƒãƒ¼ã‚¸ãƒ§ãƒ³";
 						if (m_About == null) { m_About = new About(); }
 						pageType = m_About.GetType();
 					}
@@ -352,7 +352,7 @@ namespace FlushMouseUI3DLL {
 				}
 				else if (_args.DidPresenterChange) {
 					if (IsIconic(g_hSettingsWnd) == false) {
-						Debug.WriteLine($"NOT Iconic3F({sender.Position.X}, {sender.Position.Y})");
+						Debug.WriteLine($"NOT Iconic3ï¼š({sender.Position.X}, {sender.Position.Y})");
 						UpdateProfile(SETTINGSEX_SETTINGS_SETREGISTRY);
 					}
 					SetWindowSize();

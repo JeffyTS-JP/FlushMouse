@@ -80,7 +80,8 @@ typedef struct {
 //
 // Global Prototype Define
 //
-extern VOID		vAdjustFontXPosition(DWORD dwIMEMode,LPCTSTR szMode, LPINT lpiXSize, LPRECT lprc);
+extern VOID		vAdjustFontXLeftPosition(DWORD dwIMEMode,LPCTSTR szMode, LPINT lpiXSize, LPRECT lprc);
+extern VOID		vAdjustFontXRightPosition(DWORD dwIMEMode,LPCTSTR szMode, LPINT lpiXSize, LPRECT lprc);
 
 //
 // Class CCursorSub
