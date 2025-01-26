@@ -1,18 +1,18 @@
 
 # FlushMouse
-|![Icon](https://GitHub.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/FlushMouse.png)|**システムトレイ(タスクトレイ)に常駐して、マウスカーソルやキャレットに IMEモードの表示をするユーティリティです<br>FlushMouse is a software developed by JeffyTS. It is a mouse gesture tool that allows you to perform various operations by drawing gestures with your mouse. (by Bing)**|
+|![Icon](![Image](https://github.com/user-attachments/assets/cb59e2ac-09c1-4859-9cd0-783e0689c87f))|**システムトレイ(タスクトレイ)に常駐して、マウスカーソルやキャレットに IMEモードの表示をするユーティリティです<br>FlushMouse is a software developed by JeffyTS. It is a mouse gesture tool that allows you to perform various operations by drawing gestures with your mouse. (by Bing)**|
 | :---: | :--- |
 
 #### リリース情報
 
-* **2025/01/24　　Version 3.5.1.4 を リリースしました**
+* **2025/01/24　　Version 3.5.2.0 を リリースしました**
 
 * **(主な変更点)**
    * 直接描画と併用のモードでバグがありましたので修正しました
    * その他、細かなバグの修正や機能改善をしました
    
 #### DEMO
-![demo](https://GitHub.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/FlushMouseDemo.gif)
+![Image](https://github.com/user-attachments/assets/ecaa38a5-0f94-4ca8-99e3-c2fcba513bae)
 
 #### 対応OS
    * Windows 10 / 11 64bit  (Latest Release Versionで検証しています。24H2 に対応しました(今のところ検証は仮想マシン内のみです))
@@ -23,6 +23,8 @@
    * ~~今後は、プレゼンテーションモードの追加や、マウスカーソルの形状や、表示する内容などをカスタマイズする機能をつけて有償に移行しようと考えています~~
    * と、上記のように考えていたのですが、この FlushMouse は Microsoft Storeに登録できないやり方を使って処理しているので無理なことが判明しました(フックを使用しいるとどうしてもだめなようです。ただ、SDKなどで、だいぶ検証しました)
    * ***ということで、今後も暇を見つけて、機能向上を目指していきますのでよろしくお願いします***
+   * なお、会社、団体等で使用したい場合は、コードレビューやカスタマイズも可能です。その場合は有償 (単価(内容によります。話し合いで決めさせていただきます) x 時間 + 交通費等の諸経費 )になります。X (Twitter)[@JeffyTSonTW] の DM にてご相談ください
+   * ご要望や、バグ等についても、X (Twitter)[@JeffyTSonTW] のタイムライン、または DM にお願いします
 
 #### (既知の問題)
    * Ver.3 からの デスクトップ版の UI3 で動く設定画面や、UI3 版の本体において、アプリ終了時にメモリーリークしていることがわかっています (動的に増えていくメモリーリークではありません)
@@ -68,7 +70,7 @@
 |直接描画方式を使用する|マウスカーソルの右下へ直接描画します|システム設定のカーソルが使用できます|システムがビジーの時は描画が遅れます|
 |リソース方式と直接描画方式を併用する|矢印、Ｉビーム、ハンドをリソースで表示し、残りは直接描画します|ほとんどのケースでリソースで表示することになりますので遅れも目立たないと思います|2方式を併用してますのでのマウスサイズなどの設定が少々面倒ですが[こちら](https://GitHub.com/JeffyTS-JP/FlushMouse?tab=readme-ov-file#%E8%A8%AD%E5%AE%9A%E3%81%AE%E3%83%92%E3%83%B3%E3%83%88)を参考にしてみてください|
    
-<img src="https://GitHub.com/JeffyTS-JP/FlushMouse/blob/master/OSDN%20Wiki/Cursors.png" width="80%">
+<img src="https://github.com/user-attachments/assets/6605c6a5-b507-471e-9d6a-0d5f65b1e7db" width="30%">
 
 #### 設定のヒント
    * Ver.3.1 以降では、「右下の描画方法」で、「直接描画方式を使用する」を選択している場合には、システムのカーソルをそのまま使用しますので、下記設定は不要です (その他の方式の場合に行ってください)
