@@ -12,7 +12,7 @@
    * その他、細かなバグの修正や機能改善をしました
    
 #### DEMO
-![Image]((https://github.com/user-attachments/assets/4e96b099-92e8-4d65-8ee3-6d9b252686d6)
+![Demo]((https://github.com/user-attachments/assets/4e96b099-92e8-4d65-8ee3-6d9b252686d6)
 
 #### 対応OS
    * Windows 10 / 11 64bit  (Latest Release Versionで検証しています。24H2 に対応しました(今のところ検証は仮想マシン内のみです))
