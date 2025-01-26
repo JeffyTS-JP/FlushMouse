@@ -12,7 +12,7 @@
    * その他、細かなバグの修正や機能改善をしました
    
 #### DEMO
-![Demo](https://github.com/user-attachments/assets/4e96b099-92e8-4d65-8ee3-6d9b252686d6)
+![Demo](https://github.com/user-attachments/assets/05180814-8104-4ada-80d8-4ae9dfda797c)
 
 #### 対応OS
    * Windows 10 / 11 64bit  (Latest Release Versionで検証しています。24H2 に対応しました(今のところ検証は仮想マシン内のみです))
@@ -70,7 +70,7 @@
 |直接描画方式を使用する|マウスカーソルの右下へ直接描画します|システム設定のカーソルが使用できます|システムがビジーの時は描画が遅れます|
 |リソース方式と直接描画方式を併用する|矢印、Ｉビーム、ハンドをリソースで表示し、残りは直接描画します|ほとんどのケースでリソースで表示することになりますので遅れも目立たないと思います|2方式を併用してますのでのマウスサイズなどの設定が少々面倒ですが[こちら](https://GitHub.com/JeffyTS-JP/FlushMouse?tab=readme-ov-file#%E8%A8%AD%E5%AE%9A%E3%81%AE%E3%83%92%E3%83%B3%E3%83%88)を参考にしてみてください|
    
-<img src="https://github.com/user-attachments/assets/05180814-8104-4ada-80d8-4ae9dfda797c" width="30%">
+<img src="https://github.com/user-attachments/assets/4e96b099-92e8-4d65-8ee3-6d9b252686d6" width="30%">
 
 #### 設定のヒント
    * Ver.3.1 以降では、「右下の描画方法」で、「直接描画方式を使用する」を選択している場合には、システムのカーソルをそのまま使用しますので、下記設定は不要です (その他の方式の場合に行ってください)
