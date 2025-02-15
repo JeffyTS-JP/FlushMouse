@@ -175,6 +175,7 @@ App::App()
 
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_ASSERTE(_CrtCheckMemory());
 #endif
 
 	InitializeComponent();
@@ -185,6 +186,11 @@ App::App()
 //
 App::~App()
 {
+#if defined _DEBUG
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG); 
+	_CrtDumpMemoryLeaks();
+#endif // _DEBUG
+	
 	return;
 }
 
@@ -198,13 +204,17 @@ void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 		MessageBox(NULL, L"EXCEPTION", L"FlushMouseUI3", (MB_ICONSTOP | MB_OK));
 		});
 #endif // _DEBUG
-
-	int	iRet = 0;
+	
+#if defined _DEBUG
+	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_ASSERTE(_CrtCheckMemory());
+#endif
+	
 	LPCTSTR	_lpCmdLine = GetCommandLine();
 	int		iNumArgs = 0;
 	LPTSTR	*_lpArgv = CommandLineToArgvW(_lpCmdLine, &iNumArgs);
 	if (iNumArgs != 0) {
-		if ((iRet = iCheckCmdLine((LPCTSTR)_lpArgv) != 1)) {
+		if (iCheckCmdLine((LPCTSTR)_lpArgv) != 1) {
 			LocalFree(_lpArgv);
 			PostQuitMessage(0);
 			return;
@@ -230,6 +240,11 @@ void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 	if (hFlushMouseUI3DLL)	FreeLibrary(hFlushMouseUI3DLL);
 	if (hMicrosoft_ui_xaml_dll)	FreeLibrary(hMicrosoft_ui_xaml_dll);
 
+#if defined _DEBUG
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG); 
+	_CrtDumpMemoryLeaks();
+#endif // _DEBUG
+	
 	PostQuitMessage(0);
 	return;
 }

@@ -37,17 +37,81 @@
 //
 // Local Prototype Define
 //
-static BOOL		TextDraw(HDC hDC, RECT rcSize, LPTSTR lpszIMEMode, COLORREF dwRGB, LPCTSTR lpszFontFace, int cWeight, DWORD dwUnderline);
+static BOOL		TextDraw(HDC hDC, RECT rcSize, LPTSTR szIMEMode, COLORREF dwRGB, LPCTSTR szFontFace, int cWeight, DWORD dwUnderline);
+
+//
+// vAdjustFontXLeftPosition()
+//
+VOID		vAdjustFontXLeftPosition(DWORD dwIMEMode,LPCTSTR szMode, LPINT lpiXSize, LPRECT lprc)
+{
+	int		len = (int)wcsnlen_s(szMode, sizeof(szMode));
+	if ((len < 2) && ((dwIMEMode == IMEOFF) || (dwIMEMode == HANEISU_IMEON) || (dwIMEMode == HANKANA_IMEON))) {
+		*lpiXSize = (*lpiXSize * 2) / 3;	lprc->left = lprc->left + (*lpiXSize / 3);	lprc->right = lprc->left + *lpiXSize;
+	}
+	else if (len == 2) {
+		*lpiXSize = (*lpiXSize * 2) / 3;	lprc->left = lprc->left + (*lpiXSize / 3);	lprc->right = lprc->left + *lpiXSize;
+	}
+}
+
+//
+// vAdjustFontXRightPosition()
+//
+VOID		vAdjustFontXRightPosition(DWORD dwIMEMode,LPCTSTR szMode, LPINT lpiXSize, LPRECT lprc)
+{
+	int		len = (int)wcsnlen_s(szMode, sizeof(szMode));
+	if ((len < 2) && ((dwIMEMode == IMEOFF) || (dwIMEMode == HANEISU_IMEON) || (dwIMEMode == HANKANA_IMEON))) {
+		*lpiXSize = (*lpiXSize * 2) / 3;	lprc->left = lprc->left + (*lpiXSize / 8);	lprc->right = lprc->left + *lpiXSize;
+	}
+	else if (len == 2) {
+		*lpiXSize = (*lpiXSize * 2) / 3;	lprc->left = lprc->left + (*lpiXSize / 3);	lprc->right = lprc->left + *lpiXSize;
+	}
+}
+
+//
+// TextDraw()
+//
+static BOOL		TextDraw(HDC hDC, RECT rcSize, LPTSTR szIMEMode, COLORREF dwRGB, LPCTSTR szFontFace, int cWeight, DWORD dwUnderline)
+{
+	BOOL bRet = FALSE;
+	if (hDC != NULL) {
+		if (SetBkMode(hDC, TRANSPARENT) != 0) {
+			COLORREF	dwColorPrev = 0;
+			if ((dwColorPrev = SetTextColor(hDC, dwRGB & 0x80ffffff)) != CLR_INVALID) {
+				int	iBkModePrev = 0;
+				if ((iBkModePrev = SetBkMode(hDC, TRANSPARENT)) != 0) {
+					HFONT	hFont = NULL;
+					if ((hFont = CreateFont((rcSize.bottom - rcSize.top), (rcSize.right - rcSize.left) / 2, 0, 0, cWeight, FALSE, dwUnderline, FALSE,
+						SHIFTJIS_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, (FIXED_PITCH | FF_DONTCARE), szFontFace)) != NULL) {
+						HFONT	hFontPrev = NULL;
+						if ((hFontPrev = (HFONT)SelectObject(hDC, hFont)) != NULL) {
+							if (szIMEMode != NULL) {
+								SIZE	sz{};
+								int		len = (int)wcsnlen_s(szIMEMode, sizeof(szIMEMode));
+								if (GetTextExtentExPoint(hDC, szIMEMode, len, 0, NULL, NULL, &sz)) {
+									rcSize.left = rcSize.right - sz.cx;
+									if (DrawTextEx(hDC, szIMEMode, -1, &rcSize, DT_RIGHT | DT_SINGLELINE | DT_VCENTER, NULL) != 0) {
+										bRet = TRUE;
+									}
+								}
+							}
+						}
+						DeleteObject(hFont);
+					}
+					SetBkMode(hDC, iBkModePrev);
+				}
+				SetTextColor(hDC, dwColorPrev);
+			}
+		}
+	}
+	return bRet;
+}
 
 //
 // class CCursorSub
 //
 CCursorSub::CCursorSub()
+	: lpszCursorDataFullPath(NULL), lpszCursorDataTempFullPath(NULL), hCursorData(NULL), iCursorDataLoadCount(0)
 {
-	lpszCursorDataFullPath = NULL;
-	lpszCursorDataTempFullPath = NULL;
-	hCursorData = NULL;
-	iCursorDataLoadCount = 0;
 }
 
 CCursorSub::~CCursorSub()
@@ -163,12 +227,11 @@ BOOL		CCursorSub::bGetCursorDataFullPath(LPCTSTR lpszCursorDataFileName)
 BOOL		CCursorSub::bGetCursorDataTempFullPath(LPCTSTR lpszCursorDataFileName)
 {
 	LPTSTR	lpszBuffer = new TCHAR[_MAX_PATH + 1];
-	size_t	size = 0;
 	if (lpszBuffer) {
 		ZeroMemory(lpszBuffer, _MAX_PATH + 1);
 		GetTempPath(_MAX_PATH, lpszBuffer);
 		_tcsncat_s(lpszBuffer, _MAX_PATH + 1, lpszCursorDataFileName, _TRUNCATE);
-		size = wcsnlen_s(lpszBuffer, _MAX_PATH + 1);
+		size_t	size = wcsnlen_s(lpszBuffer, _MAX_PATH + 1);
 		lpszCursorDataTempFullPath = new TCHAR[size + 1];
 		if (lpszCursorDataTempFullPath) {
 			ZeroMemory(lpszCursorDataTempFullPath, size + 1);
@@ -225,20 +288,20 @@ Cleanup:
 //
 BOOL		CCursorSub::bMakeAllCursor(LPFLUSHMOUSECURSOR lpstIMECursorData)
 {
-	HMODULE		hSrcMod;
-	HANDLE		hDstRes;
+	HMODULE	hSrcMod = NULL;
+	HANDLE	hDstRes = NULL;
 	BOOL	bRet = FALSE;
 
 	if ((hSrcMod = LoadLibrary(lpszCursorDataFullPath)) == NULL)	goto Cleanup;
 	if ((hDstRes = BeginUpdateResource(lpszCursorDataTempFullPath, FALSE)) == NULL)	goto Cleanup;
 
-	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_IMEOFF))	goto Cleanup;
-	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_ZENHIRA_IMEON))	goto Cleanup;
-	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_HANEISU_IMEON))	goto Cleanup;
-	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_HANKANA_IMEON))	goto Cleanup;
-	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_ZENEISU_IMEON))	goto Cleanup;
-	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_ZENKANA_IMEON))	goto Cleanup;
-	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_IMEHIDE))	goto Cleanup;
+	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_IMEOFF))	goto Cleanup;
+	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_ZENHIRA_IMEON))	goto Cleanup;
+	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_HANEISU_IMEON))	goto Cleanup;
+	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_HANKANA_IMEON))	goto Cleanup;
+	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_ZENEISU_IMEON))	goto Cleanup;
+	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_ZENKANA_IMEON))	goto Cleanup;
+	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_IMEHIDE))	goto Cleanup;
 
 	if (hDstRes)	if (!EndUpdateResource(hDstRes, FALSE))	goto Cleanup;
 
@@ -255,33 +318,7 @@ Cleanup:
 //
 // bMakeOneUnitCursor();
 //
-BOOL		CCursorSub::bMakeOneUnitCursor(LPFLUSHMOUSECURSOR lpstIMECursorData, int iIMEMode)
-{
-	HMODULE		hSrcMod;
-	HANDLE		hDstRes;
-	BOOL	bRet = FALSE;
-
-	if ((hSrcMod = LoadLibrary(lpszCursorDataFullPath)) == NULL)	goto Cleanup;
-	if ((hDstRes = BeginUpdateResource(lpszCursorDataTempFullPath, FALSE)) == NULL)	goto Cleanup;
-	
-	if (!_bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, iIMEMode))	goto Cleanup;
-
-	if (hDstRes)	if (!EndUpdateResource(hDstRes, FALSE))	goto Cleanup;
-	
-	bRet = TRUE;
-
-Cleanup:
-	if (hSrcMod)	FreeLibrary(hSrcMod);
-	hSrcMod = NULL;
-	
-	return bRet;
-
-}
-
-//
-// _bMakeOneUnitCursor();
-//
-BOOL		CCursorSub::_bMakeOneUnitCursor(HMODULE hSrcMod, HANDLE hDstRes, LPFLUSHMOUSECURSOR lpstIMECursorData, int iIMEMode)
+BOOL		CCursorSub::bMakeOneUnitCursor(HMODULE hSrcMod, HANDLE hDstRes, LPFLUSHMOUSECURSOR lpstIMECursorData, int iIMEMode)
 {
 	BOOL	bRet = FALSE;
 	
@@ -314,37 +351,35 @@ Cleanup:
 BOOL		CCursorSub::bMakeCursor(HMODULE hSrcMod, HANDLE hDstRes, int iSrcResID, int iDstResID, DWORD dwIMEMode, LPTSTR szIMEMode, COLORREF dwRGB, LPCTSTR szFontFace)
 {
 
-	LPRTGROUPCURSORHEAD	lpRTGrpCursorHead = NULL;
 	LPVOID	lpGrpResLock = NULL;
 	DWORD	dwGrpResSize = 0;
 	LPRTCURSORHEAD	lpMakeCursorData = NULL;
 
 	BOOL	bRet = FALSE;
 
-	if (!(lpRTGrpCursorHead = (LPRTGROUPCURSORHEAD)_FindResource(hSrcMod, iSrcResID, RT_GROUP_CURSOR, NULL)))	goto Cleanup;
+	LPRTGROUPCURSORHEAD	lpRTGrpCursorHead = static_cast<LPRTGROUPCURSORHEAD>(FindAndLockResource(hSrcMod, iSrcResID, RT_GROUP_CURSOR, NULL));
+	if (!lpRTGrpCursorHead)	goto Cleanup;
 
-	if (!(lpGrpResLock =_FindResource(hSrcMod, iDstResID, RT_GROUP_CURSOR, &dwGrpResSize)))	goto Cleanup;
+	if (!(lpGrpResLock = FindAndLockResource(hSrcMod, iDstResID, RT_GROUP_CURSOR, &dwGrpResSize)))	goto Cleanup;
 	if (dwGrpResSize == 0)		goto Cleanup;
 
 	if (lpRTGrpCursorHead->NewHeader.ResType != 2 || lpRTGrpCursorHead->NewHeader.ResCount == 0)	goto Cleanup;
-
-	for (int i = 0; i < lpRTGrpCursorHead->NewHeader.ResCount; i++) {
-		LPICONDIRENTRY	lpIconDirEntry = NULL;
-		LPRTCURSORHEAD	lpRTCursorHead = NULL;
+	for (int i = 0; i < (int)lpRTGrpCursorHead->NewHeader.ResCount; i++) {
 		DWORD	dwResSize = 0;
 		int		cx = 0, cy = 0;
 		int		iSrcID = 0;
 		int		iDstID = 0;
-
-		lpIconDirEntry = (LPICONDIRENTRY)(LPBYTE)((LPBYTE)lpRTGrpCursorHead + sizeof(RTGROUPCURSORHEAD) + (sizeof(ICONDIRENTRY) * i));
+		const LPICONDIRENTRY	lpIconDirEntry = reinterpret_cast<LPICONDIRENTRY>(static_cast<LPBYTE>((reinterpret_cast<LPBYTE>(lpRTGrpCursorHead)) + sizeof(RTGROUPCURSORHEAD) + (sizeof(ICONDIRENTRY) * i)));
+		if (!lpIconDirEntry)	goto Cleanup;
 		cx = lpIconDirEntry->Width;	cy = lpIconDirEntry->Height / 2;
 		if ((iSrcID = LookupIconIdFromDirectoryEx((LPBYTE)lpRTGrpCursorHead, FALSE, cx, cy, (LR_DEFAULTCOLOR))) == 0)	goto Cleanup;
 
-		if (!(lpRTCursorHead = (LPRTCURSORHEAD)_FindResource(hSrcMod, iSrcID, RT_CURSOR, &dwResSize)))	goto Cleanup;
-		if (dwResSize == 0)		goto Cleanup;
+		LPRTCURSORHEAD	lpRTCursorHead = reinterpret_cast<LPRTCURSORHEAD>(FindAndLockResource(hSrcMod, iSrcID, RT_CURSOR, &dwResSize));
+		if (!lpRTCursorHead || (dwResSize == 0))	goto Cleanup;
 
-		if (!(lpMakeCursorData = new RTCURSORHEAD[dwResSize]))	goto Cleanup;
-		ZeroMemory(lpMakeCursorData, dwResSize);
+		lpMakeCursorData = new RTCURSORHEAD[dwResSize];
+		if (lpMakeCursorData) ZeroMemory(lpMakeCursorData, dwResSize);
+		else goto Cleanup;
 
 		if (!bMakeCursorSub(lpRTCursorHead, lpMakeCursorData, dwResSize, cx, cy, dwIMEMode, szIMEMode, dwRGB, szFontFace))	goto Cleanup;
 
@@ -356,7 +391,6 @@ BOOL		CCursorSub::bMakeCursor(HMODULE hSrcMod, HANDLE hDstRes, int iSrcResID, in
 	}
 
 	if (!UpdateResource(hDstRes, RT_GROUP_CURSOR, MAKEINTRESOURCE(iDstResID), MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL), lpGrpResLock, dwGrpResSize))	goto Cleanup;
-
 
 	bRet = TRUE;
 
@@ -422,6 +456,7 @@ BOOL		CCursorSub::bMakeCursorSub(LPRTCURSORHEAD	lpRTCursorHead, LPRTCURSORHEAD l
 
 	if (!BitBlt(hCursorMemDC, 0, 0, cx, cy, hTextMemDC, 0, 0, SRCINVERT))	goto Cleanup;
 
+	if (!lpMakeCursorData)	goto Cleanup;
 	memcpy_s(lpMakeCursorData, dwResSize, lpRTCursorHead, sizeof(RTCURSORHEAD));
 	memcpy_s(&(lpMakeCursorData->lpData), CursorBytes, lpCursorBits, CursorBytes);
 
@@ -439,9 +474,9 @@ Cleanup:
 }
 
 //
-// _FindResource()
+// FindAndLockResource()
 //
-LPVOID		CCursorSub::_FindResource(HMODULE hModule, int iResID, LPCTSTR ResType, LPDWORD lpdwResSize)
+LPVOID		CCursorSub::FindAndLockResource(HMODULE hModule, int iResID, LPCTSTR ResType, LPDWORD lpdwResSize)
 {
 	if (!hModule)	return NULL;
 	
@@ -490,11 +525,8 @@ void		CCursorSub::MakeAlphaBlend(LPDWORD lpData, int cx, int cy, COLORREF aRGB)
 //class CCursorWindow : public CWindow
 //
 CCursorWindow::CCursorWindow()
+	: lpszIMEMode(NULL), dwTextColor(aRGB(15, 254, 192, 0)), dwBackColor(aRGB(15, 254, 192, 0)), lpszFontFace(NULL)
 {
-	lpszIMEMode = NULL;
-	dwTextColor = aRGB(15, 254, 192, 0);
-	dwBackColor = aRGB(15, 254, 192, 0);
-	lpszFontFace = NULL;
 }
 
 CCursorWindow::~CCursorWindow()
@@ -594,18 +626,6 @@ void		CCursorWindow::Cls_OnDestroy(HWND hWnd)
 }
 
 //
-// WM_ERASEBKGND
-// Cls_OnEraseBkgnd()
-//
-BOOL		CCursorWindow::Cls_OnEraseBkgnd(HWND hWnd, HDC hDC)
-{
-	UNREFERENCED_PARAMETER(hWnd);
-	UNREFERENCED_PARAMETER(hDC);
-
-	return TRUE;
-}
-
-//
 // WM_PAINT
 // Cls_OnPaint()
 //
@@ -635,72 +655,6 @@ void		CCursorWindow::Cls_OnPaint(HWND hWnd) const
 	return;
 }
 
-//
-// TextDraw()
-//
-BOOL		TextDraw(HDC hDC, RECT rcSize, LPTSTR szIMEMode, COLORREF dwRGB, LPCTSTR szFontFace, int cWeight, DWORD dwUnderline)
-{
-	BOOL bRet = FALSE;
-	if (hDC != NULL) {
-		if (SetBkMode(hDC, TRANSPARENT) != 0) {
-			COLORREF	dwColorPrev = 0;
-			if ((dwColorPrev = SetTextColor(hDC, dwRGB & 0x80ffffff)) != CLR_INVALID) {
-				int	iBkModePrev = 0;
-				if ((iBkModePrev = SetBkMode(hDC, TRANSPARENT)) != 0) {
-					HFONT	hFont = NULL;
-					if ((hFont = CreateFont((rcSize.bottom - rcSize.top), (rcSize.right - rcSize.left) / 2, 0, 0, cWeight, FALSE, dwUnderline, FALSE,
-						SHIFTJIS_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, (FIXED_PITCH | FF_DONTCARE), szFontFace)) != NULL) {
-						HFONT	hFontPrev = NULL;
-						if ((hFontPrev = (HFONT)SelectObject(hDC, hFont)) != NULL) {
-							if (szIMEMode != NULL) {
-								SIZE	sz{};
-								int		len = (int)wcsnlen_s(szIMEMode, sizeof(szIMEMode));
-								if (GetTextExtentExPoint(hDC, szIMEMode, len, 0, NULL, NULL, &sz)) {
-									rcSize.left = rcSize.right - sz.cx;
-									if (DrawTextEx(hDC, szIMEMode, -1, &rcSize, DT_RIGHT | DT_SINGLELINE | DT_VCENTER, NULL) != 0) {
-										bRet = TRUE;
-									}
-								}
-							}
-						}
-						DeleteObject(hFont);
-					}
-					SetBkMode(hDC, iBkModePrev);
-				}
-				SetTextColor(hDC, dwColorPrev);
-			}
-		}
-	}
-	return bRet;
-}
-
-//
-// vAdjustFontXLeftPosition()
-//
-VOID		vAdjustFontXLeftPosition(DWORD dwIMEMode,LPCTSTR szMode, LPINT lpiXSize, LPRECT lprc)
-{
-	int		len = (int)wcsnlen_s(szMode, sizeof(szMode));
-	if ((len < 2) && ((dwIMEMode == IMEOFF) || (dwIMEMode == HANEISU_IMEON) || (dwIMEMode == HANKANA_IMEON))) {
-		*lpiXSize = (*lpiXSize * 2) / 3;	lprc->left = lprc->left + (*lpiXSize / 3);	lprc->right = lprc->left + *lpiXSize;
-	}
-	else if (len == 2) {
-		*lpiXSize = (*lpiXSize * 2) / 3;	lprc->left = lprc->left + (*lpiXSize / 3);	lprc->right = lprc->left + *lpiXSize;
-	}
-}
-
-//
-// vAdjustFontXRightPosition()
-//
-VOID		vAdjustFontXRightPosition(DWORD dwIMEMode,LPCTSTR szMode, LPINT lpiXSize, LPRECT lprc)
-{
-	int		len = (int)wcsnlen_s(szMode, sizeof(szMode));
-	if ((len < 2) && ((dwIMEMode == IMEOFF) || (dwIMEMode == HANEISU_IMEON) || (dwIMEMode == HANKANA_IMEON))) {
-		*lpiXSize = (*lpiXSize * 2) / 3;	lprc->left = lprc->left + (*lpiXSize / 8);	lprc->right = lprc->left + *lpiXSize;
-	}
-	else if (len == 2) {
-		*lpiXSize = (*lpiXSize * 2) / 3;	lprc->left = lprc->left + (*lpiXSize / 3);	lprc->right = lprc->left + *lpiXSize;
-	}
-}
 
 
 /* = EOF = */

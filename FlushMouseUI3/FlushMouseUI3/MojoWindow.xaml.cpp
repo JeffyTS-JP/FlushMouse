@@ -64,9 +64,9 @@ namespace winrt::FlushMouseUI3::implementation
 				winrt::check_bool(windowNative);
 #pragma warning(push)
 #pragma warning(disable : 28112)
-				InterlockedIncrement64((volatile LONG64*)&s_module);
+				InterlockedIncrement64(reinterpret_cast<LONG64*>(&s_module));
 				windowNative->get_WindowHandle(&hMojoWnd);
-				InterlockedDecrement64((volatile LONG64*)&s_module);
+				InterlockedDecrement64(reinterpret_cast<LONG64*>(&s_module));
 #pragma warning(pop)
 				Microsoft::UI::WindowId windowId = Microsoft::UI::GetWindowIdFromWindow(hMojoWnd);
 				Microsoft::UI::Windowing::AppWindow appWindow = Microsoft::UI::Windowing::AppWindow::GetFromWindowId(windowId);
@@ -84,9 +84,7 @@ namespace winrt::FlushMouseUI3::implementation
 	void		MojoWindowClose()
 	{
 		SettingsClose();
-		if (wMojoWnd != nullptr) {
-			wMojoWnd = nullptr;
-		}
+		wMojoWnd = nullptr;
 	}
 
 	MojoWindow::MojoWindow()
@@ -115,7 +113,7 @@ void		SettingsExec(HWND hWnd, UINT32 uMsg, INT32 iSelectedPane)
 			Cursor->vStopDrawIMEModeMouseByWndThread();
 		}
 		try {
-			throw	m_Settings = FlushMouseUI3DLL::Settings(iSelectedPane);
+			m_Settings = FlushMouseUI3DLL::Settings(iSelectedPane);
 		}
 		catch (...) {
 		}

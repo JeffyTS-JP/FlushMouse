@@ -68,13 +68,7 @@ class CTCPIP
 		BOOL		bOpenPortForSendUDPv4(LPCTSTR lpszIPAddress, int Port);
 		BOOL		bSendPacket(LPCSTR lpszSendData, int cbSize) const;
 
-		BOOL		bCheckHostByICMPv4(LPCTSTR lpszIPAddress);
-
 	private:
-		PADDRINFOA	ResolveAddress(PCSTR addr, PCSTR port, int af, int type, int proto);
-		USHORT		CalcChecksum(PUSHORT message, size_t size);
-		BOOL		bSetTTL(SOCKET socket, int iAddressFamily, int ttl);
-		void		InitIcmpHeader(char *buf, int datasize);
 
 	public:
 

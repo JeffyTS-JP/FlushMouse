@@ -34,21 +34,18 @@
 //
 class CResource
 {
-public:
-			CResource(LPCTSTR lpszResFile);
-			~CResource();
+	public:
+		explicit CResource(LPCTSTR lpszResFile);
+		~CResource();
 
-private:
-			CResource();
+	public:
+		HMODULE	hLoad();
+		BOOL	bUnload();
 
-public:
-	HMODULE	hLoad();
-	BOOL	bUnload();
-
-private:
-	LPTSTR	szResFile;
-	HMODULE	hModRes;
-	int		iResourceLoadCount;
+	private:
+		LPTSTR	szResFile;
+		HMODULE	hModRes;
+		int		iResourceLoadCount;
 };
 
 

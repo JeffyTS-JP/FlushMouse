@@ -27,18 +27,18 @@
 //
 // class CPowerNotification
 //
-class CPowerNotification
+class CPowerNotification32
 {
-public:
-	CPowerNotification(HWND hWnd);
-	~CPowerNotification();
+	public:
+		explicit CPowerNotification32(HWND hWnd);
+		~CPowerNotification32();
 
-	BOOL		PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting);
+		BOOL		PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting);
 
-private:
-	HPOWERNOTIFY	hSuspendResumeNotification;
-	HPOWERNOTIFY	hPowerSettingNotification;
-	GUID			guidPowerSettingNotification;
+	private:
+		HPOWERNOTIFY	hSuspendResumeNotification;
+		HPOWERNOTIFY	hPowerSettingNotification;
+		GUID			guidPowerSettingNotification;
 };
 
 

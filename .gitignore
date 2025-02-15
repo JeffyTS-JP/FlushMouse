@@ -362,6 +362,8 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
+FlushMouse.cppcheck
+FlushMouse-cppcheck-build-dir/
 nuget.exe
 !NuGet/FlushMouseUI3DLL/FlushMouseUI3DLL*.nupkg
 FlushMouseCursor.dat

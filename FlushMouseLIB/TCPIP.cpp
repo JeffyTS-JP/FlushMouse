@@ -101,20 +101,19 @@ static BOOL	bIsPrivateIPv4Addr(DWORD dwIPv4Addr)
 BOOL		bCheckExistHostnameIPv4(LPCTSTR lpszHostname, int iTimeOut)
 {
 	if (lpszHostname == NULL)	return FALSE;
-	if (wcsnlen_s(lpszHostname, sizeof(lpszHostname)) <= 0)	return FALSE;
+	if (!(wcsnlen_s(lpszHostname, MAX_FQDN) > 0))	return FALSE;
 
 	std::future<BOOL> _future;
 	std::promise<BOOL> _promise;
 	_future = _promise.get_future();
 	try {
 		std::thread([&](std::promise<BOOL> _promise) {
-			LPWSADATA	lpWSAData = NULL;
-			if (lpWSAData == NULL)	lpWSAData = new WSADATA[sizeof(WSADATA)];
+			LPWSADATA	lpWSAData = new WSADATA[sizeof(WSADATA)];
 			if (lpWSAData)	ZeroMemory(lpWSAData, sizeof(WSADATA));
 			else return FALSE;;
 
 			if (WSAStartup(MAKEWORD(2, 2), lpWSAData) != 0) {
-				if (lpWSAData)	delete []	lpWSAData;
+				delete []	lpWSAData;
 				bReturn_CheckExistHostname = FALSE;
 				return FALSE;
 			}
@@ -164,7 +163,7 @@ BOOL		bCheckExistHostnameIPv4(LPCTSTR lpszHostname, int iTimeOut)
 //class CTCPIP
 //
 CTCPIP::CTCPIP()
-	:	lpWSAData(), pSocket(), lpszIPAddr(), iPortNo(), SockAddr_IN()
+	: lpWSAData(NULL), lpszIPAddr(NULL),  pSocket(NULL), iPortNo(0), SockAddr_IN(0)
 {
 	
 }
@@ -210,13 +209,13 @@ BOOL		CTCPIP::bOpenPortForReceiveUDPv4(int Port)
 	TIMEVAL	tv{};
 	tv.tv_sec = 0;
 	tv.tv_usec = 10;
-	iRet = setsockopt(pSocket, SOL_SOCKET, SO_RCVTIMEO, (char*)&tv, sizeof(TIMEVAL));
+	iRet = setsockopt(pSocket, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char*>(&tv), sizeof(TIMEVAL));
 	if (iRet != 0) {
 		WSACleanup();
 		return FALSE;
 	}
 	SockAddr_IN.sin_addr.S_un.S_addr = INADDR_ANY;
-	iRet = bind((SOCKET)pSocket, (const struct sockaddr *)&SockAddr_IN, (int)sizeof(SockAddr_IN));
+	iRet = bind((SOCKET)pSocket, reinterpret_cast<const struct sockaddr *>(&SockAddr_IN), (int)sizeof(SockAddr_IN));
 	if (iRet != 0) {
 		WSACleanup();
 		return FALSE;
@@ -233,8 +232,8 @@ BOOL		CTCPIP::bReceivePacket(LPVOID lpData, int cbSize) const
 
 	int			iRet = 0;
 	WSABUF		wsaBuf{};	wsaBuf.len = cbSize;	wsaBuf.buf = (LPSTR)lpData;
-	char		*_lpData = (char *)lpData;
-	
+	char		*_lpData = reinterpret_cast<char *>(lpData);
+
 	iRet = recv(pSocket, _lpData, cbSize, 0);
 	if (iRet == SOCKET_ERROR) {
 		int err = WSAGetLastError();
@@ -320,144 +319,6 @@ BOOL		CTCPIP::bSendPacket(LPCSTR lpszSendData, int cbSize) const
 		return FALSE;
 	}
 	return TRUE;
-}
-
-//
-// bCheckHostByICMPv4()
-//
-BOOL		CTCPIP::bCheckHostByICMPv4(LPCTSTR lpszIPAddress)
-{
-	if (lpszIPAddress == NULL)	return FALSE;
-
-	BOOL		bRet = FALSE;
-	LPWSADATA	_lpWSAData = new WSADATA[sizeof(WSADATA)];
-	PADDRINFOA	pDestAddrInfo = NULL;
-	PADDRINFOA	pLocalAddrInfo = NULL;
-	PSTR		pDest = new CHAR[MAX_FQDN];
-	SOCKET		_pSocket = NULL;
-	int			iPacketLen = 0;
-	char		*bufICMP = NULL;
-
-	if (_lpWSAData) {
-		ZeroMemory(_lpWSAData, sizeof(WSADATA));
-		if (WSAStartup(MAKEWORD(2, 2), _lpWSAData) != 0)	goto Cleanup;
-		if (pDest) {
-			ZeroMemory(pDest, MAX_FQDN);
-			if (WideCharToMultiByte(CP_ACP, 0, lpszIPAddress, -1, pDest, MAX_FQDN, NULL, NULL) == 0) {
-				goto Cleanup;
-			}
-			if ((pDestAddrInfo = ResolveAddress(pDest, "0", AF_INET, 0, 0)) == NULL)	goto Cleanup;
-			if ((pLocalAddrInfo = ResolveAddress(NULL, "0", AF_INET, 0, 0)) == NULL)	goto Cleanup;
-			if ((_pSocket = WSASocket(AF_INET, SOCK_RAW, IPPROTO_ICMP, NULL, 0, WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET) {
-				goto Cleanup;
-			}
-#define DEFAULT_TTL            128
-			if (!bSetTTL(_pSocket, AF_INET, 128)) {
-				goto Cleanup;
-			}
-			iPacketLen += sizeof(ICMP_HDR);
-#define DEFAULT_DATA_SIZE      32
-			iPacketLen += DEFAULT_DATA_SIZE;
-			if ((bufICMP = (char*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, iPacketLen)) == NULL) {
-				goto Cleanup;
-			}
-			InitIcmpHeader(bufICMP, DEFAULT_DATA_SIZE);
-			if (bind(_pSocket, pLocalAddrInfo->ai_addr, (int)pLocalAddrInfo->ai_addrlen) != 0) {
-				goto Cleanup;
-			}
-		}
-	}
-
-Cleanup:
-	if (pDest)	delete [] pDest;
-	if (_lpWSAData)	delete [] _lpWSAData;
-	if (_pSocket)	closesocket(_pSocket);
-	if (bufICMP)	HeapFree(GetProcessHeap(), 0, bufICMP);
-	WSACleanup();
-
-	return bRet;
-}
-
-//
-// usCalcChecksum()
-//
-USHORT		CTCPIP::CalcChecksum(PUSHORT message, size_t size)
-{
-	ULONG	sum = 0;
-
-	while (size > 1) {
-		sum += *message++;
-		size -= sizeof(USHORT);
-	}
-	if (size) {
-		sum += *(UCHAR*)message;
-	}
-	sum = (sum >> 16) + (sum & 0xffff);
-	sum += (sum >>16);
-	return (USHORT)(~sum);
-}
-
-//
-// ResolveAddress()
-//
-PADDRINFOA	CTCPIP::ResolveAddress(PCSTR addr, PCSTR port, int af, int type, int proto)
-{
-	ADDRINFOA	Hints{};
-	Hints.ai_flags  = ((addr) ? 0 : AI_PASSIVE);
-	Hints.ai_family = af;
-	Hints.ai_socktype = type;
-	Hints.ai_protocol = proto;
-	PADDRINFOA	pResult = NULL;
-
-	int iRet = 0;
-	iRet = getaddrinfo(addr, port, &Hints, &pResult);
-	if (iRet != 0) {
-		return NULL;
-	}
-	return pResult;
-}
-
-//
-// SetTtl()
-//
-BOOL	CTCPIP::bSetTTL(SOCKET socket, int iAddressFamily, int ttl)
-{
-	int	optlevel = 0,	option = 0;
-
-	if (iAddressFamily == AF_INET) {
-		optlevel = IPPROTO_IP;
-		option   = IP_TTL;
-	}
-	else if (iAddressFamily == AF_INET6) {
-		optlevel = IPPROTO_IPV6;
-		option   = IPV6_UNICAST_HOPS;
-	}
-	else {
-		return FALSE;
-	}
-	if (setsockopt(socket, optlevel, option, (char*)&ttl, sizeof(ttl)) != 0) {
-		return FALSE;
-	}
-	return TRUE;
-}
-
-//
-// InitIcmpHeader()
-//
-void	CTCPIP::InitIcmpHeader(char *buf, int datasize)
-{
-	ICMP_HDR   *icmp_hdr=NULL;
-	char       *datapart=NULL;
-
-	icmp_hdr = (ICMP_HDR *)buf;
-	icmp_hdr->type     = ICMPV4_ECHO_REQUEST_TYPE;
-	icmp_hdr->code     = ICMPV4_ECHO_REQUEST_CODE;
-	icmp_hdr->id       = (USHORT)GetCurrentProcessId();
-	icmp_hdr->checksum = 0;
-	icmp_hdr->sequence = 0;
-
-	datapart = buf + sizeof(ICMP_HDR);
-	memset(datapart, 'E', datasize);
 }
 
 

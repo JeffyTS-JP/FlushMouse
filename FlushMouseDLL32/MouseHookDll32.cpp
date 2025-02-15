@@ -88,7 +88,7 @@ static LRESULT CALLBACK lpMouseHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 		case WM_NCLBUTTONUP:
 		case WM_NCRBUTTONUP:
 		{
-			MOUSEHOOKSTRUCT* mh = (MOUSEHOOKSTRUCT*)lParam;
+			MOUSEHOOKSTRUCT* mh = reinterpret_cast<MOUSEHOOKSTRUCT*>(lParam);
 			DWORD pt = WORD2DWORD(mh->pt.x, mh->pt.y);
 			try {
 				PostMessage(hWndMSParent, (UINT)(WM_USER + wParam), (WPARAM)mh->hwnd, (LPARAM)pt);

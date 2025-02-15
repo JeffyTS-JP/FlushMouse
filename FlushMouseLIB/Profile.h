@@ -136,8 +136,11 @@ typedef struct tagAppRegData
 class CProfile
 {
 	public:
-					CProfile();
-					~CProfile();
+		CProfile();
+		CProfile(const CProfile& other);
+		CProfile& operator = (const CProfile& other);
+		~CProfile();
+
 		BOOL		bGetProfileData() const;
 		BOOL		bSetProfileData() const;
 

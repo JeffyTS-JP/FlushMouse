@@ -33,8 +33,8 @@
 // Class CProfile
 //
 CProfile::CProfile()
+	: lpstAppRegData(new APPREGDATA[sizeof(APPREGDATA)])
 {
-	lpstAppRegData = new APPREGDATA[sizeof(APPREGDATA)];
 	if (lpstAppRegData != NULL) {
 		ZeroMemory(lpstAppRegData, sizeof(APPREGDATA));
 
@@ -127,6 +127,28 @@ CProfile::CProfile()
 		lpstAppRegData->bIsPaneOpen = TRUE;							// Is Pane Open
 
 	}
+}
+
+CProfile::CProfile(const CProfile& other)
+	: lpstAppRegData(new APPREGDATA[sizeof(APPREGDATA)])
+{
+	if (lpstAppRegData != NULL) {
+		*lpstAppRegData = *other.lpstAppRegData;
+	}
+}
+
+CProfile& CProfile::operator = (const CProfile& other)
+{
+	if (this != &other) {
+		if (lpstAppRegData != NULL) {
+			delete lpstAppRegData;
+		}
+		lpstAppRegData = new APPREGDATA;
+		if (lpstAppRegData != NULL) {
+			*lpstAppRegData = *other.lpstAppRegData;
+		}
+	}
+	return *this;
 }
 
 CProfile::~CProfile()

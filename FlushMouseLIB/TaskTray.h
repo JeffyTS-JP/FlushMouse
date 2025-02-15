@@ -26,28 +26,28 @@
 // 
 class CTaskTray
 {
-public:
-	CTaskTray(HWND hWnd);
-	~CTaskTray();
+	public:
+		explicit CTaskTray(HWND hWnd);
+		~CTaskTray();
 
-public:
-	BOOL		bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle) const;
-	BOOL		bReCreateTaskTrayWindow(HWND hWnd) const;
-	BOOL		bDestroyTaskTrayWindow(HWND hWnd) const;
-	BOOL		bGetTaskTrayWindowRect(HWND hWnd, LPRECT lpRect) const;
-	int			iCheckTaskTrayMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-	BOOL		bDisplayBalloon(HWND hWnd, DWORD dwInfoFlags, LPCTSTR szInfoTitle, LPCTSTR szInfo);
-	BOOL		bModifyToolHints(HWND hWnd, LPCTSTR lpszToolHints) const;
+	public:
+		BOOL		bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle) const;
+		BOOL		bReCreateTaskTrayWindow(HWND hWnd) const;
+		BOOL		bDestroyTaskTrayWindow(HWND hWnd) const;
+		BOOL		bGetTaskTrayWindowRect(HWND hWnd, LPRECT lpRect) const;
+		static int	iCheckTaskTrayMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+		BOOL		bDisplayBalloon(HWND hWnd, DWORD dwInfoFlags, LPCTSTR szInfoTitle, LPCTSTR szInfo);
+		BOOL		bModifyToolHints(HWND hWnd, LPCTSTR lpszToolHints) const;
 
-private:
-	void		Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify);
-	void		Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg);
+	private:
+		static void	Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify);
+		static void	Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg);
 
-public:
+	public:
 
-private:
-	UINT		uTaskTrayID;
-	UINT		uTaskbarCreatedMessage;
+	private:
+		UINT		uTaskTrayID;
+		UINT		uTaskbarCreatedMessage;
 };
 
 

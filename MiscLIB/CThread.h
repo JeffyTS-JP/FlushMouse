@@ -38,23 +38,26 @@ typedef struct tagTHREAD_DATA {
 //
 class CThread
 {
-public:
-			CThread();
-			~CThread();
-public:
-	BOOL 	bRegister(LPCTSTR lpszThreadName, DWORD dwThreadID, LPTHREAD_START_ROUTINE lpbCallbackRoutine, LPVOID lParamOption, DWORD dwSleepTime);
-	BOOL 	bStart();
-	BOOL	bCheckSentinel() const;
-	BOOL	bSetSentinel(BOOL bSentinel);
-	BOOL	bSetThreadPriority(int nPriority) const;
-	HANDLE	hGetHandle() const;
+	public:
+		CThread();
+		CThread(const CThread& other);
+		CThread& operator = (const CThread& other);
+		~CThread();
 
-private:
-	VOID 	vUnregister();
-	static unsigned __stdcall	uThreadProc(void* pArguments);
+	public:
+		BOOL 	bRegister(LPCTSTR lpszThreadName, DWORD dwThreadID, LPTHREAD_START_ROUTINE lpbCallbackRoutine, LPVOID lParamOption, DWORD dwSleepTime);
+		BOOL 	bStart();
+		BOOL	bCheckSentinel() const;
+		BOOL	bSetSentinel(BOOL bSentinel);
+		BOOL	bSetThreadPriority(int nPriority) const;
+		HANDLE	hGetHandle() const;
 
-private:
-	LPTHREAD_DATA	lpstThreadData;
+	private:
+		VOID 	vUnregister();
+		static unsigned __stdcall	uThreadProc(void* pArguments);
+
+	private:
+		LPTHREAD_DATA	lpstThreadData;
 };
 
 /* == EOF == */

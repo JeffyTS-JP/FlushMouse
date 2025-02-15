@@ -24,10 +24,6 @@ CRawInput::CRawInput()
 {
 }
 
-CRawInput::~CRawInput()
-{
-}
-
 //
 // bRegisterRawInputDevices()
 //

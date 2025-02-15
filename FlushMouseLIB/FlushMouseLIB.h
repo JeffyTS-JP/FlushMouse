@@ -1,4 +1,4 @@
-// FlushMouseLIB.h
+﻿// FlushMouseLIB.h
 //		Copyright (C) 1993 - 2022 JeffyTS
 //
 // No.      Date		    Name		    Reason & Document
@@ -24,7 +24,7 @@
 //
 // Global Prototype Define
 //
-extern BOOL			bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_opt_ LPWSTR lpCmdLine, _In_ int nCmdShow);
+extern BOOL			bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_opt_ LPWSTR lpCmdLine, _In_ int nShowCmd);
 extern int			iCheckCmdLine(LPCTSTR lpCmdLine);
 extern VOID			vDestroyWindow(HWND hWnd);
 extern BOOL			bStartThreadHookTimer(HWND hWnd);

@@ -59,8 +59,7 @@ static TCHAR			szTitle[MAX_LOADSTRING] = FLUSHMOUSE32;
 static HINSTANCE		hInst = NULL;
 static HWND				hParentWnd = NULL;
 
-// for PowerNotification
-static CPowerNotification	*PowerNotification = NULL;
+static CPowerNotification32	*PowerNotification = NULL;
 
 //
 // Global Prototype Define
@@ -95,6 +94,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_ASSERTE(_CrtCheckMemory());
 #endif	
 
 	HANDLE	hHandle = GetCurrentProcess();
@@ -168,6 +168,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		}
 	}
 
+#if defined _DEBUG
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG); 
+	_CrtDumpMemoryLeaks();
+#endif // _DEBUG
+	
 	return (int)msg.wParam;
 }
 
@@ -248,7 +253,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 	UNREFERENCED_PARAMETER(lpCreateStruct);
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
 	
-	PowerNotification = new CPowerNotification(hWnd);
+	PowerNotification = new CPowerNotification32(hWnd);
 	if (PowerNotification == NULL) {
 		vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE, __func__, __LINE__);
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
@@ -406,9 +411,9 @@ static void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dw
 // class CPowerNotification
 // CPowerNotification()
 //
-CPowerNotification::CPowerNotification(HWND hWnd)
+CPowerNotification32::CPowerNotification32(HWND hWnd)
+	: hSuspendResumeNotification(NULL), hPowerSettingNotification(NULL), guidPowerSettingNotification(GUID_NULL)
 {
-	guidPowerSettingNotification = GUID_NULL;
 	if ((hSuspendResumeNotification = RegisterSuspendResumeNotification(hWnd, DEVICE_NOTIFY_WINDOW_HANDLE)) == NULL) {
 	}
 	if ((hPowerSettingNotification = RegisterPowerSettingNotification(hWnd, &guidPowerSettingNotification, DEVICE_NOTIFY_WINDOW_HANDLE)) == NULL) {
@@ -418,7 +423,7 @@ CPowerNotification::CPowerNotification(HWND hWnd)
 //
 // ~CPowerNotification()
 //
-CPowerNotification::~CPowerNotification()
+CPowerNotification32::~CPowerNotification32()
 {
 	if (hPowerSettingNotification != NULL) {
 		if (UnregisterPowerSettingNotification(hPowerSettingNotification) == 0) {
@@ -435,7 +440,7 @@ CPowerNotification::~CPowerNotification()
 //
 // PowerBroadcast()
 //
-BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting)
+BOOL		CPowerNotification32::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting)
 {
 	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(Type);

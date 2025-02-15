@@ -12,6 +12,7 @@
 // Include
 //
 #pragma once
+#include "CommonDef.h"
 
 //
 // Define

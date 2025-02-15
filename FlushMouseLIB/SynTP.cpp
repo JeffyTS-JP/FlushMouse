@@ -38,19 +38,9 @@
 //
 //class CSynTP : private CWindow, private CRawInput
 //
-CSynTP::CSynTP()
-	:	uuTickCount64(), Sender(), Receiver(), ReceivePacketThread()
-{
-	HIDRawInput = NULL;
-	lpSynTPData = new SYNTPDATA[sizeof(SYNTPDATA)];
-	if (lpSynTPData)	ZeroMemory(lpSynTPData, sizeof(SYNTPDATA));
-}
-
 CSynTP::CSynTP(DWORD dwSynTPPadX, DWORD dwSynTPPadY, DWORD dwSynTPEdgeX, DWORD dwSynTPEdgeY)
-	:	uuTickCount64(), Sender(), Receiver(), ReceivePacketThread()
+	: HIDRawInput(NULL), lpSynTPData(new SYNTPDATA[sizeof(SYNTPDATA)]), uuTickCount64(0), Sender(NULL), Receiver(NULL), ReceivePacketThread(NULL)
 {
-	HIDRawInput = NULL;
-	lpSynTPData = new SYNTPDATA[sizeof(SYNTPDATA)];
 	if (lpSynTPData) {
 		ZeroMemory(lpSynTPData, sizeof(SYNTPDATA));
 		lpSynTPData->rcSynTP.left = 0;
@@ -60,6 +50,33 @@ CSynTP::CSynTP(DWORD dwSynTPPadX, DWORD dwSynTPPadY, DWORD dwSynTPEdgeX, DWORD d
 		lpSynTPData->sTouchZoneX = (SHORT)dwSynTPEdgeX;
 		lpSynTPData->sTouchZoneY = (SHORT)dwSynTPEdgeY;
 	}
+}
+
+CSynTP::CSynTP(const CSynTP& other)
+	: HIDRawInput(NULL), lpSynTPData(new SYNTPDATA[sizeof(SYNTPDATA)]), uuTickCount64(0), Sender(NULL), Receiver(NULL), ReceivePacketThread(NULL)
+{
+	if (lpSynTPData != NULL) {
+		*lpSynTPData = *other.lpSynTPData;
+	}
+}
+
+CSynTP& CSynTP::operator = (const CSynTP& other)
+{
+	if (this != &other) {
+		HIDRawInput = NULL;
+		if (lpSynTPData != NULL) {
+			delete[] lpSynTPData;
+		}
+		lpSynTPData = new SYNTPDATA;
+		if (lpSynTPData != NULL) {
+			*lpSynTPData = *other.lpSynTPData;
+		}
+		uuTickCount64 = 0;
+		Sender = NULL;
+		Receiver = NULL;
+		ReceivePacketThread = NULL;
+	}
+	return *this;
 }
 
 CSynTP::~CSynTP()
@@ -154,7 +171,7 @@ BOOL		CSynTP::bStartSender(HWND hWnd, LPCTSTR szIPAddress, int iPort)
 	if (Sender == NULL)	Sender = new CTCPIP;
 	if (Sender) {
 		if (!Sender->bOpenPortForSendUDPv4(szIPAddress, iPort)) {
-			if (Sender)	delete Sender;
+			delete Sender;
 			Sender = NULL;
 			return FALSE;
 		}
@@ -395,7 +412,7 @@ void		CSynTP::vSynTPMouseData(PCHAR Report)
 #define RIGHT			(-1)
 
 	if (lpSynTPData && Report) {
-		LPSYNTPRAWDATA	lpSynTPRawData = (LPSYNTPRAWDATA)Report;
+		LPSYNTPRAWDATA	lpSynTPRawData = reinterpret_cast<LPSYNTPRAWDATA>(Report);
 
 		SHORT	newX = makeAxis(lpSynTPRawData->stFinger1.hiX, lpSynTPRawData->stFinger1.loX);
 		SHORT	newY = makeAxis(lpSynTPRawData->stFinger1.hiY, lpSynTPRawData->stFinger1.loY);
@@ -516,9 +533,7 @@ void		CSynTP::vSynTPMouseData(PCHAR Report)
 				}
 			}
 		}
-		errno_t err = 0;
-		if ((err = memcpy_s(&(lpSynTPData->stSynRawData), sizeof(SynTPRawData), Report, sizeof(SynTPRawData))) != 0) {
-		}
+		memcpy_s(&(lpSynTPData->stSynRawData), sizeof(SynTPRawData), Report, sizeof(SynTPRawData));
 	}
 }
 
@@ -538,7 +553,6 @@ BOOL		CSynTP::bReceivePacketThreadRoutine(LPVOID lpvParam)
 		return FALSE;
 	}
 	do {
-		if (This == NULL)	return FALSE;
 		ZeroMemory(szReceiveData, sizeof(szReceiveData));
 		if (This->Receiver)	This->Receiver->bReceivePacket(szReceiveData, sizeof(szReceiveData));
 		if (szReceiveData[0] == '\0')	continue;

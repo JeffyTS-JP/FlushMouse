@@ -86,44 +86,45 @@ typedef struct SynTPData
 
 class CSynTP : private CWindow, private CRawInput
 {
-public:
-	CSynTP();
-	CSynTP(DWORD dwSynTPPadX, DWORD dwSynTPPadY, DWORD dwSynTPEdgeX, DWORD dwSynTPEdgeY);
-	~CSynTP();
+	public:
+		explicit CSynTP(DWORD dwSynTPPadX, DWORD dwSynTPPadY, DWORD dwSynTPEdgeX, DWORD dwSynTPEdgeY);
+		CSynTP(const CSynTP& other);
+		CSynTP& operator = (const CSynTP& other);
+		~CSynTP() override;
 
-public:
-	BOOL		bStartReceiver(HWND hWnd, int iPort);
-	void		vStopReceiver();
-	BOOL		bStartSender(HWND hWnd, LPCTSTR szIPAddress, int iPort);
-	void		bStopSender();
+	public:
+		BOOL		bStartReceiver(HWND hWnd, int iPort);
+		void		vStopReceiver();
+		BOOL		bStartSender(HWND hWnd, LPCTSTR szIPAddress, int iPort);
+		void		bStopSender();
 
-private:
-	BOOL		bRegister(HINSTANCE hInstance, LPCTSTR szWindowClass);
-	LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	private:
+		BOOL		bRegister(HINSTANCE hInstance, LPCTSTR szWindowClassName);
+		virtual LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) override;
 
-	BOOL		Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct);
-	void		Cls_OnDestroy(HWND hWnd);
-	void		Cls_OnInput(HWND hWnd, DWORD dwFlags, HRAWINPUT hRawInput);
-	void		Cls_OnInputDeviceChange(HWND hWnd, WPARAM wParam, HANDLE hDevice);
+		BOOL		Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct);
+		void		Cls_OnDestroy(HWND hWnd);
+		void		Cls_OnInput(HWND hWnd, DWORD dwFlags, HRAWINPUT hRawInput);
+		void		Cls_OnInputDeviceChange(HWND hWnd, WPARAM wParam, HANDLE hDevice);
 
-	BOOL		bSendInput(DWORD dwFlags, int xPos, int yPos, int zDelta);
-	void		vRawInputHIDHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawInput);
-	void		vSynTPMouseData(PCHAR Report);
-	void		vSynTPSendMouseData(UINT message, SHORT zDelta);
-	static BOOL WINAPI	bReceivePacketThreadRoutine(LPVOID lpvParam);
+		BOOL		bSendInput(DWORD dwFlags, int xPos, int yPos, int zDelta);
+		void		vRawInputHIDHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawInput) override;
+		void		vSynTPMouseData(PCHAR Report);
+		void		vSynTPSendMouseData(UINT message, SHORT zDelta);
+		static BOOL WINAPI	bReceivePacketThreadRoutine(LPVOID lpvParam);
 
-public:
+	public:
 
-private:
-	CRawInput		*HIDRawInput;
+	private:
+		CRawInput		*HIDRawInput;
 
-	LPSYNTPDATA		lpSynTPData;
-	ULONGLONG		uuTickCount64;
+		LPSYNTPDATA		lpSynTPData;
+		ULONGLONG		uuTickCount64;
 
-	CTCPIP			*Sender;
-	CTCPIP			*Receiver;
+		CTCPIP			*Sender;
+		CTCPIP			*Receiver;
 
-	CThread			*ReceivePacketThread;
+		CThread			*ReceivePacketThread;
 };
 
 

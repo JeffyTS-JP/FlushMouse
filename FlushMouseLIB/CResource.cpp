@@ -34,18 +34,9 @@
 //
 // Class CResource
 //
-CResource::CResource()
-{
-	hModRes = NULL;
-	iResourceLoadCount = 0;
-	szResFile = NULL;
-}
-
 CResource::CResource(LPCTSTR lpszResFile)
+	: szResFile(new TCHAR[_MAX_PATH]), hModRes(NULL), iResourceLoadCount(0)
 {
-	hModRes = NULL;
-	iResourceLoadCount = 0;
-	szResFile = new TCHAR[_MAX_PATH];
 	if (szResFile) {
 		ZeroMemory(szResFile, sizeof(TCHAR) * _MAX_PATH);
 		_tcsncpy_s(szResFile, _MAX_PATH, lpszResFile, _TRUNCATE);

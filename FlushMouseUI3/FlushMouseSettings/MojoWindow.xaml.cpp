@@ -64,9 +64,9 @@ namespace winrt::FlushMouseSettings::implementation
 				winrt::check_bool(windowNative);
 #pragma warning(push)
 #pragma warning(disable : 28112)
-				InterlockedIncrement64((volatile LONG64*)&s_module);
+				InterlockedIncrement64(reinterpret_cast<LONG64*>(&s_module));
 				windowNative->get_WindowHandle(&hMojoWnd);
-				InterlockedDecrement64((volatile LONG64*)&s_module);
+				InterlockedDecrement64(reinterpret_cast<LONG64*>(&s_module));
 #pragma warning(pop)
 				Microsoft::UI::WindowId windowId = Microsoft::UI::GetWindowIdFromWindow(hMojoWnd);
 				Microsoft::UI::Windowing::AppWindow appWindow = Microsoft::UI::Windowing::AppWindow::GetFromWindowId(windowId);
@@ -84,9 +84,7 @@ namespace winrt::FlushMouseSettings::implementation
 	void		MojoWindowClose()
 	{
 		SettingsClose();
-		if (wMojoWnd != nullptr) {
-			wMojoWnd = nullptr;
-		}
+		wMojoWnd = nullptr;
 	}
 
 	MojoWindow::MojoWindow()
@@ -112,128 +110,120 @@ void		SettingsExec(HWND hWnd, UINT32 uMsg, INT32 iSelectedPane)
 	if (Profile == nullptr)	return;
 	if (m_Settings == nullptr) {
 		try {
-			throw	m_Settings = FlushMouseUI3DLL::Settings(iSelectedPane);
+			m_Settings = FlushMouseUI3DLL::Settings(iSelectedPane);
 		}
 		catch (...) {
 		}
-		if (m_Settings != nullptr) {
-			m_Settings.g_Settings(m_Settings);
-			m_Settings.g_hMainWnd((INT64)hWnd);
-			m_Settings.g_uMsg((UINT32)uMsg);
+		m_Settings.g_Settings(m_Settings);
+		m_Settings.g_hMainWnd((INT64)hWnd);
+		m_Settings.g_uMsg((UINT32)uMsg);
 
-			m_Settings.bIsPaneOpen(Profile->lpstAppRegData->bIsPaneOpen);
-			m_Settings.dwSettingsX(Profile->lpstAppRegData->dwSettingsX);
-			m_Settings.dwSettingsY(Profile->lpstAppRegData->dwSettingsY);
-			m_Settings.dwSettingsWidth(Profile->lpstAppRegData->dwSettingsWidth);
-			m_Settings.dwSettingsHeight(Profile->lpstAppRegData->dwSettingsHeight);
-			
-			m_Settings.bDisplayFocusWindowIME(Profile->lpstAppRegData->bDisplayFocusWindowIME);
-			m_Settings.dwDisplayIMEModeMethod(Profile->lpstAppRegData->dwDisplayIMEModeMethod);
+		m_Settings.bIsPaneOpen(Profile->lpstAppRegData->bIsPaneOpen);
+		m_Settings.dwSettingsX(Profile->lpstAppRegData->dwSettingsX);
+		m_Settings.dwSettingsY(Profile->lpstAppRegData->dwSettingsY);
+		m_Settings.dwSettingsWidth(Profile->lpstAppRegData->dwSettingsWidth);
+		m_Settings.dwSettingsHeight(Profile->lpstAppRegData->dwSettingsHeight);
 
-			m_Settings.bDisplayIMEModeOnCursor(Profile->lpstAppRegData->bDisplayIMEModeOnCursor);
-			m_Settings.bDisplayIMEModeIMEOFF(Profile->lpstAppRegData->bDisplayIMEModeIMEOFF);
-			m_Settings.bOffChangedFocus(Profile->lpstAppRegData->bOffChangedFocus);
-			m_Settings.bForceHiragana(Profile->lpstAppRegData->bForceHiragana);
-			m_Settings.bDoModeDispByIMEKeyDown(Profile->lpstAppRegData->bDoModeDispByIMEKeyDown);
-			m_Settings.bDoModeDispByMouseBttnUp(Profile->lpstAppRegData->bDoModeDispByMouseBttnUp);
-			m_Settings.bDoModeDispByCtrlUp(Profile->lpstAppRegData->bDoModeDispByCtrlUp);
-			m_Settings.bDrawNearCaret(Profile->lpstAppRegData->bDrawNearCaret);
-			m_Settings.bIMEModeForced(Profile->lpstAppRegData->bIMEModeForced);
-			m_Settings.bEnableEPHelper(Profile->lpstAppRegData->bEnableEPHelper);
-			
-			m_Settings.iCursorSize(Profile->lpstAppRegData->iCursorSize);
-			m_Settings.iIMEModeDistance(Profile->lpstAppRegData->iIMEModeDistance);
-			m_Settings.iModeMouseSize(Profile->lpstAppRegData->iModeMouseSize);
-			m_Settings.iModeCaretSize(Profile->lpstAppRegData->iModeCaretSize);
-			m_Settings.iModeByWndSize(Profile->lpstAppRegData->iModeByWndSize);
-			m_Settings.iModeMouseDistanceX(Profile->lpstAppRegData->iModeMouseDistanceX);
-			m_Settings.iModeCaretDistanceX(Profile->lpstAppRegData->iModeCaretDistanceX);
-			m_Settings.dwDisplayModeTime(Profile->lpstAppRegData->dwDisplayModeTime);
-			m_Settings.dwAdditionalWaitTime(Profile->lpstAppRegData->dwAdditionalWaitTime);
-			m_Settings.dwWaitWaveTime(Profile->lpstAppRegData->dwWaitWaveTime);
-			
-			m_Settings.szNearDrawMouseIMEOFFChar(Profile->lpstAppRegData->szNearDrawMouseIMEOFFChar);
-			m_Settings.szNearDrawMouseHANEISU_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseHANEISU_IMEONChar);
-			m_Settings.szNearDrawMouseHANKANA_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseHANKANA_IMEONChar);
-			m_Settings.szNearDrawMouseZENEISU_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseZENEISU_IMEONChar);
-			m_Settings.szNearDrawMouseZENHIRA_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseZENHIRA_IMEONChar);
-			m_Settings.szNearDrawMouseZENKANA_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseZENKANA_IMEONChar);
-			m_Settings.szNearDrawCaretIMEOFFChar(Profile->lpstAppRegData->szNearDrawCaretIMEOFFChar);
-			m_Settings.szNearDrawCaretHANEISU_IMEONChar(Profile->lpstAppRegData->szNearDrawCaretHANEISU_IMEONChar);
-			m_Settings.szNearDrawCaretHANKANA_IMEONChar(Profile->lpstAppRegData->szNearDrawCaretHANKANA_IMEONChar);
-			m_Settings.szNearDrawCaretZENEISU_IMEONChar(Profile->lpstAppRegData->szNearDrawCaretZENEISU_IMEONChar);
-			m_Settings.szNearDrawCaretZENHIRA_IMEONChar(Profile->lpstAppRegData->szNearDrawCaretZENHIRA_IMEONChar);
-			m_Settings.szNearDrawCaretZENKANA_IMEONChar(Profile->lpstAppRegData->szNearDrawCaretZENKANA_IMEONChar);
-			m_Settings.szNearDrawMouseByWndIMEOFFChar(Profile->lpstAppRegData->szNearDrawMouseByWndIMEOFFChar);
-			m_Settings.szNearDrawMouseByWndHANEISU_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseByWndHANEISU_IMEONChar);
-			m_Settings.szNearDrawMouseByWndHANKANA_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseByWndHANKANA_IMEONChar);
-			m_Settings.szNearDrawMouseByWndZENEISU_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseByWndZENEISU_IMEONChar);
-			m_Settings.szNearDrawMouseByWndZENHIRA_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseByWndZENHIRA_IMEONChar);
-			m_Settings.szNearDrawMouseByWndZENKANA_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseByWndZENKANA_IMEONChar);
-			
-			m_Settings.dwNearDrawMouseIMEOFFColor(Profile->lpstAppRegData->dwNearDrawMouseIMEOFFColor);
-			m_Settings.dwNearDrawMouseHANEISU_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseHANEISU_IMEONColor);
-			m_Settings.dwNearDrawMouseHANKANA_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseHANKANA_IMEONColor);
-			m_Settings.dwNearDrawMouseZENEISU_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseZENEISU_IMEONColor);
-			m_Settings.dwNearDrawMouseZENHIRA_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseZENHIRA_IMEONColor);
-			m_Settings.dwNearDrawMouseZENKANA_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseZENKANA_IMEONColor);
-			m_Settings.dwNearDrawCaretIMEOFFColor(Profile->lpstAppRegData->dwNearDrawCaretIMEOFFColor);
-			m_Settings.dwNearDrawCaretHANEISU_IMEONColor(Profile->lpstAppRegData->dwNearDrawCaretHANEISU_IMEONColor);
-			m_Settings.dwNearDrawCaretHANKANA_IMEONColor(Profile->lpstAppRegData->dwNearDrawCaretHANKANA_IMEONColor);
-			m_Settings.dwNearDrawCaretZENEISU_IMEONColor(Profile->lpstAppRegData->dwNearDrawCaretZENEISU_IMEONColor);
-			m_Settings.dwNearDrawCaretZENHIRA_IMEONColor(Profile->lpstAppRegData->dwNearDrawCaretZENHIRA_IMEONColor);
-			m_Settings.dwNearDrawCaretZENKANA_IMEONColor(Profile->lpstAppRegData->dwNearDrawCaretZENKANA_IMEONColor);
-			m_Settings.dwNearDrawMouseByWndIMEOFFColor(Profile->lpstAppRegData->dwNearDrawMouseByWndIMEOFFColor);
-			m_Settings.dwNearDrawMouseByWndHANEISU_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseByWndHANEISU_IMEONColor);
-			m_Settings.dwNearDrawMouseByWndHANKANA_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseByWndHANKANA_IMEONColor);
-			m_Settings.dwNearDrawMouseByWndZENEISU_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseByWndZENEISU_IMEONColor);
-			m_Settings.dwNearDrawMouseByWndZENHIRA_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseByWndZENHIRA_IMEONColor);
-			m_Settings.dwNearDrawMouseByWndZENKANA_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseByWndZENKANA_IMEONColor);
-			
-			m_Settings.szNearDrawMouseFont(Profile->lpstAppRegData->szNearDrawMouseFont);
-			m_Settings.szNearDrawCaretFont(Profile->lpstAppRegData->szNearDrawCaretFont);
-			m_Settings.szNearDrawMouseByWndFont(Profile->lpstAppRegData->szNearDrawMouseByWndFont);
+		m_Settings.bDisplayFocusWindowIME(Profile->lpstAppRegData->bDisplayFocusWindowIME);
+		m_Settings.dwDisplayIMEModeMethod(Profile->lpstAppRegData->dwDisplayIMEModeMethod);
 
-			m_Settings.dwSynTPHelper1(Profile->lpstAppRegData->dwSynTPHelper1);
-			m_Settings.dwSynTPPadX(Profile->lpstAppRegData->dwSynTPPadX);
-			m_Settings.dwSynTPPadY(Profile->lpstAppRegData->dwSynTPPadY);
-			m_Settings.dwSynTPEdgeX(Profile->lpstAppRegData->dwSynTPEdgeX);
-			m_Settings.dwSynTPEdgeY(Profile->lpstAppRegData->dwSynTPEdgeY);
-			TCHAR	addr1[4]{};
-			TCHAR	addr2[4]{};
-			TCHAR	addr3[4]{};
-			TCHAR	addr4[4]{};
-			if (!bGetString2IPv4Addr(Profile->lpstAppRegData->szSynTPSendIPAddr1, addr1, addr2, addr3, addr4)) {
-			}
-			m_Settings.szSynTPSendIPAddr1_1(addr1);
-			m_Settings.szSynTPSendIPAddr1_2(addr2);
-			m_Settings.szSynTPSendIPAddr1_3(addr3);
-			m_Settings.szSynTPSendIPAddr1_4(addr4);
-			m_Settings.szSynTPSendHostname1(Profile->lpstAppRegData->szSynTPSendHostname1);
-			m_Settings.dwSynTPPortNo1(Profile->lpstAppRegData->dwSynTPPortNo1);
-			if (_tcsncpy_s(Profile->lpstAppRegData->szSynTPSendHostname1, MAX_FQDN, (LPTSTR)(m_Settings.szSynTPSendHostname1().c_str()), _TRUNCATE) != 0) {
-			}
-			m_Settings.bSynTPStarted1(Profile->lpstAppRegData->bSynTPStarted1);
+		m_Settings.bDisplayIMEModeOnCursor(Profile->lpstAppRegData->bDisplayIMEModeOnCursor);
+		m_Settings.bDisplayIMEModeIMEOFF(Profile->lpstAppRegData->bDisplayIMEModeIMEOFF);
+		m_Settings.bOffChangedFocus(Profile->lpstAppRegData->bOffChangedFocus);
+		m_Settings.bForceHiragana(Profile->lpstAppRegData->bForceHiragana);
+		m_Settings.bDoModeDispByIMEKeyDown(Profile->lpstAppRegData->bDoModeDispByIMEKeyDown);
+		m_Settings.bDoModeDispByMouseBttnUp(Profile->lpstAppRegData->bDoModeDispByMouseBttnUp);
+		m_Settings.bDoModeDispByCtrlUp(Profile->lpstAppRegData->bDoModeDispByCtrlUp);
+		m_Settings.bDrawNearCaret(Profile->lpstAppRegData->bDrawNearCaret);
+		m_Settings.bIMEModeForced(Profile->lpstAppRegData->bIMEModeForced);
+		m_Settings.bEnableEPHelper(Profile->lpstAppRegData->bEnableEPHelper);
 
-			HWND	_hSettingsWnd = (HWND)m_Settings.g_hSettingsWnd();
-			if (_hSettingsWnd) {
-				m_SettingsWndProc = GetWindowLongPtr(_hSettingsWnd, GWLP_WNDPROC);
-				if (m_SettingsWndProc) {
-					if (SetWindowLongPtr(_hSettingsWnd, GWLP_WNDPROC, (LONG_PTR)WndProc)) {
-						return;
-					}
+		m_Settings.iCursorSize(Profile->lpstAppRegData->iCursorSize);
+		m_Settings.iIMEModeDistance(Profile->lpstAppRegData->iIMEModeDistance);
+		m_Settings.iModeMouseSize(Profile->lpstAppRegData->iModeMouseSize);
+		m_Settings.iModeCaretSize(Profile->lpstAppRegData->iModeCaretSize);
+		m_Settings.iModeByWndSize(Profile->lpstAppRegData->iModeByWndSize);
+		m_Settings.iModeMouseDistanceX(Profile->lpstAppRegData->iModeMouseDistanceX);
+		m_Settings.iModeCaretDistanceX(Profile->lpstAppRegData->iModeCaretDistanceX);
+		m_Settings.dwDisplayModeTime(Profile->lpstAppRegData->dwDisplayModeTime);
+		m_Settings.dwAdditionalWaitTime(Profile->lpstAppRegData->dwAdditionalWaitTime);
+		m_Settings.dwWaitWaveTime(Profile->lpstAppRegData->dwWaitWaveTime);
+
+		m_Settings.szNearDrawMouseIMEOFFChar(Profile->lpstAppRegData->szNearDrawMouseIMEOFFChar);
+		m_Settings.szNearDrawMouseHANEISU_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseHANEISU_IMEONChar);
+		m_Settings.szNearDrawMouseHANKANA_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseHANKANA_IMEONChar);
+		m_Settings.szNearDrawMouseZENEISU_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseZENEISU_IMEONChar);
+		m_Settings.szNearDrawMouseZENHIRA_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseZENHIRA_IMEONChar);
+		m_Settings.szNearDrawMouseZENKANA_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseZENKANA_IMEONChar);
+		m_Settings.szNearDrawCaretIMEOFFChar(Profile->lpstAppRegData->szNearDrawCaretIMEOFFChar);
+		m_Settings.szNearDrawCaretHANEISU_IMEONChar(Profile->lpstAppRegData->szNearDrawCaretHANEISU_IMEONChar);
+		m_Settings.szNearDrawCaretHANKANA_IMEONChar(Profile->lpstAppRegData->szNearDrawCaretHANKANA_IMEONChar);
+		m_Settings.szNearDrawCaretZENEISU_IMEONChar(Profile->lpstAppRegData->szNearDrawCaretZENEISU_IMEONChar);
+		m_Settings.szNearDrawCaretZENHIRA_IMEONChar(Profile->lpstAppRegData->szNearDrawCaretZENHIRA_IMEONChar);
+		m_Settings.szNearDrawCaretZENKANA_IMEONChar(Profile->lpstAppRegData->szNearDrawCaretZENKANA_IMEONChar);
+		m_Settings.szNearDrawMouseByWndIMEOFFChar(Profile->lpstAppRegData->szNearDrawMouseByWndIMEOFFChar);
+		m_Settings.szNearDrawMouseByWndHANEISU_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseByWndHANEISU_IMEONChar);
+		m_Settings.szNearDrawMouseByWndHANKANA_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseByWndHANKANA_IMEONChar);
+		m_Settings.szNearDrawMouseByWndZENEISU_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseByWndZENEISU_IMEONChar);
+		m_Settings.szNearDrawMouseByWndZENHIRA_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseByWndZENHIRA_IMEONChar);
+		m_Settings.szNearDrawMouseByWndZENKANA_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseByWndZENKANA_IMEONChar);
+
+		m_Settings.dwNearDrawMouseIMEOFFColor(Profile->lpstAppRegData->dwNearDrawMouseIMEOFFColor);
+		m_Settings.dwNearDrawMouseHANEISU_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseHANEISU_IMEONColor);
+		m_Settings.dwNearDrawMouseHANKANA_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseHANKANA_IMEONColor);
+		m_Settings.dwNearDrawMouseZENEISU_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseZENEISU_IMEONColor);
+		m_Settings.dwNearDrawMouseZENHIRA_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseZENHIRA_IMEONColor);
+		m_Settings.dwNearDrawMouseZENKANA_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseZENKANA_IMEONColor);
+		m_Settings.dwNearDrawCaretIMEOFFColor(Profile->lpstAppRegData->dwNearDrawCaretIMEOFFColor);
+		m_Settings.dwNearDrawCaretHANEISU_IMEONColor(Profile->lpstAppRegData->dwNearDrawCaretHANEISU_IMEONColor);
+		m_Settings.dwNearDrawCaretHANKANA_IMEONColor(Profile->lpstAppRegData->dwNearDrawCaretHANKANA_IMEONColor);
+		m_Settings.dwNearDrawCaretZENEISU_IMEONColor(Profile->lpstAppRegData->dwNearDrawCaretZENEISU_IMEONColor);
+		m_Settings.dwNearDrawCaretZENHIRA_IMEONColor(Profile->lpstAppRegData->dwNearDrawCaretZENHIRA_IMEONColor);
+		m_Settings.dwNearDrawCaretZENKANA_IMEONColor(Profile->lpstAppRegData->dwNearDrawCaretZENKANA_IMEONColor);
+		m_Settings.dwNearDrawMouseByWndIMEOFFColor(Profile->lpstAppRegData->dwNearDrawMouseByWndIMEOFFColor);
+		m_Settings.dwNearDrawMouseByWndHANEISU_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseByWndHANEISU_IMEONColor);
+		m_Settings.dwNearDrawMouseByWndHANKANA_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseByWndHANKANA_IMEONColor);
+		m_Settings.dwNearDrawMouseByWndZENEISU_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseByWndZENEISU_IMEONColor);
+		m_Settings.dwNearDrawMouseByWndZENHIRA_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseByWndZENHIRA_IMEONColor);
+		m_Settings.dwNearDrawMouseByWndZENKANA_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseByWndZENKANA_IMEONColor);
+
+		m_Settings.szNearDrawMouseFont(Profile->lpstAppRegData->szNearDrawMouseFont);
+		m_Settings.szNearDrawCaretFont(Profile->lpstAppRegData->szNearDrawCaretFont);
+		m_Settings.szNearDrawMouseByWndFont(Profile->lpstAppRegData->szNearDrawMouseByWndFont);
+
+		m_Settings.dwSynTPHelper1(Profile->lpstAppRegData->dwSynTPHelper1);
+		m_Settings.dwSynTPPadX(Profile->lpstAppRegData->dwSynTPPadX);
+		m_Settings.dwSynTPPadY(Profile->lpstAppRegData->dwSynTPPadY);
+		m_Settings.dwSynTPEdgeX(Profile->lpstAppRegData->dwSynTPEdgeX);
+		m_Settings.dwSynTPEdgeY(Profile->lpstAppRegData->dwSynTPEdgeY);
+		TCHAR	addr1[4]{};
+		TCHAR	addr2[4]{};
+		TCHAR	addr3[4]{};
+		TCHAR	addr4[4]{};
+		if (!bGetString2IPv4Addr(Profile->lpstAppRegData->szSynTPSendIPAddr1, addr1, addr2, addr3, addr4)) {
+		}
+		m_Settings.szSynTPSendIPAddr1_1(addr1);
+		m_Settings.szSynTPSendIPAddr1_2(addr2);
+		m_Settings.szSynTPSendIPAddr1_3(addr3);
+		m_Settings.szSynTPSendIPAddr1_4(addr4);
+		m_Settings.szSynTPSendHostname1(Profile->lpstAppRegData->szSynTPSendHostname1);
+		m_Settings.dwSynTPPortNo1(Profile->lpstAppRegData->dwSynTPPortNo1);
+		if (_tcsncpy_s(Profile->lpstAppRegData->szSynTPSendHostname1, MAX_FQDN, (LPTSTR)(m_Settings.szSynTPSendHostname1().c_str()), _TRUNCATE) != 0) {
+		}
+		m_Settings.bSynTPStarted1(Profile->lpstAppRegData->bSynTPStarted1);
+
+		HWND	_hSettingsWnd = (HWND)m_Settings.g_hSettingsWnd();
+		if (_hSettingsWnd) {
+			m_SettingsWndProc = GetWindowLongPtr(_hSettingsWnd, GWLP_WNDPROC);
+			if (m_SettingsWndProc) {
+				if (SetWindowLongPtr(_hSettingsWnd, GWLP_WNDPROC, (LONG_PTR)WndProc)) {
+					return;
 				}
 			}
-			HWND	_hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
-			if (_hWnd != NULL) {
-				SendMessage(_hWnd, WM_SETTINGSEX, SETTINGSEX_SETTINGS_STARTED, 0);
-			}
 		}
-		else {
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
-			vMessageBox(hWnd, IDS_SETTINGDLG_FAIL, MessageBoxTYPE, __func__, __LINE__);
-			SettingsClose();
-			PostQuitMessage(-1);
+		HWND	_hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
+		if (_hWnd != NULL) {
+			SendMessage(_hWnd, WM_SETTINGSEX, SETTINGSEX_SETTINGS_STARTED, 0);
 		}
 	}
 	else {

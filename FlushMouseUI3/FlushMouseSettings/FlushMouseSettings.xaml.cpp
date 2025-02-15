@@ -217,6 +217,11 @@ void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 		});
 #endif // _DEBUG
 
+#if defined _DEBUG
+	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_ASSERTE(_CrtCheckMemory());
+#endif
+	
 	LPCTSTR	_lpCmdLine = GetCommandLine();
 	int		iNumArgs = 0;
 	LPTSTR	*_lpArgv = CommandLineToArgvW(_lpCmdLine, &iNumArgs);
@@ -256,6 +261,11 @@ void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 	if (hFlushMouseUI3DLL)	FreeLibrary(hFlushMouseUI3DLL);
 	if (hMicrosoft_ui_xaml_dll)	FreeLibrary(hMicrosoft_ui_xaml_dll);
 
+#if defined _DEBUG
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG); 
+	_CrtDumpMemoryLeaks();
+#endif // _DEBUG
+	
 	PostQuitMessage(0);
 	return;
 }
@@ -286,13 +296,13 @@ static BOOL		bSettingsWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrev
 	if (!bSetHeapInformation())	return FALSE;
 	
 	Resource = new CResource(FLUSHMOUSESETTINGS_EXE);
-	if (Resource->hLoad() == NULL) {
-		if (Resource)	delete	Resource;
+	if (Resource && Resource->hLoad() == NULL) {
+		delete	Resource;
 		return FALSE;
 	}
 
-	if (LoadString(Resource->hLoad(), IDS_APP_TITLE, szTitle, MAX_LOADSTRING) == 0) {
-		if (Resource)	delete	Resource;
+	if (Resource && LoadString(Resource->hLoad(), IDS_APP_TITLE, szTitle, MAX_LOADSTRING) == 0) {
+		delete	Resource;
 		return FALSE;
 	}
 

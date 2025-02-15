@@ -123,7 +123,6 @@ class CCursor
 		VOID		vSetParamFromRegistry();
 		BOOL		bStartIMECursorChangeThread(HWND hWndObserved);
 		BOOL		bStartDrawIMEModeThread(HWND hWndObserved);
-		BOOL		bStartDrawIMEModeThreadWait(HWND hWndObserved);
 		BOOL		bStartDrawIMEModeThreadWaitWave(HWND hWndObserved);
 		BOOL		bStartDrawIMEModeThreadWaitEventForeGround(HWND hWndObserved);
 		BOOL		bStartDrawIMEModeThreadWaitDblClk(HWND hWndObserved);
@@ -148,14 +147,13 @@ class CCursor
 		BOOL		bCalcDisplayModeRect(LPINT iModeSizeX, LPINT iModeSizeY, LPRECT lpRect);
 		HWND		hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPIMECURSORDATA lpstCursorData, BOOL bAttachThreadInput);
 		BOOL		bAccessibleObjectFromWindowAsync(HWND hWnd, DWORD dwId, REFIID riId, void **ppvObject);
-		BOOL		bAdjustModeSizeByMonitorDPI(int iModeSizeX, int iModeSizeY, LPRECT lprcCaret);
+		BOOL		bAdjustModeSizeByMonitorDPI(int iModeSizeX, int iModeSizeY, LPRECT lpRect);
 		BOOL		bAdjustModeSizeByMonitorDPIAsync();
 		BOOL		bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData);
+		static int	iGetCursorID(DWORD dwIMEMode, LPFLUSHMOUSECURSOR lpstCursorData);
 		static BOOL	CALLBACK	bIconDrawEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam);
 		static BOOL WINAPI		bDrawIMEModeRoutine(LPVOID lpvParam);
-		int			iGetCursorID(DWORD dwIMEMode, LPFLUSHMOUSECURSOR lpstCursorData);
 
-		BOOL		bGetMouseRegValue(LPCTSTR szValue, LPTSTR szFile);
 		BOOL		bChangeFlushMouseCursor(UINT uCurID, LPIMECURSORDATA lpstCursorData);
 		BOOL		bSetSystemCursor(LPMOUSECURSOR lpstMC, int iCursorSizeX, int iCursorSizeY);
 

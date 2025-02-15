@@ -41,10 +41,9 @@ public:
 	~CIME();
 
 public:
-	BOOL		bIsIMEOpen(HWND hWndObserved);
 	VOID		vIMEOpenCloseForced(HWND hWndObserved, DWORD dwIMEOpenClose);
-	VOID		vIMEConvertModeChangeForced(HWND hWndObserved, DWORD dwConvertMode);
-	DWORD		dwIMEMode(HWND hWndObserved, BOOL bForceHiragana);
+	VOID		vIMEConvertModeChangeForced(HWND hWnd, DWORD dwConvertMode);
+	DWORD		dwIMEMode(HWND hWnd, BOOL bForceHiragana);
 	VOID		vActivateIME(HWND hWndObserved);
 	DWORD		dwGetInputLocale();
 	HKL			hklGetInputLocale(HWND hWndObserved);

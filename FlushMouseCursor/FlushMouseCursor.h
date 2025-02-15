@@ -18,7 +18,6 @@
 // Global Prototype Define
 //
 BOOL APIENTRY	DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved);
-HINSTANCE		hGetDllInstance();
 
 
 /* = EOF = */

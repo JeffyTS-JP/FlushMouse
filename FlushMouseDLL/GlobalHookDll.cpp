@@ -37,6 +37,7 @@ static HWND					hWndGLParent = NULL;
 static HHOOK				hHookGL = NULL;
 static HWND					hPrevWnd = NULL;
 static BOOL					bSubclassed = FALSE;
+static HMODULE				hModule = NULL;
 #pragma data_seg()
 
 //
@@ -74,9 +75,7 @@ DLLEXPORT BOOL __stdcall bGlobalHookUnset()
 	hHookGL = SetWindowsHookEx(WH_CALLWNDPROCRET, (HOOKPROC)lpGlobalHookProc, hGLInstance, GetWindowThreadProcessId(hWndGLParent, NULL));
 	if (hHookGL) {
 		SendMessage(hWndGLParent, WM_HOOKEX, 0, REMOVE_HOOK);
-		if (hHookGL) {
-			if ((bSubclassed == FALSE))	bRet = TRUE;
-		}
+		if ((bSubclassed == FALSE))	bRet = TRUE;
 	}
 	hGLInstance = NULL;
 	hWndGLParent = NULL;
@@ -116,7 +115,7 @@ static LRESULT CALLBACK lpGlobalHookProc(int nCode, WPARAM wParam, LPARAM lParam
 					if (!bSubclassed) {
 						if (hHookGL == NULL)	break;
 						if (UnhookWindowsHookEx(hHookGL) != FALSE) {
-							if (LoadLibraryEx(FLUSHMOUSE_DLL, NULL, 0)) {
+							if ((hModule = LoadLibraryEx(FLUSHMOUSE_DLL, NULL, 0))) {
 								bSubclassed = TRUE;
 							}
 							hHookGL = NULL;

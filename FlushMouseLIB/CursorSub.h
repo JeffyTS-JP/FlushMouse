@@ -88,37 +88,36 @@ extern VOID		vAdjustFontXRightPosition(DWORD dwIMEMode,LPCTSTR szMode, LPINT lpi
 // 
 class CCursorSub
 {
-public:
-	CCursorSub();
-	~CCursorSub();
+	public:
+		CCursorSub();
+		~CCursorSub();
 
-public:
-	BOOL		bInitialize(LPCTSTR lpszCursorDataFileName);
-	HMODULE		hLoadCursorData();
-	BOOL		bUnLoadCursorData();
+	public:
+		BOOL		bInitialize(LPCTSTR lpszCursorDataFileName);
+		HMODULE		hLoadCursorData();
+		BOOL		bUnLoadCursorData();
 
-	BOOL		bMakeAllCursor(LPFLUSHMOUSECURSOR lpstIMECursorData);
-	BOOL		bMakeOneUnitCursor(LPFLUSHMOUSECURSOR lpstIMECursorData, int iIMEMode);
+		BOOL		bMakeAllCursor(LPFLUSHMOUSECURSOR lpstIMECursorData);
 
-private:
-	BOOL		bGetCursorDataFullPath(LPCTSTR lpszCursorDataFileName);
-	BOOL		bGetCursorDataTempFullPath(LPCTSTR lpszCursorDataFileName);
-	BOOL		bCopyFile(LPCTSTR lpszDstPath,  LPCTSTR lpszSrcPath);
+	private:
+		BOOL		bGetCursorDataFullPath(LPCTSTR lpszCursorDataFileName);
+		BOOL		bGetCursorDataTempFullPath(LPCTSTR lpszCursorDataFileName);
+		BOOL		bCopyFile(LPCTSTR lpszDstPath,  LPCTSTR lpszSrcPath);
 
-	BOOL		_bMakeOneUnitCursor(HMODULE hSrcMod, HANDLE hDstRes, LPFLUSHMOUSECURSOR lpstIMECursorData, int iIMEMode);
-	BOOL		bMakeCursor(HMODULE hSrcMod, HANDLE hDstRes, int iSrcResID, int iDstResID, DWORD dwIMEMode, LPTSTR szIMEMode, COLORREF dwRGB, LPCTSTR szFontFace);
-	BOOL		bMakeCursorSub(LPRTCURSORHEAD	lpRTCursorHead, LPRTCURSORHEAD lpMakeCursorData, DWORD dwResSize, int cx, int cy, DWORD dwIMEMode, LPTSTR lpszIMEMode, COLORREF dwRGB, LPCTSTR lpszFontFace);
-	LPVOID		_FindResource(HMODULE hModule, int iResID, LPCTSTR ResType, LPDWORD lpdwResSize);
-	void		ReverseDataTopDown(LPDWORD lpData, int cx, int cy);
-	void		MakeAlphaBlend(LPDWORD lpData, int cx, int cy, COLORREF aRGB);
+		BOOL		bMakeOneUnitCursor(HMODULE hSrcMod, HANDLE hDstRes, LPFLUSHMOUSECURSOR lpstIMECursorData, int iIMEMode);
+		BOOL		bMakeCursor(HMODULE hSrcMod, HANDLE hDstRes, int iSrcResID, int iDstResID, DWORD dwIMEMode, LPTSTR szIMEMode, COLORREF dwRGB, LPCTSTR szFontFace);
+		BOOL		bMakeCursorSub(LPRTCURSORHEAD	lpRTCursorHead, LPRTCURSORHEAD lpMakeCursorData, DWORD dwResSize, int cx, int cy, DWORD dwIMEMode, LPTSTR lpszIMEMode, COLORREF dwRGB, LPCTSTR lpszFontFace);
+		LPVOID		FindAndLockResource(HMODULE hModule, int iResID, LPCTSTR ResType, LPDWORD lpdwResSize);
+		static void	ReverseDataTopDown(LPDWORD lpData, int cx, int cy);
+		static void	MakeAlphaBlend(LPDWORD lpData, int cx, int cy, COLORREF aRGB);
 
-public:
+	public:
 	
-private:
-	LPTSTR		lpszCursorDataFullPath;	
-	LPTSTR		lpszCursorDataTempFullPath;
-	HMODULE		hCursorData;
-	int			iCursorDataLoadCount;
+	private:
+		LPTSTR		lpszCursorDataFullPath;	
+		LPTSTR		lpszCursorDataTempFullPath;
+		HMODULE		hCursorData;
+		int			iCursorDataLoadCount;
 };
 
 //
@@ -126,29 +125,29 @@ private:
 //
 class CCursorWindow : public CWindow
 {
-public:
-	CCursorWindow();
-	~CCursorWindow();
+	public:
+		CCursorWindow();
+		~CCursorWindow() override;
 
-public:
-	BOOL		bRegister(HINSTANCE hInstance, LPCTSTR szWindowClass);
-	VOID		vSetModeStringColorFont(LPCTSTR _lpszIMEMode, COLORREF dwRGB, LPCTSTR _lpszFontFace);
+	public:
+		BOOL		bRegister(HINSTANCE hInstance, LPCTSTR szWindowClassName);
+		VOID		vSetModeStringColorFont(LPCTSTR _lpszIMEMode, COLORREF dwRGB, LPCTSTR _lpszFontFace);
 
-private:
-	LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	private:
+		virtual LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) override;
 
-	BOOL		Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct) const;
-	void		Cls_OnDestroy(HWND hWnd);
-	BOOL		Cls_OnEraseBkgnd(HWND hWnd, HDC hDC);
-	void		Cls_OnPaint(HWND hWnd) const;
+		BOOL		Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct) const;
+		void		Cls_OnDestroy(HWND hWnd);
+		//BOOL		Cls_OnEraseBkgnd(HWND hWnd, HDC hDC);
+		void		Cls_OnPaint(HWND hWnd) const;
 
-public:
+	public:
 
-private:
-	LPTSTR		lpszIMEMode;
-	COLORREF	dwTextColor;
-	COLORREF	dwBackColor;
-	LPTSTR		lpszFontFace;
+	private:
+		LPTSTR		lpszIMEMode;
+		COLORREF	dwTextColor;
+		COLORREF	dwBackColor;
+		LPTSTR		lpszFontFace;
 };
 
 

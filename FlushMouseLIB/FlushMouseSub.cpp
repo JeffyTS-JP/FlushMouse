@@ -299,14 +299,6 @@ BOOL		bCheckDrawIMEModeArea(HWND hWndObserved)
 //
 // class CMouseRawInput
 //
-CMouseRawInput::CMouseRawInput()
-{
-}
-
-CMouseRawInput::~CMouseRawInput()
-{
-}
-
 //
 // vRawInputMouseHandler()
 //
@@ -331,10 +323,8 @@ void	CMouseRawInput::vRawInputMouseHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT 
 // class CPowerNotification
 //
 CPowerNotification::CPowerNotification(HWND hWnd)
+	: hSuspendResumeNotification(NULL), hPowerSettingNotification(NULL), guidPowerSettingNotification(GUID_NULL)
 {
-	hSuspendResumeNotification = NULL;
-	hPowerSettingNotification = NULL;;
-	guidPowerSettingNotification = GUID_NULL;
 	if ((hSuspendResumeNotification = RegisterSuspendResumeNotification(hWnd, DEVICE_NOTIFY_WINDOW_HANDLE)) == NULL) {
 	}
 	if ((hPowerSettingNotification = RegisterPowerSettingNotification(hWnd, &guidPowerSettingNotification, DEVICE_NOTIFY_WINDOW_HANDLE)) == NULL) {
@@ -388,7 +378,7 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 			}
 		}
 		if (lpSetting != NULL) {
-			PPOWERBROADCAST_SETTING	lpPwrSetting = (POWERBROADCAST_SETTING*)lpSetting;
+			PPOWERBROADCAST_SETTING	lpPwrSetting = reinterpret_cast<POWERBROADCAST_SETTING*>(lpSetting);
 			if ((lpPwrSetting->PowerSetting == GUID_CONSOLE_DISPLAY_STATE)
 				|| (lpPwrSetting->PowerSetting == GUID_MONITOR_POWER_ON)
 				|| (lpPwrSetting->PowerSetting == GUID_SESSION_DISPLAY_STATUS)) {
@@ -407,10 +397,8 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 //
 //
 CEventHook::CEventHook()
+	: hFormerWnd(NULL), hEventHook(NULL), hEventHookIME(NULL)
 {
-	hEventHook = NULL;
-	hFormerWnd = NULL;
-	hEventHookIME = NULL;
 }
 
 CEventHook::~CEventHook()
@@ -517,13 +505,9 @@ void CALLBACK CEventHook::vHandleEventIME(HWINEVENTHOOK hook, DWORD dwEvent, HWN
 // class CFlushMouseHook 
 //
 CFlushMouseHook::CFlushMouseHook()
+	: hHook64Dll(NULL), bShellHook64(FALSE), bGlobalHook64(FALSE), bKeyboardHookLL64(FALSE), bHook32Dll(FALSE),
+	lpstProcessInfomation(new PROCESS_INFORMATION[sizeof(PROCESS_INFORMATION)])
 {
-	hHook64Dll = NULL;
-	bShellHook64 = FALSE;
-	bGlobalHook64 = FALSE;
-	bKeyboardHookLL64 = FALSE;
-	bHook32Dll = FALSE;
-	lpstProcessInfomation = new PROCESS_INFORMATION[sizeof(PROCESS_INFORMATION)];
 	if (lpstProcessInfomation)	ZeroMemory(lpstProcessInfomation, sizeof(PROCESS_INFORMATION));
 }
 
@@ -594,7 +578,7 @@ BOOL	 	CFlushMouseHook::bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name)
 		LPTSTR	lpszCommandLine = NULL;
 		lpszCommandLine = new TCHAR[dwSize + COMAMANDLINESIZE];
 		if (lpszCommandLine) {
-			ZeroMemory(lpszCommandLine, (dwSize + sizeof(COMAMANDLINESIZE)));
+			ZeroMemory(lpszCommandLine, (size_t)(dwSize + COMAMANDLINESIZE));
 			_sntprintf_s(lpszCommandLine, (dwSize + COMAMANDLINESIZE), _TRUNCATE, _T("%s %llu"), lpszBuffer, (unsigned long long)hWnd);
 			if (lpstProcessInfomation) {
 				STARTUPINFO	stStartupInfo{};	stStartupInfo.cb = sizeof(STARTUPINFO);
@@ -642,9 +626,7 @@ BOOL 	CFlushMouseHook::bHook32DllStop() const
 					case WAIT_ABANDONED:
 					case WAIT_TIMEOUT:
 					default:
-						if (TerminateProcess(lpstProcessInfomation->hProcess, 0)) {
-							bRet = TRUE;
-						}
+						TerminateProcess(lpstProcessInfomation->hProcess, 0);
 						bRet = TRUE;
 					}
 					DWORD dwExitCode;

@@ -40,19 +40,21 @@ HWND			hSynTPHelperDlg = NULL;
 //
 // Local Data
 //
-static UINT		uTaskbarCreatedMessage = 0;
 
 //
 // Local Prototype Define
 //
 
 //
+// iCheckTaskTrayMessage()
+//
+
+//
 // Class CTaskTray
 // 
 CTaskTray::CTaskTray(HWND hWnd)
+	: uTaskTrayID(NOTIFYICONDATA_ID), uTaskbarCreatedMessage(0)
 {
-	uTaskbarCreatedMessage = 0;
-	uTaskTrayID = NOTIFYICONDATA_ID;
 	if ((uTaskbarCreatedMessage = RegisterWindowMessage(_T("FlushMouseTaskTray-{CA959312-1F82-45E8-AC7B-6F1F6CDD19C4}"))) == 0) {
 		uTaskbarCreatedMessage = 0;
 		return;
@@ -147,15 +149,6 @@ BOOL		CTaskTray::bReCreateTaskTrayWindow(HWND hWnd) const
 	if (bDestroyTaskTrayWindow(hWnd)) {
 	}
 	HICON	hIcon = NULL;
-	if ((hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_SMALL))) != NULL) {
-		for (int i = 0; i < 3; i++) {
-			if (bCreateTaskTrayWindow(hWnd, hIcon, szTitle))	break;
-			Sleep(1000);
-		}
-	}
-	else {
-		return FALSE;
-	}
 	if ((hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE))) != NULL) {
 		BOOL	bRet = FALSE;
 		for (int i = 0; i < 3; i++) {
@@ -241,13 +234,14 @@ int		CTaskTray::iCheckTaskTrayMessage(HWND hWnd, UINT message, WPARAM wParam, LP
 		HANDLE_MSG(hWnd, WM_TASKTRAYEX, Cls_OnTaskTrayEx);
 
 	default:
-		if (message == uTaskbarCreatedMessage) {	
-			if (bDestroyTaskTrayWindow(hWnd)) {
-				if (bReCreateTaskTrayWindow(hWnd)) {
+		if ((TaskTray->uTaskbarCreatedMessage != 0) && (message == TaskTray->uTaskbarCreatedMessage)) {
+			if (TaskTray->bDestroyTaskTrayWindow(hWnd)) {
+				if (TaskTray->bReCreateTaskTrayWindow(hWnd)) {
 					return 0;
 				}
-				else return 1;
+				else return (-1);
 			}
+			else return (-1);
 		}
 	}
 	return 0;
@@ -261,6 +255,7 @@ void		CTaskTray::Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 {
 	UNREFERENCED_PARAMETER(hWndCtl);
 	UNREFERENCED_PARAMETER(codeNotify);
+
 	if (!Profile || !Cursor)	return;
 	Cursor->vStopDrawIMEModeMouseByWndThread();
 	switch (id) {
@@ -292,7 +287,7 @@ void		CTaskTray::Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 			return;
 		}
 		vSettingDialogClose();
-		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);	// Restart FlushMouse
 		return;
 	}
 	else {

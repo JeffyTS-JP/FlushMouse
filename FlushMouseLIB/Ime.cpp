@@ -47,20 +47,6 @@ CIME::~CIME()
 }
 
 //
-// bIsIMEOpen()
-//
-BOOL		CIME::bIsIMEOpen(HWND hWndObserved)
-{
-	HWND    hIMWnd = NULL;
-	if ((hIMWnd = ImmGetDefaultIMEWnd(hWndObserved)) != NULL) {
-		if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETOPENSTATUS, (LPARAM)NULL) != 0) {
-			return TRUE;	
-		}
-	}
-	return FALSE;
-}
-
-//
 // vIMEOpenCloseForced()
 //
 VOID		CIME::vIMEOpenCloseForced(HWND hWndObserved, DWORD dwIMEOpenClose)
@@ -74,22 +60,22 @@ VOID		CIME::vIMEOpenCloseForced(HWND hWndObserved, DWORD dwIMEOpenClose)
 //
 // vIMEConvertModeChangeForced()
 //
-VOID		CIME::vIMEConvertModeChangeForced(HWND hWndObserved, DWORD dwConvertMode)
+VOID		CIME::vIMEConvertModeChangeForced(HWND hWnd, DWORD dwConvertMode)
 {
-	if (hWndObserved == NULL)	return;
+	if (hWnd == NULL)	return;
 	LPARAM	lParam = (LPARAM)dwConvertMode;
-	EnumChildWindows(hWndObserved, &bEnumChildProcIMEConvertMode, lParam);
+	EnumChildWindows(hWnd, &bEnumChildProcIMEConvertMode, lParam);
 	return;
 }
 
 //
 // bEnumChildProcIMEConvertMode()
 //
-BOOL CALLBACK CIME::bEnumChildProcIMEConvertMode(HWND hWndObserved, LPARAM lParam)
+BOOL CALLBACK CIME::bEnumChildProcIMEConvertMode(HWND hWnd, LPARAM lParam)
 {
-	if (hWndObserved == NULL)	return FALSE;
+	if (hWnd == NULL)	return FALSE;
 	HWND    hIMWnd = NULL;
-	if ((hIMWnd = ImmGetDefaultIMEWnd(hWndObserved)) != NULL) {
+	if ((hIMWnd = ImmGetDefaultIMEWnd(hWnd)) != NULL) {
 		if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETOPENSTATUS, (LPARAM)TRUE) == 0) {	
 			if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETCONVERSIONMODE, (LPARAM)lParam) == 0) {
 			}
@@ -101,11 +87,11 @@ BOOL CALLBACK CIME::bEnumChildProcIMEConvertMode(HWND hWndObserved, LPARAM lPara
 //
 // bEnumChildProcIMEOpenClose()
 //
-BOOL CALLBACK CIME::bEnumChildProcIMEOpenClose(HWND hWndObserved, LPARAM lParam)
+BOOL CALLBACK CIME::bEnumChildProcIMEOpenClose(HWND hWnd, LPARAM lParam)
 {
-	if (hWndObserved == NULL)	return FALSE;
+	if (hWnd == NULL)	return FALSE;
 	HWND    hIMWnd = NULL;
-	if ((hIMWnd = ImmGetDefaultIMEWnd(hWndObserved)) != NULL) {
+	if ((hIMWnd = ImmGetDefaultIMEWnd(hWnd)) != NULL) {
 		if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETOPENSTATUS, lParam) == 0) {
 		}
 	}
@@ -115,13 +101,13 @@ BOOL CALLBACK CIME::bEnumChildProcIMEOpenClose(HWND hWndObserved, LPARAM lParam)
 //
 // dwIMEMode()
 //
-DWORD		CIME::dwIMEMode(HWND hWndObserved, BOOL bForceHiragana)
+DWORD		CIME::dwIMEMode(HWND hWnd, BOOL bForceHiragana)
 {
-	if (hWndObserved != NULL) {
+	if (hWnd != NULL) {
 		HWND    hIMWnd = NULL;
 		HKL		hkl = NULL;
 		DWORD   dwConvertMode = 0;
-		if ((hIMWnd = ImmGetDefaultIMEWnd(hWndObserved)) != NULL) {
+		if ((hIMWnd = ImmGetDefaultIMEWnd(hWnd)) != NULL) {
 			if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETOPENSTATUS, NULL) != 0) {
 				if ((dwConvertMode = (DWORD)SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETCONVERSIONMODE, NULL)) != 0) {
 					switch (dwConvertMode) {
@@ -152,10 +138,10 @@ DWORD		CIME::dwIMEMode(HWND hWndObserved, BOOL bForceHiragana)
 						dwConvertMode = IMEOFF;
 					}
 					if ((bForceHiragana != FALSE) && (dwConvertMode != ZENHIRA_IMEON)) {
-						vIMEConvertModeChangeForced(hWndObserved, ZENHIRA_IMEON);
+						vIMEConvertModeChangeForced(hWnd, ZENHIRA_IMEON);
 						dwConvertMode = ZENHIRA_IMEON;
 					}
-					if ((hkl = hklGetInputLocale(hWndObserved)) != (HKL)0) {
+					if ((hkl = hklGetInputLocale(hWnd)) != (HKL)0) {
 						if (hkl != JP_IME) {
 							dwConvertMode = IMEOFF;
 						}

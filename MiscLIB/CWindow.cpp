@@ -21,11 +21,8 @@
 //class CWindow
 //
 CWindow::CWindow()
+	: _hInstance(NULL), _hWnd(NULL), _lpWndClass(NULL), _lpWndClassEx(NULL)
 {
-	_hInstance = NULL;
-	_hWnd = NULL;
-	_lpWndClass = NULL;
-	_lpWndClassEx = NULL;
 }
 
 CWindow::~CWindow()
@@ -172,23 +169,23 @@ void		CWindow::vSetWindowLongPtr(HWND hWnd)
 //
 LRESULT CWindow::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	CWindow* This = (CWindow*)(::GetWindowLongPtr(hWnd, GWLP_USERDATA));
-	if (This == NULL) {
-		if (message == WM_CREATE) {
-			This = (CWindow*)(((LPCREATESTRUCT)lParam)->lpCreateParams);
-		}
-		if (This != NULL) {
-			vSetWindowLongPtr(hWnd);
+	const CWindow* This = reinterpret_cast<CWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+	if (This != NULL) {
+		switch (message) {
+			case WM_CREATE:
+				break;
+			case WM_DESTROY:
+				break;
+			default:
+				break;
 		}
 	}
 	else {
-		switch (message) {
-		case WM_CREATE:
-			break;
-		case WM_DESTROY:
-			break;
-		default:
-			break;
+		if (message == WM_CREATE) {
+			This = reinterpret_cast<CWindow*>((reinterpret_cast<LPCREATESTRUCT>(lParam)->lpCreateParams));
+		}
+		if (This != NULL) {
+			vSetWindowLongPtr(hWnd);
 		}
 	}
 	return DefWindowProc(hWnd, message, wParam, lParam);

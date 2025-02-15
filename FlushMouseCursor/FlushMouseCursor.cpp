@@ -39,12 +39,5 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 	return TRUE;
 }
 
-//
-// hGetDllInstance()
-//
-HINSTANCE hGetDllInstance()
-{
-	return hDLLInstance;
-}
 
 /* = EOF = */

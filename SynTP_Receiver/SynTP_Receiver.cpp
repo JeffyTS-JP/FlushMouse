@@ -147,6 +147,11 @@ int APIENTRY	wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 	if (SynTP_Receiver)	delete SynTP_Receiver;
 
+#if defined _DEBUG
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG); 
+	_CrtDumpMemoryLeaks();
+#endif // _DEBUG
+
 	return 0;
 }
 
@@ -271,7 +276,7 @@ BOOL		CSynTP_Receiver::Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
 
 	if (SynTP == NULL) {
-		SynTP = new CSynTP;
+		SynTP = new CSynTP(0, 0, 0, 0);
 		if (SynTP) {
 			if (SynTP->bStartReceiver(hWnd, iPort)) {
 				return TRUE;

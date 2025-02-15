@@ -44,12 +44,12 @@ extern BOOL	 	bCreateProcess(LPCTSTR lpszExecName, LPTSTR lpCommandLine);
 //
 class CMouseRawInput	:	public CRawInput
 {
-public:
-	CMouseRawInput();
-	~CMouseRawInput();
+	public:
+		CMouseRawInput() {};
+		~CMouseRawInput() override {};
 
-private:
-	void	vRawInputMouseHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawInput);
+	private:
+		virtual void	vRawInputMouseHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawInput) override;
 };
 
 //
@@ -57,16 +57,16 @@ private:
 //
 class CPowerNotification
 {
-public:
-	CPowerNotification(HWND hWnd);
-	~CPowerNotification();
+	public:
+		explicit CPowerNotification(HWND hWnd);
+		~CPowerNotification();
 
-	BOOL		PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting);
+		BOOL		PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting);
 
-private:
-	HPOWERNOTIFY	hSuspendResumeNotification;
-	HPOWERNOTIFY	hPowerSettingNotification;
-	GUID			guidPowerSettingNotification;
+	private:
+		HPOWERNOTIFY	hSuspendResumeNotification;
+		HPOWERNOTIFY	hPowerSettingNotification;
+		GUID			guidPowerSettingNotification;
 };
 
 //
@@ -74,23 +74,23 @@ private:
 //
 class CEventHook
 {
-public:
-	CEventHook();
-	~CEventHook();
+	public:
+		CEventHook();
+		~CEventHook();
 
-	BOOL		bEventSet();
-	BOOL		bEventUnset();
+		BOOL		bEventSet();
+		BOOL		bEventUnset();
 
-private:
-	static void CALLBACK vHandleEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime);
-	static void CALLBACK vHandleEventIME(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime);
+	private:
+		static void CALLBACK vHandleEvent(HWINEVENTHOOK hook, DWORD dwEvent, HWND hWnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime);
+		static void CALLBACK vHandleEventIME(HWINEVENTHOOK hook, DWORD dwEvent, HWND hWnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime);
 
-public:
-	HWND			hFormerWnd;
+	public:
+		HWND			hFormerWnd;
 
-private:
-	HWINEVENTHOOK	hEventHook;
-	HWINEVENTHOOK	hEventHookIME;
+	private:
+		HWINEVENTHOOK	hEventHook;
+		HWINEVENTHOOK	hEventHookIME;
 };
 
 //
@@ -98,27 +98,27 @@ private:
 //
 class CFlushMouseHook
 {
-public:
-	CFlushMouseHook();
-	~CFlushMouseHook();
-	BOOL		bHookSet(HWND hWnd, LPCTSTR lpszDll64Name, LPCTSTR lpszExec32Name);
-	BOOL		bHookUnset();
-	BOOL		bHookUnset64() const;
+	public:
+		CFlushMouseHook();
+		~CFlushMouseHook();
+		BOOL		bHookSet(HWND hWnd, LPCTSTR lpszDll64Name, LPCTSTR lpszExec32Name);
+		BOOL		bHookUnset();
+		BOOL		bHookUnset64() const;
 
-private:
-	BOOL		bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name);
-	BOOL		bHook32DllStop() const;
-	static BOOL CALLBACK bEnumWindowsProcHookStop(HWND hWnd, LPARAM lParam);
+	private:
+		BOOL		bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name);
+		BOOL		bHook32DllStop() const;
+		static BOOL CALLBACK bEnumWindowsProcHookStop(HWND hWnd, LPARAM lParam);
 
-private:
-	HMODULE		hHook64Dll;
-	BOOL		bShellHook64;
-	BOOL		bGlobalHook64;
-	BOOL		bKeyboardHookLL64;
-	BOOL		bHook32Dll;
+	private:
+		HMODULE		hHook64Dll;
+		BOOL		bShellHook64;
+		BOOL		bGlobalHook64;
+		BOOL		bKeyboardHookLL64;
+		BOOL		bHook32Dll;
 
-private:
-	LPPROCESS_INFORMATION	lpstProcessInfomation;
+	private:
+		LPPROCESS_INFORMATION	lpstProcessInfomation;
 };
 
 /* = EOF = */
