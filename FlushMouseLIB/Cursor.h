@@ -162,7 +162,7 @@ class CCursor
 	private:
 		IMECURSORDATA	stIMECursorData;
 
-		HWND			hMainWnd;
+		HWND			_hMainWnd;
 		HMODULE			hCursorData;
 		int				iCursorDataLoadCount;
 

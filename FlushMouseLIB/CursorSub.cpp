@@ -12,7 +12,9 @@
 #pragma once
 #include "pch.h"
 #include "CursorSub.h"
+#include "FlushMouseLIB.h"
 #include "Profile.h"
+#include "Resource.h"
 #include "..\FlushMouseCursor\Resource.h"
 
 //
@@ -128,19 +130,32 @@ CCursorSub::~CCursorSub()
 //
 //	bInitialize()
 //
-BOOL		CCursorSub::bInitialize(LPCTSTR lpszCursorDataFileName)
+BOOL		CCursorSub::bInitialize(HWND hWnd, LPCTSTR lpszCursorDataFileName)
 {
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
+	
 	BOOL	bRet = FALSE;
 	
-	if (!bGetCursorDataFullPath(lpszCursorDataFileName))	goto Cleanup;
-
-	if (!bGetCursorDataTempFullPath(lpszCursorDataFileName))	goto Cleanup;
+	if (!Cursor) goto Cleanup;
+	
+	if (!bGetCursorDataFullPath(lpszCursorDataFileName)) {
+		vMessageBox(hWnd, IDS_CANTLOADCURSOR, MessageBoxTYPE, __func__, __LINE__);
+		goto Cleanup;
+	}
+	if (!bGetCursorDataTempFullPath(lpszCursorDataFileName)) {
+		vMessageBox(hWnd, IDS_CANTLOADCURSOR, MessageBoxTYPE, __func__, __LINE__);
+		goto Cleanup;
+	}
 	if (!DeleteFile(lpszCursorDataTempFullPath)) {
 	}
-	if (!bCopyFile(lpszCursorDataTempFullPath, lpszCursorDataFullPath))	goto Cleanup;
-
-	if (!hLoadCursorData())	goto Cleanup;
-
+	if (!bCopyFile(lpszCursorDataTempFullPath, lpszCursorDataFullPath)) {
+		vMessageBox(hWnd, IDS_CANTLOADCURSOR, MessageBoxTYPE, __func__, __LINE__);
+		goto Cleanup;
+	}
+	if (!hLoadCursorData()) {
+		vMessageBox(hWnd, IDS_CANTLOADCURSOR, MessageBoxTYPE, __func__, __LINE__);
+		goto Cleanup;
+	}
 	bRet = TRUE;
 
 Cleanup:
@@ -256,10 +271,10 @@ BOOL		CCursorSub::bCopyFile(LPCTSTR lpszDstPath, LPCTSTR lpszSrcPath)
 	DWORD	dwNumberOfBytesRead = 0;
 	BOOL	bRet = FALSE;
 
-	if ((hSrcFile = CreateFile(lpszSrcPath, (GENERIC_READ), FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE)	goto Cleanup;
+	if ((hSrcFile = CreateFile(lpszSrcPath, (FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE), FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE)	goto Cleanup;
 	if (!GetFileSizeEx(hSrcFile, &SrcSize))	goto Cleanup;
 
-	if ((hDstFile = CreateFile(lpszDstPath, (GENERIC_READ | GENERIC_WRITE), FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL)) == INVALID_HANDLE_VALUE)	goto Cleanup;
+	if ((hDstFile = CreateFile(lpszDstPath, (FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE), FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL)) == INVALID_HANDLE_VALUE)	goto Cleanup;
 	if ((dwFileSize = GetFileSize(hSrcFile, NULL)) == INVALID_FILE_SIZE)	goto Cleanup;
 
 #define	BUFFERSIZE	(1024 * 1024)

@@ -93,7 +93,7 @@ class CCursorSub
 		~CCursorSub();
 
 	public:
-		BOOL		bInitialize(LPCTSTR lpszCursorDataFileName);
+		BOOL		bInitialize(HWND hWnd, LPCTSTR lpszCursorDataFileName);
 		HMODULE		hLoadCursorData();
 		BOOL		bUnLoadCursorData();
 

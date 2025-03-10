@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
 	<Identity Name="FlushMouseUI3DLL"
-			  Version="3.5.3.9"
+			  Version="3.5.4.7"
 			  Publisher="CN=JeffyTS, O=JeffyTS, L=MyCity, S=MyState, C=JP" />
 	<Properties>
 		<DisplayName>FlushMouseUI3DLL</DisplayName>

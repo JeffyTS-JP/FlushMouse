@@ -94,7 +94,7 @@ FLUSHMOUSECURSOR	stFlushMouseCursor[sizeof(FLUSHMOUSECURSOR)] {
 // class CCursor
 //
 CCursor::CCursor()
-	: stIMECursorData(), hMainWnd(NULL), hCursorData(NULL), iCursorDataLoadCount(0),
+	: stIMECursorData(), _hMainWnd(NULL), hCursorData(NULL), iCursorDataLoadCount(0),
 	IMECursorChangeThread(NULL), DrawIMEModeThread(NULL), DrawIMEModeCaretThread(NULL), DrawIMEModeMouseByWndThread(NULL),
 	CursorWindow(NULL), CaretWindow(NULL), MouseWindow(NULL),
 	dwIMEModeMouseWindow(IMEHIDE), uuMouseWindowTick(0), CursorSub(NULL),
@@ -181,11 +181,17 @@ CCursor::~CCursor()
 //
 BOOL			CCursor::bInitialize(HWND hWnd)
 {
-	this->hMainWnd = hWnd;
+#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
+	if (!hWnd)	return FALSE;
+	_hMainWnd = hWnd;
 	CursorSub = new CCursorSub();
 	if (!CursorSub)	return FALSE;
-	if (!CursorSub->bInitialize(FLUSHMOUSECURSOR_DAT))	return FALSE;
-	return bReloadCursor();
+	if (!CursorSub->bInitialize(hWnd, FLUSHMOUSECURSOR_DAT))	return FALSE;
+	if (!bReloadCursor()) {
+		vMessageBox(hWnd, IDS_CANTLOADCURSOR, MessageBoxTYPE, __func__, __LINE__);
+		return FALSE;
+	}
+	return TRUE;
 }
 
 //
@@ -210,14 +216,14 @@ BOOL			CCursor::bReloadCursor()
 	if (!CursorWindow) {
 		CursorWindow = new CCursorWindow;
 		if (CursorWindow == NULL)	return FALSE;
-		if (!CursorWindow->bRegister((HINSTANCE)GetWindowLongPtr(hMainWnd, GWLP_HINSTANCE), CLASS_CURSORWINDOW))		return FALSE;
+		if (!CursorWindow->bRegister((HINSTANCE)GetWindowLongPtr(_hMainWnd, GWLP_HINSTANCE), CLASS_CURSORWINDOW))		return FALSE;
 	}
 	CursorWindow->vSetModeStringColorFont(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEHIDE].szMode, stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF].dwColor, stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF].szFont);
 	
 	if (!CaretWindow) {
 		CaretWindow = new CCursorWindow;
 		if (CaretWindow == NULL)	return FALSE;
-		if (!CaretWindow->bRegister((HINSTANCE)GetWindowLongPtr(hMainWnd, GWLP_HINSTANCE), CLASS_CARETWINDOW))	return FALSE;
+		if (!CaretWindow->bRegister((HINSTANCE)GetWindowLongPtr(_hMainWnd, GWLP_HINSTANCE), CLASS_CARETWINDOW))	return FALSE;
 	}
 	CaretWindow->vSetModeStringColorFont(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEOFF].szMode, stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEOFF].dwColor, stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEOFF].szFont);
 	
@@ -228,7 +234,7 @@ BOOL			CCursor::bReloadCursor()
 	if (!MouseWindow) {
 		MouseWindow = new CCursorWindow;
 		if (MouseWindow == NULL)	return FALSE;
-		if (!MouseWindow->bRegister((HINSTANCE)GetWindowLongPtr(hMainWnd, GWLP_HINSTANCE), CLASS_MOUSEWINDOW))	return FALSE;
+		if (!MouseWindow->bRegister((HINSTANCE)GetWindowLongPtr(_hMainWnd, GWLP_HINSTANCE), CLASS_MOUSEWINDOW))	return FALSE;
 	}
 	MouseWindow->vSetModeStringColorFont(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEHIDE].szMode, stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF].dwColor, stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF].szFont);
 	
@@ -240,12 +246,12 @@ BOOL			CCursor::bReloadCursor()
 	if (!DrawIMEModeThread) {
 		DrawIMEModeThread = new CThread;
 		if (DrawIMEModeThread != NULL) {
-			if (!bRegisterDrawIMEModeThread(hMainWnd))	return FALSE;
+			if (!bRegisterDrawIMEModeThread(_hMainWnd))	return FALSE;
 		}
 	}
 	
-	if (!bRegisterDrawIMEModeMouseByWndThread(hMainWnd))	return FALSE;
-	if (!bRegisterIMECursorChangeThread(hMainWnd)) return FALSE;
+	if (!bRegisterDrawIMEModeMouseByWndThread(_hMainWnd))	return FALSE;
+	if (!bRegisterIMECursorChangeThread(_hMainWnd)) return FALSE;
 	return TRUE;
 }
 
@@ -337,7 +343,7 @@ BOOL		CCursor::bStartIMECursorChangeThread(HWND hWndObserved)
 			IMECursorChangeThread = NULL;
 			IMECursorChangeThread = new CThread;
 			if (!IMECursorChangeThread)	return FALSE;
-			if (!bRegisterIMECursorChangeThread(this->hMainWnd)) return FALSE;
+			if (!bRegisterIMECursorChangeThread(_hMainWnd)) return FALSE;
 		}
 	}
 	return TRUE;
@@ -406,7 +412,7 @@ BOOL		CCursor::bStartDrawIMEModeThreadSub(HWND hWndObserved)
 		DrawIMEModeThread = NULL;
 		DrawIMEModeThread = new CThread;
 		if (!DrawIMEModeThread)	return FALSE;
-		if (!bRegisterDrawIMEModeThread(this->hMainWnd)) return FALSE;
+		if (!bRegisterDrawIMEModeThread(_hMainWnd)) return FALSE;
 	}
 	return TRUE;
 }
@@ -557,7 +563,7 @@ BOOL		CCursor::bStartDrawIMEModeMouseByWndThread()
 		}
 		DrawIMEModeMouseByWndThread = new CThread;
 		if (!DrawIMEModeMouseByWndThread)	return FALSE;
-		if (!bRegisterDrawIMEModeMouseByWndThread(this->hMainWnd)) return FALSE;
+		if (!bRegisterDrawIMEModeMouseByWndThread(_hMainWnd)) return FALSE;
 	}
 	if (!DrawIMEModeMouseByWndThread)	return FALSE;
 	if (!DrawIMEModeMouseByWndThread->bStart()) {
@@ -565,7 +571,7 @@ BOOL		CCursor::bStartDrawIMEModeMouseByWndThread()
 		DrawIMEModeMouseByWndThread = NULL;
 		DrawIMEModeMouseByWndThread = new CThread;
 		if (!DrawIMEModeMouseByWndThread)	return FALSE;
-		if (!bRegisterDrawIMEModeMouseByWndThread(this->hMainWnd)) return FALSE;
+		if (!bRegisterDrawIMEModeMouseByWndThread(_hMainWnd)) return FALSE;
 	}
 	return TRUE;
 #undef	DIFF_TIME
@@ -1194,8 +1200,8 @@ BOOL		CCursor::bSetSystemCursor(LPMOUSECURSOR lpstMC, int iCursorSizeX, int iCur
 		if (err == ERROR_MOD_NOT_FOUND) {
 			if (CursorSub)	CursorSub->bUnLoadCursorData();
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
-			vMessageBox(hMainWnd, IDS_CANTCHANGECURSOR, MessageBoxTYPE, __func__, __LINE__);
-			PostMessage(hMainWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			vMessageBox(_hMainWnd, IDS_CANTCHANGECURSOR, MessageBoxTYPE, __func__, __LINE__);
+			PostMessage(_hMainWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			return FALSE;
 		}
 	}
