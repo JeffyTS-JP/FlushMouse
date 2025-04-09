@@ -939,6 +939,7 @@ BOOL		CCursor::bAccessibleObjectFromWindowAsync(HWND hWnd, DWORD dwId, REFIID ri
 	_future = _promise.get_future();
 	try {
 		std::thread([&](std::promise<BOOL> _promise) {
+			(void)_promise;
 			IAccessible* _IAccessible = NULL;
 			AccessibleObjectFromWindow(hWnd, dwId, riId, reinterpret_cast<LPVOID*>(&_IAccessible));
 			}, std::move(_promise)).detach();
@@ -995,6 +996,7 @@ BOOL		CCursor::bAdjustModeSizeByMonitorDPIAsync()
 	_future = _promise.get_future();
 	try {
 		std::thread([&](std::promise<BOOL> _promise) {
+			(void)_promise;
 			RECT	rc{};
 			bAdjustModeSizeByMonitorDPI(32, 32, &rc);
 		}, std::move(_promise)).detach();

@@ -108,6 +108,7 @@ BOOL		bCheckExistHostnameIPv4(LPCTSTR lpszHostname, int iTimeOut)
 	_future = _promise.get_future();
 	try {
 		std::thread([&](std::promise<BOOL> _promise) {
+			(void)_promise;
 			LPWSADATA	lpWSAData = new WSADATA[sizeof(WSADATA)];
 			if (lpWSAData)	ZeroMemory(lpWSAData, sizeof(WSADATA));
 			else return FALSE;;

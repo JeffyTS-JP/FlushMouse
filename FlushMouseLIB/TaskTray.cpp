@@ -357,6 +357,7 @@ BOOL		CTaskTray::bDisplayBalloon(HWND hWnd, DWORD dwInfoFlags, LPCTSTR szInfoTit
 	_future = _promise.get_future();
 	try {
 		std::thread([&](std::promise<BOOL> _promise) { 
+			(void)_promise;
 			NOTIFYICONDATA	nIco{};
 			nIco.cbSize = sizeof(NOTIFYICONDATA);
 			nIco.hWnd = hWnd;

@@ -671,7 +671,7 @@ void		Cls_OnCheckExistingJPIMEEx(HWND hWnd, BOOL bEPHelper)
 }
 
 //
-// WM_SYSKEYDOWNEX
+// WM_SYSKEYDOWNUPEX
 // Cls_OnSysKeyDownUpEx()
 //
 static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flags)
@@ -939,6 +939,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 							if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
 								if (((UINT64)hPreviousHKL & LANG_MASK) != LANG_IME) {
 									PostMessage(hWnd, WM_SYSKEYDOWNUPEX, KEY_OEM_PA1, (0x80000000));
+									return;
 								}
 							}
 							else {
@@ -1069,7 +1070,7 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 		FlushMouseHook = new CFlushMouseHook;
 		if (!FlushMouseHook || !FlushMouseHook->bHookSet(hWnd, FLUSHMOUSE_DLL, FLUSHMOUSE32_EXE)) {
 			DWORD	dwErr = GetLastError();
-			if ((dwErr == ERROR_MOD_NOT_FOUND) || (dwErr == ERROR_SHARING_VIOLATION)) {
+			if ((dwErr == ERROR_MOD_NOT_FOUND) || (dwErr == ERROR_SHARING_VIOLATION) || (dwErr == ERROR_ENVVAR_NOT_FOUND)) {
 				Sleep(3000);
 				if (!FlushMouseHook || !FlushMouseHook->bHookSet(hWnd, FLUSHMOUSE_DLL, FLUSHMOUSE32_EXE)) {
 					bReportEvent(MSG_THREAD_HOOK_TIMER_START_FAILED, APPLICATION_CATEGORY);
