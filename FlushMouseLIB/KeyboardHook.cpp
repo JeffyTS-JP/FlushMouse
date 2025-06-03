@@ -246,7 +246,6 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 					if (bKBisEP()) {
 						PostMessage(hWndKBParentLL, WM_CHECKIMESTARTCONVEX, (WPARAM)bStartConvertingLL, (WM_USER + lpstKBH->vkCode));
 						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (WM_USER + lpstKBH->vkCode), (0x7f000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24)));
-						return 1;
 					}
 					break;
 				case VK_OEM_ATTN:		// OEM 英数/CapsLock (0xf0)

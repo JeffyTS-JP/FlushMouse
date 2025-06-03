@@ -763,26 +763,6 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 			}
 			if (bIMEInConverting)	return;
 			break;
-		case KEY_OEM_3:				// JP(IME/ENG) [@] / US(ENG) IME ON (0xc0) = ['] ALT + 半角/全角 or 漢字
-		case KEY_OEM_8:				// JP(IME/ENG) [`] / UK(ENG) IME ON (0xdf) = ['] ALT + 半角/全角 or 漢字
-			if (!bKBisEP())	return;
-			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
-			if ((Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
-				if (bForExplorerPatcherSWS(hForeWnd, TRUE, Profile->lpstAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL)) {
-					if (Profile->lpstAppRegData->bIMEModeForced) {
-						if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
-							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
-							Sleep(50);
-							Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
-						}
-						else {
-							return;
-						}
-					}
-				}
-			}
-			if (bIMEInConverting)	return;
-			break;
 		case KEY_OEM_PA1:			// US(ENG) 無変換			(0xeb)
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);

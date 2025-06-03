@@ -672,6 +672,7 @@ BOOL		CCursor::bIMEModeMouseByWndThreadRoutine(LPVOID lpvParam)
 		}
 		else break;
 	} while(lpstCursorData->bIMEModeByWindowThreadSentinel);
+	Sleep(100);
 	lpstCursorData->bIMEModeByWindowThreadSentinel = FALSE;
 	return TRUE;
 Cleanup:
