@@ -240,13 +240,6 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 					break;
 				case VK_OEM_3:			// JP(IME/ENG) [@] / US(ENG) IME ON (0xc0) = ['] ALT + 半角/全角 or 漢字
 				case VK_OEM_8:			// JP(IME/ENG) [`] / British(ENG) IME ON (0xdf) = ['] ALT + 半角/全角 or 漢字
-					bOnlyCtrlLL = FALSE;
-					bStartConvertingLL = FALSE;
-					if (!bEnableEPHelperLL)	break;
-					if (bKBisEP()) {
-						PostMessage(hWndKBParentLL, WM_CHECKIMESTARTCONVEX, (WPARAM)bStartConvertingLL, (WM_USER + lpstKBH->vkCode));
-						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (WM_USER + lpstKBH->vkCode), (0x7f000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24)));
-					}
 					break;
 				case VK_OEM_ATTN:		// OEM 英数/CapsLock (0xf0)
 					bOnlyCtrlLL = FALSE;

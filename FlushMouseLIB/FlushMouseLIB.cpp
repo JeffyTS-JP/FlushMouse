@@ -536,7 +536,7 @@ void Cls_OnLButtonDownEx(HWND hWnd, int x, int y, HWND hForeground)
 	if (!Profile)	return;
 	if (bCheckExistingJPIME() && (Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
 		if (Profile->lpstAppRegData->bEnableEPHelper) {
-			bForExplorerPatcherSWS(hForeground, FALSE, FALSE, NULL, NULL);
+			bForExplorerPatcherSWS(hForeground, TRUE, FALSE, NULL, NULL);
 		}
 		if (Profile->lpstAppRegData->bIMEModeForced) {
 			if (!bChromium_Helper(hForeground))	return;
