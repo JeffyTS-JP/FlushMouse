@@ -296,8 +296,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 		default:
 			if (TaskTray && (TaskTray->iCheckTaskTrayMessage(hWnd, message, wParam, lParam) == (-1))) {
-#define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
-				vMessageBox(hWnd, IDS_NOTREGISTERTT, MessageBoxTYPE, __func__, __LINE__);
+				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
 				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			}
 			break;

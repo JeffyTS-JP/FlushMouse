@@ -53,10 +53,14 @@ HWND			hSynTPHelperDlg = NULL;
 // Class CTaskTray
 // 
 CTaskTray::CTaskTray(HWND hWnd)
-	: uTaskTrayID(NOTIFYICONDATA_ID), uTaskbarCreatedMessage(0)
+	: uTaskTrayID(NOTIFYICONDATA_ID), uTaskbarCreatedMessage(0), uTaskbarCreated(0)
 {
 	if ((uTaskbarCreatedMessage = RegisterWindowMessage(_T("FlushMouseTaskTray-{CA959312-1F82-45E8-AC7B-6F1F6CDD19C4}"))) == 0) {
 		uTaskbarCreatedMessage = 0;
+		return;
+	}
+	if ((uTaskbarCreated = RegisterWindowMessage(_T("TaskbarCreated"))) == 0) {
+		uTaskbarCreated = 0;
 		return;
 	}
 	CHANGEFILTERSTRUCT	cf{};
@@ -234,12 +238,10 @@ int		CTaskTray::iCheckTaskTrayMessage(HWND hWnd, UINT message, WPARAM wParam, LP
 		HANDLE_MSG(hWnd, WM_TASKTRAYEX, Cls_OnTaskTrayEx);
 
 	default:
-		if ((TaskTray->uTaskbarCreatedMessage != 0) && (message == TaskTray->uTaskbarCreatedMessage)) {
-			if (TaskTray->bDestroyTaskTrayWindow(hWnd)) {
-				if (TaskTray->bReCreateTaskTrayWindow(hWnd)) {
-					return 0;
-				}
-				else return (-1);
+		if (((TaskTray->uTaskbarCreatedMessage != 0) && (message == TaskTray->uTaskbarCreatedMessage)) 
+				|| ((TaskTray->uTaskbarCreated != 0) && (message == TaskTray->uTaskbarCreated))) {
+			if (TaskTray->bReCreateTaskTrayWindow(hWnd)) {
+				return 0;
 			}
 			else return (-1);
 		}

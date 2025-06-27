@@ -48,6 +48,7 @@ class CTaskTray
 	private:
 		UINT		uTaskTrayID;
 		UINT		uTaskbarCreatedMessage;
+		UINT		uTaskbarCreated;
 };
 
 
