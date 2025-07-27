@@ -51,7 +51,7 @@ BOOL		bIMEInConverting = FALSE;
 //
 // Local Data
 //
-constexpr auto FOCUSINITTIMERVALUE = 200;
+constexpr auto FOCUSINITTIMERVALUE = 500;
 constexpr auto CHECKFOCUSTIMERID = 1;
 static UINT     nCheckFocusTimerTickValue = FOCUSINITTIMERVALUE;
 static UINT_PTR nCheckFocusTimerID = CHECKFOCUSTIMERID;
@@ -97,8 +97,8 @@ static void		Cls_OnCheckExistingJPIMEEx(HWND hWnd, BOOL bEPHelper);
 static void		Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flags);
 
 // Sub
-static VOID CALLBACK		vCheckFocusTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
-static VOID CALLBACK		vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
+static VOID CALLBACK	vCheckFocusTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
+static VOID CALLBACK	vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
 static BOOL		bNotInTaskBar(LPCTSTR lpClassName);
 
 //
@@ -636,9 +636,9 @@ static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd)
 				else {
 					if ((hWndObserved = WindowFromPoint(CursorInfo.ptScreenPos)) == NULL)	return;
 				}
-				if (!Cursor->bStartIMECursorChangeThread(hWndObserved))	return;
 				if (!bCheckDrawIMEModeArea(hWndObserved))	return;
-				if (!Cursor->bStartDrawIMEModeThreadWaitEventForeGround(hWndObserved))	return;
+				if (!Cursor->bStartIMECursorChangeThreadWait(hWndObserved))	return;
+				if (!Cursor->bStartDrawIMEModeThreadWaitEventForeGround(hForeWnd))	return;
 			}
 		}
 	}
@@ -679,17 +679,24 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 	UNREFERENCED_PARAMETER(flags);
 
 	if (!Profile || !Cursor)	return;
-	if ((cRepeat & 0xfffe) != 0) {
-		return;	
-	}
+	if (((cRepeat & 0xfffe) != 0) || ((flags & 0x4000) != 0))	return;
+
 	HKL		hNewHKL = NULL;
 	HKL		hPreviousHKL = NULL;
 	HWND	hForeWnd = NULL;
 	DWORD	dwBeforeIMEMode = IMEOFF;
+	POINT	pt{};
+
 	if ((fDown == FALSE)) {											// Key up
 		switch (vk) {
 		case KEY_TAB:
 			if (bIMEInConverting)	return;
+			if ((GetKeyState(VK_LMENU) & 0x8000)) {
+				if (GetCursorPos(&pt)) {
+					if (!Cursor->bStartIMECursorChangeThreadWait(WindowFromPoint(pt)))	return;
+				}
+				return;
+			}
 			break;
 		case KEY_RETURN:
 			bIMEInConverting = FALSE;
@@ -698,34 +705,58 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			if (Profile->lpstAppRegData->bEnableEPHelper)	bForExplorerPatcherSWS(hForeWnd, FALSE, FALSE, NULL, NULL);
 			if (Profile->lpstAppRegData->bDoModeDispByCtrlUp) {
-				POINT	pt{};
 				if (GetCursorPos(&pt)) {
 					if (!Cursor->bStartDrawIMEModeThreadWaitWave(WindowFromPoint(pt)))	return;
 				}
 			}
 			return;
-		case KEY_CTRL:
-		case KEY_LCTRL:
-		case KEY_RCTRL:
-		case KEY_ALT:
-		case KEY_LALT:
-		case KEY_RALT:
+		case KEY_LWIN:				// L Win			(0x5b)
+		case KEY_RWIN:				// R Win			(0x5c)
+			if (bIMEInConverting)	return;
+			if (GetCursorPos(&pt)) {
+				if (!Cursor->bStartIMECursorChangeThreadByWnd(WindowFromPoint(pt)))	return;
+			}
+			return;
+		case KEY_ALT:				// ALT				(0x12)
+		case KEY_LALT:				// ALT L			(0xa4)
+		case KEY_RALT:				// ALT R			(0xa5)
+			if (bIMEInConverting)	return;
+			if (GetCursorPos(&pt)) {
+				if (!Cursor->bStartIMECursorChangeThreadByWnd(WindowFromPoint(pt)))	return;
+			}
+			return;
+		case KEY_CTRL:				// Ctrl				(0x11)
+		case KEY_LCTRL:				// Ctrl L			(0xa2)
+		case KEY_RCTRL:				// Ctrl R			(0xa3)
+		case KEY_SHIFT:				// Shift			(0x10)
+		case KEY_LSHIFT:			// Shift L			(0xa0)
+		case KEY_RSHIFT:			// Shift R			(0xa1)
+			if (bIMEInConverting)	return;
+			if (GetCursorPos(&pt)) {
+				if (!Cursor->bStartIMECursorChangeThreadByWnd(WindowFromPoint(pt)))	return;
+			}
 			return;
 		case KEY_F5:				// F5				(0x74)
+			if (bIMEInConverting)	return;
+			break;
 		case KEY_F6:				// F6				(0x75)
 		case KEY_F7:				// F7				(0x76)
 		case KEY_F8:				// F8				(0x77)
 		case KEY_F9:				// F9				(0x78)
-		case KEY_F10:				// F10				(0x79)
-			break;
+			if (bIMEInConverting)	return;
+			if ((GetKeyState(VK_CONTROL) & 0x8000)) {
+				break;
+			}
+			return;
 		case KEY_IME_ON:			// IME ON			(0x16)
+			if (bIMEInConverting)	return;
 			if (Profile->lpstAppRegData->bIMEModeForced) {
 				if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 				Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
 			}
-			if (bIMEInConverting)	return;
 			break;
 		case KEY_KANJI:				// JP(IME/ENG) Alt + 漢字	(0x19)
+			if (bIMEInConverting)	return;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
 			if ((Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
@@ -734,10 +765,11 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 						if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
 							if (dwBeforeIMEMode != IMEOFF) {
 								Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+								bIMEInConverting = FALSE;
 							}
 							else {
 								Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
-								Sleep(50);
+								SleepEx(50, FALSE);
 								Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
 							}
 						}
@@ -753,37 +785,39 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 				}
 			}
 			if (Profile->lpstAppRegData->bForceHiragana && !(dwBeforeIMEMode != IMEOFF))	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
-			if (bIMEInConverting)	return;
 			break;
 		case KEY_IME_OFF:			// IME OFF					(0x1a)
+			if (bIMEInConverting)	return;
 			if (Profile->lpstAppRegData->bIMEModeForced) {
 				if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 				Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+				bIMEInConverting = FALSE;
 			}
-			if (bIMEInConverting)	return;
 			break;
 		case KEY_OEM_PA1:			// US(ENG) 無変換			(0xeb)
+			if (bIMEInConverting)	return;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
 			if ((Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
 				if (dwBeforeIMEMode != IMEOFF) {
 					if (Profile->lpstAppRegData->bIMEModeForced) {
-						if (bForExplorerPatcherSWS(hForeWnd, TRUE,Profile->lpstAppRegData-> bEnableEPHelper, &hNewHKL, &hPreviousHKL)) {
+						if (bForExplorerPatcherSWS(hForeWnd, TRUE, Profile->lpstAppRegData-> bEnableEPHelper, &hNewHKL, &hPreviousHKL)) {
 							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+							bIMEInConverting = FALSE;
 						}
 					}
 				}
 			}
-			if (bIMEInConverting)	return;
 			break;
 		case KEY_OEM_IME_OFF:		// JP(IME/ENG) IME OFF (0xf3)
+			if (bIMEInConverting)	return;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
 			if ((Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
-				Sleep(50);
+				SleepEx(50, FALSE);
 				HWND	hWndHidemaru = FindWindow(_T("Hidemaru32Class"), NULL);
 				if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
-					Sleep(300);
+					SleepEx(300, FALSE);
 					break;
 				}
 				if (bForExplorerPatcherSWS(hForeWnd, TRUE, Profile->lpstAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL)) {
@@ -791,21 +825,23 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 						if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
 							if (dwBeforeIMEMode != IMEOFF) {
 								Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+								bIMEInConverting = FALSE;
 							}
 							else {
 								Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
-								Sleep(50);
-								Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
+								SleepEx(50, FALSE);
+								Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
 								if (!bChromium_Helper(hForeWnd))	return;
 							}
 						}
 						else {
 							if (dwBeforeIMEMode != IMEOFF) {
 								Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+								bIMEInConverting = FALSE;
 							}
 							else {
 								Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
-								Sleep(50);
+								SleepEx(50, FALSE);
 								if (!bChromium_Helper(hForeWnd))	return;
 							}
 						}
@@ -813,17 +849,17 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 				}
 			}
 			if (Profile->lpstAppRegData->bForceHiragana && !(dwBeforeIMEMode != IMEOFF))	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
-			if (bIMEInConverting)	return;
-			Sleep(50);
+			SleepEx(50, FALSE);
 			break;
 		case KEY_OEM_IME_ON:		// JP(IME/ENG) IME ON  (0xf4)
+			if (bIMEInConverting)	return;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
 			if ((Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
-				Sleep(50);
+				SleepEx(50, FALSE);
 				HWND	hWndHidemaru = FindWindow(_T("Hidemaru32Class"), NULL);
 				if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
-					Sleep(300);
+					SleepEx(100, FALSE);
 					break;
 				}
 				if (bForExplorerPatcherSWS(hForeWnd, TRUE, Profile->lpstAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL)) {
@@ -831,18 +867,20 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 						if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
 							if (dwBeforeIMEMode != IMEOFF) {
 								Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+								bIMEInConverting = FALSE;
 							}
 							else {
 								Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
-								Sleep(50);
+								SleepEx(50, FALSE);
 								Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
-								Sleep(50);
+								SleepEx(50, FALSE);
 								if (!bChromium_Helper(hForeWnd))	return;
 							}
 						}
 						else {
 							if (dwBeforeIMEMode != IMEOFF) {
 								Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+								bIMEInConverting = FALSE;
 							}
 							else {
 								if (!bChromium_Helper(hForeWnd))	return;
@@ -852,11 +890,11 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 				}
 			}
 			if (Profile->lpstAppRegData->bForceHiragana && !(dwBeforeIMEMode != IMEOFF))	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
-			if (bIMEInConverting)	return;
-			Sleep(50);
+			SleepEx(50, FALSE);
 			break;
 		case KEY_OEM_BACKTAB:		// OEM Alt+カタカナ/ひらがな	(0xf5)
 		case KEY_FF:				// US(ENG) 変換/ひら/カタ	(0xff)
+			if (bIMEInConverting)	return;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			if ((Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
 				SetFocus(hForeWnd);
@@ -864,17 +902,17 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 					if (Profile->lpstAppRegData->bIMEModeForced) {
 						if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
 							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
-							Sleep(50);
+							SleepEx(50, FALSE);
 							Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
 						}
 						else {
 							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+							bIMEInConverting = FALSE;
 						}
 					}
 				}
 			}
 			if (Profile->lpstAppRegData->bForceHiragana)	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
-			if (bIMEInConverting)	return;
 			break;
 		default:
 			return;
@@ -895,7 +933,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 						if (Profile->lpstAppRegData->bIMEModeForced) {
 							if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
 								Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
-								Sleep(50);
+								SleepEx(50, FALSE);
 								Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
 							}
 							else {
@@ -906,9 +944,9 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 				}
 			}
 			if (Profile->lpstAppRegData->bForceHiragana && !(dwBeforeIMEMode != IMEOFF))	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
-			if (bIMEInConverting)	return;
 			break;
 		case KEY_NONCONVERT:		// JP(IME/ENG) 無変換		(0x1d)
+			if (bIMEInConverting)	return;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
 			if ((Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
@@ -923,22 +961,22 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 							}
 							else {
 								Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
-								Sleep(50);
+								SleepEx(50, FALSE);
 								Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+								bIMEInConverting = FALSE;
 							}
 						}
 					}
 				}
 				else {
-					Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
-					Sleep(50);
 					Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 				}
 			}
-			if (Profile->lpstAppRegData->bForceHiragana && (dwBeforeIMEMode != IMEOFF) && (GetAsyncKeyState(VK_SHIFT) & 0x8000))	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
-			if (bIMEInConverting)	return;
+			if (Profile->lpstAppRegData->bForceHiragana && (dwBeforeIMEMode != IMEOFF) && (GetKeyState(VK_SHIFT) & 0x8000))	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
 			break;
 		case KEY_OEM_ATTN:			// JP(IME/ENG) 英数/CapsLock(0xf0)
+			if (bIMEInConverting)	return;
+			if (GetKeyState(VK_SHIFT) & 0x8000)	break;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
 			if ((Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
@@ -947,17 +985,19 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 						if (Profile->lpstAppRegData->bIMEModeForced) {
 							if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
 								Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+								bIMEInConverting = FALSE;
 							}
 							else {
 								Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+								bIMEInConverting = FALSE;
 							}
 						}
 					}
 				}
 			}
-			if (bIMEInConverting)	return;
 			break;
 		case KEY_OEM_FINISH:		// JP(IME/ENG) OEM カタカナ	(0xf1)
+			if (bIMEInConverting)	return;
 			if ((Profile->lpstAppRegData->bIMEModeForced == FALSE)) {
 				return;
 			}
@@ -967,13 +1007,13 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 					if (Profile->lpstAppRegData->bIMEModeForced) {
 						if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
 							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
-							Sleep(50);
+							SleepEx(50, FALSE);
 							Cime->vIMEConvertModeChangeForced(hForeWnd, ZENKANA_IMEON);
 							if (!bChromium_Helper(hForeWnd))	return;
 						}
 						else {
 							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
-							Sleep(50);
+							SleepEx(50, FALSE);
 							Cime->vIMEConvertModeChangeForced(hForeWnd, ZENKANA_IMEON);
 							if (!bChromium_Helper(hForeWnd))	return;
 						}
@@ -981,9 +1021,9 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 				}
 			}
 			if (Profile->lpstAppRegData->bForceHiragana)	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
-			if (bIMEInConverting)	return;
 			break;
 		case KEY_OEM_COPY:			// JP(IME/ENG) OEM ひらがな	(0xf2)
+			if (bIMEInConverting)	return;
 			if ((Profile->lpstAppRegData->bIMEModeForced == FALSE)) {
 				return;
 			}
@@ -993,7 +1033,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 					if (Profile->lpstAppRegData->bIMEModeForced) {
 						if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
 							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
-							Sleep(50);
+							SleepEx(50, FALSE);
 							Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
 							if (!bChromium_Helper(hForeWnd))	return;
 						}
@@ -1005,6 +1045,9 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 				}
 			}
 			if (Profile->lpstAppRegData->bForceHiragana)	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
+			break;
+		case KEY_OEM_IME_OFF:			// JP(IME/ENG) IME OFF		(0xf3)
+		case KEY_OEM_IME_ON:			// JP(IME/ENG) IME ON		(0xf4)
 			if (bIMEInConverting)	return;
 			break;
 		default:
@@ -1016,7 +1059,6 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 		if ((hWndObserved = GetForegroundWindow()) == NULL)	return;
 	}
 	else {
-		POINT	pt{};
 		if (GetCursorPos(&pt)) {
 			if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return;
 		}
@@ -1087,7 +1129,7 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 		if (uCheckFocusTimer == NULL) {
 			if ((uCheckFocusTimer = SetTimer(hWnd, nCheckFocusTimerID, nCheckFocusTimerTickValue, (TIMERPROC)&vCheckFocusTimerProc)) == 0) {
 				vMessageBox(hWnd, IDS_NOTIMERESOUCE, MessageBoxTYPE, __func__, __LINE__);
-				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);	// Quit
 				return FALSE;
 			}
 		}
@@ -1112,13 +1154,10 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 //
 VOID	vStopThreadHookTimer(HWND hWnd)
 {
+	UNREFERENCED_PARAMETER(hWnd);
+	
 	if (Cursor)	Cursor->vStopDrawIMEModeMouseByWndThread();
 
-	if (uCheckFocusTimer != NULL) {
-		if (KillTimer(hWnd, nCheckFocusTimerID)) {
-			uCheckFocusTimer = NULL;
-		}
-	}
 	if (EventHook != NULL) {
 		delete EventHook;
 		EventHook = NULL;
@@ -1142,7 +1181,6 @@ static VOID CALLBACK vCheckFocusTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, D
 	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(uMsg);
 	UNREFERENCED_PARAMETER(dwTime);
-
 	if (!Profile || !Cursor)	return;
 	if (uTimerID == nCheckFocusTimerID) {
 		HWND hWndObserved = NULL;
@@ -1151,10 +1189,10 @@ static VOID CALLBACK vCheckFocusTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, D
 		}
 		else {
 			POINT	pt{};
-			if (!GetCursorPos(&pt))	return;
+			if (!GetCursorPos(&pt))	return;	// error
 			if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return;
 		}
-		if (!Cursor->bStartIMECursorChangeThread(hWndObserved))	return;
+		if (!Cursor->bStartIMECursorChangeThreadByWnd(hWndObserved))	return;
 	}
 	return;
 }

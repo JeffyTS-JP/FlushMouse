@@ -88,7 +88,7 @@ CSynTP::~CSynTP()
 	Sender = NULL;
 	if (ReceivePacketThread != NULL) {
 		ReceivePacketThread->bSetSentinel(FALSE);
-		Sleep(10);
+		SleepEx(10, FALSE);
 		delete	ReceivePacketThread;
 		ReceivePacketThread = NULL;
 	}
@@ -154,7 +154,7 @@ void		CSynTP::vStopReceiver()
 	}
 	if (ReceivePacketThread != NULL) {
 		ReceivePacketThread->bSetSentinel(FALSE);
-		Sleep(10);
+		SleepEx(10, FALSE);
 		delete	ReceivePacketThread;
 		ReceivePacketThread = NULL;
 	}
@@ -298,7 +298,7 @@ void		CSynTP::Cls_OnDestroy(HWND hWnd)
 
 	if (ReceivePacketThread != NULL) {
 		ReceivePacketThread->bSetSentinel(FALSE);
-		Sleep(10);
+		SleepEx(10, FALSE);
 		delete	ReceivePacketThread;
 		ReceivePacketThread = NULL;
 	}

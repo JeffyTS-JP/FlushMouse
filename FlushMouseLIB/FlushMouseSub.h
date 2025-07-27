@@ -45,11 +45,15 @@ extern BOOL	 	bCreateProcess(LPCTSTR lpszExecName, LPTSTR lpCommandLine);
 class CMouseRawInput	:	public CRawInput
 {
 	public:
-		CMouseRawInput() {};
+		CMouseRawInput() : uuMouseWindowTick(GetTickCount64()) {};
 		~CMouseRawInput() override {};
 
 	private:
 		virtual void	vRawInputMouseHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawInput) override;
+
+	private:
+		ULONGLONG		uuMouseWindowTick;
+
 };
 
 //
@@ -118,7 +122,7 @@ class CFlushMouseHook
 		BOOL		bHook32Dll;
 
 	private:
-		LPPROCESS_INFORMATION	lpstProcessInfomation;
+		LPPROCESS_INFORMATION	lpstProcessInformation;
 };
 
 /* = EOF = */

@@ -100,12 +100,6 @@ typedef struct tagIMECursorData
 	BOOL		bDenyChangedByApp;
 	BOOL		bUseBigArrow;
 	BOOL		bDisplayFocusWindowIME;
-
-	BOOL		bIMEModeByWindowThreadSentinel;
-	BOOL		bIMECursorChangeThreadSentinel;
-
-	HWND		hWndCaret;
-	RECT		rcCaret;
 } IMECURSORDATA, * PIMECURSORDATA, * LPIMECURSORDATA;
 
 //
@@ -122,6 +116,8 @@ class CCursor
 		BOOL		bReloadCursor();
 		VOID		vSetParamFromRegistry();
 		BOOL		bStartIMECursorChangeThread(HWND hWndObserved);
+		BOOL		bStartIMECursorChangeThreadWait(HWND hWndObserved);
+		BOOL		bStartIMECursorChangeThreadByWnd(HWND hWndObserved);
 		BOOL		bStartDrawIMEModeThread(HWND hWndObserved);
 		BOOL		bStartDrawIMEModeThreadWaitWave(HWND hWndObserved);
 		BOOL		bStartDrawIMEModeThreadWaitEventForeGround(HWND hWndObserved);
@@ -131,6 +127,7 @@ class CCursor
 		VOID		vStopDrawIMEModeMouseByWndThread();
 
 	private:
+		BOOL		bStartIMECursorChangeThreadSub(HWND hWndObserved);
 		BOOL		bStartDrawIMEModeThreadSub(HWND hWndObserved);
 
 		BOOL		bRegisterIMECursorChangeThread(HWND hWnd);
@@ -145,11 +142,11 @@ class CCursor
 		BOOL		bIsIMECursorChanged(LPIMECURSORDATA lpstCursorData);
 		BOOL		bDrawIMEModeOnDisplay(LPIMECURSORDATA lpstCursorData);
 		BOOL		bCalcDisplayModeRect(LPINT iModeSizeX, LPINT iModeSizeY, LPRECT lpRect);
-		HWND		hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPIMECURSORDATA lpstCursorData, BOOL bAttachThreadInput);
+		HWND		hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPRECT lprcCaret, BOOL bAttachThreadInput);
 		BOOL		bAccessibleObjectFromWindowAsync(HWND hWnd, DWORD dwId, REFIID riId, void **ppvObject);
 		BOOL		bAdjustModeSizeByMonitorDPI(int iModeSizeX, int iModeSizeY, LPRECT lpRect);
 		BOOL		bAdjustModeSizeByMonitorDPIAsync();
-		BOOL		bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData);
+		BOOL		bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData, LPRECT lprcCaret);
 		static int	iGetCursorID(DWORD dwIMEMode, LPFLUSHMOUSECURSOR lpstCursorData);
 		static BOOL	CALLBACK	bIconDrawEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam);
 		static BOOL WINAPI		bDrawIMEModeRoutine(LPVOID lpvParam);
@@ -175,6 +172,7 @@ class CCursor
 		CCursorWindow	*CaretWindow;
 		CCursorWindow	*MouseWindow;
 		DWORD			dwIMEModeMouseWindow;
+		DWORD			dwWaitTimeMouseWindow;
 		ULONGLONG		uuMouseWindowTick;
 		CCursorSub		*CursorSub;
 	
@@ -188,6 +186,13 @@ class CCursor
 		HCURSOR			hCursorSizeNS;
 		HCURSOR			hCursorSizeAll;
 		HCURSOR			hCursorAppStarting;
+
+		HWND			hWndCaret;
+		RECT			rcCaret;
+		BOOL			bCapsLock;
+
+		BOOL			bIMEModeByWindowThreadSentinel;
+		BOOL			bIMECursorChangeThreadSentinel;
 };
 
 

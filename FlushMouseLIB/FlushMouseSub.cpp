@@ -317,6 +317,18 @@ void	CMouseRawInput::vRawInputMouseHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT 
 		GetCursorPos(&pt);
 		Cls_OnLButtonUpEx(hWnd, pt.x, pt.y, GetForegroundWindow());
 	}
+	if ((RawMouse.usFlags == MOUSE_MOVE_RELATIVE) && (RawMouse.lLastX || RawMouse.lLastY)) {
+		if (!Profile || !Cursor)	return;
+		HWND hWndObserved = NULL;
+		if (Profile->lpstAppRegData->bDisplayFocusWindowIME) {
+			if ((hWndObserved = GetForegroundWindow()) == NULL)	return;
+		}
+		else {
+			if (!GetCursorPos(&pt))	return;
+			if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return;
+		}
+		if (!Cursor->bStartIMECursorChangeThreadByWnd(hWndObserved))	return;
+	}
 }
 
 //
@@ -506,17 +518,17 @@ void CALLBACK CEventHook::vHandleEventIME(HWINEVENTHOOK hook, DWORD dwEvent, HWN
 //
 CFlushMouseHook::CFlushMouseHook()
 	: hHook64Dll(NULL), bShellHook64(FALSE), bGlobalHook64(FALSE), bKeyboardHookLL64(FALSE), bHook32Dll(FALSE),
-	lpstProcessInfomation(new PROCESS_INFORMATION[sizeof(PROCESS_INFORMATION)])
+	lpstProcessInformation(new PROCESS_INFORMATION[sizeof(PROCESS_INFORMATION)])
 {
-	if (lpstProcessInfomation)	ZeroMemory(lpstProcessInfomation, sizeof(PROCESS_INFORMATION));
+	if (lpstProcessInformation)	ZeroMemory(lpstProcessInformation, sizeof(PROCESS_INFORMATION));
 }
 
 CFlushMouseHook::~CFlushMouseHook()
 {
 	bHookUnset();
-	if (lpstProcessInfomation) {
-		delete[]	lpstProcessInfomation;
-		lpstProcessInfomation = NULL;
+	if (lpstProcessInformation) {
+		delete[]	lpstProcessInformation;
+		lpstProcessInformation = NULL;
 	}
 }
 //
@@ -580,10 +592,10 @@ BOOL	 	CFlushMouseHook::bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name)
 		if (lpszCommandLine) {
 			ZeroMemory(lpszCommandLine, (size_t)(dwSize + COMAMANDLINESIZE));
 			_sntprintf_s(lpszCommandLine, (dwSize + COMAMANDLINESIZE), _TRUNCATE, _T("%s %llu"), lpszBuffer, (unsigned long long)hWnd);
-			if (lpstProcessInfomation) {
+			if (lpstProcessInformation) {
 				STARTUPINFO	stStartupInfo{};	stStartupInfo.cb = sizeof(STARTUPINFO);
 				if ((bRet = CreateProcess(NULL, lpszCommandLine, NULL, NULL, TRUE,
-					NORMAL_PRIORITY_CLASS, NULL, NULL, &stStartupInfo, lpstProcessInfomation)) != FALSE) {
+					NORMAL_PRIORITY_CLASS, NULL, NULL, &stStartupInfo, lpstProcessInformation)) != FALSE) {
 					for (int i = 5; i > 0; i--) {
 						Sleep(500);
 						if (FindWindow(CLASS_FLUSHMOUSE32, NULL) != NULL) {
@@ -613,11 +625,11 @@ BOOL 	CFlushMouseHook::bHook32DllStop() const
 #define	TIMEOUT	3000 
 	if (!bHook32Dll)		return TRUE;
 	BOOL		bRet = FALSE;
-	if (lpstProcessInfomation != NULL) {
-		if (lpstProcessInfomation->hProcess != NULL) {
-			if (!EnumWindows((WNDENUMPROC)&CFlushMouseHook::bEnumWindowsProcHookStop, (LPARAM)lpstProcessInfomation)) {
+	if (lpstProcessInformation != NULL) {
+		if (lpstProcessInformation->hProcess != NULL) {
+			if (!EnumWindows((WNDENUMPROC)&CFlushMouseHook::bEnumWindowsProcHookStop, (LPARAM)lpstProcessInformation)) {
 				if (GetLastError() == ERROR_SUCCESS) {
-					DWORD dwRet = WaitForSingleObject(lpstProcessInfomation->hProcess, TIMEOUT);
+					DWORD dwRet = WaitForSingleObject(lpstProcessInformation->hProcess, TIMEOUT);
 					switch (dwRet) {
 					case WAIT_OBJECT_0:
 						bRet = TRUE;
@@ -626,19 +638,19 @@ BOOL 	CFlushMouseHook::bHook32DllStop() const
 					case WAIT_ABANDONED:
 					case WAIT_TIMEOUT:
 					default:
-						TerminateProcess(lpstProcessInfomation->hProcess, 0);
+						TerminateProcess(lpstProcessInformation->hProcess, 0);
 						bRet = TRUE;
 					}
 					DWORD dwExitCode;
-					if (!GetExitCodeProcess(lpstProcessInfomation->hProcess, &dwExitCode)) {
+					if (!GetExitCodeProcess(lpstProcessInformation->hProcess, &dwExitCode)) {
 						bRet = FALSE;
 					}
-					if (lpstProcessInfomation->hProcess != NULL) {
-						CloseHandle(lpstProcessInfomation->hProcess);
+					if (lpstProcessInformation->hProcess != NULL) {
+						CloseHandle(lpstProcessInformation->hProcess);
 					}
 				}
-				if (lpstProcessInfomation->hThread != NULL) {
-					CloseHandle(lpstProcessInfomation->hThread);
+				if (lpstProcessInformation->hThread != NULL) {
+					CloseHandle(lpstProcessInformation->hThread);
 				}
 			}
 		}
@@ -781,7 +793,7 @@ static BOOL	bChangeHKLbySendInput(HKL hNewHKL, HKL hPreviousHKL, BOOL bForce)
 					if (lpHKL[i] == hNewHKL)		iNewKB = i;
 				}
 				int iKB = iKBList - iPreviousKB + iNewKB;
-				if ((GetAsyncKeyState(VK_SHIFT) & 0x8000)) iKB = iKBList - iKB;
+				if ((GetKeyState(VK_SHIFT) & 0x8000)) iKB = iKBList - iKB;
 				if ((iNewKB != iPreviousKB) || bForce) {
 					LPINPUT lpInputs = NULL;
 					if ((lpInputs = new INPUT[sizeof(INPUT) * (iKB * 2 + 2)]) != NULL) {
@@ -864,7 +876,7 @@ BOOL		bCheckExistingJPIME()
 static BOOL		bSendInputSub(UINT cInputs, LPINPUT pInputs)
 {
 	if (SendInput(cInputs, pInputs, sizeof(INPUT)) == cInputs) {
-		Sleep(10);
+		SleepEx(10, FALSE);
 		return TRUE;
 	}
 	return FALSE;
@@ -925,12 +937,12 @@ BOOL	 	bCreateProcess(LPCTSTR lpszExecName, LPTSTR lpCommandLine)
 				if (_lpCommandLine) {
 					ZeroMemory(_lpCommandLine, size);
 					_sntprintf_s(_lpCommandLine, size, _TRUNCATE, _T("%s %s"), lpszBuffer, lpCommandLine);
-					PROCESS_INFORMATION	ProcessInfomation{};	
+					PROCESS_INFORMATION	ProcessInformation{};	
 					STARTUPINFO	StartupInfo{};		StartupInfo.cb = sizeof(STARTUPINFO);
 #define	CREATIONFLAGS	0
-					if (CreateProcess(NULL, _lpCommandLine, NULL, NULL, FALSE, CREATIONFLAGS, NULL, NULL, &StartupInfo, &ProcessInfomation) != FALSE) {
-						CloseHandle(ProcessInfomation.hProcess);
-						CloseHandle(ProcessInfomation.hThread);
+					if (CreateProcess(NULL, _lpCommandLine, NULL, NULL, FALSE, CREATIONFLAGS, NULL, NULL, &StartupInfo, &ProcessInformation) != FALSE) {
+						CloseHandle(ProcessInformation.hProcess);
+						CloseHandle(ProcessInformation.hThread);
 						bRet = TRUE;
 					}
 					delete[] _lpCommandLine;

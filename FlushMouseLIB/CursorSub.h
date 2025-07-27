@@ -138,7 +138,6 @@ class CCursorWindow : public CWindow
 
 		BOOL		Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct) const;
 		void		Cls_OnDestroy(HWND hWnd);
-		//BOOL		Cls_OnEraseBkgnd(HWND hWnd, HDC hDC);
 		void		Cls_OnPaint(HWND hWnd) const;
 
 	public:

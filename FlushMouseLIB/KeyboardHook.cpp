@@ -27,13 +27,14 @@
 //
 #pragma comment(linker, "/SECTION:FLUSHMOUSE_SEG,RWS")
 #pragma data_seg("FLUSHMOUSE_SEG")
-static HHOOK	hHookLL = NULL;
-static BOOL		bOnlyCtrlLL = FALSE;
-static DWORD	dwPreviousVKLL = 0;
-static HWND		hWndKBParentLL = NULL;
-static BOOL		bEnableEPHelperLL = FALSE;
-static BOOL		bIMEModeForcedLL = FALSE;
-static BOOL		bStartConvertingLL = FALSE;
+static HHOOK		hHookLL = NULL;
+static BOOL			bOnlyCtrlLL = FALSE;
+static DWORD		dwPreviousVKLL = 0;
+static HWND			hWndKBParentLL = NULL;
+static BOOL			bEnableEPHelperLL = FALSE;
+static BOOL			bIMEModeForcedLL = FALSE;
+static BOOL			bStartConvertingLL = FALSE;
+static ULONGLONG	uuKeyRepeatTickLL = GetTickCount64();
 #pragma data_seg()
 
 //
@@ -60,6 +61,7 @@ BOOL	bKeyboardHookLLSet(HWND hWnd)
 				bEnableEPHelperLL = FALSE;
 				bIMEModeForcedLL = FALSE;
 				bStartConvertingLL = FALSE;
+				uuKeyRepeatTickLL = GetTickCount64();
 				return FALSE;
 			}
 		}
@@ -80,6 +82,7 @@ VOID	vKeyboardHookLLUnset()
 	bEnableEPHelperLL = FALSE;
 	bIMEModeForcedLL = FALSE;
 	bStartConvertingLL = FALSE;
+	uuKeyRepeatTickLL = GetTickCount64();
 }
 
 //
@@ -111,6 +114,16 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 	if (nCode == HC_ACTION) {
 		LPKBDLLHOOKSTRUCT	lpstKBH = (LPKBDLLHOOKSTRUCT)lParam;
 		if ((lpstKBH->flags & LLKHF_UP)) {									// Key up
+#define	DIFF_TIME	500
+			if ((lpstKBH->vkCode == VK_OEM_IME_OFF) || (lpstKBH->vkCode == VK_OEM_IME_ON)) {
+				ULONGLONG	_uuKeyRepeatTickLL = GetTickCount64();
+				if ((_uuKeyRepeatTickLL - uuKeyRepeatTickLL) <= DIFF_TIME) {
+					uuKeyRepeatTickLL = _uuKeyRepeatTickLL;
+					return CallNextHookEx(NULL, nCode, wParam, lParam);
+				}
+				uuKeyRepeatTickLL = _uuKeyRepeatTickLL;
+			}
+#undef	DIFF_TIME
 			dwPreviousVKLL = 0;
 			switch (lpstKBH->vkCode) {
 				case VK_CONTROL:		// Ctrl   (0x11)
@@ -120,6 +133,7 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, KEY_ONLY_CTRLUP, (0x80000000 | (0xff000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24))));
 					}
 					bOnlyCtrlLL = FALSE;
+					PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, KEY_ONLY_CTRLUP, (0x80000000 | (0xff000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24))));
 					break;
 				case VK_RETURN:			// Enter (0x0d)
 					bOnlyCtrlLL = FALSE;
@@ -179,7 +193,7 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 				case VK_FF:				// US(ENG) Convert
 					bOnlyCtrlLL = FALSE;
 					if (!bEnableEPHelperLL)	break;
-					if (GetAsyncKeyState(VK_SHIFT) & 0x8000) {
+					if (GetKeyState(VK_SHIFT) & 0x8000) {
 						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (KEY_OEM_FINISH), ((0x80000000 | 0xff000000 & (static_cast<LPARAM>(lpstKBH->flags)) << 24)));
 					}
 					else if (lpstKBH->scanCode == 0x70) {
@@ -195,9 +209,17 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 			}
 		}
 		else {																// Key down
-			if (dwPreviousVKLL == lpstKBH->vkCode) {
-				return CallNextHookEx(NULL, nCode, wParam, lParam);
+#define	DIFF_TIME	500
+			if ((dwPreviousVKLL == lpstKBH->vkCode) || (lpstKBH->vkCode == VK_OEM_IME_OFF) || (lpstKBH->vkCode == VK_OEM_IME_ON)
+				|| (lpstKBH->vkCode == VK_OEM_FINISH) || (lpstKBH->vkCode == VK_OEM_COPY)) {
+				ULONGLONG	_uuKeyRepeatTickLL = GetTickCount64();
+				if ((_uuKeyRepeatTickLL - uuKeyRepeatTickLL) <= DIFF_TIME) {
+					uuKeyRepeatTickLL = _uuKeyRepeatTickLL;
+					return CallNextHookEx(NULL, nCode, wParam, lParam);
+				}
+				uuKeyRepeatTickLL = _uuKeyRepeatTickLL;
 			}
+#undef	DIFF_TIME
 			dwPreviousVKLL = lpstKBH->vkCode;
 			switch (lpstKBH->vkCode) {
 				case VK_CONTROL:		// Ctrl   (0x11)
@@ -215,18 +237,17 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 				case VK_CAPITAL:		// 英数/CapsLock (0x14)
 					bOnlyCtrlLL = FALSE;
 					bStartConvertingLL = FALSE;
-					dwPreviousVKLL = 0;
+					dwPreviousVKLL = lpstKBH->vkCode;
 					if (!bEnableEPHelperLL)	break;
 					if (bKBisEP()) {
 						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, KEY_OEM_ATTN, (0x7f000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24)));
-						return 1;
 					}
 					break;
 				case VK_KANJI:			// JP(IME/ENG) Alt + 漢字	(0x19)
 					bOnlyCtrlLL = FALSE;
 					bStartConvertingLL = FALSE;
-					dwPreviousVKLL = 0;
-					if (GetAsyncKeyState(VK_MENU) & 0x8000) {
+					dwPreviousVKLL = lpstKBH->vkCode;
+					if (GetKeyState(VK_MENU) & 0x8000) {
 						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, KEY_KANJI, (0x7f000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24)));
 					}
 					break;
@@ -234,27 +255,32 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 				case VK_NONCONVERT:		// 無変換 (0x1d)
 					bOnlyCtrlLL = FALSE;
 					bStartConvertingLL = FALSE;
-					dwPreviousVKLL = 0;
+					dwPreviousVKLL = lpstKBH->vkCode;
 					PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (WM_USER + lpstKBH->vkCode), (0x7f000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24)));
 					if ((lpstKBH->vkCode == VK_NONCONVERT) && bIMEModeForcedLL)	return 1;
 					break;
+				case VK_OEM_IME_OFF:	// OEM IME OFF (0xf3)
+				case VK_OEM_IME_ON:		// OEM IME ON  (0xf4)
 				case VK_OEM_3:			// JP(IME/ENG) [@] / US(ENG) IME ON (0xc0) = ['] ALT + 半角/全角 or 漢字
 				case VK_OEM_8:			// JP(IME/ENG) [`] / British(ENG) IME ON (0xdf) = ['] ALT + 半角/全角 or 漢字
+					bOnlyCtrlLL = FALSE;
+					bStartConvertingLL = FALSE;
+					dwPreviousVKLL = lpstKBH->vkCode;
 					break;
 				case VK_OEM_ATTN:		// OEM 英数/CapsLock (0xf0)
 					bOnlyCtrlLL = FALSE;
 					bStartConvertingLL = FALSE;
-					dwPreviousVKLL = 0;
+					dwPreviousVKLL = lpstKBH->vkCode;
 					if (!bStartConvertingLL) {
-						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (WM_USER + lpstKBH->vkCode), (0x7f000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24)));
+						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, KEY_OEM_ATTN, (0x7f000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24)));
 					}
 					break;
 				case VK_OEM_FINISH:		// OEM カタカナ (0xf1)
 				case VK_OEM_COPY:		// OEM ひらがな (0xf2)
 					bOnlyCtrlLL = FALSE;
 					bStartConvertingLL = FALSE;
-					dwPreviousVKLL = 0;
-					if (GetAsyncKeyState(VK_SHIFT) & 0x8000) {
+					dwPreviousVKLL = lpstKBH->vkCode;
+					if (GetKeyState(VK_SHIFT) & 0x8000) {
 						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (KEY_OEM_FINISH), (0x7f000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24)));
 					}
 					else {

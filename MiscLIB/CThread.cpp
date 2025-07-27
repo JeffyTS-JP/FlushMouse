@@ -180,7 +180,9 @@ VOID 	CThread::vUnregister()
 		}
 	}
 	if (lpstThreadData->hThread != NULL)	CloseHandle(lpstThreadData->hThread);
+	lpstThreadData->hThread = NULL;
 	if (lpstThreadData->hEvent != NULL)		CloseHandle(lpstThreadData->hEvent);
+	lpstThreadData->hEvent = NULL;
 	return;
 }
 
@@ -192,9 +194,10 @@ unsigned __stdcall	CThread::uThreadProc(void* pArguments)
 	LPTHREAD_DATA lpstThreadData = reinterpret_cast<LPTHREAD_DATA>(pArguments);
 	do {
 		if ((lpstThreadData != NULL) && (lpstThreadData->lpstSA != NULL) && (lpstThreadData->hEvent != NULL) && (lpstThreadData->hThread != NULL)) {
+			if (!lpstThreadData->bThreadSentinel)	break;
 			DWORD	dwRet = WaitForSingleObject(lpstThreadData->hEvent, INFINITE);
 			switch (dwRet) {
-			case WAIT_OBJECT_0:	
+			case WAIT_OBJECT_0:
 				break;
 			case WAIT_ABANDONED:
 			case WAIT_TIMEOUT:
@@ -202,12 +205,12 @@ unsigned __stdcall	CThread::uThreadProc(void* pArguments)
 			default:
 				break;
 			}
-			if (!lpstThreadData->bThreadSentinel)	break;
 			if (!(lpstThreadData->lpbCallbackRoutine)((LPVOID)lpstThreadData->lParamOption)) {
 				_endthreadex((unsigned)-1);	
 				return FALSE;
 			}
-			if (lpstThreadData->dwSleepTime != 0)	Sleep(lpstThreadData->dwSleepTime);
+			if (!lpstThreadData->bThreadSentinel)	break;
+			if (lpstThreadData->dwSleepTime != 0)	SleepEx(lpstThreadData->dwSleepTime, TRUE);
 			if (SuspendThread(lpstThreadData->hThread) == -1) {
 				_endthreadex((unsigned)-2);
 				return FALSE;
@@ -217,7 +220,7 @@ unsigned __stdcall	CThread::uThreadProc(void* pArguments)
 			_endthreadex((unsigned)-3);
 			return FALSE;
 		}
-		Sleep(0);
+		SleepEx(0, TRUE);
 	} while (lpstThreadData && lpstThreadData->bThreadSentinel);
 	_endthreadex(0);
 	return TRUE;
