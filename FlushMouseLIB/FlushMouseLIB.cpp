@@ -51,13 +51,7 @@ BOOL		bIMEInConverting = FALSE;
 //
 // Local Data
 //
-constexpr auto FOCUSINITTIMERVALUE = 500;
-constexpr auto CHECKFOCUSTIMERID = 1;
-static UINT     nCheckFocusTimerTickValue = FOCUSINITTIMERVALUE;
-static UINT_PTR nCheckFocusTimerID = CHECKFOCUSTIMERID;
-static UINT_PTR	uCheckFocusTimer = NULL;
-
-constexpr auto PROCINITTIMERVALUE = 2000;
+constexpr auto PROCINITTIMERVALUE = 3000;
 constexpr auto CHECKPROCTIMERID = 2;
 static UINT     nCheckProcTimerTickValue = PROCINITTIMERVALUE;
 static UINT_PTR nCheckProcTimerID = CHECKPROCTIMERID;
@@ -97,7 +91,6 @@ static void		Cls_OnCheckExistingJPIMEEx(HWND hWnd, BOOL bEPHelper);
 static void		Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flags);
 
 // Sub
-static VOID CALLBACK	vCheckFocusTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
 static VOID CALLBACK	vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
 static BOOL		bNotInTaskBar(LPCTSTR lpClassName);
 
@@ -532,13 +525,21 @@ void Cls_OnLButtonDownEx(HWND hWnd, int x, int y, HWND hForeground)
 	UNREFERENCED_PARAMETER(x);
 	UNREFERENCED_PARAMETER(y);
 	UNREFERENCED_PARAMETER(hForeground);
-	if (!Profile)	return;
+	if (!Profile || !Cursor)	return;
 	if (bCheckExistingJPIME() && (Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
 		if (Profile->lpstAppRegData->bEnableEPHelper) {
 			bForExplorerPatcherSWS(hForeground, TRUE, FALSE, NULL, NULL);
 		}
 		if (Profile->lpstAppRegData->bIMEModeForced) {
 			if (!bChromium_Helper(hForeground))	return;
+		}
+	}
+	if (Profile->lpstAppRegData->bSupportVirtualDesktop) {
+		TCHAR	szBuffer[_MAX_PATH]{};
+		if (GetClassName(hForeground, szBuffer, _MAX_PATH) != 0) {
+			if ((szBuffer[0] != _T('\0')) && (CompareStringOrdinal(szBuffer, -1, L"TscShellContainerClass", -1, TRUE) == CSTR_EQUAL)) {
+				return;
+			}
 		}
 	}
 	return;
@@ -555,6 +556,14 @@ void Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground)
 	UNREFERENCED_PARAMETER(y);
 	UNREFERENCED_PARAMETER(hForeground);
 	if (!Profile || !Cursor)	return;
+	if (Profile->lpstAppRegData->bSupportVirtualDesktop) {
+		TCHAR	szBuffer[_MAX_PATH]{};
+		if (GetClassName(hForeground, szBuffer, _MAX_PATH) != 0) {
+			if ((szBuffer[0] != _T('\0')) && (CompareStringOrdinal(szBuffer, -1, L"TscShellContainerClass", -1, TRUE) == CSTR_EQUAL)) {
+				return;
+			}
+		}
+	}
 	if (Profile->lpstAppRegData->bDoModeDispByMouseBttnUp) {
 		HWND	hWndObserved = NULL;
 		POINT	pt{};
@@ -623,6 +632,15 @@ static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd)
 	if (EventHook->hFormerWnd != hForeWnd) {
 		EventHook->hFormerWnd = hForeWnd;
 		if (hWnd != hForeWnd) {
+			SleepEx(100, FALSE);
+			if (Profile->lpstAppRegData->bSupportVirtualDesktop) {
+				TCHAR	szBuffer[_MAX_PATH]{};
+				if (GetClassName(hForeWnd, szBuffer, _MAX_PATH) != 0) {
+					if ((szBuffer[0] != _T('\0')) && (CompareStringOrdinal(szBuffer, -1, L"TscShellContainerClass", -1, TRUE) == CSTR_EQUAL)) {
+						return;
+					}
+				}
+			}
 			HWND	hWndObserved = NULL;
 			CURSORINFO	CursorInfo{ CursorInfo.cbSize = sizeof(CURSORINFO) };
 			if (Profile->lpstAppRegData->bOffChangedFocus) {
@@ -631,13 +649,12 @@ static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd)
 			if ((Profile) && Profile->lpstAppRegData->bDoModeDispByMouseBttnUp && GetCursorInfo(&CursorInfo)) {
 				if (CursorInfo.flags != CURSOR_SHOWING)	return;
 				if (Profile->lpstAppRegData->bDisplayFocusWindowIME) {
-					hWndObserved = hForeWnd;
+					hWndObserved = GetForegroundWindow();
 				}
 				else {
 					if ((hWndObserved = WindowFromPoint(CursorInfo.ptScreenPos)) == NULL)	return;
 				}
 				if (!bCheckDrawIMEModeArea(hWndObserved))	return;
-				if (!Cursor->bStartIMECursorChangeThreadWait(hWndObserved))	return;
 				if (!Cursor->bStartDrawIMEModeThreadWaitEventForeGround(hForeWnd))	return;
 			}
 		}
@@ -666,6 +683,7 @@ void		Cls_OnCheckExistingJPIMEEx(HWND hWnd, BOOL bEPHelper)
 	UNREFERENCED_PARAMETER(bEPHelper);
 	if (!bSetEnableEPHelperLL64(bEPHelper)) {
 		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
 	}
 }
 
@@ -689,19 +707,16 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 
 	if ((fDown == FALSE)) {											// Key up
 		switch (vk) {
-		case KEY_TAB:
+		case KEY_TAB:				// Tab				(0x09)
 			if (bIMEInConverting)	return;
 			if ((GetKeyState(VK_LMENU) & 0x8000)) {
-				if (GetCursorPos(&pt)) {
-					if (!Cursor->bStartIMECursorChangeThreadWait(WindowFromPoint(pt)))	return;
-				}
 				return;
 			}
 			break;
-		case KEY_RETURN:
+		case KEY_RETURN:			// Enter			(0x0d)
 			bIMEInConverting = FALSE;
 			break;
-		case KEY_ONLY_CTRLUP:
+		case KEY_ONLY_CTRLUP:		// VK_ONLY_CTRLUP	(0xe8)
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			if (Profile->lpstAppRegData->bEnableEPHelper)	bForExplorerPatcherSWS(hForeWnd, FALSE, FALSE, NULL, NULL);
 			if (Profile->lpstAppRegData->bDoModeDispByCtrlUp) {
@@ -712,19 +727,9 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 			return;
 		case KEY_LWIN:				// L Win			(0x5b)
 		case KEY_RWIN:				// R Win			(0x5c)
-			if (bIMEInConverting)	return;
-			if (GetCursorPos(&pt)) {
-				if (!Cursor->bStartIMECursorChangeThreadByWnd(WindowFromPoint(pt)))	return;
-			}
-			return;
 		case KEY_ALT:				// ALT				(0x12)
 		case KEY_LALT:				// ALT L			(0xa4)
 		case KEY_RALT:				// ALT R			(0xa5)
-			if (bIMEInConverting)	return;
-			if (GetCursorPos(&pt)) {
-				if (!Cursor->bStartIMECursorChangeThreadByWnd(WindowFromPoint(pt)))	return;
-			}
-			return;
 		case KEY_CTRL:				// Ctrl				(0x11)
 		case KEY_LCTRL:				// Ctrl L			(0xa2)
 		case KEY_RCTRL:				// Ctrl R			(0xa3)
@@ -733,7 +738,7 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 		case KEY_RSHIFT:			// Shift R			(0xa1)
 			if (bIMEInConverting)	return;
 			if (GetCursorPos(&pt)) {
-				if (!Cursor->bStartIMECursorChangeThreadByWnd(WindowFromPoint(pt)))	return;
+				if (!Cursor->bStartIMECursorChangeThread(WindowFromPoint(pt)))	return;
 			}
 			return;
 		case KEY_F5:				// F5				(0x74)
@@ -1062,12 +1067,12 @@ static void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UI
 		if (GetCursorPos(&pt)) {
 			if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return;
 		}
+		else 	return;
 	}
-	if (Cursor->bStartIMECursorChangeThread(hWndObserved)) {
-		if (Profile->lpstAppRegData->bDoModeDispByIMEKeyDown) {
-			if (!bIMEInConverting) {
-				if (!Cursor->bStartDrawIMEModeThread(hWndObserved))	return;
-			}
+	if (!Cursor->bStartIMECursorChangeThread(hWndObserved))	return;
+	if (Profile->lpstAppRegData->bDoModeDispByIMEKeyDown) {
+		if (!bIMEInConverting) {
+			if (!Cursor->bStartDrawIMEModeThread(hWndObserved))	return;
 		}
 	}
 	return;
@@ -1109,7 +1114,7 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 	}
 	if (EventHook == NULL) {
 		EventHook = new CEventHook;
-		if (!EventHook || !EventHook->bEventSet()) {
+		if (!EventHook || !EventHook->bEventSet(hWnd)) {
 			vMessageBox(hWnd, IDS_NOTRREGISTEVH, MessageBoxTYPE, __func__, __LINE__);
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			return FALSE;
@@ -1126,13 +1131,6 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 	}
 	BOOL	bBool = FALSE;
 	if (SetUserObjectInformation(GetCurrentProcess(), UOI_TIMERPROC_EXCEPTION_SUPPRESSION, &bBool, sizeof(BOOL)) != FALSE) {
-		if (uCheckFocusTimer == NULL) {
-			if ((uCheckFocusTimer = SetTimer(hWnd, nCheckFocusTimerID, nCheckFocusTimerTickValue, (TIMERPROC)&vCheckFocusTimerProc)) == 0) {
-				vMessageBox(hWnd, IDS_NOTIMERESOUCE, MessageBoxTYPE, __func__, __LINE__);
-				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);	// Quit
-				return FALSE;
-			}
-		}
 		if (uCheckProcTimer == NULL) {
 			if ((uCheckProcTimer = SetTimer(hWnd, nCheckProcTimerID, nCheckProcTimerTickValue, (TIMERPROC)&vCheckProcTimerProc)) == 0) {
 				vMessageBox(hWnd, IDS_NOTIMERESOUCE, MessageBoxTYPE, __func__, __LINE__);
@@ -1156,7 +1154,7 @@ VOID	vStopThreadHookTimer(HWND hWnd)
 {
 	UNREFERENCED_PARAMETER(hWnd);
 	
-	if (Cursor)	Cursor->vStopDrawIMEModeMouseByWndThread();
+	if (Cursor)	Cursor->vStopIMECursorChangeThread();
 
 	if (EventHook != NULL) {
 		delete EventHook;
@@ -1171,30 +1169,6 @@ VOID	vStopThreadHookTimer(HWND hWnd)
 		Cursor = NULL;
 	}
 	SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
-}
-
-//
-// vCheckFocusTimerProc()
-//
-static VOID CALLBACK vCheckFocusTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime)
-{
-	UNREFERENCED_PARAMETER(hWnd);
-	UNREFERENCED_PARAMETER(uMsg);
-	UNREFERENCED_PARAMETER(dwTime);
-	if (!Profile || !Cursor)	return;
-	if (uTimerID == nCheckFocusTimerID) {
-		HWND hWndObserved = NULL;
-		if (Profile->lpstAppRegData->bDisplayFocusWindowIME) {
-			if ((hWndObserved = GetForegroundWindow()) == NULL)	return;
-		}
-		else {
-			POINT	pt{};
-			if (!GetCursorPos(&pt))	return;	// error
-			if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return;
-		}
-		if (!Cursor->bStartIMECursorChangeThreadByWnd(hWndObserved))	return;
-	}
-	return;
 }
 
 //

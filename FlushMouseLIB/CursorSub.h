@@ -18,13 +18,19 @@
 //
 #define	MAX_IMEMODECHAR		3
 
-#define	IMEMODE_IMEOFF			0
-#define	IMEMODE_ZENHIRA_IMEON	1
-#define	IMEMODE_HANEISU_IMEON	2
-#define	IMEMODE_HANKANA_IMEON	3
-#define	IMEMODE_ZENEISU_IMEON	4
-#define	IMEMODE_ZENKANA_IMEON	5
-#define	IMEMODE_IMEHIDE			6
+#define	IMEMODE_IMEOFF					0
+#define	IMEMODE_ZENHIRA_IMEON			1
+#define	IMEMODE_HANEISU_IMEON			2
+#define	IMEMODE_HANKANA_IMEON			3
+#define	IMEMODE_ZENEISU_IMEON			4
+#define	IMEMODE_ZENKANA_IMEON			5
+#define	IMEMODE_IMEHIDE					6
+#define	IMEMODE_IMEOFF_CAPSON			7
+#define	IMEMODE_ZENHIRA_IMEON_CAPSON	8
+#define	IMEMODE_HANEISU_IMEON_CAPSON	9
+#define	IMEMODE_HANKANA_IMEON_CAPSON	10
+#define	IMEMODE_ZENEISU_IMEON_CAPSON	11
+#define	IMEMODE_ZENKANA_IMEON_CAPSON	12
 
 //
 // Struct Define
@@ -39,6 +45,7 @@ typedef struct tagFLUSHMOUSECURSOR {
 	TCHAR		szMode[MAX_IMEMODECHAR];
 	COLORREF	dwColor;
 	TCHAR		szFont[LF_FACESIZE];
+	BOOL		bUnderLine;
 	MOUSECURSOR	stArrow;
 	MOUSECURSOR	stHand;
 	MOUSECURSOR	stIBeam;
@@ -105,8 +112,8 @@ class CCursorSub
 		BOOL		bCopyFile(LPCTSTR lpszDstPath,  LPCTSTR lpszSrcPath);
 
 		BOOL		bMakeOneUnitCursor(HMODULE hSrcMod, HANDLE hDstRes, LPFLUSHMOUSECURSOR lpstIMECursorData, int iIMEMode);
-		BOOL		bMakeCursor(HMODULE hSrcMod, HANDLE hDstRes, int iSrcResID, int iDstResID, DWORD dwIMEMode, LPTSTR szIMEMode, COLORREF dwRGB, LPCTSTR szFontFace);
-		BOOL		bMakeCursorSub(LPRTCURSORHEAD	lpRTCursorHead, LPRTCURSORHEAD lpMakeCursorData, DWORD dwResSize, int cx, int cy, DWORD dwIMEMode, LPTSTR lpszIMEMode, COLORREF dwRGB, LPCTSTR lpszFontFace);
+		BOOL		bMakeCursor(HMODULE hSrcMod, HANDLE hDstRes, int iSrcResID, int iDstResID, DWORD dwIMEMode, LPTSTR szIMEMode, COLORREF dwRGB, LPCTSTR szFontFace, BOOL bUnderLine);
+		BOOL		bMakeCursorSub(LPRTCURSORHEAD	lpRTCursorHead, LPRTCURSORHEAD lpMakeCursorData, DWORD dwResSize, int cx, int cy, DWORD dwIMEMode, LPTSTR lpszIMEMode, COLORREF dwRGB, LPCTSTR lpszFontFace, BOOL bUnderLine);
 		LPVOID		FindAndLockResource(HMODULE hModule, int iResID, LPCTSTR ResType, LPDWORD lpdwResSize);
 		static void	ReverseDataTopDown(LPDWORD lpData, int cx, int cy);
 		static void	MakeAlphaBlend(LPDWORD lpData, int cx, int cy, COLORREF aRGB);

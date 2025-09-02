@@ -310,13 +310,19 @@ BOOL		CCursorSub::bMakeAllCursor(LPFLUSHMOUSECURSOR lpstIMECursorData)
 	if ((hSrcMod = LoadLibrary(lpszCursorDataFullPath)) == NULL)	goto Cleanup;
 	if ((hDstRes = BeginUpdateResource(lpszCursorDataTempFullPath, FALSE)) == NULL)	goto Cleanup;
 
-	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_IMEOFF))	goto Cleanup;
-	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_ZENHIRA_IMEON))	goto Cleanup;
-	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_HANEISU_IMEON))	goto Cleanup;
-	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_HANKANA_IMEON))	goto Cleanup;
-	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_ZENEISU_IMEON))	goto Cleanup;
-	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_ZENKANA_IMEON))	goto Cleanup;
-	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_IMEHIDE))	goto Cleanup;
+	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_IMEOFF))				goto Cleanup;
+	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_ZENHIRA_IMEON))		goto Cleanup;
+	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_HANEISU_IMEON))		goto Cleanup;
+	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_HANKANA_IMEON))		goto Cleanup;
+	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_ZENEISU_IMEON))		goto Cleanup;
+	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_ZENKANA_IMEON))		goto Cleanup;
+	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_IMEHIDE))				goto Cleanup;
+	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_IMEOFF_CAPSON))		goto Cleanup;
+	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_ZENHIRA_IMEON_CAPSON))	goto Cleanup;
+	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_HANEISU_IMEON_CAPSON))	goto Cleanup;
+	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_HANKANA_IMEON_CAPSON))	goto Cleanup;
+	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_ZENEISU_IMEON_CAPSON))	goto Cleanup;
+	if (!bMakeOneUnitCursor(hSrcMod, hDstRes, lpstIMECursorData, IMEMODE_ZENKANA_IMEON_CAPSON))	goto Cleanup;
 
 	if (hDstRes)	if (!EndUpdateResource(hDstRes, FALSE))	goto Cleanup;
 
@@ -341,17 +347,20 @@ BOOL		CCursorSub::bMakeOneUnitCursor(HMODULE hSrcMod, HANDLE hDstRes, LPFLUSHMOU
 														lpstIMECursorData[iIMEMode].dwIMEMode,
 														lpstIMECursorData[iIMEMode].szMode,
 														lpstIMECursorData[iIMEMode].dwColor,
-														lpstIMECursorData[iIMEMode].szFont))	goto Cleanup;
+														lpstIMECursorData[iIMEMode].szFont,
+														lpstIMECursorData[iIMEMode].bUnderLine))	goto Cleanup;
 	if (!bMakeCursor(hSrcMod, hDstRes, IDC_HIDE_IBEAM,	lpstIMECursorData[iIMEMode].stIBeam.iResourceID,
 														lpstIMECursorData[iIMEMode].dwIMEMode,
 														lpstIMECursorData[iIMEMode].szMode,
 														lpstIMECursorData[iIMEMode].dwColor,
-														lpstIMECursorData[iIMEMode].szFont))	goto Cleanup;
+														lpstIMECursorData[iIMEMode].szFont,
+														lpstIMECursorData[iIMEMode].bUnderLine))	goto Cleanup;
 	if (!bMakeCursor(hSrcMod, hDstRes, IDC_HIDE_HAND,	lpstIMECursorData[iIMEMode].stHand.iResourceID,
 														lpstIMECursorData[iIMEMode].dwIMEMode,
 														lpstIMECursorData[iIMEMode].szMode,
 														lpstIMECursorData[iIMEMode].dwColor,
-														lpstIMECursorData[iIMEMode].szFont))	goto Cleanup;
+														lpstIMECursorData[iIMEMode].szFont,
+														lpstIMECursorData[iIMEMode].bUnderLine))	goto Cleanup;
 
 	bRet = TRUE;
 	
@@ -363,7 +372,7 @@ Cleanup:
 //
 // bMakeCursor()
 //
-BOOL		CCursorSub::bMakeCursor(HMODULE hSrcMod, HANDLE hDstRes, int iSrcResID, int iDstResID, DWORD dwIMEMode, LPTSTR szIMEMode, COLORREF dwRGB, LPCTSTR szFontFace)
+BOOL		CCursorSub::bMakeCursor(HMODULE hSrcMod, HANDLE hDstRes, int iSrcResID, int iDstResID, DWORD dwIMEMode, LPTSTR szIMEMode, COLORREF dwRGB, LPCTSTR szFontFace, BOOL bUnderLine)
 {
 
 	LPVOID	lpGrpResLock = NULL;
@@ -396,7 +405,7 @@ BOOL		CCursorSub::bMakeCursor(HMODULE hSrcMod, HANDLE hDstRes, int iSrcResID, in
 		if (lpMakeCursorData) ZeroMemory(lpMakeCursorData, dwResSize);
 		else goto Cleanup;
 
-		if (!bMakeCursorSub(lpRTCursorHead, lpMakeCursorData, dwResSize, cx, cy, dwIMEMode, szIMEMode, dwRGB, szFontFace))	goto Cleanup;
+		if (!bMakeCursorSub(lpRTCursorHead, lpMakeCursorData, dwResSize, cx, cy, dwIMEMode, szIMEMode, dwRGB, szFontFace, bUnderLine))	goto Cleanup;
 
 		if ((iDstID = LookupIconIdFromDirectoryEx((PBYTE)lpGrpResLock, FALSE, cx, cy, (LR_DEFAULTCOLOR))) == 0)	goto Cleanup;
 		if (!UpdateResource(hDstRes, RT_CURSOR, MAKEINTRESOURCE(iDstID), MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL), NULL, 0))	goto Cleanup;
@@ -420,7 +429,7 @@ Cleanup:
 //
 // bMakeCursorSub()
 //
-BOOL		CCursorSub::bMakeCursorSub(LPRTCURSORHEAD	lpRTCursorHead, LPRTCURSORHEAD lpMakeCursorData, DWORD dwResSize, int cx, int cy, DWORD dwIMEMode, LPTSTR lpszIMEMode, COLORREF dwRGB, LPCTSTR lpszFontFace)
+BOOL		CCursorSub::bMakeCursorSub(LPRTCURSORHEAD	lpRTCursorHead, LPRTCURSORHEAD lpMakeCursorData, DWORD dwResSize, int cx, int cy, DWORD dwIMEMode, LPTSTR lpszIMEMode, COLORREF dwRGB, LPCTSTR lpszFontFace, BOOL bUnderLine)
 {
 	HDC		hDC = NULL, hCursorMemDC = NULL, hTextMemDC = NULL;
 	HBITMAP	hCursorBitmap = NULL, hTextBitmap = NULL;
@@ -464,7 +473,7 @@ BOOL		CCursorSub::bMakeCursorSub(LPRTCURSORHEAD	lpRTCursorHead, LPRTCURSORHEAD l
 	rc.left = cx / 3 + 2;	rc.right = rc.left + cx * 2 / 3;	rc.top = cy / 3;	rc.bottom = rc.top + cy * 2 / 3 + 2;
 	iXSize = rc.right - rc.left;
 	vAdjustFontXRightPosition(dwIMEMode, lpszIMEMode, &iXSize, &rc);
-	if (!TextDraw(hTextMemDC, rc, lpszIMEMode, dwRGB, lpszFontFace, FW_NORMAL, FALSE))	goto Cleanup;
+	if (!TextDraw(hTextMemDC, rc, lpszIMEMode, dwRGB, lpszFontFace, FW_NORMAL, bUnderLine))	goto Cleanup;
 
 	ReverseDataTopDown((LPDWORD)lpTextBits, cx, cy);
 	MakeAlphaBlend((LPDWORD)lpTextBits, cx, cy, dwRGB);
@@ -597,6 +606,7 @@ BOOL		CCursorWindow::bRegister(HINSTANCE hInstance, LPCTSTR szWindowClassName)
 // 
 VOID		CCursorWindow::vSetModeStringColorFont(LPCTSTR _lpszIMEMode, COLORREF dwRGB, LPCTSTR _lpszFontFace)
 {
+	if (!this)	return;
 	lpszIMEMode = (LPTSTR)_lpszIMEMode;
 	dwTextColor = dwRGB;
 	if (dwRGB & 0x00000100)	dwBackColor = dwRGB & 0xfffffeff;

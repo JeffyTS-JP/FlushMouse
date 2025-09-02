@@ -135,6 +135,7 @@ void		SettingsExec(HWND hWnd, UINT32 uMsg, INT32 iSelectedPane)
 		m_Settings.bDoModeDispByMouseBttnUp(Profile->lpstAppRegData->bDoModeDispByMouseBttnUp);
 		m_Settings.bDoModeDispByCtrlUp(Profile->lpstAppRegData->bDoModeDispByCtrlUp);
 		m_Settings.bDrawNearCaret(Profile->lpstAppRegData->bDrawNearCaret);
+		m_Settings.bSupportVirtualDesktop(Profile->lpstAppRegData->bSupportVirtualDesktop);
 		m_Settings.bIMEModeForced(Profile->lpstAppRegData->bIMEModeForced);
 		m_Settings.bEnableEPHelper(Profile->lpstAppRegData->bEnableEPHelper);
 
@@ -289,6 +290,7 @@ void		SettingsApply()
 		Profile->lpstAppRegData->bDoModeDispByMouseBttnUp = m_Settings.bDoModeDispByMouseBttnUp();
 		Profile->lpstAppRegData->bDoModeDispByCtrlUp = m_Settings.bDoModeDispByCtrlUp();
 		Profile->lpstAppRegData->bDrawNearCaret = m_Settings.bDrawNearCaret();
+		Profile->lpstAppRegData->bSupportVirtualDesktop = m_Settings.bSupportVirtualDesktop();
 		Profile->lpstAppRegData->bIMEModeForced = m_Settings.bIMEModeForced();
 		Profile->lpstAppRegData->bEnableEPHelper = m_Settings.bEnableEPHelper();
 		

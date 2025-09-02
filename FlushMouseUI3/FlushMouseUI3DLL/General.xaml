@@ -144,25 +144,34 @@
 			<TextBlock Margin="0,0,45,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="text9" Text="オン"/>
 			<ToggleSwitch Margin="0,-8,-115,0" Grid.Column="1" HorizontalAlignment="Right"  x:Name="ts9" Toggled="HandleToggleSwitch" OffContent="" OnContent="" IsOn="False" FlowDirection="LeftToRight"/>
 		</Grid>
-		<Grid Margin="0,12,0,0" Grid.Row="11">
+		<Grid Margin="0,14,0,0" Grid.Row="11">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<TextBlock Margin="0,-8,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="500" Text="Windows Remote Desktop と VMware guest のウィンドウ内で、&#10;できる限り Host の IME モードを表示しない"/>
+			<TextBlock Margin="0,0,45,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="text10" Text="オン"/>
+			<ToggleSwitch Margin="0,-8,-115,0" Grid.Column="1" HorizontalAlignment="Right"  x:Name="ts10" Toggled="HandleToggleSwitch" OffContent="" OnContent="" IsOn="False" FlowDirection="LeftToRight"/>
+		</Grid>
+		<Grid Margin="0,12,0,0" Grid.Row="12">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
 			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="500" Text="IME 関連キーのサポート機能を有効にする"/>
-			<TextBlock Margin="0,0,45,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="text10" Text="オン"/>
-			<ToggleSwitch Margin="0,-8,-115,0" Grid.Column="1" HorizontalAlignment="Right"  x:Name="ts10" Toggled="HandleToggleSwitch" OffContent="" OnContent="" IsOn="False" FlowDirection="LeftToRight"/>
+			<TextBlock Margin="0,0,45,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="text11" Text="オン"/>
+			<ToggleSwitch Margin="0,-8,-115,0" Grid.Column="1" HorizontalAlignment="Right"  x:Name="ts11" Toggled="HandleToggleSwitch" OffContent="" OnContent="" IsOn="False" FlowDirection="LeftToRight"/>
 		</Grid>
-		<Grid Margin="0,10,0,0" Grid.Row="12">
+		<Grid Margin="0,10,0,0" Grid.Row="13">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
 			<TextBlock Margin="0,0,0,0" Grid.Column="0" HorizontalAlignment="Left" Width="500" Text="ExplorerPatcher Simple Window Switcher Helperを有効にする"/>
-			<TextBlock Margin="0,0,45,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="text11" Text="オン"/>
-			<ToggleSwitch Margin="0,-8,-115,0" Grid.Column="1" HorizontalAlignment="Right"  x:Name="ts11" Toggled="HandleToggleSwitch" OffContent="" OnContent="" IsOn="False" FlowDirection="LeftToRight"/>
+			<TextBlock Margin="0,0,45,0" Grid.Column="1" HorizontalAlignment="Right" x:Name="text12" Text="オン"/>
+			<ToggleSwitch Margin="0,-8,-115,0" Grid.Column="1" HorizontalAlignment="Right"  x:Name="ts12" Toggled="HandleToggleSwitch" OffContent="" OnContent="" IsOn="False" FlowDirection="LeftToRight"/>
 		</Grid>
-		<Grid Margin="0,12,0,0" Grid.Row="13">
+		<Grid Margin="0,12,0,0" Grid.Row="14">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
@@ -171,7 +180,7 @@
 			<Slider Margin="0,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl2" ValueChanged="Slider_ValueChanged"
 									Minimum="1" Maximum="100" StepFrequency="1" SmallChange="1" Value="40" TickFrequency="10" TickPlacement="Outside" SnapsTo="StepValues"/>
 		</Grid>
-		<Grid Margin="0,12,0,0" Grid.Row="14">
+		<Grid Margin="0,12,0,0" Grid.Row="15">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
@@ -180,7 +189,7 @@
 			<Slider Margin="0,-4,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl3" ValueChanged="Slider_ValueChanged"
 									Minimum="1" Maximum="100" StepFrequency="1" SmallChange="1" Value="30" TickFrequency="10" TickPlacement="Outside" SnapsTo="StepValues"/>
 		</Grid>
-		<Grid Margin="0,6,0,0" Grid.Row="15">
+		<Grid Margin="0,6,0,0" Grid.Row="16">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
@@ -189,7 +198,7 @@
 			<Slider Margin="0,8,0,0" Grid.Column="1" HorizontalAlignment="Right" Width="400" x:Name="sl4" ValueChanged="Slider_ValueChanged"
 									Minimum="1" Maximum="100" StepFrequency="1" SmallChange="1" Value="40" TickFrequency="10" TickPlacement="Outside" SnapsTo="StepValues"/>
 		</Grid>
-		<Grid Margin="0,10,0,0" Grid.Row="16">
+		<Grid Margin="0,10,0,0" Grid.Row="17">
 		</Grid>
 	</Grid>
 </Page>

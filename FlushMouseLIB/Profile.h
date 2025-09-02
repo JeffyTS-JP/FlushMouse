@@ -44,6 +44,7 @@ typedef struct tagAppRegData
 	BOOL		bDisplayIMEModeIMEOFF = FALSE;
 	BOOL		bForceHiragana = FALSE;
 	BOOL		bDenyChangedByApp = FALSE;
+	BOOL		bSupportVirtualDesktop = FALSE;
 	BOOL		bUseBigArrow = FALSE;
 
 	TCHAR		szNearDrawMouseIMEOFFChar[MAX_IMEMODECHAR] = L"A";

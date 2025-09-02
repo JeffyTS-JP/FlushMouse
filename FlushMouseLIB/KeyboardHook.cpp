@@ -118,7 +118,6 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 			if ((lpstKBH->vkCode == VK_OEM_IME_OFF) || (lpstKBH->vkCode == VK_OEM_IME_ON)) {
 				ULONGLONG	_uuKeyRepeatTickLL = GetTickCount64();
 				if ((_uuKeyRepeatTickLL - uuKeyRepeatTickLL) <= DIFF_TIME) {
-					uuKeyRepeatTickLL = _uuKeyRepeatTickLL;
 					return CallNextHookEx(NULL, nCode, wParam, lParam);
 				}
 				uuKeyRepeatTickLL = _uuKeyRepeatTickLL;
@@ -133,7 +132,7 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, KEY_ONLY_CTRLUP, (0x80000000 | (0xff000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24))));
 					}
 					bOnlyCtrlLL = FALSE;
-					PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, KEY_ONLY_CTRLUP, (0x80000000 | (0xff000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24))));
+					PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, (WM_USER + lpstKBH->vkCode), (0x80000000 | (0xff000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24))));
 					break;
 				case VK_RETURN:			// Enter (0x0d)
 					bOnlyCtrlLL = FALSE;

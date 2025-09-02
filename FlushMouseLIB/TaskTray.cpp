@@ -169,6 +169,7 @@ BOOL		CTaskTray::bReCreateTaskTrayWindow(HWND hWnd) const
 			}
 			bReportEvent(MSG_TASKTRAY_REGISTER_FAILD, APPLICATION_CATEGORY);
 			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
 		}
 	}
 	else {
@@ -259,7 +260,7 @@ void		CTaskTray::Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 	UNREFERENCED_PARAMETER(codeNotify);
 
 	if (!Profile || !Cursor)	return;
-	Cursor->vStopDrawIMEModeMouseByWndThread();
+	Cursor->vStopIMECursorChangeThread();
 	switch (id) {
 	case IDR_TT_MENU:
 		break;
@@ -284,16 +285,10 @@ void		CTaskTray::Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
 		return;
 	}
-	if (Profile->lpstAppRegData->bDisplayIMEModeOnCursor && (Profile->lpstAppRegData->dwDisplayIMEModeMethod != DisplayIMEModeMethod_RESOURCE)) {
-		if (Cursor->bStartDrawIMEModeMouseByWndThread()) {
-			return;
-		}
+	if (!Cursor->bReloadCursor()) {
 		vSettingDialogClose();
-		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);	// Restart FlushMouse
-		return;
-	}
-	else {
-		Cursor->vStopDrawIMEModeMouseByWndThread();
+		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
 	}
 }
 

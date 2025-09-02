@@ -50,6 +50,7 @@ CProfile::CProfile()
 		lpstAppRegData->dwAdditionalWaitTime = 300;										// IME mode displayの 追加待ち時間
 		lpstAppRegData->dwDisplayModeTime = 400;										// IME mode displayの表示時間
 		lpstAppRegData->bForceHiragana = FALSE;											// 「全角ひらがな」へ強制的に変更する
+		lpstAppRegData->bSupportVirtualDesktop = FALSE;									// 仮想デスクトップをサポートする
 		lpstAppRegData->dwNearDrawMouseIMEOFFColor = aRGB(48, 255, 0, 0);				// IMEOFF マウスカーソルへのIMEモード表示色 RGB(255, 192, 0) + α (0xf0)
 		lpstAppRegData->dwNearDrawMouseHANEISU_IMEONColor = aRGB(48, 255, 0, 0);		// 半英数　マウスカーソルへのIMEモード表示色 RGB(255, 192, 0) + α (0xf0)
 		lpstAppRegData->dwNearDrawMouseHANKANA_IMEONColor = aRGB(48, 255, 0, 0);		// 半カナ　マウスカーソルへのIMEモード表示色 RGB(255, 192, 0) + α (0xf0)
@@ -301,6 +302,7 @@ BOOL		CProfile::bGetProfileData4Mouse() const
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeIMEOFF"), (LPBOOL)&lpstAppRegData->bDisplayIMEModeIMEOFF, lpstAppRegData->bDisplayIMEModeIMEOFF))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("ForceHiragana"), (LPBOOL)&(lpstAppRegData->bForceHiragana), lpstAppRegData->bForceHiragana))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DenyChangedByApp"), (LPBOOL)&(lpstAppRegData->bDenyChangedByApp), lpstAppRegData->bDenyChangedByApp))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("SupportVirtualDesktop"), (LPBOOL)&(lpstAppRegData->bSupportVirtualDesktop), lpstAppRegData->bSupportVirtualDesktop))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("UseBigArrow"), (LPBOOL)&(lpstAppRegData->bUseBigArrow), lpstAppRegData->bUseBigArrow))	goto Cleanup;
 	
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayFocusWindowIME"), (LPBOOL)&(lpstAppRegData->bDisplayFocusWindowIME), lpstAppRegData->bDisplayFocusWindowIME))	goto Cleanup;
@@ -343,6 +345,7 @@ BOOL		CProfile::bSetProfileData4Mouse() const
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeIMEOFF"), lpstAppRegData->bDisplayIMEModeIMEOFF))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("ForceHiragana"), lpstAppRegData->bForceHiragana))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DenyChangedByApp"), lpstAppRegData->bDenyChangedByApp))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("SupportVirtualDesktop"), lpstAppRegData->bSupportVirtualDesktop))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("UseBigArrow"), lpstAppRegData->bUseBigArrow))	goto Cleanup;
 
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayFocusWindowIME"), lpstAppRegData->bDisplayFocusWindowIME))	goto Cleanup;

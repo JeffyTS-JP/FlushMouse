@@ -1,4 +1,4 @@
-// General.Xaml.cs for FlushMouseUI3DLL
+﻿// General.Xaml.cs for FlushMouseUI3DLL
 //      Copyright (C) 2024 JeffyTS
 //
 //    
@@ -27,6 +27,7 @@ namespace FlushMouseUI3DLL {
 		public static bool bDoModeDispByMouseBttnUp { get; set; }
 		public static bool bDoModeDispByCtrlUp { get; set; }
 		public static bool bDrawNearCaret { get; set; }
+		public static bool bSupportVirtualDesktop { get; set; }
 		public static bool bIMEModeForced { get; set; }
 		public static bool bEnableEPHelper { get; set; }
 
@@ -56,46 +57,48 @@ namespace FlushMouseUI3DLL {
 			if (e == null) { }
 			if (sender != null) {
 				if (!bDisplayIMEModeOnCursor) {
-					if (Combo1 != null)		Combo1.IsEnabled = false;
-					if (Combo2 != null)		Combo2.IsEnabled = false;
-					if (sl1 != null)		sl1.IsEnabled = false;
+					if (Combo1 != null)     Combo1.IsEnabled = false;
+					if (Combo2 != null)     Combo2.IsEnabled = false;
+					if (sl1 != null)        sl1.IsEnabled = false;
 				}
 				else {
-					if (Combo1 != null)		Combo1.IsEnabled = true;
-					if (Combo2 != null)		Combo2.IsEnabled = true;
+					if (Combo1 != null)     Combo1.IsEnabled = true;
+					if (Combo2 != null)     Combo2.IsEnabled = true;
 					if (dwDisplayIMEModeMethod == DisplayIMEModeMethod_ByWindow) {
-						if (sl1 != null)	sl1.IsEnabled = false;
+						if (sl1 != null)    sl1.IsEnabled = false;
 					}
 					else {
-						if (sl1 != null)	sl1.IsEnabled = true;
+						if (sl1 != null)    sl1.IsEnabled = true;
 					}
 				}
 				if (!bDoModeDispByIMEKeyDown && !bDoModeDispByMouseBttnUp && !bDoModeDispByCtrlUp) {
-					if (ts9 != null)	ts9.IsEnabled = false;
-					if (sl2 != null)	sl2.IsEnabled = false;
-					if (sl3 != null)	sl3.IsEnabled = false;
+					if (ts9 != null)    ts9.IsEnabled = false;
+					if (sl2 != null)    sl2.IsEnabled = false;
+					if (sl3 != null)    sl3.IsEnabled = false;
 				}
 				else {
-					if (ts9 != null)	ts9.IsEnabled = true;
-					if (sl2 != null)	sl2.IsEnabled = true;
-					if (sl3 != null)	sl3.IsEnabled = true;
+					if (ts9 != null)    ts9.IsEnabled = true;
+					if (sl2 != null)    sl2.IsEnabled = true;
+					if (sl3 != null)    sl3.IsEnabled = true;
 				}
 				if (!bDoModeDispByCtrlUp) {
-					if (sl4 != null)	sl4.IsEnabled = false;
+					if (sl4 != null)    sl4.IsEnabled = false;
 				}
 				else {
-					if (sl4 != null)	sl4.IsEnabled = true;
+					if (sl4 != null)    sl4.IsEnabled = true;
 				}
-				if (ts1.IsOn)	text1.Text = "オン";		else text1.Text = "オフ";
-				if (ts3.IsOn)	text3.Text = "オン";		else text3.Text = "オフ";
-				if (ts4.IsOn)	text4.Text = "オン";		else text4.Text = "オフ";
-				if (ts5.IsOn)	text5.Text = "オン";		else text5.Text = "オフ";
-				if (ts6.IsOn)	text6.Text = "オン";		else text6.Text = "オフ";
-				if (ts7.IsOn)	text7.Text = "オン";		else text7.Text = "オフ";
-				if (ts8.IsOn)	text8.Text = "オン";		else text8.Text = "オフ";
-				if (ts9.IsOn)	text9.Text = "オン";		else text9.Text = "オフ";
-				if (ts10.IsOn)	text10.Text = "オン";	else text10.Text = "オフ";
-				if (ts11.IsOn)	text11.Text = "オン";	else text11.Text = "オフ";
+				if (ts1.IsOn)   text1.Text = "オン";		else text1.Text = "オフ";
+				//if (ts2.IsOn) text2.Text = "オン";		else text2.Text = "オフ";
+				if (ts3.IsOn)   text3.Text = "オン";		else text3.Text = "オフ";
+				if (ts4.IsOn)   text4.Text = "オン";		else text4.Text = "オフ";
+				if (ts5.IsOn)   text5.Text = "オン";		else text5.Text = "オフ";
+				if (ts6.IsOn)   text6.Text = "オン";		else text6.Text = "オフ";
+				if (ts7.IsOn)   text7.Text = "オン";		else text7.Text = "オフ";
+				if (ts8.IsOn)   text8.Text = "オン";		else text8.Text = "オフ";
+				if (ts9.IsOn)   text9.Text = "オン";		else text9.Text = "オフ";
+				if (ts10.IsOn)  text10.Text = "オン";	else text10.Text = "オフ";
+				if (ts11.IsOn)  text11.Text = "オン";	else text11.Text = "オフ";
+				if (ts12.IsOn)  text12.Text = "オン";	else text12.Text = "オフ";
 			}
 		}
 		
@@ -157,16 +160,17 @@ namespace FlushMouseUI3DLL {
 
 		private void SetToggleSwitch()
 		{
-			if (ts1 == null)	ts1 = new ToggleSwitch();
-			if (ts3 == null)	ts3 = new ToggleSwitch();
-			if (ts4 == null)	ts4 = new ToggleSwitch();
-			if (ts5 == null)	ts5 = new ToggleSwitch();
-			if (ts6 == null)	ts6 = new ToggleSwitch();
-			if (ts7 == null)	ts7 = new ToggleSwitch();
-			if (ts8 == null)	ts8 = new ToggleSwitch();
-			if (ts9 == null)	ts9 = new ToggleSwitch();
-			if (ts10 == null)	ts10 = new ToggleSwitch();
-			if (ts11 == null)	ts11 = new ToggleSwitch();
+			if (ts1 == null)    ts1 = new ToggleSwitch();
+			if (ts3 == null)    ts3 = new ToggleSwitch();
+			if (ts4 == null)    ts4 = new ToggleSwitch();
+			if (ts5 == null)    ts5 = new ToggleSwitch();
+			if (ts6 == null)    ts6 = new ToggleSwitch();
+			if (ts7 == null)    ts7 = new ToggleSwitch();
+			if (ts8 == null)    ts8 = new ToggleSwitch();
+			if (ts9 == null)    ts9 = new ToggleSwitch();
+			if (ts10 == null)   ts10 = new ToggleSwitch();
+			if (ts11 == null)   ts11 = new ToggleSwitch();
+			if (ts12 == null)   ts12 = new ToggleSwitch();
 			ts1.IsOn = bDisplayIMEModeOnCursor;
 			ts3.IsOn = bDisplayIMEModeIMEOFF;
 			ts4.IsOn = bOffChangedFocus;
@@ -175,8 +179,9 @@ namespace FlushMouseUI3DLL {
 			ts7.IsOn = bDoModeDispByMouseBttnUp;
 			ts8.IsOn = bDoModeDispByCtrlUp;
 			ts9.IsOn = bDrawNearCaret;
-			ts10.IsOn = bIMEModeForced;
-			ts11.IsOn = bEnableEPHelper;
+			ts10.IsOn = bSupportVirtualDesktop;
+			ts11.IsOn = bIMEModeForced;
+			ts12.IsOn = bEnableEPHelper;
 		}
 
 		private void HandleToggleSwitch(object sender, RoutedEventArgs e)
@@ -190,15 +195,22 @@ namespace FlushMouseUI3DLL {
 					UpdateProfile(SETTINGSEX_RELOAD_MOUSECURSOR);
 					return;
 				}
-				else if (ts.Name == "ts3") bDisplayIMEModeIMEOFF = !bDisplayIMEModeIMEOFF;
+				else if (ts.Name == "ts3")
+				{
+					bDisplayIMEModeIMEOFF = !bDisplayIMEModeIMEOFF;
+					EnableDisableItems(sender, e);
+					UpdateProfile(SETTINGSEX_RELOAD_MOUSECURSOR);
+					return;
+				}
 				else if (ts.Name == "ts4") bOffChangedFocus = !bOffChangedFocus;
 				else if (ts.Name == "ts5") bForceHiragana = !bForceHiragana;
 				else if (ts.Name == "ts6") bDoModeDispByIMEKeyDown = !bDoModeDispByIMEKeyDown;
 				else if (ts.Name == "ts7") bDoModeDispByMouseBttnUp = !bDoModeDispByMouseBttnUp;
 				else if (ts.Name == "ts8") bDoModeDispByCtrlUp = !bDoModeDispByCtrlUp;
 				else if (ts.Name == "ts9") bDrawNearCaret = !bDrawNearCaret;
-				else if (ts.Name == "ts10") bIMEModeForced = !bIMEModeForced;
-				else if (ts.Name == "ts11") bEnableEPHelper = !bEnableEPHelper;
+				else if (ts.Name == "ts10") bSupportVirtualDesktop = !bSupportVirtualDesktop;
+				else if (ts.Name == "ts11") bIMEModeForced = !bIMEModeForced;
+				else if (ts.Name == "ts12") bEnableEPHelper = !bEnableEPHelper;
 				EnableDisableItems(sender, e);
 				UpdateProfile(SETTINGSEX_SETTINGS_GENERAL_SETREGISTRY);
 			}
@@ -206,10 +218,10 @@ namespace FlushMouseUI3DLL {
 
 		private void SetSlider()
 		{
-			if (sl1 == null)	sl1 = new Slider();
-			if (sl2 == null)	sl2 = new Slider();
-			if (sl3 == null)	sl3 = new Slider();
-			if (sl4 == null)	sl4 = new Slider();
+			if (sl1 == null)    sl1 = new Slider();
+			if (sl2 == null)    sl2 = new Slider();
+			if (sl3 == null)    sl3 = new Slider();
+			if (sl4 == null)    sl4 = new Slider();
 			sl1.Value = iCursorSize;
 			sl2.Value = dwDisplayModeTime / 10;
 			sl3.Value = dwAdditionalWaitTime / 10;
@@ -221,10 +233,10 @@ namespace FlushMouseUI3DLL {
 			if (m_Sentinel == false) return;
 			Slider sl = sender as Slider;
 			if (sl != null) {
-				if (sl.Name == "sl1")		iCursorSize = (Int32)sl.Value;
-				else if (sl.Name == "sl2")	dwDisplayModeTime = (Int32)(sl.Value * 10);
-				else if (sl.Name == "sl3")	dwAdditionalWaitTime = (Int32)(sl.Value * 10);
-				else if (sl.Name == "sl4")	dwWaitWaveTime = (Int32)(sl.Value * 10);
+				if (sl.Name == "sl1")       iCursorSize = (Int32)sl.Value;
+				else if (sl.Name == "sl2")  dwDisplayModeTime = (Int32)(sl.Value * 10);
+				else if (sl.Name == "sl3")  dwAdditionalWaitTime = (Int32)(sl.Value * 10);
+				else if (sl.Name == "sl4")  dwWaitWaveTime = (Int32)(sl.Value * 10);
 				EnableDisableItems(sender, e);
 				UpdateProfile(SETTINGSEX_SETTINGS_GENERAL_SETREGISTRY);
 			}

@@ -75,7 +75,7 @@ typedef struct tagIMECursorData
 {
 	HWND		hWndObserved;
 	DWORD		dwIMEModeCursor;
-	DWORD		dwWaitTime;
+	DWORD		dwDrawIMEModeWaitTime;
 	BOOL		bDrawIMEModeWait;
 	LPCTSTR		lpszLoadDatName;
 	LPFLUSHMOUSECURSOR	lpstNearDrawMouseCursor;
@@ -95,6 +95,7 @@ typedef struct tagIMECursorData
 	DWORD		dwDisplayIMEModeMethod;
 	BOOL		bDisplayIMEModeIMEOFF;
 	BOOL		bForceHiragana;
+	BOOL		bSupportVirtualDesktop;
 	BOOL		bDrawNearCaret;
 
 	BOOL		bDenyChangedByApp;
@@ -117,14 +118,12 @@ class CCursor
 		VOID		vSetParamFromRegistry();
 		BOOL		bStartIMECursorChangeThread(HWND hWndObserved);
 		BOOL		bStartIMECursorChangeThreadWait(HWND hWndObserved);
-		BOOL		bStartIMECursorChangeThreadByWnd(HWND hWndObserved);
+		BOOL		bStartIMECursorChangeThreadRawInput(HWND hWndObserved);
+		VOID		vStopIMECursorChangeThread();
 		BOOL		bStartDrawIMEModeThread(HWND hWndObserved);
 		BOOL		bStartDrawIMEModeThreadWaitWave(HWND hWndObserved);
 		BOOL		bStartDrawIMEModeThreadWaitEventForeGround(HWND hWndObserved);
 		BOOL		bStartDrawIMEModeThreadWaitDblClk(HWND hWndObserved);
-
-		BOOL		bStartDrawIMEModeMouseByWndThread();
-		VOID		vStopDrawIMEModeMouseByWndThread();
 
 	private:
 		BOOL		bStartIMECursorChangeThreadSub(HWND hWndObserved);
@@ -147,11 +146,11 @@ class CCursor
 		BOOL		bAdjustModeSizeByMonitorDPI(int iModeSizeX, int iModeSizeY, LPRECT lpRect);
 		BOOL		bAdjustModeSizeByMonitorDPIAsync();
 		BOOL		bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData, LPRECT lprcCaret);
-		static int	iGetCursorID(DWORD dwIMEMode, LPFLUSHMOUSECURSOR lpstCursorData);
+		static int	iGetCursorID(DWORD dwIMEMode, LPFLUSHMOUSECURSOR lpstCursorData, BOOL bUnderLine);
 		static BOOL	CALLBACK	bIconDrawEnumProc(HMONITOR hMonitor, HDC hDC, LPCRECT lprcClip, LPARAM lParam);
 		static BOOL WINAPI		bDrawIMEModeRoutine(LPVOID lpvParam);
 
-		BOOL		bChangeFlushMouseCursor(UINT uCurID, LPIMECURSORDATA lpstCursorData);
+		BOOL		bChangeFlushMouseCursor(UINT uCurID, LPIMECURSORDATA lpstCursorData, BOOL bUnderLine);
 		BOOL		bSetSystemCursor(LPMOUSECURSOR lpstMC, int iCursorSizeX, int iCursorSizeY);
 
 	public:

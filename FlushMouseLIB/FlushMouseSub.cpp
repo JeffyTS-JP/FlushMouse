@@ -54,25 +54,15 @@ BOOL		bSettingsEx(HWND hWnd, int iCode, int iSubCode)
 
 	switch(iCode) {
 		case SETTINGSEX_OK:
-			Cursor->vStopDrawIMEModeMouseByWndThread();
+			Cursor->vStopIMECursorChangeThread();
 			vSettingDialogApply();
 			if (!Profile->bSetProfileData())	return FALSE;
-			if (Profile->lpstAppRegData->bDisplayIMEModeOnCursor && (Profile->lpstAppRegData->dwDisplayIMEModeMethod != DisplayIMEModeMethod_RESOURCE)) {
-				Cursor->bStartDrawIMEModeMouseByWndThread();
-			}
-			else {
-				Cursor->vStopDrawIMEModeMouseByWndThread();
-			}
+			if (!Cursor->bReloadCursor())	return FALSE;
 			vSettingDialogClose();
 			return TRUE;
 		case SETTINGSEX_CANCEL:
 			vSettingDialogClose();
-			if (Profile->lpstAppRegData->bDisplayIMEModeOnCursor && (Profile->lpstAppRegData->dwDisplayIMEModeMethod != DisplayIMEModeMethod_RESOURCE)) {
-				Cursor->bStartDrawIMEModeMouseByWndThread();
-			}
-			else {
-				Cursor->vStopDrawIMEModeMouseByWndThread();
-			}
+			if (!Cursor->bReloadCursor())	return FALSE;
 			return TRUE;
 		case SETTINGSEX_APPLY:
 			vSettingDialogApply();
@@ -87,32 +77,21 @@ BOOL		bSettingsEx(HWND hWnd, int iCode, int iSubCode)
 			vSettingDialogApply();
 			if (!Profile->bGetProfileData4Mouse())	return FALSE;
 			if (!Profile->bGetProfileData4IMEMode())	return FALSE;
-			Cursor->vSetParamFromRegistry();
 			if (!Cursor->bReloadCursor()) {
 				vSettingDialogClose();
 				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+				PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
 				return FALSE;
-			}
-			if (Profile->lpstAppRegData->bDisplayIMEModeOnCursor && (Profile->lpstAppRegData->dwDisplayIMEModeMethod != DisplayIMEModeMethod_RESOURCE)) {
-				Cursor->bStartDrawIMEModeMouseByWndThread();
-			}
-			else {
-				Cursor->vStopDrawIMEModeMouseByWndThread();
 			}
 			return TRUE;
 		case SETTINGSEX_SETTINGS_CHANGE_PANE:
 			return TRUE;
 		case SETTINGSEX_SETTINGS_STARTED:
-			if (Profile->lpstAppRegData->bDisplayIMEModeOnCursor &&(Profile->lpstAppRegData->dwDisplayIMEModeMethod != DisplayIMEModeMethod_RESOURCE)) {
-				if (Cursor->bStartDrawIMEModeMouseByWndThread()) {
-					return TRUE;
-				}
+			if (!Cursor->bReloadCursor()) {
 				vSettingDialogClose();
 				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+				PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
 				return FALSE;
-			}
-			else {
-				Cursor->vStopDrawIMEModeMouseByWndThread();
 			}
 			return TRUE;
 		case SETTINGSEX_SETTINGS_SETREGISTRY:
@@ -327,7 +306,7 @@ void	CMouseRawInput::vRawInputMouseHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT 
 			if (!GetCursorPos(&pt))	return;
 			if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return;
 		}
-		if (!Cursor->bStartIMECursorChangeThreadByWnd(hWndObserved))	return;
+		if (!Cursor->bStartIMECursorChangeThreadRawInput(hWndObserved))	return;
 	}
 }
 
@@ -408,8 +387,10 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 // class CEventHook
 //
 //
+static CEventHook*	pEventHook = NULL;
+
 CEventHook::CEventHook()
-	: hFormerWnd(NULL), hEventHook(NULL), hEventHookIME(NULL)
+	: hMainWnd(NULL), hFormerWnd(NULL), hEventHook(NULL), hEventHookIME(NULL)
 {
 }
 
@@ -425,8 +406,12 @@ CEventHook::~CEventHook()
 //
 // bEventSet()
 //
-BOOL		CEventHook::bEventSet()
+BOOL		CEventHook::bEventSet(HWND hWnd)
 {
+	if (!hWnd)	return FALSE;
+	hMainWnd = hWnd;
+	pEventHook = this;
+
 #define	EVENT_FLAGS		(WINEVENT_OUTOFCONTEXT)
 	hEventHook = SetWinEventHook(
 		EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND,
@@ -477,13 +462,10 @@ void CALLBACK CEventHook::vHandleEvent(HWINEVENTHOOK hook, DWORD dwEvent, HWND h
 	UNREFERENCED_PARAMETER(dwEventThread);
 	UNREFERENCED_PARAMETER(dwmsEventTime);
 
-	if (hWnd == NULL)	return;
+	if (!hWnd || !pEventHook || !pEventHook->hMainWnd) return;
 	if (dwEvent == EVENT_SYSTEM_FOREGROUND) {
 		bIMEInConverting = FALSE;
-		HWND	hFindWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
-		if (hFindWnd != NULL) {
-			PostMessage(hFindWnd, WM_EVENT_SYSTEM_FOREGROUNDEX, (WPARAM)dwEvent, (LPARAM)hWnd);
-		}
+		PostMessage(pEventHook->hMainWnd, WM_EVENT_SYSTEM_FOREGROUNDEX, (WPARAM)dwEvent, (LPARAM)hWnd);
 	}
 }
 

@@ -82,8 +82,8 @@ class CEventHook
 		CEventHook();
 		~CEventHook();
 
-		BOOL		bEventSet();
-		BOOL		bEventUnset();
+		BOOL	bEventSet(HWND hWnd);
+		BOOL	bEventUnset();
 
 	private:
 		static void CALLBACK vHandleEvent(HWINEVENTHOOK hook, DWORD dwEvent, HWND hWnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime);
@@ -93,6 +93,7 @@ class CEventHook
 		HWND			hFormerWnd;
 
 	private:
+		HWND			hMainWnd;
 		HWINEVENTHOOK	hEventHook;
 		HWINEVENTHOOK	hEventHookIME;
 };
