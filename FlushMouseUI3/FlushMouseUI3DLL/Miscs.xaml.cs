@@ -196,6 +196,32 @@ namespace FlushMouseUI3DLL {
 		[return: MarshalAs(UnmanagedType.Bool)]
 		internal static partial bool MessageBeep(UInt32 uType);
 		internal const UInt32 MB_ICONWARNING = 0x00000030;
+
+		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = false)]
+		[return: MarshalAs(UnmanagedType.I8)]
+		internal static partial Int64 SetCursor(Int64 hCursor);
+
+		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		internal static partial bool SetSystemCursor(Int64 hCursor, UInt32 id);
+		internal const UInt32 OCR_NORMAL		=  32512;
+		internal const UInt32 OCR_IBEAM			=  32513;
+		internal const UInt32 OCR_WAIT			=  32514;
+		internal const UInt32 OCR_HAND			=  32649;
+		internal const UInt32 OCR_APPSTARTING	=  32650;
+		
+		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.I8)]
+		internal static partial Int64 LoadCursorW(Int64 hInstance, Int64 lpCursorName);
+		internal const UInt32 IDC_ARROW			=  32512;
+		internal const UInt32 IDC_IBEAM			=  32513;
+		internal const UInt32 IDC_WAIT			=  32514;
+		internal const UInt32 IDC_HAND			=  32649;
+		internal const UInt32 IDC_APPSTARTING	=  32650;
+
+		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.I8)]
+		internal static partial Int64 CopyIcon(Int64 hIcon);
 	}
 
 	public sealed partial class Miscs {

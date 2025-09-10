@@ -190,6 +190,9 @@ typedef struct tagSIZED
 
 #define KEY_TAB				(WM_USER + VK_TAB)						// Tab    (0x09)
 #define KEY_RETURN			(WM_USER + VK_RETURN)					// Enter  (0x0d)
+#define KEY_ESCAPE			(WM_USER + VK_ESCAPE)					// Esc    (0x1b)
+#define KEY_ACCEPT			(WM_USER + VK_ACCEPT)					// IME 使用可能 (0x1e)
+#define KEY_MODECHANGE		(WM_USER + VK_MODECHANGE)				// IME モード変更要求 (0x1f)
 #define KEY_CTRL			(WM_USER + VK_CONTROL)					// Ctrl   (0x11)
 #define KEY_LCTRL			(WM_USER + VK_LCONTROL)					// Ctrl L (0xa2)
 #define KEY_RCTRL			(WM_USER + VK_RCONTROL)					// Ctrl R (0xa3)

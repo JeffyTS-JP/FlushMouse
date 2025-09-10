@@ -16,7 +16,6 @@
 #include "FlushMouseLIB.h"
 #include "TaskTray.h"
 #include "Eventlog.h"
-#include "KeyboardHook.h"
 #include "Resource.h"
 #include "CommonDef.h"
 #include "..\FlushMouseDLL\ShellHookDll.h"
@@ -276,12 +275,30 @@ BOOL		bCheckDrawIMEModeArea(HWND hWndObserved)
 }
 
 //
-// class CMouseRawInput
+// class CRawInputDevice
 //
+//
+// bSetEnableEPHelper()
+//
+BOOL	CRawInputDevice::bSetEnableEPHelper(BOOL bEPHelper)
+{
+	bEnableEPHelperLL = bEPHelper;
+	return TRUE;
+}
+
+//
+// bSetEnableIMEModeForced()
+//
+BOOL	CRawInputDevice::bSetEnableIMEModeForced(BOOL bIMEModeForced)
+{
+	bIMEModeForcedLL = bIMEModeForced;
+	return TRUE;
+}
+
 //
 // vRawInputMouseHandler()
 //
-void	CMouseRawInput::vRawInputMouseHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawInput)
+void	CRawInputDevice::vRawInputMouseHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawInput)
 {
 	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(dwFlags);
@@ -298,15 +315,246 @@ void	CMouseRawInput::vRawInputMouseHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT 
 	}
 	if ((RawMouse.usFlags == MOUSE_MOVE_RELATIVE) && (RawMouse.lLastX || RawMouse.lLastY)) {
 		if (!Profile || !Cursor)	return;
-		HWND hWndObserved = NULL;
-		if (Profile->lpstAppRegData->bDisplayFocusWindowIME) {
-			if ((hWndObserved = GetForegroundWindow()) == NULL)	return;
-		}
-		else {
-			if (!GetCursorPos(&pt))	return;
-			if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return;
-		}
+		HWND hWndObserved = hGetObservedWnd();
+		if (!hWndObserved)	return;
 		if (!Cursor->bStartIMECursorChangeThreadRawInput(hWndObserved))	return;
+	}
+}
+
+//
+// vRawInputKeyboardHandler()
+//
+void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawInput)
+{
+	UNREFERENCED_PARAMETER(hWnd);
+	UNREFERENCED_PARAMETER(dwFlags);
+
+	RAWKEYBOARD RawKeyboard = (RAWKEYBOARD)(lpRawInput->data.keyboard);
+
+	BOOL	bKeyUp = RawKeyboard.Flags & RI_KEY_BREAK;
+	if (RawKeyboard.MakeCode == KEYBOARD_OVERRUN_MAKE_CODE || RawKeyboard.VKey >= UCHAR_MAX)	return;
+	WORD	wScanCode = 0;
+	if (RawKeyboard.MakeCode) {
+		wScanCode = MAKEWORD(RawKeyboard.MakeCode & 0x7f, ((RawKeyboard.Flags & RI_KEY_E0) ? 0xe0 : ((RawKeyboard.Flags & RI_KEY_E1) ? 0xe1 : 0x00)));
+	}
+	else {
+		wScanCode = LOWORD(MapVirtualKey(RawKeyboard.VKey, MAPVK_VK_TO_VSC_EX));
+	}
+
+	if (!bIMEModeForcedLL || !bEnableEPHelperLL)	return;
+
+	if (bKeyUp) {														// Key up
+#define	DIFF_TIME	500
+		if ((RawKeyboard.VKey == VK_OEM_IME_OFF) || (RawKeyboard.VKey == VK_OEM_IME_ON)) {
+			ULONGLONG	_uuKeyRepeatTickLL = GetTickCount64();
+			if ((_uuKeyRepeatTickLL - uuKeyRepeatTickLL) <= DIFF_TIME) {
+				uuKeyRepeatTickLL = _uuKeyRepeatTickLL;
+				return;
+			}
+			uuKeyRepeatTickLL = _uuKeyRepeatTickLL;
+		}
+#undef	DIFF_TIME
+		dwPreviousVKLL = 0;												// Reset vkCode
+		switch (RawKeyboard.VKey) {
+		case VK_CONTROL:		// Ctrl   (0x11)
+		case VK_LCONTROL:		// Ctrl L (0xa2)
+		case VK_RCONTROL:		// Ctrl R (0xa3)
+			if (bOnlyCtrlLL) {
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_ONLY_CTRLUP, bKeyUp, 1, 0);
+			}
+			bOnlyCtrlLL = FALSE;
+			Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), bKeyUp, 1, 0);
+			return;
+		case VK_RETURN:			// Enter (0x0d)
+			bOnlyCtrlLL = FALSE;
+			if (bStartConvertingLL) {
+				bStartConvertingLL = FALSE;
+				PostMessage(hWnd, WM_CHECKIMESTARTCONVEX, (WPARAM)bStartConvertingLL, (LPARAM)(DWORD)(WM_USER + RawKeyboard.VKey));
+			}
+			else {
+				Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), bKeyUp, 1, 0);
+			}
+			return;
+		case VK_TAB:			// Tab (0x09)
+		case VK_KANJI:			// Alt + 漢字 (0x19)
+		case VK_OEM_3:			// @@@ JP(IME/ENG) [@] / US(ENG) IME ON (0xc0) = ['] ALT + 半角/全角 or 漢字
+		case VK_OEM_8:			// @@@ JP(IME/ENG) [`] / British(ENG) IME ON (0xdf) = ['] ALT + 半角/全角 or 漢字
+		case VK_MENU:			// ALT (0x12)
+		case VK_LMENU:			// ALT L (0xa4)
+		case VK_RMENU:			// ALT R (0xa5)
+		case VK_SHIFT:			// Shift (0x10)
+		case VK_LSHIFT:			// Shift L (0xa0)
+		case VK_RSHIFT:			// Shift R (0xa1)
+		case VK_LWIN:			// Left  Win (0x5b)
+		case VK_RWIN:			// Right Win (0x5c)
+		case VK_KANA:			// かな (0x15)
+		case VK_IME_ON:			// IME ON (0x16)
+		case VK_IME_OFF:		// IME OFF (0x1a)
+		case VK_F5:				// (0x74)
+		case VK_F6:				// (0x75)
+		case VK_F7:				// (0x76)
+		case VK_F8:				// (0x77)
+		case VK_F9:				// (0x78)
+		case VK_F10:			// (0x79)
+		case VK_OEM_IME_OFF:	// OEM IME OFF (0xf3)
+		case VK_OEM_IME_ON:		// OEM IME ON  (0xf4)
+		case VK_OEM_BACKTAB:	// OEM Alt+カタカナ/ひらがな (0xf5)
+		case VK_OEM_PA1:		// US(ENG) Non Convert (0xeb)
+			bOnlyCtrlLL = FALSE;
+			Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), bKeyUp, 1, 0);
+			return;
+		case VK_OEM_ATTN:		// OEM 英数/CapsLock (0xf0)
+		case VK_OEM_FINISH:		// OEM カタカナ (0xf1)
+		case VK_OEM_COPY:		// OEM ひらがな (0xf2)
+			bOnlyCtrlLL = FALSE;
+			return;
+		case VK_FF:				// US(ENG) Convert
+			bOnlyCtrlLL = FALSE;
+			if (!bEnableEPHelperLL)	return;
+			if ((GetKeyState(VK_SHIFT) & 0x8000) || (GetKeyState(VK_LSHIFT) & 0x8000) || (GetKeyState(VK_RSHIFT) & 0x8000)) {
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_FINISH, bKeyUp, 1, 0);
+			}
+			else if (wScanCode == 0x70) {						// US(ENG) ひらがな
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_COPY, bKeyUp, 1, 0);
+			}
+			else if (wScanCode == 0x79) {						// US(ENG) 変換
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_CONVERT, bKeyUp, 1, 0);
+			}
+			return;
+		default:
+			bOnlyCtrlLL = FALSE;
+			return;
+		}
+	}
+	else {																// Key down
+#define	DIFF_TIME	500
+		if ((dwPreviousVKLL == RawKeyboard.VKey) || (RawKeyboard.VKey == VK_OEM_IME_OFF) || (RawKeyboard.VKey == VK_OEM_IME_ON)
+			|| (RawKeyboard.VKey == VK_OEM_FINISH) || (RawKeyboard.VKey == VK_OEM_COPY)) {
+			ULONGLONG	_uuKeyRepeatTickLL = GetTickCount64();
+			if ((_uuKeyRepeatTickLL - uuKeyRepeatTickLL) <= DIFF_TIME) {
+				return;
+			}
+			uuKeyRepeatTickLL = _uuKeyRepeatTickLL;
+		}
+#undef	DIFF_TIME
+		dwPreviousVKLL = RawKeyboard.VKey;
+		switch (RawKeyboard.VKey) {
+		case VK_CONTROL:		// Ctrl   (0x11)
+		case VK_LCONTROL:		// Ctrl L (0xa2)
+		case VK_RCONTROL:		// Ctrl R (0xa3)
+			bOnlyCtrlLL = TRUE;
+			bStartConvertingLL = FALSE;
+			return;
+		case VK_MENU:			// ALT    (0x12)
+		case VK_LMENU:			// ALT L  (0xa4)
+		case VK_RMENU:			// ALT R  (0xa5)
+			bOnlyCtrlLL = FALSE;
+			bStartConvertingLL = FALSE;
+			return;
+		case VK_CAPITAL:		// 英数/CapsLock (0x14)
+			bOnlyCtrlLL = FALSE;
+			bStartConvertingLL = FALSE;
+			dwPreviousVKLL = RawKeyboard.VKey;
+			if (!bEnableEPHelperLL)	return;
+			if (bKeyboardTypeIsEP()) {
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_ATTN, !bKeyUp, 1, 0);
+			}
+			return;
+		case VK_KANJI:			// JP(IME/ENG) Alt + 漢字	(0x19)
+			bOnlyCtrlLL = FALSE;
+			bStartConvertingLL = FALSE;
+			dwPreviousVKLL = VK_KANJI;
+			dwPreviousVKLL = RawKeyboard.VKey;
+			if ((GetKeyState(VK_MENU) & 0x8000) || (GetKeyState(VK_LMENU) & 0x8000) || (GetKeyState(VK_RMENU) & 0x8000)) {
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_KANJI, bKeyUp, 1, 0);
+			}
+			return;
+		case VK_CONVERT:		// 変換 (0x1c)
+		case VK_NONCONVERT:		// 無変換 (0x1d)
+			bOnlyCtrlLL = FALSE;
+			bStartConvertingLL = FALSE;
+			dwPreviousVKLL = RawKeyboard.VKey;
+			Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), bKeyUp, 1, 0);
+			return;
+		case VK_OEM_IME_OFF:	// OEM IME OFF (0xf3)
+		case VK_OEM_IME_ON:		// OEM IME ON  (0xf4)
+			bOnlyCtrlLL = FALSE;
+			bStartConvertingLL = FALSE;
+			dwPreviousVKLL = RawKeyboard.VKey;
+			Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), !bKeyUp, 1, 0);
+			return;
+		case VK_OEM_3:			// @@@ JP(IME/ENG) [@] / US(ENG) IME ON (0xc0) = ['] ALT + 半角/全角 or 漢字
+		case VK_OEM_8:			// @@@ JP(IME/ENG) [`] / British(ENG) IME ON (0xdf) = ['] ALT + 半角/全角 or 漢字
+			bOnlyCtrlLL = FALSE;
+			bStartConvertingLL = FALSE;
+			dwPreviousVKLL = RawKeyboard.VKey;
+			return;
+		case VK_OEM_ATTN:		// OEM 英数/CapsLock (0xf0)
+			bOnlyCtrlLL = FALSE;
+			bStartConvertingLL = FALSE;
+			dwPreviousVKLL = 0;
+			if (!bStartConvertingLL) {
+				dwPreviousVKLL = RawKeyboard.VKey;
+				if ((RawKeyboard.Message == WM_KEYDOWN)) {
+					Cls_OnSysKeyDownUpEx(hWnd, RawKeyboard.VKey, !bKeyUp, 1, 0);
+				}
+				else {
+					if ((GetKeyState(VK_SHIFT) & 0x8000) || (GetKeyState(VK_LSHIFT) & 0x8000) || (GetKeyState(VK_RSHIFT) & 0x8000)) {
+						Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_FINISH, !bKeyUp, 1, 0);
+					}
+					else {
+						Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_COPY, !bKeyUp, 1, 0);
+					}
+				}
+			}
+			return;
+		case VK_OEM_FINISH:		// OEM カタカナ (0xf1)
+			bOnlyCtrlLL = FALSE;
+			bStartConvertingLL = FALSE;
+			dwPreviousVKLL = RawKeyboard.VKey;
+			if ((RawKeyboard.Message == WM_KEYDOWN)) {
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_FINISH, bKeyUp, 1, 0);
+			}
+			else {
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_COPY, bKeyUp, 1, 0);
+			}
+			return;
+		case VK_OEM_COPY:		// OEM ひらがな (0xf2)
+			bOnlyCtrlLL = FALSE;
+			bStartConvertingLL = FALSE;
+			dwPreviousVKLL = RawKeyboard.VKey;
+			if ((RawKeyboard.Message == WM_KEYDOWN)) {
+				if ((GetKeyState(VK_SHIFT) & 0x8000) || (GetKeyState(VK_LSHIFT) & 0x8000) || (GetKeyState(VK_RSHIFT) & 0x8000)) {
+					Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_FINISH, bKeyUp, 1, 0);
+				}
+				else {
+					Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_COPY, bKeyUp, 1, 0);
+				}
+			}
+			return;
+
+		case VK_ESCAPE:			// ESC (0x1b)
+		case VK_INSERT:			// INSERT (0x2d)
+			bOnlyCtrlLL = FALSE;
+			bStartConvertingLL = FALSE;
+			PostMessage(hWnd, WM_CHECKIMESTARTCONVEX, (WPARAM)bStartConvertingLL, (LPARAM)(DWORD)(WM_USER + RawKeyboard.VKey));
+			return;
+		default:
+			bOnlyCtrlLL = FALSE;
+			if (bStartConvertingLL == FALSE) {
+				if (((0x30 <= RawKeyboard.VKey) && (RawKeyboard.VKey <= 0x39))		// 「0」～「9」
+					|| ((0x41 <= RawKeyboard.VKey) && (RawKeyboard.VKey <= 0x5A))	// 「A」～「Z」
+					|| ((0x60 <= RawKeyboard.VKey) && (RawKeyboard.VKey <= 0x6f))	//  Ten Key
+					|| ((0xba <= RawKeyboard.VKey) && (RawKeyboard.VKey <= 0xc0))	// 「: *」「; +」「, <」「- =」「. >」「/ ?」「@ `」
+					|| ((0xdb <= RawKeyboard.VKey) && (RawKeyboard.VKey <= 0xde))	// 「[ {」「\ |」「- =」「^ ~」
+					|| ((RawKeyboard.VKey == 0xe2))) {								// 「\ _」
+					bStartConvertingLL = TRUE;
+					PostMessage(hWnd, WM_CHECKIMESTARTCONVEX, (WPARAM)bStartConvertingLL, (WM_USER + RawKeyboard.VKey));
+				}
+				else bStartConvertingLL = FALSE;
+			}
+			return;
+		}
 	}
 }
 
@@ -390,7 +638,7 @@ BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_S
 static CEventHook*	pEventHook = NULL;
 
 CEventHook::CEventHook()
-	: hMainWnd(NULL), hFormerWnd(NULL), hEventHook(NULL), hEventHookIME(NULL)
+	: hMainWnd(NULL), hEventHook(NULL), hEventHookIME(NULL)
 {
 }
 
@@ -398,7 +646,6 @@ CEventHook::~CEventHook()
 {
 	if (bEventUnset()) {
 		hEventHook = NULL;
-		hFormerWnd = NULL;
 		hEventHookIME = NULL;
 	}
 }
@@ -499,7 +746,7 @@ void CALLBACK CEventHook::vHandleEventIME(HWINEVENTHOOK hook, DWORD dwEvent, HWN
 // class CFlushMouseHook 
 //
 CFlushMouseHook::CFlushMouseHook()
-	: hHook64Dll(NULL), bShellHook64(FALSE), bGlobalHook64(FALSE), bKeyboardHookLL64(FALSE), bHook32Dll(FALSE),
+	: hHook64Dll(NULL), bShellHook64(FALSE), bGlobalHook64(FALSE), bHook32Dll(FALSE),
 	lpstProcessInformation(new PROCESS_INFORMATION[sizeof(PROCESS_INFORMATION)])
 {
 	if (lpstProcessInformation)	ZeroMemory(lpstProcessInformation, sizeof(PROCESS_INFORMATION));
@@ -520,12 +767,10 @@ BOOL			CFlushMouseHook::bHookSet(HWND hWnd, LPCTSTR lpszDll64Name, LPCTSTR lpszE
 {
 	UNREFERENCED_PARAMETER(lpszDll64Name);
 
-	if ((bKeyboardHookLL64 = bKeyboardHookLLSet(hWnd)) != FALSE) {
-		if ((bGlobalHook64 = bGlobalHookSet(hWnd)) != FALSE) {
-			if ((bShellHook64 = bShellHookSet(hWnd)) != FALSE) {
-				if ((bHook32Dll = bHook32DllStart(hWnd, lpszExec32Name)) != FALSE) {
-					return TRUE;
-				}
+	if ((bGlobalHook64 = bGlobalHookSet(hWnd)) != FALSE) {
+		if ((bShellHook64 = bShellHookSet(hWnd)) != FALSE) {
+			if ((bHook32Dll = bHook32DllStart(hWnd, lpszExec32Name)) != FALSE) {
+				return TRUE;
 			}
 		}
 	}
@@ -540,7 +785,6 @@ BOOL		CFlushMouseHook::bHookUnset()
 {
 	if (bHook32Dll)			bHook32DllStop();
 	if (bShellHook64)		bShellHookUnset();
-	if (bKeyboardHookLL64)	vKeyboardHookLLUnset();
 	if (bGlobalHook64)		bGlobalHookUnset();
 	return TRUE;
 }
@@ -551,7 +795,7 @@ BOOL		CFlushMouseHook::bHookUnset()
 BOOL		CFlushMouseHook::bHookUnset64() const
 {
 	if (bShellHook64)		bShellHookUnset();
-	if (bKeyboardHookLL64)	vKeyboardHookLLUnset();
+	if (bShellHook64)		bShellHookUnset();
 	if (bGlobalHook64)		bGlobalHookUnset();
 	return TRUE;
 }
@@ -660,9 +904,9 @@ BOOL CALLBACK CFlushMouseHook::bEnumWindowsProcHookStop(HWND hWnd, LPARAM lParam
 }
 
 //
-// bKBisEP()
+// bKeyboardTypeIsEP()
 //
-BOOL		bKBisEP()
+BOOL		bKeyboardTypeIsEP()
 {
 	if (GetKeyboardType(1) == 0) {
 		_Post_equals_last_error_ DWORD err = GetLastError();
@@ -775,7 +1019,8 @@ static BOOL	bChangeHKLbySendInput(HKL hNewHKL, HKL hPreviousHKL, BOOL bForce)
 					if (lpHKL[i] == hNewHKL)		iNewKB = i;
 				}
 				int iKB = iKBList - iPreviousKB + iNewKB;
-				if ((GetKeyState(VK_SHIFT) & 0x8000)) iKB = iKBList - iKB;
+				if ((GetKeyState(VK_SHIFT) & 0x8000) || (GetKeyState(VK_LSHIFT) & 0x8000)
+						|| (GetKeyState(VK_RSHIFT) & 0x8000))	iKB = iKBList - iKB;
 				if ((iNewKB != iPreviousKB) || bForce) {
 					LPINPUT lpInputs = NULL;
 					if ((lpInputs = new INPUT[sizeof(INPUT) * (iKB * 2 + 2)]) != NULL) {
@@ -869,18 +1114,19 @@ static BOOL		bSendInputSub(UINT cInputs, LPINPUT pInputs)
 //
 BOOL	bChromium_Helper(HWND hForeWnd)
 {
-	TCHAR	szBuffer[_MAX_PATH]{};
-	if (GetClassName(hForeWnd, szBuffer, _MAX_PATH) != 0) {
-		if ((szBuffer[0] != _T('\0')) && ((CompareStringOrdinal(szBuffer, -1, L"Chrome_RenderWidgetHostHWND", -1, TRUE) == CSTR_EQUAL)
-			|| (CompareStringOrdinal(szBuffer, -1, L"Chrome_WidgetWin_1", -1, TRUE) == CSTR_EQUAL))) {
-			DWORD	dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
-			if (dwBeforeIMEMode != IMEOFF) {
+	DWORD	dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
+	if (dwBeforeIMEMode != IMEOFF) {
+		TCHAR	szBuffer[_MAX_PATH]{};
+		if (GetClassName(hForeWnd, szBuffer, _MAX_PATH) != 0 && szBuffer[0] != _T('\0')) {
+			static const LPCTSTR szTargetClasses[] = { L"Chrome_RenderWidgetHostHWND", L"Chrome_WidgetWin_1" };
+			if (std::any_of(std::begin(szTargetClasses), std::end(szTargetClasses), [&](const LPCTSTR szClassName) {
+				return _tcscmp(szBuffer, szClassName) == 0;})) {
 				HWND    hIMWnd = NULL;
 				if ((hIMWnd = ImmGetDefaultIMEWnd(hForeWnd)) != NULL) {
 					DWORD	dwSentenceMode = 0;
 					if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETOPENSTATUS, NULL) != 0) {
 						if ((dwSentenceMode = (DWORD)SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETSENTENCEMODE, NULL)) == 0) {
-							if (!SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETSENTENCEMODE, (LPARAM)IME_SMODE_PHRASEPREDICT) != 0) {
+							if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETSENTENCEMODE, (LPARAM)IME_SMODE_PHRASEPREDICT) != 0) {
 								return TRUE;
 							}
 							else return FALSE;
@@ -891,11 +1137,31 @@ BOOL	bChromium_Helper(HWND hForeWnd)
 				}
 				else return FALSE;
 			}
-			else return TRUE;
+			return FALSE;
 		}
-		return TRUE;
+		else return FALSE;
 	}
-	return FALSE;
+	return TRUE;
+}
+
+//
+// hGetObservedWnd()
+//
+HWND	 	hGetObservedWnd()
+{
+	if (!Profile)	return FALSE;
+	HWND	hWndObserved = NULL;
+	POINT	pt{};
+	if (Profile->lpstAppRegData->bDisplayFocusWindowIME) {
+		if ((hWndObserved = GetForegroundWindow()) == NULL)	return NULL;
+	}
+	else {
+		if (GetCursorPos(&pt)) {
+			if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return NULL;
+		}
+		else return NULL;
+	}
+	return hWndObserved;
 }
 
 //

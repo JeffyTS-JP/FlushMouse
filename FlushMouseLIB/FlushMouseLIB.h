@@ -32,6 +32,7 @@ extern VOID			vStopThreadHookTimer(HWND hWnd);
 
 extern void			Cls_OnLButtonDownEx(HWND hWnd, int x, int y, HWND hForeground);
 extern void			Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground);
+extern void			Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flags);
 
 extern VOID			vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine);
 extern VOID			vAboutDialog(HWND hWnd);

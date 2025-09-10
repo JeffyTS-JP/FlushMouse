@@ -157,8 +157,6 @@ int APIENTRY	wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 //
 // iCheckCmdLine()
-//	Return	0, -1 = Exit Code
-//			2     = Continue App
 //
 static int			iCheckCmdLine(LPCTSTR lpCmdLine)
 {
@@ -167,7 +165,7 @@ static int			iCheckCmdLine(LPCTSTR lpCmdLine)
 	if ((lpRet == NULL) && (argc == 0))	return (-1);
 	for (int i = 0; i < argc; i++) {
 		if (lpRet == NULL)	break;
-		if ((*lpRet[i] != L'\0') && (CompareStringOrdinal(lpRet[i], -1, L"/Port", -1, TRUE) == CSTR_EQUAL)) {
+		if ((*lpRet[i] != L'\0') && (_tcscmp(lpRet[i], L"/Port") == 0)) {
 			if ((i < argc) && (*lpRet[i + 1] != L'\0')) {
 				if ((iPort = _wtoi(lpRet[i + 1])) == 0) {
 					return (-1);

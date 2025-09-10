@@ -227,21 +227,21 @@ void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 	LPTSTR	*_lpArgv = CommandLineToArgvW(_lpCmdLine, &iNumArgs);
 	if (iNumArgs != 0) {
 		if (_lpArgv[1]  != NULL) {
-			if (CompareStringOrdinal(_lpArgv[1], -1, L"1", -1, TRUE) == CSTR_EQUAL) {
+			if (_tcscmp(_lpArgv[1], L"1") == 0) {
 				iSelectedPane = SETTINGSEX_SELECTEDPANE_GENERAL;
 			}
-			else if (CompareStringOrdinal(_lpArgv[1], -1, L"2", -1, TRUE) == CSTR_EQUAL) {
+			else if (_tcscmp(_lpArgv[1], L"2") == 0) {
 				iSelectedPane = SETTINGSEX_SELECTEDPANE_IMEMODE;
 			}
-			else if (CompareStringOrdinal(_lpArgv[1], -1, L"3", -1, TRUE) == CSTR_EQUAL) {
+			else if (_tcscmp(_lpArgv[1], L"3") == 0) {
 				iSelectedPane = SETTINGSEX_SELECTEDPANE_SYNTPHELPER;
 			}
-			else if (CompareStringOrdinal(_lpArgv[1], -1, L"4", -1, TRUE) == CSTR_EQUAL) {
+			else if (_tcscmp(_lpArgv[1], L"4") == 0) {
 				iSelectedPane = SETTINGSEX_SELECTEDPANE_ABOUT;
 			}
 		}
+		LocalFree(_lpArgv);
 	}
-	LocalFree(_lpArgv);
 
 	if ((m_hInstance = GetModuleHandle(FLUSHMOUSESETTINGS_EXE)) == NULL) {
 		PostQuitMessage(0);

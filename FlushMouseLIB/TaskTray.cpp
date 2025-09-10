@@ -242,6 +242,8 @@ int		CTaskTray::iCheckTaskTrayMessage(HWND hWnd, UINT message, WPARAM wParam, LP
 		if (((TaskTray->uTaskbarCreatedMessage != 0) && (message == TaskTray->uTaskbarCreatedMessage)) 
 				|| ((TaskTray->uTaskbarCreated != 0) && (message == TaskTray->uTaskbarCreated))) {
 			if (TaskTray->bReCreateTaskTrayWindow(hWnd)) {
+				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 				return 0;
 			}
 			else return (-1);

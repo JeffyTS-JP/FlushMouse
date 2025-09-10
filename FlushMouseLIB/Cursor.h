@@ -73,15 +73,6 @@
 //
 typedef struct tagIMECursorData
 {
-	HWND		hWndObserved;
-	DWORD		dwIMEModeCursor;
-	DWORD		dwDrawIMEModeWaitTime;
-	BOOL		bDrawIMEModeWait;
-	LPCTSTR		lpszLoadDatName;
-	LPFLUSHMOUSECURSOR	lpstNearDrawMouseCursor;
-	LPFLUSHMOUSECURSOR	lpstNearDrawCaretCursor;
-	LPFLUSHMOUSECURSOR	lpstNearDrawMouseByWndCursor;
-
 	int			iCursorSize;
 	int			iIMEModeDistance;
 	int			iModeMouseSize;
@@ -116,14 +107,17 @@ class CCursor
 		BOOL		bInitialize(HWND hWnd);
 		BOOL		bReloadCursor();
 		VOID		vSetParamFromRegistry();
+
 		BOOL		bStartIMECursorChangeThread(HWND hWndObserved);
-		BOOL		bStartIMECursorChangeThreadWait(HWND hWndObserved);
+		BOOL		bStartIMECursorChangeThreadWait(HWND hWndObserved, DWORD dwWaitTime);
+		BOOL		bStartIMECursorChangeThreadTimer(HWND hWndObserved);
 		BOOL		bStartIMECursorChangeThreadRawInput(HWND hWndObserved);
 		VOID		vStopIMECursorChangeThread();
+
 		BOOL		bStartDrawIMEModeThread(HWND hWndObserved);
-		BOOL		bStartDrawIMEModeThreadWaitWave(HWND hWndObserved);
-		BOOL		bStartDrawIMEModeThreadWaitEventForeGround(HWND hWndObserved);
-		BOOL		bStartDrawIMEModeThreadWaitDblClk(HWND hWndObserved);
+		BOOL		bStartDrawIMEModeThreadWait(HWND hWndObserved, DWORD dwWaitTime);
+
+		BOOL		bIsDisplayWindow(HWND hWnd);
 
 	private:
 		BOOL		bStartIMECursorChangeThreadSub(HWND hWndObserved);
@@ -170,9 +164,22 @@ class CCursor
 		CCursorWindow	*CursorWindow;
 		CCursorWindow	*CaretWindow;
 		CCursorWindow	*MouseWindow;
+
+		HWND			_hWndObserved;
+		DWORD			dwIMEModeCursor;
+		BOOL			bDrawIMEModeWait;
+		DWORD			dwDrawIMEModeWaitTime;
+
 		DWORD			dwIMEModeMouseWindow;
 		DWORD			dwWaitTimeMouseWindow;
 		ULONGLONG		uuMouseWindowTick;
+		ULONGLONG		uuMouseWindowDiffTick;
+
+		LPCTSTR				lpszLoadDatName;
+		LPFLUSHMOUSECURSOR	lpstNearDrawMouseCursor;
+		LPFLUSHMOUSECURSOR	lpstNearDrawCaretCursor;
+		LPFLUSHMOUSECURSOR	lpstNearDrawMouseByWndCursor;
+
 		CCursorSub		*CursorSub;
 	
 		HCURSOR			hCursorArrow;
@@ -191,7 +198,7 @@ class CCursor
 		BOOL			bCapsLock;
 
 		BOOL			bIMEModeByWindowThreadSentinel;
-		BOOL			bIMECursorChangeThreadSentinel;
+		BOOL			bIMEDrawIMEModeThreadSentinel;
 };
 
 

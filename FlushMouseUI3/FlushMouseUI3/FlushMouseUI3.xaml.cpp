@@ -220,7 +220,7 @@ void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 			return;
 		}
 	}
-	LocalFree(_lpArgv);
+	if (_lpArgv)	LocalFree(_lpArgv);
 	
 	if ((m_hInstance = GetModuleHandle(NULL)) == NULL) {
 		PostQuitMessage(0);
@@ -234,7 +234,7 @@ void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 
 	if (!bWinMain((HINSTANCE)m_hInstance, NULL, NULL, SW_HIDE)) {
 	}
-	
+
 	MojoWindowClose();
 
 	if (hFlushMouseUI3DLL)	FreeLibrary(hFlushMouseUI3DLL);

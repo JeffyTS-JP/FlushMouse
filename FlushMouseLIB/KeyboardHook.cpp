@@ -41,7 +41,7 @@ static ULONGLONG	uuKeyRepeatTickLL = GetTickCount64();
 // Local Prototype Define
 //
 static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lParam);
-static BOOL	bKBisEP();
+static BOOL	bKeyboardTypeIsEP();
 
 //
 // bKeyboardHookLLSet()
@@ -238,7 +238,7 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 					bStartConvertingLL = FALSE;
 					dwPreviousVKLL = lpstKBH->vkCode;
 					if (!bEnableEPHelperLL)	break;
-					if (bKBisEP()) {
+					if (bKeyboardTypeIsEP()) {
 						PostMessage(hWndKBParentLL, WM_SYSKEYDOWNUPEX, KEY_OEM_ATTN, (0x7f000000 & (static_cast<LPARAM>(lpstKBH->flags) << 24)));
 					}
 					break;
@@ -314,9 +314,9 @@ static LRESULT CALLBACK lpKeyboardHookLLProc(int nCode, WPARAM wParam, LPARAM lP
 }
 
 //
-// bKBisEP()
+// bKeyboardTypeIsEP()
 //
-static BOOL		bKBisEP()
+static BOOL		bKeyboardTypeIsEP()
 {
 	if (GetKeyboardType(1) == 0) {
 		_Post_equals_last_error_ DWORD err = GetLastError();

@@ -606,7 +606,6 @@ BOOL		CCursorWindow::bRegister(HINSTANCE hInstance, LPCTSTR szWindowClassName)
 // 
 VOID		CCursorWindow::vSetModeStringColorFont(LPCTSTR _lpszIMEMode, COLORREF dwRGB, LPCTSTR _lpszFontFace)
 {
-	if (!this)	return;
 	lpszIMEMode = (LPTSTR)_lpszIMEMode;
 	dwTextColor = dwRGB;
 	if (dwRGB & 0x00000100)	dwBackColor = dwRGB & 0xfffffeff;

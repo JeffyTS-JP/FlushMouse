@@ -32,28 +32,42 @@ extern BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage
 extern BOOL		bStopSynTPHelper(HWND hWnd);
 extern BOOL		bCheckDrawIMEModeArea(HWND hWndObserved);
 
-extern BOOL		bKBisEP();
+extern BOOL		bKeyboardTypeIsEP();
 extern BOOL		bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, BOOL bIMEModeForcedChange, LPHKL lpNewHKL, LPHKL lpPreviousHKL);
 extern BOOL		bCheckExistingJPIME();
 extern BOOL		bChromium_Helper(HWND hForeWnd);
 
+extern HWND	 	hGetObservedWnd();
 extern BOOL	 	bCreateProcess(LPCTSTR lpszExecName, LPTSTR lpCommandLine);
 
 //
-// class CMouseRawInput
+// class CRawInputDevice
 //
-class CMouseRawInput	:	public CRawInput
+class CRawInputDevice	:	public CRawInput
 {
 	public:
-		CMouseRawInput() : uuMouseWindowTick(GetTickCount64()) {};
-		~CMouseRawInput() override {};
+		CRawInputDevice()
+			:	uuMouseWindowTick(GetTickCount64()), bOnlyCtrlLL(FALSE), dwPreviousVKLL(0), bEnableEPHelperLL(FALSE),
+				bIMEModeForcedLL(FALSE), bStartConvertingLL(FALSE), uuKeyRepeatTickLL(GetTickCount64())
+		{};
+		~CRawInputDevice() override {};
 
-	private:
-		virtual void	vRawInputMouseHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawInput) override;
+		BOOL		bSetEnableEPHelper(BOOL bEPHelper);
+		BOOL		bSetEnableIMEModeForced(BOOL bIMEModeForced);
 
-	private:
-		ULONGLONG		uuMouseWindowTick;
+private:
+	virtual void	vRawInputMouseHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawInput) override;
+	virtual void	vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawInput) override;
 
+private:
+	ULONGLONG		uuMouseWindowTick;
+
+	BOOL			bOnlyCtrlLL;
+	DWORD			dwPreviousVKLL;
+	BOOL			bEnableEPHelperLL;		// @@@ for Explorer Patcher Simple Window Switcher
+	BOOL			bIMEModeForcedLL;
+	BOOL			bStartConvertingLL;
+	ULONGLONG		uuKeyRepeatTickLL;
 };
 
 //
@@ -90,7 +104,6 @@ class CEventHook
 		static void CALLBACK vHandleEventIME(HWINEVENTHOOK hook, DWORD dwEvent, HWND hWnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime);
 
 	public:
-		HWND			hFormerWnd;
 
 	private:
 		HWND			hMainWnd;
@@ -119,7 +132,6 @@ class CFlushMouseHook
 		HMODULE		hHook64Dll;
 		BOOL		bShellHook64;
 		BOOL		bGlobalHook64;
-		BOOL		bKeyboardHookLL64;
 		BOOL		bHook32Dll;
 
 	private:
