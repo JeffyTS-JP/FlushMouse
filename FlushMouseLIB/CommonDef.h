@@ -112,10 +112,6 @@ typedef struct tagSIZED
 #define WM_EVENT_SYSTEM_FOREGROUNDEX		(WM_USER + 0x0002)
 #define HANDLE_WM_EVENT_SYSTEM_FOREGROUNDEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (DWORD)(wParam), (HWND)(lParam)), 0L)
 
-// void	Cls_OnCheckExistingJPIMEEx(HWND hWnd, BOOL bEPHelper);
-#define WM_CHECKEXISTINGJPIMEEX				(WM_USER + 0x0003)
-#define	HANDLE_WM_CHECKEXISTINGJPIMEEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (BOOL)(wParam)), 0L)
-
 // void	Cls_OnCheckIMEStartConvertingEx(HWND hWnd, BOOL bStartConverting, DWORD vkCode);
 #define WM_CHECKIMESTARTCONVEX				(WM_USER + 0x0004)
 #define	HANDLE_WM_CHECKIMESTARTCONVEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (BOOL)(wParam), (DWORD)(lParam)), 0L)

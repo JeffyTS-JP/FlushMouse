@@ -268,19 +268,19 @@ void		CTaskTray::Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 		break;
 	case IDR_TT_SETTING:
 		Profile->bGetProfileData();
-		vSettingDialog(hWnd);
+		vSettingDialog(hWnd,SETTINGSEX_SELECTEDPANE_GENERAL);
 		return;
 	case IDR_TT_IMEMODE:
 		Profile->bGetProfileData();
-		vIMEModeDialog(hWnd);
+		vSettingDialog(hWnd,SETTINGSEX_SELECTEDPANE_IMEMODE);
 		return;
 	case IDR_TT_SYNTPHELPER:
 		Profile->bGetProfileData();
-		vSynTPHelperDialog(hWnd);
+		vSettingDialog(hWnd,SETTINGSEX_SELECTEDPANE_SYNTPHELPER);
 		return;
 	case IDM_ABOUT:
 	case IDR_TT_ABOUT:
-		vAboutDialog(hWnd);
+		vSettingDialog(hWnd,SETTINGSEX_SELECTEDPANE_ABOUT);
 		return;
 	case IDM_EXIT:
 	case IDR_TT_QUIT:

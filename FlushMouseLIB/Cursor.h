@@ -175,7 +175,6 @@ class CCursor
 		ULONGLONG		uuMouseWindowTick;
 		ULONGLONG		uuMouseWindowDiffTick;
 
-		LPCTSTR				lpszLoadDatName;
 		LPFLUSHMOUSECURSOR	lpstNearDrawMouseCursor;
 		LPFLUSHMOUSECURSOR	lpstNearDrawCaretCursor;
 		LPFLUSHMOUSECURSOR	lpstNearDrawMouseByWndCursor;

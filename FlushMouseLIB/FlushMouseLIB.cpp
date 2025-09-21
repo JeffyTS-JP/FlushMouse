@@ -92,7 +92,6 @@ static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, int iSubCode);
 static void		Cls_OnInputLangChangeEx(HWND hWnd, UINT CodePage, HKL hkl);
 static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd);
 static void		Cls_OnCheckIMEStartConvertingEx(HWND hWnd, BOOL bStartConverting, DWORD vkCode);
-static void		Cls_OnCheckExistingJPIMEEx(HWND hWnd, BOOL bEPHelper);
 
 // Sub
 static VOID CALLBACK	vCheckFocusTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
@@ -295,7 +294,6 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		HANDLE_MSG(hWnd, WM_INPUTLANGCHANGEEX, Cls_OnInputLangChangeEx);
 		HANDLE_MSG(hWnd, WM_EVENT_SYSTEM_FOREGROUNDEX, Cls_OnEventForegroundEx);
 		HANDLE_MSG(hWnd, WM_CHECKIMESTARTCONVEX, Cls_OnCheckIMEStartConvertingEx);
-		HANDLE_MSG(hWnd, WM_CHECKEXISTINGJPIMEEX, Cls_OnCheckExistingJPIMEEx);
 			break;
 
 		default:
@@ -711,20 +709,6 @@ static void		Cls_OnCheckIMEStartConvertingEx(HWND hWnd, BOOL bStartConverting, D
 }
 
 //
-// WM_CHECKEXISTINGJPIMEEX
-// Cls_OnCheckExistingJPIMEEx()
-//
-void		Cls_OnCheckExistingJPIMEEx(HWND hWnd, BOOL bEPHelper)
-{
-	UNREFERENCED_PARAMETER(hWnd);
-	UNREFERENCED_PARAMETER(bEPHelper);
-	if (!RawInput || !RawInput->bSetEnableEPHelper(bEPHelper)) {
-		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
-	}
-}
-
-//
 // WM_SYSKEYDOWNUPEX
 // Cls_OnSysKeyDownUpEx()
 //
@@ -750,15 +734,7 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 				|| (GetKeyState(VK_LWIN) & 0x8000) || (GetKeyState(VK_RWIN) & 0x8000)) {
 				return;
 			}
-			hWndObserved = hGetObservedWnd();
-			if (!hWndObserved)	return;
-			if (Profile->lpstAppRegData->bDoModeDispByIMEKeyDown) {
-				if (!bIMEInConverting) {
-					if (!Cursor->bStartDrawIMEModeThreadWait(hWndObserved, Profile->lpstAppRegData->dwAdditionalWaitTime))	return;
-				}
-			}
-			if (!Cursor->bStartIMECursorChangeThread(hWndObserved))	return;
-			return;
+			break;
 		case KEY_RETURN:				// Enter (0x0d)
 			bIMEInConverting = FALSE;
 			break;
@@ -903,7 +879,6 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 				}
 			}
 			if (Profile->lpstAppRegData->bForceHiragana && !(dwBeforeIMEMode != IMEOFF))	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
-			SleepEx(50, FALSE);
 			break;
 		case KEY_OEM_IME_ON:				// JP(IME/ENG) IME ON		(0xf4)
 			if (bIMEInConverting)	return;
@@ -1056,7 +1031,8 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 					}
 				}
 				else {
-					return;
+					Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
+					bIMEInConverting = FALSE;
 				}
 			}
 			break;
@@ -1126,8 +1102,6 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 		if (!bIMEInConverting) {
 			if (!Cursor->bStartDrawIMEModeThreadWait(hWndObserved, Profile->lpstAppRegData->dwAdditionalWaitTime))	return;	// error
 		}
-		else {
-		}
 	}
 	if (!Cursor->bStartIMECursorChangeThread(hWndObserved))	return;
 	return;
@@ -1162,27 +1136,12 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 			}
 		}
 	}
-	if (!Profile || !RawInput || !RawInput->bSetEnableIMEModeForced(Profile->lpstAppRegData->bIMEModeForced)
-				|| !RawInput->bSetEnableEPHelper(Profile->lpstAppRegData->bEnableEPHelper)) {
-		vMessageBox(hWnd, IDS_NOTREGISTERHOOK, MessageBoxTYPE, __func__, __LINE__);
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-		return FALSE;
-	}
 	if (EventHook == NULL) {
 		EventHook = new CEventHook;
 		if (!EventHook || !EventHook->bEventSet(hWnd)) {
 			vMessageBox(hWnd, IDS_NOTRREGISTEVH, MessageBoxTYPE, __func__, __LINE__);
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			return FALSE;
-		}
-	}
-	HWND	hFindWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
-	if ((hFindWnd) && Profile) {
-		if (Profile->lpstAppRegData->bEnableEPHelper) {
-			SendMessage(hFindWnd, WM_CHECKEXISTINGJPIMEEX, (WPARAM)Profile->lpstAppRegData->bEnableEPHelper, (LPARAM)NULL);
-		}
-		else {
-			SendMessage(hFindWnd, WM_CHECKEXISTINGJPIMEEX, (WPARAM)FALSE, (LPARAM)NULL);
 		}
 	}
 	BOOL	bBool = FALSE;

@@ -107,37 +107,9 @@ void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine)
 }
 
 //
-// vAboutDialog()
-//
-VOID		vAboutDialog(HWND hWnd)
-{
-	UNREFERENCED_PARAMETER(hWnd);
-	SettingsExec(hWnd, WM_SETTINGSEX, SETTINGSEX_SELECTEDPANE_ABOUT);
-}
-
-//
-// vIMEModeDialog()
-//
-VOID		vIMEModeDialog(HWND hWnd)
-{
-	if (Profile != NULL) {
-
-	}
-	SettingsExec(hWnd, WM_SETTINGSEX, SETTINGSEX_SELECTEDPANE_IMEMODE);
-}
-
-//
-// vSynTPHelperDialog()
-//
-VOID		vSynTPHelperDialog(HWND hWnd)
-{
-	SettingsExec(hWnd, WM_SETTINGSEX, SETTINGSEX_SELECTEDPANE_SYNTPHELPER);
-}
-
-//
 // vSettingDialog()
 //
-VOID		vSettingDialog(HWND hWnd)
+static VOID		vSettingDialog(HWND hWnd)
 {
 	SettingsExec(hWnd, WM_SETTINGSEX, iSelectedPane);
 }
@@ -523,13 +495,13 @@ static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, int iSubCode)
 					vSettingDialog(hWnd);
 					break;
 				case SETTINGSEX_SELECTEDPANE_IMEMODE:
-					vIMEModeDialog(hWnd);
+					vSettingDialog(hWnd);
 					break;
 				case SETTINGSEX_SELECTEDPANE_SYNTPHELPER:
-					vSynTPHelperDialog(hWnd);
+					vSettingDialog(hWnd);
 					break;
 				case SETTINGSEX_SELECTEDPANE_ABOUT:
-					vAboutDialog(hWnd);
+					vSettingDialog(hWnd);
 					break;
 			}
 			return TRUE;

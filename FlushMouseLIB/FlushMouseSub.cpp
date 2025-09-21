@@ -278,23 +278,6 @@ BOOL		bCheckDrawIMEModeArea(HWND hWndObserved)
 // class CRawInputDevice
 //
 //
-// bSetEnableEPHelper()
-//
-BOOL	CRawInputDevice::bSetEnableEPHelper(BOOL bEPHelper)
-{
-	bEnableEPHelperLL = bEPHelper;
-	return TRUE;
-}
-
-//
-// bSetEnableIMEModeForced()
-//
-BOOL	CRawInputDevice::bSetEnableIMEModeForced(BOOL bIMEModeForced)
-{
-	bIMEModeForcedLL = bIMEModeForced;
-	return TRUE;
-}
-
 //
 // vRawInputMouseHandler()
 //
@@ -341,8 +324,6 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 		wScanCode = LOWORD(MapVirtualKey(RawKeyboard.VKey, MAPVK_VK_TO_VSC_EX));
 	}
 
-	if (!bIMEModeForcedLL || !bEnableEPHelperLL)	return;
-
 	if (bKeyUp) {														// Key up
 #define	DIFF_TIME	500
 		if ((RawKeyboard.VKey == VK_OEM_IME_OFF) || (RawKeyboard.VKey == VK_OEM_IME_ON)) {
@@ -360,10 +341,10 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 		case VK_LCONTROL:		// Ctrl L (0xa2)
 		case VK_RCONTROL:		// Ctrl R (0xa3)
 			if (bOnlyCtrlLL) {
-				Cls_OnSysKeyDownUpEx(hWnd, KEY_ONLY_CTRLUP, bKeyUp, 1, 0);
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_ONLY_CTRLUP, !bKeyUp, 1, 0);
 			}
 			bOnlyCtrlLL = FALSE;
-			Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), bKeyUp, 1, 0);
+			Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), !bKeyUp, 1, 0);
 			return;
 		case VK_RETURN:			// Enter (0x0d)
 			bOnlyCtrlLL = FALSE;
@@ -372,7 +353,7 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 				PostMessage(hWnd, WM_CHECKIMESTARTCONVEX, (WPARAM)bStartConvertingLL, (LPARAM)(DWORD)(WM_USER + RawKeyboard.VKey));
 			}
 			else {
-				Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), bKeyUp, 1, 0);
+				Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), !bKeyUp, 1, 0);
 			}
 			return;
 		case VK_TAB:			// Tab (0x09)
@@ -401,7 +382,7 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 		case VK_OEM_BACKTAB:	// OEM Alt+カタカナ/ひらがな (0xf5)
 		case VK_OEM_PA1:		// US(ENG) Non Convert (0xeb)
 			bOnlyCtrlLL = FALSE;
-			Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), bKeyUp, 1, 0);
+			Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), !bKeyUp, 1, 0);
 			return;
 		case VK_OEM_ATTN:		// OEM 英数/CapsLock (0xf0)
 		case VK_OEM_FINISH:		// OEM カタカナ (0xf1)
@@ -410,15 +391,14 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 			return;
 		case VK_FF:				// US(ENG) Convert
 			bOnlyCtrlLL = FALSE;
-			if (!bEnableEPHelperLL)	return;
 			if ((GetKeyState(VK_SHIFT) & 0x8000) || (GetKeyState(VK_LSHIFT) & 0x8000) || (GetKeyState(VK_RSHIFT) & 0x8000)) {
-				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_FINISH, bKeyUp, 1, 0);
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_FINISH, !bKeyUp, 1, 0);
 			}
 			else if (wScanCode == 0x70) {						// US(ENG) ひらがな
-				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_COPY, bKeyUp, 1, 0);
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_COPY, !bKeyUp, 1, 0);
 			}
 			else if (wScanCode == 0x79) {						// US(ENG) 変換
-				Cls_OnSysKeyDownUpEx(hWnd, KEY_CONVERT, bKeyUp, 1, 0);
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_CONVERT, !bKeyUp, 1, 0);
 			}
 			return;
 		default:
@@ -455,7 +435,6 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 			bOnlyCtrlLL = FALSE;
 			bStartConvertingLL = FALSE;
 			dwPreviousVKLL = RawKeyboard.VKey;
-			if (!bEnableEPHelperLL)	return;
 			if (bKeyboardTypeIsEP()) {
 				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_ATTN, !bKeyUp, 1, 0);
 			}
@@ -463,10 +442,9 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 		case VK_KANJI:			// JP(IME/ENG) Alt + 漢字	(0x19)
 			bOnlyCtrlLL = FALSE;
 			bStartConvertingLL = FALSE;
-			dwPreviousVKLL = VK_KANJI;
 			dwPreviousVKLL = RawKeyboard.VKey;
 			if ((GetKeyState(VK_MENU) & 0x8000) || (GetKeyState(VK_LMENU) & 0x8000) || (GetKeyState(VK_RMENU) & 0x8000)) {
-				Cls_OnSysKeyDownUpEx(hWnd, KEY_KANJI, bKeyUp, 1, 0);
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_KANJI, !bKeyUp, 1, 0);
 			}
 			return;
 		case VK_CONVERT:		// 変換 (0x1c)
@@ -474,7 +452,7 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 			bOnlyCtrlLL = FALSE;
 			bStartConvertingLL = FALSE;
 			dwPreviousVKLL = RawKeyboard.VKey;
-			Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), bKeyUp, 1, 0);
+			Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), !bKeyUp, 1, 0);
 			return;
 		case VK_OEM_IME_OFF:	// OEM IME OFF (0xf3)
 		case VK_OEM_IME_ON:		// OEM IME ON  (0xf4)
@@ -513,10 +491,7 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 			bStartConvertingLL = FALSE;
 			dwPreviousVKLL = RawKeyboard.VKey;
 			if ((RawKeyboard.Message == WM_KEYDOWN)) {
-				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_FINISH, bKeyUp, 1, 0);
-			}
-			else {
-				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_COPY, bKeyUp, 1, 0);
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_FINISH, !bKeyUp, 1, 0);
 			}
 			return;
 		case VK_OEM_COPY:		// OEM ひらがな (0xf2)
@@ -525,10 +500,10 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 			dwPreviousVKLL = RawKeyboard.VKey;
 			if ((RawKeyboard.Message == WM_KEYDOWN)) {
 				if ((GetKeyState(VK_SHIFT) & 0x8000) || (GetKeyState(VK_LSHIFT) & 0x8000) || (GetKeyState(VK_RSHIFT) & 0x8000)) {
-					Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_FINISH, bKeyUp, 1, 0);
+					Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_FINISH, !bKeyUp, 1, 0);
 				}
 				else {
-					Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_COPY, bKeyUp, 1, 0);
+					Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_COPY, !bKeyUp, 1, 0);
 				}
 			}
 			return;
@@ -794,7 +769,6 @@ BOOL		CFlushMouseHook::bHookUnset()
 //
 BOOL		CFlushMouseHook::bHookUnset64() const
 {
-	if (bShellHook64)		bShellHookUnset();
 	if (bShellHook64)		bShellHookUnset();
 	if (bGlobalHook64)		bGlobalHookUnset();
 	return TRUE;
@@ -1081,17 +1055,6 @@ BOOL		bCheckExistingJPIME()
 				}
 			}
 			if (lpHKL)	delete[]	lpHKL;
-		}
-	}
-	HWND	hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
-	if (hWnd != NULL) {
-		if (Profile != NULL) {
-			if (Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced) {
-				SendMessage(hWnd, WM_CHECKEXISTINGJPIMEEX, (WPARAM)bRet, (LPARAM)NULL);
-			}
-			else {
-				SendMessage(hWnd, WM_CHECKEXISTINGJPIMEEX, (WPARAM)FALSE, (LPARAM)NULL);
-			}
 		}
 	}
 	return bRet;

@@ -87,36 +87,11 @@ void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine)
 }
 
 //
-// vAboutDialog()
-//
-VOID		vAboutDialog(HWND hWnd)
-{
-	UNREFERENCED_PARAMETER(hWnd);
-	SettingsExec(hWnd, WM_SETTINGSEX, SETTINGSEX_SELECTEDPANE_ABOUT);
-}
-
-//
-// vIMEModeDialog()
-//
-VOID		vIMEModeDialog(HWND hWnd)
-{
-	SettingsExec(hWnd, WM_SETTINGSEX, SETTINGSEX_SELECTEDPANE_IMEMODE);
-}
-
-//
-// vSynTPHelperDialog()
-//
-VOID		vSynTPHelperDialog(HWND hWnd)
-{
-	SettingsExec(hWnd, WM_SETTINGSEX, SETTINGSEX_SELECTEDPANE_SYNTPHELPER);
-}
-
-//
 // vSettingDialog()
 //
-VOID		vSettingDialog(HWND hWnd)
+VOID		vSettingDialog(HWND hWnd, INT32 iSelectedPane)
 {
-	SettingsExec(hWnd, WM_SETTINGSEX, SETTINGSEX_SELECTEDPANE_GENERAL);
+	SettingsExec(hWnd, WM_SETTINGSEX, iSelectedPane);
 }
 
 //

@@ -77,68 +77,21 @@ void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine)
 }
 
 //
-// vAboutDialog()
-//
-VOID		vAboutDialog(HWND hWnd)
-{
-	UNREFERENCED_PARAMETER(hWnd);
-
-	HWND	_hWnd = FindWindow(CLASS_FLUSHMOUSESETTINGS, NULL);
-	if (_hWnd != NULL) {
-		SetForegroundWindow(_hWnd);
-		SendMessage(_hWnd, WM_SETTINGSEX, SETTINGSEX_SETTINGS_CHANGE_PANE, SETTINGSEX_SELECTEDPANE_ABOUT);
-	}
-	else {
-		if (Cursor)	Cursor->vStopIMECursorChangeThread();
-		TCHAR	CommandLine[2]{};
-		if (_itow_s(SETTINGSEX_SELECTEDPANE_ABOUT, CommandLine, (sizeof(CommandLine) - sizeof(TCHAR)), 10) != 0)	return;
-
-		if (!bCreateProcess(RELATIVE_FLUSHMOUSESETTINGS_EXE, CommandLine)) {
-			return;
-		}
-	}
-}
-
-//
-// vIMEModeDialog()
-//
-VOID		vIMEModeDialog(HWND hWnd)
-{
-	UNREFERENCED_PARAMETER(hWnd);
-
-	HWND	_hWnd = FindWindow(CLASS_FLUSHMOUSESETTINGS, NULL);
-	if (_hWnd != NULL) {
-		SetForegroundWindow(_hWnd);
-		SendMessage(_hWnd, WM_SETTINGSEX, SETTINGSEX_SETTINGS_CHANGE_PANE, SETTINGSEX_SELECTEDPANE_IMEMODE);
-	}
-	else {
-		if (Cursor)	Cursor->vStopIMECursorChangeThread();
-		TCHAR	CommandLine[2]{};
-		if (_itow_s(SETTINGSEX_SELECTEDPANE_IMEMODE, CommandLine, (sizeof(CommandLine) - sizeof(TCHAR)), 10) != 0)	return;
-
-		if (!bCreateProcess(RELATIVE_FLUSHMOUSESETTINGS_EXE, CommandLine)) {
-			return;
-		}
-	}
-}
-
-//
 // vSettingDialog()
 //
-VOID		vSettingDialog(HWND hWnd)
+VOID		vSettingDialog(HWND hWnd, INT32 iSelectedPane)
 {
 	UNREFERENCED_PARAMETER(hWnd);
 
 	HWND	_hWnd = FindWindow(CLASS_FLUSHMOUSESETTINGS, NULL);
 	if (_hWnd != NULL) {
 		SetForegroundWindow(_hWnd);
-		SendMessage(_hWnd, WM_SETTINGSEX, SETTINGSEX_SETTINGS_CHANGE_PANE, SETTINGSEX_SELECTEDPANE_GENERAL);
+		SendMessage(_hWnd, WM_SETTINGSEX, SETTINGSEX_SETTINGS_CHANGE_PANE, iSelectedPane);
 	}
 	else {
 		if (Cursor)	Cursor->vStopIMECursorChangeThread();
 		TCHAR	CommandLine[2]{};
-		if (_itow_s(SETTINGSEX_SELECTEDPANE_GENERAL, CommandLine, (sizeof(CommandLine) - sizeof(TCHAR)), 10) != 0)	return;
-
+		if (_itow_s(iSelectedPane, CommandLine, (sizeof(CommandLine) - sizeof(TCHAR)), 10) != 0)	return;
 		if (!bCreateProcess(RELATIVE_FLUSHMOUSESETTINGS_EXE, CommandLine)) {
 			return;
 		}

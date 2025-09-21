@@ -195,7 +195,7 @@ namespace FlushMouseUI3DLL {
 		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		internal static partial bool MessageBeep(UInt32 uType);
-		internal const UInt32 MB_ICONWARNING = 0x00000030;
+		internal const UInt32 MB_ICONWARNING	= 0x00000030;
 
 		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = false)]
 		[return: MarshalAs(UnmanagedType.I8)]
@@ -204,24 +204,49 @@ namespace FlushMouseUI3DLL {
 		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		internal static partial bool SetSystemCursor(Int64 hCursor, UInt32 id);
-		internal const UInt32 OCR_NORMAL		=  32512;
-		internal const UInt32 OCR_IBEAM			=  32513;
-		internal const UInt32 OCR_WAIT			=  32514;
-		internal const UInt32 OCR_HAND			=  32649;
-		internal const UInt32 OCR_APPSTARTING	=  32650;
+		internal const UInt32 OCR_NORMAL		= 32512;
+		internal const UInt32 OCR_IBEAM			= 32513;
+		internal const UInt32 OCR_WAIT			= 32514;
+		internal const UInt32 OCR_HAND			= 32649;
+		internal const UInt32 OCR_APPSTARTING	= 32650;
 		
 		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.I8)]
+		internal static partial Int64 LoadImageW(Int64 hInstance, Int64 lpName, uint type, int cx, int cy, uint fuLoad);
+		internal const uint LR_DEFAULTCOLOR		= 0x00000000;
+		internal const uint LR_MONOCHROME		= 0x00000001;
+		internal const uint LR_COLOR			= 0x00000002;
+		internal const uint LR_COPYRETURNORG	= 0x00000004;
+		internal const uint LR_COPYDELETEORG	= 0x00000008;
+		internal const uint LR_LOADFROMFILE		= 0x00000010;
+		internal const uint LR_LOADTRANSPARENT	= 0x00000020;
+		internal const uint LR_DEFAULTSIZE		= 0x00000040;
+		internal const uint LR_VGACOLOR			= 0x00000080;
+		internal const uint LR_LOADMAP3DCOLORS	= 0x00001000;
+		internal const uint LR_CREATEDIBSECTION	= 0x00002000;
+		internal const uint LR_COPYFROMRESOURCE	= 0x00004000;
+		internal const uint LR_SHARED			= 0x00008000;
+		internal const uint MAGE_BITMAP			= 0;
+		internal const uint IMAGE_ICON			= 1;
+		internal const uint IMAGE_CURSOR		= 2;
+		internal const uint IMAGE_ENHMETAFILE	= 3;
+	
+		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.I8)]
 		internal static partial Int64 LoadCursorW(Int64 hInstance, Int64 lpCursorName);
-		internal const UInt32 IDC_ARROW			=  32512;
-		internal const UInt32 IDC_IBEAM			=  32513;
-		internal const UInt32 IDC_WAIT			=  32514;
-		internal const UInt32 IDC_HAND			=  32649;
-		internal const UInt32 IDC_APPSTARTING	=  32650;
+		internal const UInt32 IDC_ARROW			= 32512;
+		internal const UInt32 IDC_IBEAM			= 32513;
+		internal const UInt32 IDC_WAIT			= 32514;
+		internal const UInt32 IDC_HAND			= 32649;
+		internal const UInt32 IDC_APPSTARTING	= 32650;
 
 		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.I8)]
 		internal static partial Int64 CopyIcon(Int64 hIcon);
+
+		[LibraryImport("User32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		internal static partial bool DestroyCursor(Int64 hCursor);
 	}
 
 	public sealed partial class Miscs {

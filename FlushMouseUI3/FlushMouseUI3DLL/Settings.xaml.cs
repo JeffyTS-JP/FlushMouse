@@ -378,29 +378,14 @@ namespace FlushMouseUI3DLL {
 		public static Int64 UpdateProfile(Int64 iSettingsEX)
 		{
 			Int64 iRet = 0;
-			Int64 hOriginalCursor = 0;
-			if (iSettingsEX == SETTINGSEX_RELOAD_MOUSECURSOR) {
-				hOriginalCursor = LoadCursorW(0, IDC_ARROW);
-				if (hOriginalCursor == 0)	return iRet;
-				hOriginalCursor = CopyIcon(hOriginalCursor);
-				if (hOriginalCursor == 0)	return iRet;
-				Int64 hCur = LoadCursorW(0, IDC_APPSTARTING);
-				if (hCur == 0)	return iRet;
-				hCur = CopyIcon(hCur);
-				if (hCur == 0)	return iRet;
-				if (!SetSystemCursor(hCur, OCR_NORMAL))	return iRet;
-			}
 			if (g_hMainWnd != 0) {
 				iRet = SendMessageW(g_hMainWnd, g_uMsg, iSettingsEX, 0);
-				if (iRet == 0) return iRet;
+				if (iRet == 0) return 0;
 			}
 			Int64 _hWnd = FindWindowW(CLASS_FLUSHMOUSE, null);
 			if ((_hWnd != 0) && (_hWnd != g_hMainWnd)) {
 				SendMessageW(_hWnd, g_uMsg, SETTINGSEX_RELOAD_REGISTRY, 0);
 				iRet = SendMessageW(_hWnd, g_uMsg, iSettingsEX, 0);
-			}
-			if (hOriginalCursor != 0) {
-				if (!SetSystemCursor(hOriginalCursor, OCR_NORMAL)) return 0;
 			}
 			return iRet;
 		}

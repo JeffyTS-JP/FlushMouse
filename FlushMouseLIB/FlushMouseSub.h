@@ -47,13 +47,10 @@ class CRawInputDevice	:	public CRawInput
 {
 	public:
 		CRawInputDevice()
-			:	uuMouseWindowTick(GetTickCount64()), bOnlyCtrlLL(FALSE), dwPreviousVKLL(0), bEnableEPHelperLL(FALSE),
-				bIMEModeForcedLL(FALSE), bStartConvertingLL(FALSE), uuKeyRepeatTickLL(GetTickCount64())
+			:	uuMouseWindowTick(GetTickCount64()), bOnlyCtrlLL(FALSE), dwPreviousVKLL(0),
+				bStartConvertingLL(FALSE), uuKeyRepeatTickLL(GetTickCount64())
 		{};
 		~CRawInputDevice() override {};
-
-		BOOL		bSetEnableEPHelper(BOOL bEPHelper);
-		BOOL		bSetEnableIMEModeForced(BOOL bIMEModeForced);
 
 private:
 	virtual void	vRawInputMouseHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawInput) override;
@@ -64,8 +61,6 @@ private:
 
 	BOOL			bOnlyCtrlLL;
 	DWORD			dwPreviousVKLL;
-	BOOL			bEnableEPHelperLL;		// @@@ for Explorer Patcher Simple Window Switcher
-	BOOL			bIMEModeForcedLL;
 	BOOL			bStartConvertingLL;
 	ULONGLONG		uuKeyRepeatTickLL;
 };

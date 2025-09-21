@@ -35,10 +35,7 @@ extern void			Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground);
 extern void			Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flags);
 
 extern VOID			vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine);
-extern VOID			vAboutDialog(HWND hWnd);
-extern VOID			vIMEModeDialog(HWND hWnd);
-extern VOID			vSynTPHelperDialog(HWND hWnd);
-extern VOID			vSettingDialog(HWND hWnd);
+extern VOID			vSettingDialog(HWND hWnd, INT32 iSelectedPane);
 extern VOID			vSettingDialogApply();
 extern VOID			vSettingDialogClose();
 
