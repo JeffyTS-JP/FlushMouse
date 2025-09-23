@@ -1,6 +1,6 @@
 ﻿
 # FlushMouse
-|<img width="80" height="80" alt="Image" src="https://github.com/user-attachments/assets/520a32ac-afd6-4af7-b0c3-389f8daf7c79" />|**システムトレイ(タスクトレイ)に常駐して、マウスカーソルやキャレットに IMEモードの表示をするユーティリティです<br>FlushMouse is a software developed by JeffyTS. It is a mouse gesture tool that allows you to perform various operations by drawing gestures with your mouse. (by Bing)**|
+|<img width="100" height="100" alt="Image" src="https://github.com/user-attachments/assets/520a32ac-afd6-4af7-b0c3-389f8daf7c79" />|**システムトレイ(タスクトレイ)に常駐して、マウスカーソルやキャレットに IMEモードの表示をするユーティリティです<br>FlushMouse is a software developed by JeffyTS. It is a mouse gesture tool that allows you to perform various operations by drawing gestures with your mouse. (by Bing)**|
 | :---: | :--- |
 
 #### リリース情報
