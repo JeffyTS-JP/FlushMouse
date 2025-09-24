@@ -152,7 +152,7 @@ class CCursor
 	private:
 		IMECURSORDATA	stIMECursorData;
 
-		HWND			_hMainWnd;
+		HWND			m_hMainWnd;
 		HMODULE			hCursorData;
 		int				iCursorDataLoadCount;
 
@@ -165,7 +165,7 @@ class CCursor
 		CCursorWindow	*CaretWindow;
 		CCursorWindow	*MouseWindow;
 
-		HWND			_hWndObserved;
+		HWND			m_hWndObserved;
 		DWORD			dwIMEModeCursor;
 		BOOL			bDrawIMEModeWait;
 		DWORD			dwDrawIMEModeWaitTime;

@@ -61,7 +61,7 @@ void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine)
 				_sntprintf_s(lpText, (MAX_LOADSTRING * 2), _TRUNCATE, L"%s\n\n (%s : %d : 0x%08X)", lpText, _lpFunc, dwLine, GetLastError());
 			}
 			try {
-				throw MessageBox(hWnd, lpText, szTitle, uType);
+				throw MessageBox(hWnd, lpText, g_szWindowTitle, uType);
 			}
 			catch (int) {
 				return;

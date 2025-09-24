@@ -145,7 +145,7 @@ BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
 		case SYNTPH_SENDERIPV4_START:
 			if (bIsPrivateAddress(Profile->lpstAppRegData->szSynTPSendIPAddr1)) {
 				SynTP->bStopSender();
-				if (SynTP->bStartSender(hMainWnd, Profile->lpstAppRegData->szSynTPSendIPAddr1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
+				if (SynTP->bStartSender(g_hMainWnd, Profile->lpstAppRegData->szSynTPSendIPAddr1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
 					Profile->lpstAppRegData->bSynTPStarted1 = TRUE;
 					break;
 				}
@@ -171,7 +171,7 @@ BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
 		case SYNTPH_SENDERHOSNAMEIPV6_START:
 			if (bCheckExistHostnameIPv4(Profile->lpstAppRegData->szSynTPSendHostname1, Profile->lpstAppRegData->dwSynTPTimeOut)) {
 				SynTP->bStopSender();
-				if (SynTP->bStartSender(hMainWnd, Profile->lpstAppRegData->szSynTPSendHostname1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
+				if (SynTP->bStartSender(g_hMainWnd, Profile->lpstAppRegData->szSynTPSendHostname1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
 					Profile->lpstAppRegData->bSynTPStarted1 = TRUE;
 					break;
 				}
@@ -196,7 +196,7 @@ BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
 		case SYNTPH_RECEIVERIPV6:
 		case SYNTPH_RECEIVERIPV6_START:
 			SynTP->vStopReceiver();
-			if (SynTP->bStartReceiver(hMainWnd, Profile->lpstAppRegData->dwSynTPPortNo1)) {
+			if (SynTP->bStartReceiver(g_hMainWnd, Profile->lpstAppRegData->dwSynTPPortNo1)) {
 				Profile->lpstAppRegData->bSynTPStarted1 = TRUE;
 				break;
 			}
@@ -216,7 +216,7 @@ BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
 		LPTSTR	lpszToolHints = new TCHAR[MAX_LOADSTRING];
 		if (lpszToolHints) {
 			ZeroMemory(lpszToolHints, MAX_LOADSTRING);
-			_tcsncpy_s(lpszToolHints, MAX_LOADSTRING, szTitle, _TRUNCATE);
+			_tcsncpy_s(lpszToolHints, MAX_LOADSTRING, g_szWindowTitle, _TRUNCATE);
 			LPTSTR	lpszBuff = new TCHAR[MAX_LOADSTRING];
 			if (lpszBuff) {
 				ZeroMemory(lpszBuff, MAX_LOADSTRING);
@@ -244,7 +244,7 @@ BOOL		bStopSynTPHelper(HWND hWnd)
 		if (Profile) {
 			Profile->lpstAppRegData->bSynTPStarted1 = FALSE;
 			Profile->bSetProfileData();
-			if (!Profile->lpstAppRegData->bSynTPStarted1)	TaskTray->bModifyToolHints(hWnd, szTitle);
+			if (!Profile->lpstAppRegData->bSynTPStarted1)	TaskTray->bModifyToolHints(hWnd, g_szWindowTitle);
 			return TRUE;
 		}
 		return TRUE;
@@ -257,14 +257,14 @@ BOOL		bStopSynTPHelper(HWND hWnd)
 //
 BOOL		bCheckDrawIMEModeArea(HWND hWndObserved)
 {
-	if (hMainWnd == hWndObserved)	return FALSE;
+	if (g_hMainWnd == hWndObserved)	return FALSE;
 	if (FindWindow(L"Shell_TrayWnd", NULL) == hWndObserved)	return FALSE;
 	POINT	pt{};
 	if (GetCursorPos(&pt)) {
 		if (WindowFromPoint(pt) != NULL) {
 			RECT	rc{};
 			if (TaskTray) {
-				if (TaskTray->bGetTaskTrayWindowRect(hMainWnd, &rc)) {
+				if (TaskTray->bGetTaskTrayWindowRect(g_hMainWnd, &rc)) {
 					if (((pt.x >= rc.left) && (pt.x <= rc.right)) || ((pt.y <= rc.top) && (pt.y >= rc.bottom)))	return FALSE;
 				}
 			}
@@ -314,7 +314,7 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 
 	RAWKEYBOARD RawKeyboard = (RAWKEYBOARD)(lpRawInput->data.keyboard);
 
-	BOOL	bKeyUp = RawKeyboard.Flags & RI_KEY_BREAK;
+	BOOL	bKeyDown = !(RawKeyboard.Flags & RI_KEY_BREAK);
 	if (RawKeyboard.MakeCode == KEYBOARD_OVERRUN_MAKE_CODE || RawKeyboard.VKey >= UCHAR_MAX)	return;
 	WORD	wScanCode = 0;
 	if (RawKeyboard.MakeCode) {
@@ -324,7 +324,7 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 		wScanCode = LOWORD(MapVirtualKey(RawKeyboard.VKey, MAPVK_VK_TO_VSC_EX));
 	}
 
-	if (bKeyUp) {														// Key up
+	if (bKeyDown == FALSE) {											// Key up
 #define	DIFF_TIME	500
 		if ((RawKeyboard.VKey == VK_OEM_IME_OFF) || (RawKeyboard.VKey == VK_OEM_IME_ON)) {
 			ULONGLONG	_uuKeyRepeatTickLL = GetTickCount64();
@@ -341,10 +341,10 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 		case VK_LCONTROL:		// Ctrl L (0xa2)
 		case VK_RCONTROL:		// Ctrl R (0xa3)
 			if (bOnlyCtrlLL) {
-				Cls_OnSysKeyDownUpEx(hWnd, KEY_ONLY_CTRLUP, !bKeyUp, 1, 0);
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_ONLY_CTRLUP, bKeyDown, 1, 0);
 			}
 			bOnlyCtrlLL = FALSE;
-			Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), !bKeyUp, 1, 0);
+			Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), bKeyDown, 1, 0);
 			return;
 		case VK_RETURN:			// Enter (0x0d)
 			bOnlyCtrlLL = FALSE;
@@ -353,13 +353,12 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 				PostMessage(hWnd, WM_CHECKIMESTARTCONVEX, (WPARAM)bStartConvertingLL, (LPARAM)(DWORD)(WM_USER + RawKeyboard.VKey));
 			}
 			else {
-				Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), !bKeyUp, 1, 0);
+				Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), bKeyDown, 1, 0);
 			}
 			return;
 		case VK_TAB:			// Tab (0x09)
-		case VK_KANJI:			// Alt + 漢字 (0x19)
-		case VK_OEM_3:			// @@@ JP(IME/ENG) [@] / US(ENG) IME ON (0xc0) = ['] ALT + 半角/全角 or 漢字
-		case VK_OEM_8:			// @@@ JP(IME/ENG) [`] / British(ENG) IME ON (0xdf) = ['] ALT + 半角/全角 or 漢字
+		case VK_OEM_3:			// JP(IME/ENG) [@] / US(ENG) IME ON (0xc0) = ['] ALT + 半角/全角 or 漢字
+		case VK_OEM_8:			// JP(IME/ENG) [`] / British(ENG) IME ON (0xdf) = ['] ALT + 半角/全角 or 漢字
 		case VK_MENU:			// ALT (0x12)
 		case VK_LMENU:			// ALT L (0xa4)
 		case VK_RMENU:			// ALT R (0xa5)
@@ -377,12 +376,10 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 		case VK_F8:				// (0x77)
 		case VK_F9:				// (0x78)
 		case VK_F10:			// (0x79)
-		case VK_OEM_IME_OFF:	// OEM IME OFF (0xf3)
-		case VK_OEM_IME_ON:		// OEM IME ON  (0xf4)
 		case VK_OEM_BACKTAB:	// OEM Alt+カタカナ/ひらがな (0xf5)
 		case VK_OEM_PA1:		// US(ENG) Non Convert (0xeb)
 			bOnlyCtrlLL = FALSE;
-			Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), !bKeyUp, 1, 0);
+			Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), bKeyDown, 1, 0);
 			return;
 		case VK_OEM_ATTN:		// OEM 英数/CapsLock (0xf0)
 		case VK_OEM_FINISH:		// OEM カタカナ (0xf1)
@@ -392,13 +389,13 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 		case VK_FF:				// US(ENG) Convert
 			bOnlyCtrlLL = FALSE;
 			if ((GetKeyState(VK_SHIFT) & 0x8000) || (GetKeyState(VK_LSHIFT) & 0x8000) || (GetKeyState(VK_RSHIFT) & 0x8000)) {
-				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_FINISH, !bKeyUp, 1, 0);
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_FINISH, bKeyDown, 1, 0);
 			}
 			else if (wScanCode == 0x70) {						// US(ENG) ひらがな
-				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_COPY, !bKeyUp, 1, 0);
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_COPY, bKeyDown, 1, 0);
 			}
 			else if (wScanCode == 0x79) {						// US(ENG) 変換
-				Cls_OnSysKeyDownUpEx(hWnd, KEY_CONVERT, !bKeyUp, 1, 0);
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_CONVERT, bKeyDown, 1, 0);
 			}
 			return;
 		default:
@@ -417,7 +414,6 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 			uuKeyRepeatTickLL = _uuKeyRepeatTickLL;
 		}
 #undef	DIFF_TIME
-		dwPreviousVKLL = RawKeyboard.VKey;
 		switch (RawKeyboard.VKey) {
 		case VK_CONTROL:		// Ctrl   (0x11)
 		case VK_LCONTROL:		// Ctrl L (0xa2)
@@ -436,7 +432,7 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 			bStartConvertingLL = FALSE;
 			dwPreviousVKLL = RawKeyboard.VKey;
 			if (bKeyboardTypeIsEP()) {
-				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_ATTN, !bKeyUp, 1, 0);
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_ATTN, bKeyDown, 1, 0);
 			}
 			return;
 		case VK_KANJI:			// JP(IME/ENG) Alt + 漢字	(0x19)
@@ -444,7 +440,7 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 			bStartConvertingLL = FALSE;
 			dwPreviousVKLL = RawKeyboard.VKey;
 			if ((GetKeyState(VK_MENU) & 0x8000) || (GetKeyState(VK_LMENU) & 0x8000) || (GetKeyState(VK_RMENU) & 0x8000)) {
-				Cls_OnSysKeyDownUpEx(hWnd, KEY_KANJI, !bKeyUp, 1, 0);
+				Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), !bKeyDown, 1, 0);
 			}
 			return;
 		case VK_CONVERT:		// 変換 (0x1c)
@@ -452,17 +448,22 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 			bOnlyCtrlLL = FALSE;
 			bStartConvertingLL = FALSE;
 			dwPreviousVKLL = RawKeyboard.VKey;
-			Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), !bKeyUp, 1, 0);
+			Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), bKeyDown, 1, 0);
 			return;
 		case VK_OEM_IME_OFF:	// OEM IME OFF (0xf3)
 		case VK_OEM_IME_ON:		// OEM IME ON  (0xf4)
 			bOnlyCtrlLL = FALSE;
 			bStartConvertingLL = FALSE;
-			dwPreviousVKLL = RawKeyboard.VKey;
-			Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), !bKeyUp, 1, 0);
+			if ((RawKeyboard.Message == WM_KEYDOWN)) {
+				dwPreviousVKLL = RawKeyboard.VKey;
+			}
+			else {
+				dwPreviousVKLL = 0;
+				Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), !bKeyDown, 1, 0);
+			}
 			return;
-		case VK_OEM_3:			// @@@ JP(IME/ENG) [@] / US(ENG) IME ON (0xc0) = ['] ALT + 半角/全角 or 漢字
-		case VK_OEM_8:			// @@@ JP(IME/ENG) [`] / British(ENG) IME ON (0xdf) = ['] ALT + 半角/全角 or 漢字
+		case VK_OEM_3:			// JP(IME/ENG) [@] / US(ENG) IME ON (0xc0) = ['] ALT + 半角/全角 or 漢字
+		case VK_OEM_8:			// JP(IME/ENG) [`] / British(ENG) IME ON (0xdf) = ['] ALT + 半角/全角 or 漢字
 			bOnlyCtrlLL = FALSE;
 			bStartConvertingLL = FALSE;
 			dwPreviousVKLL = RawKeyboard.VKey;
@@ -474,14 +475,14 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 			if (!bStartConvertingLL) {
 				dwPreviousVKLL = RawKeyboard.VKey;
 				if ((RawKeyboard.Message == WM_KEYDOWN)) {
-					Cls_OnSysKeyDownUpEx(hWnd, RawKeyboard.VKey, !bKeyUp, 1, 0);
+					Cls_OnSysKeyDownUpEx(hWnd, (WM_USER + RawKeyboard.VKey), bKeyDown, 1, 0);
 				}
 				else {
 					if ((GetKeyState(VK_SHIFT) & 0x8000) || (GetKeyState(VK_LSHIFT) & 0x8000) || (GetKeyState(VK_RSHIFT) & 0x8000)) {
-						Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_FINISH, !bKeyUp, 1, 0);
+						Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_FINISH, bKeyDown, 1, 0);
 					}
 					else {
-						Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_COPY, !bKeyUp, 1, 0);
+						Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_COPY, bKeyDown, 1, 0);
 					}
 				}
 			}
@@ -491,20 +492,17 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 			bStartConvertingLL = FALSE;
 			dwPreviousVKLL = RawKeyboard.VKey;
 			if ((RawKeyboard.Message == WM_KEYDOWN)) {
-				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_FINISH, !bKeyUp, 1, 0);
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_FINISH, bKeyDown, 1, 0);
 			}
 			return;
 		case VK_OEM_COPY:		// OEM ひらがな (0xf2)
 			bOnlyCtrlLL = FALSE;
 			bStartConvertingLL = FALSE;
 			dwPreviousVKLL = RawKeyboard.VKey;
-			if ((RawKeyboard.Message == WM_KEYDOWN)) {
-				if ((GetKeyState(VK_SHIFT) & 0x8000) || (GetKeyState(VK_LSHIFT) & 0x8000) || (GetKeyState(VK_RSHIFT) & 0x8000)) {
-					Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_FINISH, !bKeyUp, 1, 0);
-				}
-				else {
-					Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_COPY, !bKeyUp, 1, 0);
-				}
+			if ((GetKeyState(VK_SHIFT) & 0x8000) || (GetKeyState(VK_LSHIFT) & 0x8000) || (GetKeyState(VK_RSHIFT) & 0x8000)) {
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_FINISH, bKeyDown, 1, 0);
+			} else {
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_COPY, bKeyDown, 1, 0);
 			}
 			return;
 
@@ -759,16 +757,6 @@ BOOL			CFlushMouseHook::bHookSet(HWND hWnd, LPCTSTR lpszDll64Name, LPCTSTR lpszE
 BOOL		CFlushMouseHook::bHookUnset()
 {
 	if (bHook32Dll)			bHook32DllStop();
-	if (bShellHook64)		bShellHookUnset();
-	if (bGlobalHook64)		bGlobalHookUnset();
-	return TRUE;
-}
-
-//
-// bHookUnset64()
-//
-BOOL		CFlushMouseHook::bHookUnset64() const
-{
 	if (bShellHook64)		bShellHookUnset();
 	if (bGlobalHook64)		bGlobalHookUnset();
 	return TRUE;

@@ -116,7 +116,6 @@ class CFlushMouseHook
 		~CFlushMouseHook();
 		BOOL		bHookSet(HWND hWnd, LPCTSTR lpszDll64Name, LPCTSTR lpszExec32Name);
 		BOOL		bHookUnset();
-		BOOL		bHookUnset64() const;
 
 	private:
 		BOOL		bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name);

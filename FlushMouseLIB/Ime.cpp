@@ -4,8 +4,8 @@
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
-// #0000		2022/03/03  JeffyTS  	New edit.
-// #0001		2023/06/30	JeffyTS		Divided from cursor.cpp
+// #0000	2022/03/03  JeffyTS  	New edit.
+// #0001	2023/06/30	JeffyTS		Divided from cursor.cpp
 //
 
 // Include
@@ -76,12 +76,12 @@ BOOL CALLBACK CIME::bEnumChildProcIMEConvertMode(HWND hWnd, LPARAM lParam)
 	if (hWnd == NULL)	return FALSE;
 	HWND    hIMWnd = NULL;
 	if ((hIMWnd = ImmGetDefaultIMEWnd(hWnd)) != NULL) {
-		if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETOPENSTATUS, (LPARAM)TRUE) == 0) {	
+		if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETOPENSTATUS, (LPARAM)TRUE) == 0) {
 			if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETCONVERSIONMODE, (LPARAM)lParam) == 0) {
 			}
 		}
 	}
-	return TRUE;	
+	return TRUE;
 }
 
 //
@@ -95,7 +95,7 @@ BOOL CALLBACK CIME::bEnumChildProcIMEOpenClose(HWND hWnd, LPARAM lParam)
 		if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETOPENSTATUS, lParam) == 0) {
 		}
 	}
-	return TRUE;	
+	return TRUE;
 }
 
 //
@@ -197,7 +197,7 @@ DWORD		CIME::dwGetInputLocale()
 #define SUBKEY	_T("SOFTWARE\\Microsoft\\Input\\Locales")
 #define VALUE	_T("InputLocale")
 	DWORD	dwInputLocale = 0;
-	CRegistry* CReg = new CRegistry;
+	CRegistry	*CReg = new CRegistry;
 	if (CReg) {
 		if (!CReg->bReadSystemRegValueDWORD(HKEY_LOCAL_MACHINE, SUBKEY, VALUE, &dwInputLocale)) {
 		}

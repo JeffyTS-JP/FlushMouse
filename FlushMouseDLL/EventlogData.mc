@@ -179,7 +179,7 @@ Severity=Success
 Facility=Application
 SymbolicName=MSG_STOPPED_FLUSHMOUSE
 Language=English
-Stoped FlushMouse.
+Stopped FlushMouse.
 .
 
 Language=Japanese

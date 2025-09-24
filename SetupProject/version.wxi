@@ -2,12 +2,12 @@
 	
 	<!-- for wix Setup Project -->
 	<!-- Copyright (C) 2023 JeffyTS -->
-	<?define Version = "3.7.2.5" ?>
+	<?define Version = "3.7.3.13" ?>
 
 	<!-- Common -->
 	<?define ProductName = "FlushMouse" ?>
 	<?define Manufacturer = "JeffyTS" ?>
-		
+	
 	<!-- Product.wxs -->
 	<?define Comments = "Mouse and IME UTY" ?>
 

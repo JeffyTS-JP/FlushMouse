@@ -179,7 +179,7 @@
 //
 // MessageText:
 //
-// Stoped FlushMouse.
+// Stopped FlushMouse.
 //
 #define MSG_STOPPED_FLUSHMOUSE           ((DWORD)0x00000105L)
 

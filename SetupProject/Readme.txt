@@ -4,14 +4,10 @@
 	Files
 		%ProgramFiles%\JeffyTS\FlushMouse
 			FlushMouse.exe
-			FlushMouse.pdb
 			FlushMouseDLL.dll
-			FlushMouseDLL.pdb
 			FlushMouse32.exe
-			FlushMouse32.pdb
 			FlushMouseDLL32.dll
-			FlushMouseDLL32.pdb
-			Register_Eventlog.reg
+		Register_Eventlog.reg
 			Register_TaskScheduler.xml
 			Register_TaskScheduler1.xml
 			Register_TaskScheduler2.xml
@@ -21,11 +17,9 @@
 		\Program Files\JeffyTS\FlushMouse\FlushMouseSettngs
 			FlushMouseSettings.exe
 			FlushMouseSettings.exe.manifest
-			FlushMouseSettings.pdb
 			FlushMouseSettings.pri
 			FlushMouseSettings.xbf
 			FlushMouseUI3DLL.dll
-			FlushMouseUI3DLL.pdb
 			FlushMouse.ico
 			SynTP_Receiver.ico
 			(some).xbf files

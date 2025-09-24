@@ -45,8 +45,8 @@ extern VOID			vSettingDialogClose();
 extern TCHAR		szFlushMouseDLL[];
 extern TCHAR		szFlushMouse32[];
 
-extern TCHAR		szTitle[];
-extern HWND			hMainWnd;
+extern TCHAR		g_szWindowTitle[];
+extern HWND			g_hMainWnd;
 
 extern CProfile		*Profile;
 extern CCursor		*Cursor;

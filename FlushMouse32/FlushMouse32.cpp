@@ -38,8 +38,8 @@
 // Define
 //
 // Timer
-constexpr auto PROCINITTIMERVALUE = 3000;
-constexpr auto CHECKPROCTIMERID = 2;
+constexpr UINT PROCINITTIMERVALUE = 3000;
+constexpr UINT_PTR CHECKPROCTIMERID = 2;
 static UINT     nCheckProcTimerTickValue = PROCINITTIMERVALUE;
 static UINT_PTR nCheckProcTimerID = CHECKPROCTIMERID;
 static UINT_PTR	uCheckProcTimer = NULL;

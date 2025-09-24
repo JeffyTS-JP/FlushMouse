@@ -156,7 +156,7 @@ BOOL		CTaskTray::bReCreateTaskTrayWindow(HWND hWnd) const
 	if ((hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE))) != NULL) {
 		BOOL	bRet = FALSE;
 		for (int i = 0; i < 3; i++) {
-			if ((bRet = bCreateTaskTrayWindow(hWnd, hIcon, szTitle)))	break;
+			if ((bRet = bCreateTaskTrayWindow(hWnd, hIcon, g_szWindowTitle)))	break;
 			Sleep(1000);
 		}
 		if (bRet) {

@@ -120,7 +120,7 @@ BOOL		bCheckExistHostnameIPv4(LPCTSTR lpszHostname, int iTimeOut)
 			}
 
 			ADDRINFOW	pHints{};	
-			SecureZeroMemory(&pHints, sizeof(ADDRINFOW));
+			ZeroMemory(&pHints, sizeof(ADDRINFOW));
 			pHints.ai_flags  = AI_V4MAPPED;
 			pHints.ai_family = PF_INET;
 			pHints.ai_socktype = SOCK_STREAM;
@@ -279,7 +279,7 @@ BOOL		CTCPIP::bOpenPortForSendUDPv4(LPCTSTR lpszIPAddress, int Port)
 	iRet = InetPton(SockAddr_IN.sin_family, lpszIPAddr, &SockAddr_IN.sin_addr.S_un.S_addr);
 	if (iRet == 0) {
 		ADDRINFOW	pHints{};	
-		SecureZeroMemory(&pHints, sizeof(ADDRINFOW));
+		ZeroMemory(&pHints, sizeof(ADDRINFOW));
 		pHints.ai_flags  = AI_V4MAPPED;
 		pHints.ai_family = PF_INET;
 		pHints.ai_socktype = SOCK_STREAM;

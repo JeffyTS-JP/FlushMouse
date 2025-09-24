@@ -241,19 +241,40 @@ BOOL		CCursorSub::bGetCursorDataFullPath(LPCTSTR lpszCursorDataFileName)
 //
 BOOL		CCursorSub::bGetCursorDataTempFullPath(LPCTSTR lpszCursorDataFileName)
 {
+	GUID	guid = GUID_NULL;
+	HRESULT	hResult = CoCreateGuid(&guid);
+	if (hResult != S_OK) {
+		return FALSE;
+	}
+
 	LPTSTR	lpszBuffer = new TCHAR[_MAX_PATH + 1];
-	if (lpszBuffer) {
+	LPTSTR	lpszBuffer2 = new TCHAR[_MAX_PATH + 1];
+	LPTSTR	fname = new TCHAR[_MAX_FNAME];
+	LPTSTR	ext = new TCHAR[_MAX_EXT];
+
+	if (lpszBuffer && lpszBuffer2) {
 		ZeroMemory(lpszBuffer, _MAX_PATH + 1);
+		ZeroMemory(lpszBuffer2, _MAX_PATH + 1);
+		ZeroMemory(fname, _MAX_FNAME);
+		ZeroMemory(ext, _MAX_EXT);
+
 		GetTempPath(_MAX_PATH, lpszBuffer);
-		_tcsncat_s(lpszBuffer, _MAX_PATH + 1, lpszCursorDataFileName, _TRUNCATE);
+
+		_tsplitpath_s(lpszCursorDataFileName, NULL, 0, NULL, 0, fname, _MAX_FNAME, ext, _MAX_EXT);
+		_sntprintf_s(lpszBuffer2, (MAX_LOADSTRING * 2), _TRUNCATE, L"%s-{%08lx-%04lx-%04lx-%02lx%02lx-%02lx%02lx%02lx%02lx%02lx%02lx}%s", fname, guid.Data1, guid.Data2, guid.Data3,
+			guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3], guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7], ext);
+		_tcsncat_s(lpszBuffer, _MAX_PATH + 1, lpszBuffer2, _TRUNCATE);
 		size_t	size = wcsnlen_s(lpszBuffer, _MAX_PATH + 1);
 		lpszCursorDataTempFullPath = new TCHAR[size + 1];
 		if (lpszCursorDataTempFullPath) {
 			ZeroMemory(lpszCursorDataTempFullPath, size + 1);
 			_tcsncpy_s(lpszCursorDataTempFullPath, size + 1, lpszBuffer, _TRUNCATE);
 		}
-		delete[]	lpszBuffer;
 	}
+	if (lpszBuffer)		delete[]	lpszBuffer;
+	if (lpszBuffer2)	delete[]	lpszBuffer2;
+	if (fname)			delete[]	fname;
+	if (ext)			delete[]	ext;
 	if (lpszCursorDataTempFullPath)	return TRUE;
 	return FALSE;
 }
