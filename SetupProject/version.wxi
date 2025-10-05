@@ -2,7 +2,7 @@
 	
 	<!-- for wix Setup Project -->
 	<!-- Copyright (C) 2023 JeffyTS -->
-	<?define Version = "3.7.3.13" ?>
+	<?define Version = "3.7.4.14" ?>
 
 	<!-- Common -->
 	<?define ProductName = "FlushMouse" ?>

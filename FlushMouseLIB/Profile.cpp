@@ -51,6 +51,10 @@ CProfile::CProfile()
 		lpstAppRegData->dwDisplayModeTime = 400;										// IME mode displayの表示時間
 		lpstAppRegData->bForceHiragana = FALSE;											// 「全角ひらがな」へ強制的に変更する
 		lpstAppRegData->bSupportVirtualDesktop = FALSE;									// 仮想デスクトップをサポートする
+		lpstAppRegData->uuMouseWindowDiffTickDrawByResource = 50;						// Mouse Window Thread を動かす差分 Tick (リソースで描画しているとき)
+		lpstAppRegData->uuMouseWindowDiffTickDrawByWindow = 15;							// 同上 (直接描画しているとき)
+		lpstAppRegData->uuMouseWindowDiffTickNotDrawing = 50;							// 同上 (Mouse cursorに描画してない時)
+		lpstAppRegData->uuMouseWindowDiffTickInVDT = 100;								// 同上 (仮想デスクトップ内にいるとき)
 		lpstAppRegData->dwNearDrawMouseIMEOFFColor = aRGB(48, 255, 0, 0);				// IMEOFF マウスカーソルへのIMEモード表示色 RGB(255, 192, 0) + α (0xf0)
 		lpstAppRegData->dwNearDrawMouseHANEISU_IMEONColor = aRGB(48, 255, 0, 0);		// 半英数　マウスカーソルへのIMEモード表示色 RGB(255, 192, 0) + α (0xf0)
 		lpstAppRegData->dwNearDrawMouseHANKANA_IMEONColor = aRGB(48, 255, 0, 0);		// 半カナ　マウスカーソルへのIMEモード表示色 RGB(255, 192, 0) + α (0xf0)
@@ -103,6 +107,8 @@ CProfile::CProfile()
 		lpstAppRegData->bDoModeDispByCtrlUp = TRUE;					// Ctrlが離されたときにIMEモードを表示する
 		lpstAppRegData->bIMEModeForced = FALSE;						// Change IME Mode Forced
 		lpstAppRegData->bEnableEPHelper = FALSE;					// for Explorer Patcher Simple Window Switcher Helper
+		lpstAppRegData->nCheckFocusTimerTickValue = 500;			// Focus チェック タイマー値
+		lpstAppRegData->nCheckProcTimerTickValue = 3000;			// Process  チェック タイマー値
 
 		lpstAppRegData->bOffChangedFocus = FALSE;					// アプリケーションが切り替わったときIMEをOFFにする(bDisplayFocusWindowIMEとは排他的動作になる)
 		lpstAppRegData->bDrawNearCaret = FALSE;						// Caretの横にIMEモードを表示
@@ -297,6 +303,10 @@ BOOL		CProfile::bGetProfileData4Mouse() const
 	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("AdditionalWaitTime"), (LPDWORD)&lpstAppRegData->dwAdditionalWaitTime, lpstAppRegData->dwAdditionalWaitTime))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayModeTime"), (LPDWORD)&lpstAppRegData->dwDisplayModeTime, lpstAppRegData->dwDisplayModeTime))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeMethod"), (LPDWORD)&lpstAppRegData->dwDisplayIMEModeMethod, lpstAppRegData->dwDisplayIMEModeMethod))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("MouseWindowDiffTickDrawByResource"), (LPDWORD)&lpstAppRegData->uuMouseWindowDiffTickDrawByResource, (DWORD)lpstAppRegData->uuMouseWindowDiffTickDrawByResource))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("MouseWindowDiffTickDrawByWindow"), (LPDWORD)&lpstAppRegData->uuMouseWindowDiffTickDrawByWindow, (DWORD)lpstAppRegData->uuMouseWindowDiffTickDrawByWindow))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("MouseWindowDiffTickNotDrawing"), (LPDWORD)&lpstAppRegData->uuMouseWindowDiffTickNotDrawing, (DWORD)lpstAppRegData->uuMouseWindowDiffTickNotDrawing))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("MouseWindowDiffTickInVDT"), (LPDWORD)&lpstAppRegData->uuMouseWindowDiffTickInVDT, (DWORD)lpstAppRegData->uuMouseWindowDiffTickInVDT))	goto Cleanup;
 
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeOnCursor"), (LPBOOL)&lpstAppRegData->bDisplayIMEModeOnCursor, lpstAppRegData->bDisplayIMEModeOnCursor))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeIMEOFF"), (LPBOOL)&lpstAppRegData->bDisplayIMEModeIMEOFF, lpstAppRegData->bDisplayIMEModeIMEOFF))	goto Cleanup;
@@ -306,6 +316,10 @@ BOOL		CProfile::bGetProfileData4Mouse() const
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("UseBigArrow"), (LPBOOL)&(lpstAppRegData->bUseBigArrow), lpstAppRegData->bUseBigArrow))	goto Cleanup;
 	
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayFocusWindowIME"), (LPBOOL)&(lpstAppRegData->bDisplayFocusWindowIME), lpstAppRegData->bDisplayFocusWindowIME))	goto Cleanup;
+	
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("CheckFocusTimerTickValue"), (LPDWORD)&lpstAppRegData->nCheckFocusTimerTickValue, lpstAppRegData->nCheckFocusTimerTickValue))	goto Cleanup;
+	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("CheckProcTimerTickValue"), (LPDWORD)&lpstAppRegData->nCheckProcTimerTickValue, lpstAppRegData->nCheckProcTimerTickValue))	goto Cleanup;
+	
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByMouseBttnUp"), (LPBOOL)&(lpstAppRegData->bDoModeDispByMouseBttnUp), lpstAppRegData->bDoModeDispByMouseBttnUp))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByIMEKeyDown"), (LPBOOL)&(lpstAppRegData->bDoModeDispByIMEKeyDown), lpstAppRegData->bDoModeDispByIMEKeyDown))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByCtrlUp"), (LPBOOL)&(lpstAppRegData->bDoModeDispByCtrlUp), lpstAppRegData->bDoModeDispByCtrlUp))	goto Cleanup;
@@ -340,6 +354,10 @@ BOOL		CProfile::bSetProfileData4Mouse() const
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("AdditionalWaitTime"), lpstAppRegData->dwAdditionalWaitTime))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayModeTime"), lpstAppRegData->dwDisplayModeTime))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeMethod"), lpstAppRegData->dwDisplayIMEModeMethod))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("MouseWindowDiffTickDrawByResource"), (DWORD)lpstAppRegData->uuMouseWindowDiffTickDrawByResource))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("MouseWindowDiffTickDrawByWindow"), (DWORD)lpstAppRegData->uuMouseWindowDiffTickDrawByWindow))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("MouseWindowDiffTickNotDrawing"), (DWORD)lpstAppRegData->uuMouseWindowDiffTickNotDrawing))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("MouseWindowDiffTickInVDT"), (DWORD)lpstAppRegData->uuMouseWindowDiffTickInVDT))	goto Cleanup;
 
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeOnCursor"), lpstAppRegData->bDisplayIMEModeOnCursor))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayIMEModeIMEOFF"), lpstAppRegData->bDisplayIMEModeIMEOFF))	goto Cleanup;
@@ -349,6 +367,10 @@ BOOL		CProfile::bSetProfileData4Mouse() const
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("UseBigArrow"), lpstAppRegData->bUseBigArrow))	goto Cleanup;
 
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayFocusWindowIME"), lpstAppRegData->bDisplayFocusWindowIME))	goto Cleanup;
+	
+	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("CheckFocusTimerTickValue"), lpstAppRegData->nCheckFocusTimerTickValue))	goto Cleanup;
+	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("CheckProcTimerTickValue"), lpstAppRegData->nCheckProcTimerTickValue))	goto Cleanup;
+	
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByIMEKeyDown"), lpstAppRegData->bDoModeDispByIMEKeyDown))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByCtrlUp"), lpstAppRegData->bDoModeDispByCtrlUp))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByMouseBttnUp"), lpstAppRegData->bDoModeDispByMouseBttnUp))	goto Cleanup;

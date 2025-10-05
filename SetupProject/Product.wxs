@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Product.wxs for FlushMouse Copyright (C) 2023 JeffyTS -->
 
@@ -778,7 +778,7 @@
 				<Condition>((NOT (BUNDLE = 1)) and (WIXUI_VERIFYDIALOGOPTIONALCHECKBOX1 = 1)) or (BUNDLE = 1)</Condition>
 				<RegistryValue Root="HKCU" Key="$(var.AppRegKey)" Name="InstalledDesktopShortcut" Type="integer" Value="1" KeyPath="yes" />
 				<RemoveFolder Id="DesktopFolder" On="uninstall" />
-				<Shortcut Id="DesktopShortcut" Name="$(var.ProductName)" Target="[INSTALLFOLDER]$(var.MainExeFileName)" Arguments="/Start" WorkingDirectory="INSTALLFOLDER" Advertise="no" />
+				<Shortcut Id="DesktopShortcut" Name="Flush Mouse" Target="[INSTALLFOLDER]$(var.MainExeFileName)" Arguments="/Start" WorkingDirectory="INSTALLFOLDER" Advertise="no" />
 			</Component>
 		</DirectoryRef>
 		<DirectoryRef Id="AppStartMenuFolder">

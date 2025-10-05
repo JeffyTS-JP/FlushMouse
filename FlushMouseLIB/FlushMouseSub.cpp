@@ -494,6 +494,9 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 			if ((RawKeyboard.Message == WM_KEYDOWN)) {
 				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_FINISH, bKeyDown, 1, 0);
 			}
+			else {
+				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_COPY, bKeyDown, 1, 0);
+			}
 			return;
 		case VK_OEM_COPY:		// OEM ひらがな (0xf2)
 			bOnlyCtrlLL = FALSE;
@@ -935,7 +938,18 @@ BOOL		bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, BOOL bIMEModeForc
 								}
 							}
 							else {
-								bRet = TRUE;
+								HWND	hWnd = FindWindow(_T("Hidemaru32Class"), NULL);
+								if ((hWnd != NULL) && (hForeWnd == hWnd)) {
+									hkl = US_ENG;
+									bRet = FALSE;
+									if (bChangeHKLbySendInput(JP_IME, hkl, FALSE)) {
+										hkl = JP_IME;
+										if (ActivateKeyboardLayout(hkl, (KLF_SETFORPROCESS | KLF_REORDER)) != 0) {
+											bRet = TRUE;
+										}
+									}
+								}
+								else bRet = TRUE;
 							}
 						}
 					}
@@ -951,11 +965,6 @@ BOOL		bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, BOOL bIMEModeForc
 	if (bRet) {
 		EnumChildWindows(hForeWnd, &bEnumChildProcChangeHKL, (LPARAM)hkl);
 		Cime->vActivateIME(hForeWnd);
-	}
-	HWND	hWnd = FindWindow(_T("Hidemaru32Class"), NULL);
-	if ((hWnd != NULL) && (hForeWnd == hWnd)) {
-		if (!bChangeHKLbySendInput(hkl, hPreviousHKL, FALSE)) {
-		}
 	}
 
 	if (lpNewHKL != NULL)		*lpNewHKL = hkl;

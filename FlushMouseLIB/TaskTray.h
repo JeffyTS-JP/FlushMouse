@@ -27,7 +27,7 @@
 class CTaskTray
 {
 	public:
-		explicit CTaskTray(HWND hWnd);
+		explicit CTaskTray();
 		~CTaskTray();
 
 	public:
@@ -47,7 +47,6 @@ class CTaskTray
 
 	private:
 		UINT		uTaskTrayID;
-		UINT		uTaskbarCreatedMessage;
 		UINT		uTaskbarCreated;
 };
 

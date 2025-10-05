@@ -38,7 +38,7 @@
 // Define
 //
 // Timer
-constexpr UINT PROCINITTIMERVALUE = 3000;
+constexpr UINT PROCINITTIMERVALUE = 1000;
 constexpr UINT_PTR CHECKPROCTIMERID = 2;
 static UINT     nCheckProcTimerTickValue = PROCINITTIMERVALUE;
 static UINT_PTR nCheckProcTimerID = CHECKPROCTIMERID;
@@ -58,6 +58,7 @@ static UINT_PTR	uCheckProcTimer = NULL;
 static TCHAR			szTitle[MAX_LOADSTRING] = FLUSHMOUSE32;
 static HINSTANCE		hInst = NULL;
 static HWND				hParentWnd = NULL;
+static UINT				uTaskbarCreated = 0;
 
 static CPowerNotification32	*PowerNotification = NULL;
 
@@ -239,7 +240,15 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		HANDLE_MSG(hWnd, WM_DESTROY, Cls_OnDestroy);
 		HANDLE_MSG(hWnd, WM_POWERBROADCAST, Cls_OnPowerBroadcast);
 	default:
-			break;
+		if ((uTaskbarCreated != 0) && (message == uTaskbarCreated)) {
+			if (uCheckProcTimer != NULL) {
+				if (KillTimer(hWnd, nCheckProcTimerID)) {
+					uCheckProcTimer = NULL;
+				}
+			}
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+		}
+		break;
 	}
 	return DefWindowProc(hWnd, message, wParam, lParam);
 }
@@ -253,6 +262,11 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 	UNREFERENCED_PARAMETER(lpCreateStruct);
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
 	
+	if ((uTaskbarCreated = RegisterWindowMessage(_T("TaskbarCreated"))) == 0) {
+		vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE, __func__, __LINE__);
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+		return FALSE;
+	}
 	PowerNotification = new CPowerNotification32(hWnd);
 	if (PowerNotification == NULL) {
 		vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE, __func__, __LINE__);

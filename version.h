@@ -9,9 +9,9 @@
 
 #define MAJOR_VERSION				3
 #define MINOR_VERSION				7
-#define BUILD_VERSION				3
-#define REVISION_VERSION		    13
-#define	VERSION				 "3.7.3.13"
+#define BUILD_VERSION				4
+#define REVISION_VERSION		    1
+#define	VERSION				 "3.7.4.14"
 
 #define FILE_VERSION_STRING		VALUE	"FileVersion",		VERSION
 #define PRODUCT_VERSION_STRING	VALUE	"ProductVersion",	VERSION

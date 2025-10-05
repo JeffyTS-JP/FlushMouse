@@ -86,12 +86,50 @@ typedef struct tagIMECursorData
 	DWORD		dwDisplayIMEModeMethod;
 	BOOL		bDisplayIMEModeIMEOFF;
 	BOOL		bForceHiragana;
-	BOOL		bSupportVirtualDesktop;
 	BOOL		bDrawNearCaret;
+	BOOL		bSupportVirtualDesktop;
+	ULONGLONG	uuMouseWindowDiffTickDrawByResource;
+	ULONGLONG	uuMouseWindowDiffTickDrawByWindow;
+	ULONGLONG	uuMouseWindowDiffTickNotDrawing;
+	ULONGLONG	uuMouseWindowDiffTickInVDT;
 
 	BOOL		bDenyChangedByApp;
 	BOOL		bUseBigArrow;
 	BOOL		bDisplayFocusWindowIME;
+
+	HWND		hWndObserved;
+	DWORD		dwIMEModeCursor;
+	BOOL		bDrawIMEModeWait;
+	DWORD		dwIMEModeMouseWindow;
+	DWORD		dwWaitTimeMouseWindow;
+	DWORD		dwDrawIMEModeWaitTime;
+	HWND		hWndCaret;
+	RECT		rcCaret;
+	BOOL		bCapsLock;
+
+	BOOL		bIMEModeByWindowThreadSentinel;
+	BOOL		bIMEDrawIMEModeThreadSentinel;
+
+	ULONGLONG	uuMouseWindowDiffTick;
+	
+	CCursorWindow	*CursorWindow;
+	CCursorWindow	*CaretWindow;
+	CCursorWindow	*MouseWindow;
+
+	LPFLUSHMOUSECURSOR	lpstNearDrawMouseCursor;
+	LPFLUSHMOUSECURSOR	lpstNearDrawCaretCursor;
+	LPFLUSHMOUSECURSOR	lpstNearDrawMouseByWndCursor;
+
+	HCURSOR			hCursorArrow;
+	HCURSOR			hCursorIBeam;
+	HCURSOR			hCursorHand;
+	HCURSOR			hCursorWait;
+	HCURSOR			hCursorSizeNWSE;
+	HCURSOR			hCursorSizeNESW;
+	HCURSOR			hCursorSizeWE;
+	HCURSOR			hCursorSizeNS;
+	HCURSOR			hCursorSizeAll;
+	HCURSOR			hCursorAppStarting;
 } IMECURSORDATA, * PIMECURSORDATA, * LPIMECURSORDATA;
 
 //
@@ -161,43 +199,9 @@ class CCursor
 		CThread			*DrawIMEModeCaretThread;
 		CThread			*DrawIMEModeMouseByWndThread;
 
-		CCursorWindow	*CursorWindow;
-		CCursorWindow	*CaretWindow;
-		CCursorWindow	*MouseWindow;
-
-		HWND			m_hWndObserved;
-		DWORD			dwIMEModeCursor;
-		BOOL			bDrawIMEModeWait;
-		DWORD			dwDrawIMEModeWaitTime;
-
-		DWORD			dwIMEModeMouseWindow;
-		DWORD			dwWaitTimeMouseWindow;
 		ULONGLONG		uuMouseWindowTick;
-		ULONGLONG		uuMouseWindowDiffTick;
-
-		LPFLUSHMOUSECURSOR	lpstNearDrawMouseCursor;
-		LPFLUSHMOUSECURSOR	lpstNearDrawCaretCursor;
-		LPFLUSHMOUSECURSOR	lpstNearDrawMouseByWndCursor;
 
 		CCursorSub		*CursorSub;
-	
-		HCURSOR			hCursorArrow;
-		HCURSOR			hCursorIBeam;
-		HCURSOR			hCursorHand;
-		HCURSOR			hCursorWait;
-		HCURSOR			hCursorSizeNWSE;
-		HCURSOR			hCursorSizeNESW;
-		HCURSOR			hCursorSizeWE;
-		HCURSOR			hCursorSizeNS;
-		HCURSOR			hCursorSizeAll;
-		HCURSOR			hCursorAppStarting;
-
-		HWND			hWndCaret;
-		RECT			rcCaret;
-		BOOL			bCapsLock;
-
-		BOOL			bIMEModeByWindowThreadSentinel;
-		BOOL			bIMEDrawIMEModeThreadSentinel;
 };
 
 

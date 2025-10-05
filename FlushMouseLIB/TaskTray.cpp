@@ -33,9 +33,6 @@
 //
 // Global Data
 //
-HWND			hAboutDlg = NULL;
-HWND			hSettingDlg = NULL;
-HWND			hSynTPHelperDlg = NULL;
 
 //
 // Local Data
@@ -52,21 +49,12 @@ HWND			hSynTPHelperDlg = NULL;
 //
 // Class CTaskTray
 // 
-CTaskTray::CTaskTray(HWND hWnd)
-	: uTaskTrayID(NOTIFYICONDATA_ID), uTaskbarCreatedMessage(0), uTaskbarCreated(0)
+CTaskTray::CTaskTray()
+	: uTaskTrayID(NOTIFYICONDATA_ID), uTaskbarCreated(0)
 {
-	if ((uTaskbarCreatedMessage = RegisterWindowMessage(_T("FlushMouseTaskTray-{CA959312-1F82-45E8-AC7B-6F1F6CDD19C4}"))) == 0) {
-		uTaskbarCreatedMessage = 0;
-		return;
-	}
 	if ((uTaskbarCreated = RegisterWindowMessage(_T("TaskbarCreated"))) == 0) {
 		uTaskbarCreated = 0;
 		return;
-	}
-	CHANGEFILTERSTRUCT	cf{};
-	cf.cbSize = sizeof(CHANGEFILTERSTRUCT);
-	if (!ChangeWindowMessageFilterEx(hWnd, uTaskbarCreatedMessage, MSGFLT_ALLOW, &cf)) {
-		uTaskbarCreatedMessage = 0;
 	}
 }
 
@@ -80,7 +68,7 @@ CTaskTray::~CTaskTray()
 //
 BOOL		CTaskTray::bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle) const
 {
-	if ((uTaskTrayID == 0) || (uTaskbarCreatedMessage == 0))	return FALSE;
+	if ((uTaskTrayID == 0) || (uTaskbarCreated == 0))	return FALSE;
 
 	NOTIFYICONDATA   nIco{};
 	nIco.cbSize = sizeof(NOTIFYICONDATA);
@@ -150,7 +138,10 @@ BOOL		CTaskTray::bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle
 //
 BOOL		CTaskTray::bReCreateTaskTrayWindow(HWND hWnd) const
 {
-	if (bDestroyTaskTrayWindow(hWnd)) {
+	if (!Resource || !Cursor)	return FALSE;
+	if (!bDestroyTaskTrayWindow(hWnd)) {
+		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
 	}
 	HICON	hIcon = NULL;
 	if ((hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE))) != NULL) {
@@ -239,11 +230,8 @@ int		CTaskTray::iCheckTaskTrayMessage(HWND hWnd, UINT message, WPARAM wParam, LP
 		HANDLE_MSG(hWnd, WM_TASKTRAYEX, Cls_OnTaskTrayEx);
 
 	default:
-		if (((TaskTray->uTaskbarCreatedMessage != 0) && (message == TaskTray->uTaskbarCreatedMessage)) 
-				|| ((TaskTray->uTaskbarCreated != 0) && (message == TaskTray->uTaskbarCreated))) {
+		if ((TaskTray->uTaskbarCreated != 0) && (message == TaskTray->uTaskbarCreated)) {
 			if (TaskTray->bReCreateTaskTrayWindow(hWnd)) {
-				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
-				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 				return 0;
 			}
 			else return (-1);

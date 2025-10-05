@@ -43,8 +43,12 @@ typedef struct tagAppRegData
 	DWORD		dwDisplayIMEModeMethod = 0;
 	BOOL		bDisplayIMEModeIMEOFF = FALSE;
 	BOOL		bForceHiragana = FALSE;
-	BOOL		bDenyChangedByApp = FALSE;
 	BOOL		bSupportVirtualDesktop = FALSE;
+	ULONGLONG	uuMouseWindowDiffTickDrawByResource = 50;
+	ULONGLONG	uuMouseWindowDiffTickDrawByWindow = 15;
+	ULONGLONG	uuMouseWindowDiffTickNotDrawing = 50;
+	ULONGLONG	uuMouseWindowDiffTickInVDT = 100;
+	BOOL		bDenyChangedByApp = FALSE;
 	BOOL		bUseBigArrow = FALSE;
 
 	TCHAR		szNearDrawMouseIMEOFFChar[MAX_IMEMODECHAR] = L"A";
@@ -96,6 +100,8 @@ typedef struct tagAppRegData
 	BOOL		bDoModeDispByCtrlUp = TRUE;
 	BOOL		bIMEModeForced = FALSE;
 	BOOL		bMoveIMEToolbar = FALSE;
+	UINT		nCheckFocusTimerTickValue = 500;
+	UINT		nCheckProcTimerTickValue = 3000;
 
 	// for FlushMouse & FlushMouseSub
 	BOOL		bOffChangedFocus = FALSE;
