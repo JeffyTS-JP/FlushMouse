@@ -13,11 +13,9 @@
 #pragma once
 #include "pch.h"
 #include "Dialogs.h"
-#include "..\version.h"
-#include "..\FlushMouseLIB\Resource.h"
 #include "..\FlushMouseLIB\CommonDef.h"
 #include "..\FlushMouseLIB\FlushMouseLIB.h"
-#include "..\FlushMouseLIB\TaskTray.h"
+#include "..\FlushMouseLIB\FlushMouseSub.h"
 
 //
 // Library

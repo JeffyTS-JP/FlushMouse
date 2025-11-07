@@ -15,11 +15,9 @@
 
 #pragma push_macro("GetCurrentTime")
 #undef GetCurrentTime
-#include <WindowsAppSDK-VersionInfo.h>
 
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
 #include <crtdbg.h>
 #define DEBUG_CLIENTBLOCK   new( _CLIENT_BLOCK, __FILE__, __LINE__)
 #define new DEBUG_CLIENTBLOCK
@@ -39,7 +37,7 @@
 #include "..\..\FlushMouseLIB\Profile.h"
 #include "..\..\FlushMouseLIB\CResource.h"
 #include "..\..\FlushMouseLIB\Resource.h"
-#include "..\..\FlushMouseLIB\TaskTray.h"
+#include "..\..\FlushMouseLIB\CommonDef.h"
 
 #pragma pop_macro("GetCurrentTime")
 

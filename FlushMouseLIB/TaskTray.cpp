@@ -17,6 +17,7 @@
 #include "Resource.h"
 #include "Eventlog.h"
 #include "FlushMouseLIB.h"
+#include "..\FlushMouseDLL\EventlogData.h"
 
 //
 // Library

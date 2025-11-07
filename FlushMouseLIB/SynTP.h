@@ -12,8 +12,8 @@
 //
 #pragma once
 #include "pch.h"
-#include "FlushMouseSub.h"
 #include "TCPIP.h"
+#include "..\MiscLIB\CRawInput.h"
 #include "..\MiscLIB\CWindow.h"
 #include "..\MiscLIB\CThread.h"
 

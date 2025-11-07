@@ -12,8 +12,7 @@
 //
 #pragma once
 #include "pch.h"
-#include "CommonDef.h"
-#include "Cursor.h"
+#include "CursorSub.h"
 #include "SynTP.h"
 #include "TCPIP.h"
 

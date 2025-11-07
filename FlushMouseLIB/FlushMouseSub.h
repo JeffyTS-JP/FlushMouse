@@ -12,6 +12,7 @@
 //
 #pragma once
 #include "..\MiscLIB\CRawInput.h"
+
 //
 // Define
 // 

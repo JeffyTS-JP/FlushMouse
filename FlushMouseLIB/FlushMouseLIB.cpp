@@ -19,9 +19,7 @@
 #include "Resource.h"
 #include "Eventlog.h"
 #include "CommonDef.h"
-#include "..\FlushMouseDLL\GlobalHookDll.h"
-#include "..\MiscLIB\CThread.h"
-#include "..\MiscLIB\CRegistry.h"
+#include "..\FlushMouseDLL\EventlogData.h"
 
 //
 // Define
@@ -474,7 +472,6 @@ void		vDestroyWindow(HWND hWnd)
 		delete Cime;
 		Cime = NULL;
 	}
-	SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
 	if (TaskTray != NULL) {
 		if (!TaskTray->bDestroyTaskTrayWindow(hWnd)) {
 		}
@@ -485,6 +482,7 @@ void		vDestroyWindow(HWND hWnd)
 		delete PowerNotification;
 		PowerNotification = NULL;
 	}
+	SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
 }
 
 //

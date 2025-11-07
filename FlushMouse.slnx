@@ -1,0 +1,109 @@
+<Solution>
+  <Configurations>
+    <Platform Name="arm64" />
+    <Platform Name="Mixed Platform for FlushMouse" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/ソリューション項目/">
+    <File Path="README.md" />
+    <File Path="SetupProject/version.wxi" />
+    <File Path="version.h" />
+  </Folder>
+  <Project Path="FlushMouse/FlushMouse.vcxproj" Id="25ccb51d-e30e-4a21-ba9d-09cf79484fe9">
+    <BuildDependency Project="FlushMouse32/FlushMouse32.vcxproj" />
+    <BuildDependency Project="FlushMouseCursor/FlushMouseCursor.vcxproj" />
+    <BuildDependency Project="FlushMouseDLL32/FlushMouseDLL32.vcxproj" />
+    <BuildDependency Project="FlushMouseUI3/FlushMouseSettings/FlushMouseSettings.vcxproj" />
+    <BuildDependency Project="FlushMouseUI3/FlushMouseUI3DLL/FlushMouseUI3DLL.csproj" />
+    <BuildDependency Project="MiscLIB/MiscLIB.vcxproj" />
+    <Platform Project="x64" />
+    <Build Solution="*|x86" Project="false" />
+  </Project>
+  <Project Path="FlushMouse32/FlushMouse32.vcxproj" Id="dbedaf04-fc3f-48dc-81ac-981a747f30a4">
+    <Platform Solution="*|arm64" Project="x64" />
+    <Platform Solution="*|Mixed Platform for FlushMouse" Project="Win32" />
+    <Platform Solution="*|x64" Project="Win32" />
+    <Build Solution="*|x64" Project="false" />
+  </Project>
+  <Project Path="FlushMouseCursor/FlushMouseCursor.vcxproj" Id="fb5448f4-cedd-4025-af2a-f7540bdf9dde">
+    <Platform Project="x64" />
+    <Build Solution="*|x86" Project="false" />
+  </Project>
+  <Project Path="FlushMouseDLL/FlushMouseDLL.vcxproj" Id="ec908a5d-8859-4b02-9ace-023ff407a3a3">
+    <Platform Solution="*|arm64" Project="x64" />
+    <Platform Solution="*|Mixed Platform for FlushMouse" Project="x64" />
+  </Project>
+  <Project Path="FlushMouseDLL32/FlushMouseDLL32.vcxproj" Id="701b5f8e-0e39-40c3-a692-b23a3836bede">
+    <Platform Solution="*|arm64" Project="x64" />
+    <Platform Solution="*|Mixed Platform for FlushMouse" Project="Win32" />
+    <Platform Solution="*|x64" Project="Win32" />
+    <Build Solution="*|x64" Project="false" />
+  </Project>
+  <Project Path="FlushMouseLIB/FlushMouseLIB.vcxproj" Id="24085cf0-ec19-4a1c-9ddf-1c04a571ed57">
+    <BuildDependency Project="MiscLIB/MiscLIB.vcxproj" />
+    <Platform Solution="*|arm64" Project="x64" />
+    <Platform Solution="*|Mixed Platform for FlushMouse" Project="x64" />
+  </Project>
+  <Project Path="FlushMouseUI3/FlushMouseSettings/FlushMouseSettings.vcxproj" Id="5f3b07f2-915c-447b-8db6-0d2a532885a9">
+    <BuildDependency Project="FlushMouseUI3/FlushMouseUI3DLL/FlushMouseUI3DLL.csproj" />
+    <Platform Solution="*|Mixed Platform for FlushMouse" Project="x64" />
+  </Project>
+  <Project Path="FlushMouseUI3/FlushMouseUI3/FlushMouseUI3.vcxproj" Id="580b9738-824a-4c7a-abbf-6f9343a95a50">
+    <BuildDependency Project="FlushMouse32/FlushMouse32.vcxproj" />
+    <BuildDependency Project="FlushMouseCursor/FlushMouseCursor.vcxproj" />
+    <BuildDependency Project="FlushMouseUI3/FlushMouseUI3DLL/FlushMouseUI3DLL.csproj" />
+    <Platform Solution="*|Mixed Platform for FlushMouse" Project="x64" />
+  </Project>
+  <Project Path="FlushMouseUI3/FlushMouseUI3DLL/FlushMouseUI3DLL.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="FlushMouseUI3/SetupProjectUI3-exe/SetupProjectUI3-exe.wixproj" Id="7304fd00-d114-45bc-9af9-b36c1b1b23f5">
+    <Platform Project="x86" />
+    <Build Solution="*|arm64" />
+    <Build Solution="*|x64" />
+    <Build Solution="*|x86" />
+    <Build Solution="Release|Mixed Platform for FlushMouse" />
+  </Project>
+  <Project Path="FlushMouseUI3/SetupProjectUI3/SetupProjectUI3.wixproj" Id="e97dfbbb-4c45-47df-8f9b-3fc4e1289c66">
+    <BuildDependency Project="FlushMouseDLL/FlushMouseDLL.vcxproj" />
+    <BuildDependency Project="FlushMouseDLL32/FlushMouseDLL32.vcxproj" />
+    <BuildDependency Project="FlushMouseUI3/FlushMouseUI3DLL/FlushMouseUI3DLL.csproj" />
+    <Platform Project="x64" />
+    <Build Solution="*|arm64" />
+    <Build Solution="*|x64" />
+    <Build Solution="*|x86" />
+    <Build Solution="Release|Mixed Platform for FlushMouse" />
+  </Project>
+  <Project Path="MiscLIB/MiscLIB.vcxproj" Id="ccaf431f-ce8e-4879-9b1f-3f1df4ac2269">
+    <Platform Solution="*|arm64" Project="x64" />
+    <Platform Solution="*|Mixed Platform for FlushMouse" Project="x64" />
+    <Build Solution="*|x86" Project="false" />
+  </Project>
+  <Project Path="MiscLIB32/MiscLIB32.vcxproj" Id="3d3f632c-75bb-4830-aa8e-0871c6aa1a72">
+    <Platform Solution="*|arm64" Project="x64" />
+    <Platform Solution="*|Mixed Platform for FlushMouse" Project="Win32" />
+    <Platform Solution="*|x64" Project="Win32" />
+    <Build Solution="Debug|x64" Project="false" />
+  </Project>
+  <Project Path="SetupProject-exe/SetupProject-exe.wixproj" Id="ecb3c2e4-5915-4fb4-a8d5-93155d9f6339">
+    <Platform Project="x86" />
+    <Build Solution="*|arm64" />
+    <Build Solution="*|x64" />
+    <Build Solution="*|x86" />
+    <Build Solution="Release|Mixed Platform for FlushMouse" />
+  </Project>
+  <Project Path="SetupProject/SetupProject.wixproj" Id="40614f11-a07b-42ab-822e-fac73cc85cb0">
+    <BuildDependency Project="FlushMouseDLL/FlushMouseDLL.vcxproj" />
+    <BuildDependency Project="FlushMouseDLL32/FlushMouseDLL32.vcxproj" />
+    <Platform Project="x64" />
+    <Build Solution="*|arm64" />
+    <Build Solution="Release|Mixed Platform for FlushMouse" />
+    <Build Solution="Release|x64" />
+  </Project>
+  <Project Path="SynTP_Receiver/SynTP_Receiver.vcxproj" Id="bf5287e9-ef56-42de-acf6-7cf0543e1314">
+    <BuildDependency Project="FlushMouseLIB/FlushMouseLIB.vcxproj" />
+    <Platform Solution="*|arm64" Project="x64" />
+    <Platform Solution="*|Mixed Platform for FlushMouse" Project="x64" />
+  </Project>
+</Solution>

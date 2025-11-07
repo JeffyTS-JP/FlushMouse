@@ -1,0 +1,74 @@
+﻿# EditorConfig for FlushMouse (C++ / C# mixed repository)
+# Generated to match existing code style: tabs, Windows CRLF, utf-8-bom, explicit types in C#
+#
+
+#@@@
+# https://learn.microsoft.com/ja-jp/cpp/ide/include-cleanup-config?view=msvc-170
+#
+#変更点と理由（短く）
+#•	リポジトリ内の C++ / C# ソースを確認し、実際にタブでインデントされ、ブレースは同じ行に置かれていることを踏まえ、全体をタブ#インデントに統一しました。
+#•	C# のスタイルは明示的な型（var を避ける）、using は名前空間外、this. の明示は不要、開き中括弧は同一行という既存の記法に合わせて設定しました。
+#•	改行は Windows 向けに CRLF、文字コードは utf-8 with BOM を指定（日本語ソースを含むため）。
+#配置方法
+#•	リポジトリルートにこのファイルを .editorconfig として置いてください。
+#
+
+root = true
+
+[*]
+charset = utf-8-bom
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Use tabs throughout (source files show tab indentation)
+indent_style = tab
+indent_size = tab
+
+# C/C++ files
+[*.{c,cpp,h,hpp,cc,hh,inl}]
+# keep tabs, common C++ conventions
+indent_style = tab
+indent_size = tab
+charset = utf-8-bom
+insert_final_newline = true
+
+#@@@
+cpp_include_cleanup_add_missing_error_tag_type = none
+cpp_include_cleanup_remove_unused_error_tag_type = suggestion
+cpp_include_cleanup_excluded_files = pch.h, MojoWindow.xaml.cpp, MojoWindow.g.cpp, WinRT.h, Inaddr.h, commctrl.h, ws2tcpip.h
+
+# C# files
+[*.cs]
+indent_style = tab
+indent_size = tab
+charset = utf-8-bom
+dotnet_sort_system_directives_first = true
+
+# C# code style preferences inferred from repository:
+# - prefer explicit types (var NOT preferred)
+# - qualification with 'this.' not required
+# - using directives placed outside namespace
+# - open-brace on same line
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = false:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_event = false:suggestion
+
+csharp_using_directive_placement = outside_namespace:warning
+
+csharp_new_line_before_open_brace_for_types = false:suggestion
+csharp_new_line_before_open_brace_for_methods = false:suggestion
+csharp_new_line_before_open_brace_for_anonymous_methods = false:suggestion
+csharp_new_line_before_open_brace_for_control_blocks = false:suggestion
+csharp_new_line_before_open_brace_for_anonymous_types = false:suggestion
+csharp_new_line_before_open_brace_for_lambda_expression_body = false:suggestion
+csharp_new_line_before_open_brace_for_accessors = false:suggestion
+
+# File header / copyright: keep as-is (no automatic header inserted)
+# (Optional) enable analyzer severities below if you use Roslyn analyzers
+# dotnet_analyzer_diagnostic.severity = warning

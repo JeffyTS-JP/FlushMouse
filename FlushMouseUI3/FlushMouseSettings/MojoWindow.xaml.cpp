@@ -22,8 +22,9 @@
 #pragma pop_macro("GetCurrentTime")
 
 #include "FlushMouseSettings.xaml.h"
-#include "..\..\FlushMouseLIB\Resource.h"
 #include "..\..\FlushMouseLIB\FlushMouseLIB.h"
+#include "..\..\FlushMouseLIB\Profile.h"
+#include "..\..\FlushMouseLIB\CommonDef.h"
 
 //
 // Using

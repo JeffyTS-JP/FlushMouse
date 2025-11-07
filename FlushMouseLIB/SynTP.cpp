@@ -13,8 +13,6 @@
 #pragma once
 #include "pch.h"
 #include "SynTP.h"
-#include "CommonDef.h"
-#include "..\MiscLIB\CRegistry.h"
 
 //
 // Define

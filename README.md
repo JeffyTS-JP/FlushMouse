@@ -5,11 +5,12 @@
 
 #### リリース情報
 
-* **2025/11/03　　Version 3.7.4.14 を リリースしました**
+* **2025/11/25　　Version 3.8.0.10 を リリースしました**
 
 * **(主な変更点)**
-   * IME 関連キーのサポートの機能を見直しとバグ修正を行いました
-   * エクスプローラーの再起動時の処理を見直しました
+   * 開発環境を VisualStudio 2026 に移行しました
+   * .NET Framework 8 から .NET Framework 10 に移行しました
+	* 上記の移行に伴い、マイナーバージョンを 3.7.x.x.x から 3.8.x.x に変更しました
    * その他、細かなバグの修正や機能改善をしました
    
 #### DEMO
@@ -17,7 +18,7 @@
 
 #### 対応OS
    * Windows 10 / 11 64bit  (Latest Release Versionで検証しています。25H2 に対応しました)
-   * Ver.2 以降では、WinUI3 のために.NET Framework 8 のランタイムが必要になります。インストーラーで自動的にインストール画面が出ます
+   * WinUI3 のために.NET Framework 10 のランタイムが必要になります。インストーラーで自動的にインストールされます
 
 #### (今後について)
    * ~~OSDN上ではここまでの機能で開発は終了としたいと考えています(バグ対応は除く)~~
@@ -167,8 +168,8 @@
 #### (β機能) SynTP_Helper機能 (Synaptics社製タッチパッドと、VMware Workstation / Playerでの Two Finger Scroll) について
   * 動作環境 (検証環境)
     * Panasonic社製 Let's note CF-SV1 搭載の Synaptics社製 Wheel Pad (Touch Pad) および Windows 11 Pro (Version 23H2)
-    * Broadcom (VMware)社製 VMware(R) Workstation 17 Pro (Version 17.6.1) / VMware(R) Workstation 17 Player (Version 17.6.1)
-    * Guest OS は、主に Windows 11 Pro (Version 23H2)
+    * Broadcom (VMware)社製 VMware(R) Workstation Pro 25H2 / VMware(R) Workstation Player 25H2
+    * Guest OS は、主に Windows 11 Pro (Version 25H2)
     
   * 機能概要
     * 上記環境で、Wheel Padの Two Finger Scroll、および Wheel Pad 沿いを回転するようになぞることでのスクロール(右端が起点)を可能にしました
@@ -227,9 +228,7 @@
 
 #### ビルド方法
 
-* ~~注意 Visual Studio 2022 の Ver.17.11.4 では正常にビルドして動作しますが、Ver.17.11.5 では、動作しません。設定画面を呼び出すと例外で落ちます。原因は調査中です~~ Ver.17.12.0 で解消されました
-
-* まず、Visual Studio 2022 の開発環境が必要になりますので、二つの方法を紹介します
+* まず、Visual Studio 2026 の開発環境が必要になりますので、二つの方法を紹介します
 
   (A). ご自分のPCに直接Visual Studioを入れる場合は、このリンク [https://visualstudio.microsoft.com/ja/downloads/](https://visualstudio.microsoft.com/ja/downloads/) から入手できます(Communityで十分だと思います)
   
@@ -250,7 +249,7 @@
 
 * 次に、Visual Studioの設定を行います
 
-  1. まず、Visual Studio **Installer** (2022 本体ではなく**Installer**です。Windowsキーを押して「vis」と入力すると候補に出てきます)を起動します
+  1. まず、Visual Studio **Installer** (2026 本体ではなく**Installer**です。Windowsキーを押して「vis」と入力すると候補に出てきます)を起動します
   2. 変更を選んで、 「C++ によるデスクトップ開発」にチェックを入れます。次に「言語パック」タブで日本語にチェックを入れます。その後、右下の変更ボタンで、インストールを行います
   3. 次に、WiXを使用するために、Windowsの設定 -> アプリ -> オプション機能 -> Windowsのその他の機能 -> Windowsの機能の有効化または無効化 -> .NET Framework 3.5.1(.NET 2.0及び3.0を含む)にチェックを入れてOKを押して、インストール、再起動します
   4. [https://GitHub.com/wixtoolset/wix3](https://GitHub.com/wixtoolset/wix3) から、Wix311.exeをダウンロードしてインストールします

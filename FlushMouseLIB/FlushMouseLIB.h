@@ -12,7 +12,7 @@
 #pragma once
 #include "Profile.h"
 #include "Cursor.h"
-#include "FlushMouseSub.h"
+#include "Ime.h"
 #include "CResource.h"
 #include "TaskTray.h"
 #include "SynTP.h"

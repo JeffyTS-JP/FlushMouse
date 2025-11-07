@@ -10,7 +10,6 @@
 // Include
 //
 #pragma once
-#include "CommonDef.h"
 #include "..\MiscLIB\CWindow.h"
 
 //
