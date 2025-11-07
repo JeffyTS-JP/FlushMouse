@@ -15,6 +15,7 @@
 #include "FlushMouseLIB.h"
 #include "Profile.h"
 #include "Resource.h"
+#include "CommonDef.h"
 #include "..\FlushMouseCursor\Resource.h"
 
 //

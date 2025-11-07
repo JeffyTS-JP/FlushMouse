@@ -17,10 +17,9 @@
 #include "FlushMouseLIB.h"
 #include "Resource.h"
 #include "CommonDef.h"
-#include "Eventlog.h"
 #include "CursorSub.h"
+#include "..\FlushMouseCursor\Resource.h"
 #include "..\MiscLIB\CThread.h"
-#include "..\MiscLIB\CRegistry.h"
 
 //
 // Library

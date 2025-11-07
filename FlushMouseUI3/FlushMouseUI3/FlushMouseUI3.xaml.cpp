@@ -15,11 +15,9 @@
 
 #pragma push_macro("GetCurrentTime")
 #undef GetCurrentTime
-#include <WindowsAppSDK-VersionInfo.h>
 
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
 #include <crtdbg.h>
 #define DEBUG_CLIENTBLOCK   new( _CLIENT_BLOCK, __FILE__, __LINE__)
 #define new DEBUG_CLIENTBLOCK
@@ -37,14 +35,12 @@
 #include "MojoWindow.xaml.h"
 
 #include "..\..\FlushMouseLIB\FlushMouseLIB.h"
-#include "..\..\FlushMouseLIB\Resource.h"
-#include "..\..\FlushMouseLIB\Eventlog.h"
+#include "..\..\FlushMouseLIB\CommonDef.h"
 
 #pragma pop_macro("GetCurrentTime")
 
 #include <commctrl.h>
 #pragma comment(lib, "Comctl32.lib")
-#include "..\..\FlushMouseLIB\TaskTray.h"
 
 //
 // Using

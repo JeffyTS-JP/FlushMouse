@@ -17,11 +17,10 @@
 //
 #pragma once
 #include "pch.h"
-
 #include "..\FlushMouseLIB\FlushMouseLIB.h"
+#include "..\FlushMouseLIB\CommonDef.h"
 
 #ifdef _DEBUG
-#include <stdlib.h>
 #include <crtdbg.h>
 #define DEBUG_CLIENTBLOCK   new( _CLIENT_BLOCK, __FILE__, __LINE__)
 #define new DEBUG_CLIENTBLOCK

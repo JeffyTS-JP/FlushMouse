@@ -1,4 +1,4 @@
-// Eventlog.h
+﻿// Eventlog.h
 //		Copyright (C) 2022 JeffyTS
 //
 // No.      Date		    Name		    Reason & Document
@@ -11,7 +11,6 @@
 //
 #pragma once
 #include "pch.h"
-#include "..\FlushMouseDLL\EventlogData.h"
 
 //
 // Global Prototype Define

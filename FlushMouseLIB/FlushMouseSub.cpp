@@ -18,6 +18,7 @@
 #include "Eventlog.h"
 #include "Resource.h"
 #include "CommonDef.h"
+#include "..\FlushMouseDLL\EventlogData.h"
 #include "..\FlushMouseDLL\ShellHookDll.h"
 #include "..\FlushMouseDLL\GlobalHookDll.h"
 #include "..\MiscLIB\CRegistry.h"

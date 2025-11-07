@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.6901\build\Microsoft.Windows.SDK.BuildTools.props" Condition="Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.6901\build\Microsoft.Windows.SDK.BuildTools.props')" />
-  <Import Project="..\..\packages\Microsoft.WindowsAppSDK.1.8.251003001\build\native\Microsoft.WindowsAppSDK.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.1.8.251003001\build\native\Microsoft.WindowsAppSDK.props')" />
-  <Import Project="..\..\packages\Microsoft.WindowsAppSDK.Runtime.1.8.251003001\build\native\Microsoft.WindowsAppSDK.Runtime.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.Runtime.1.8.251003001\build\native\Microsoft.WindowsAppSDK.Runtime.props')" />
-  <Import Project="..\..\packages\Microsoft.WindowsAppSDK.ML.1.8.2095\build\native\Microsoft.WindowsAppSDK.ML.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.ML.1.8.2095\build\native\Microsoft.WindowsAppSDK.ML.props')" />
-  <Import Project="..\..\packages\Microsoft.WindowsAppSDK.AI.1.8.38\build\native\Microsoft.WindowsAppSDK.AI.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.AI.1.8.38\build\native\Microsoft.WindowsAppSDK.AI.props')" />
-  <Import Project="..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.250906003\build\native\Microsoft.WindowsAppSDK.WinUI.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.250906003\build\native\Microsoft.WindowsAppSDK.WinUI.props')" />
+  <Import Project="..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7175\build\Microsoft.Windows.SDK.BuildTools.props" Condition="Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7175\build\Microsoft.Windows.SDK.BuildTools.props')" />
+  <Import Project="..\..\packages\Microsoft.WindowsAppSDK.1.8.251106002\build\native\Microsoft.WindowsAppSDK.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.1.8.251106002\build\native\Microsoft.WindowsAppSDK.props')" />
+  <Import Project="..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.251105000\build\native\Microsoft.WindowsAppSDK.WinUI.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.251105000\build\native\Microsoft.WindowsAppSDK.WinUI.props')" />
+  <Import Project="..\..\packages\Microsoft.WindowsAppSDK.Runtime.1.8.251106002\build\native\Microsoft.WindowsAppSDK.Runtime.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.Runtime.1.8.251106002\build\native\Microsoft.WindowsAppSDK.Runtime.props')" />
+  <Import Project="..\..\packages\Microsoft.WindowsAppSDK.ML.1.8.2109\build\native\Microsoft.WindowsAppSDK.ML.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.ML.1.8.2109\build\native\Microsoft.WindowsAppSDK.ML.props')" />
+  <Import Project="..\..\packages\Microsoft.WindowsAppSDK.AI.1.8.39\build\native\Microsoft.WindowsAppSDK.AI.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.AI.1.8.39\build\native\Microsoft.WindowsAppSDK.AI.props')" />
+  <Import Project="..\..\packages\Microsoft.WindowsAppSDK.Foundation.1.8.251104000\build\native\Microsoft.WindowsAppSDK.Foundation.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.Foundation.1.8.251104000\build\native\Microsoft.WindowsAppSDK.Foundation.props')" />
+  <Import Project="..\..\packages\Microsoft.WindowsAppSDK.InteractiveExperiences.1.8.251104001\build\native\Microsoft.WindowsAppSDK.InteractiveExperiences.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.InteractiveExperiences.1.8.251104001\build\native\Microsoft.WindowsAppSDK.InteractiveExperiences.props')" />
   <Import Project="..\..\packages\Microsoft.WindowsAppSDK.Widgets.1.8.250904007\build\native\Microsoft.WindowsAppSDK.Widgets.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.Widgets.1.8.250904007\build\native\Microsoft.WindowsAppSDK.Widgets.props')" />
-  <Import Project="..\..\packages\Microsoft.WindowsAppSDK.Foundation.1.8.250906002\build\native\Microsoft.WindowsAppSDK.Foundation.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.Foundation.1.8.250906002\build\native\Microsoft.WindowsAppSDK.Foundation.props')" />
-  <Import Project="..\..\packages\Microsoft.WindowsAppSDK.InteractiveExperiences.1.8.250906004\build\native\Microsoft.WindowsAppSDK.InteractiveExperiences.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.InteractiveExperiences.1.8.250906004\build\native\Microsoft.WindowsAppSDK.InteractiveExperiences.props')" />
   <Import Project="..\..\packages\Microsoft.WindowsAppSDK.DWrite.1.8.25090401\build\Microsoft.WindowsAppSDK.DWrite.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.DWrite.1.8.25090401\build\Microsoft.WindowsAppSDK.DWrite.props')" />
   <Import Project="..\..\packages\Microsoft.WindowsAppSDK.Base.1.8.250831001\build\native\Microsoft.WindowsAppSDK.Base.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.Base.1.8.250831001\build\native\Microsoft.WindowsAppSDK.Base.props')" />
   <Import Project="..\..\packages\Microsoft.Windows.SDK.BuildTools.MSIX.1.7.20250829.1\build\Microsoft.Windows.SDK.BuildTools.MSIX.props" Condition="Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.MSIX.1.7.20250829.1\build\Microsoft.Windows.SDK.BuildTools.MSIX.props')" />
@@ -81,7 +81,7 @@
   </ItemGroup>
   <PropertyGroup Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <PlatformToolset Condition="'$(VisualStudioVersion)' == '16.0'">v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <DesktopCompatible>true</DesktopCompatible>
@@ -140,8 +140,8 @@
     <PostBuildEvent>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Xcopy /Y "$(ProjectDir)FlushMouse.ico" "$(OutDir)"
 Xcopy /Y "$(SolutionDir)SynTP_Receiver\SynTP_Receiver.ico" "$(OutDir)"
-Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configuration)\net8.0-windows10.0.19041.0\*.xbf" "$(OutDir)"
-Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configuration)\net8.0-windows10.0.19041.0\*.pdb" "$(OutDir)"
+Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configuration)\net10.0-windows10.0.22621.0\*.xbf" "$(OutDir)"
+Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configuration)\net10.0-windows10.0.22621.0\*.pdb" "$(OutDir)"
 </Command>
     </PostBuildEvent>
     <Link>
@@ -151,7 +151,8 @@ Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configu
       <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nothrownew.obj;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">rem Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\$(BaseOutputPath)$(Platform)\$(Configuration)\FlushMouseUI3DLL*.nupkg" "$(SolutionDir)NuGet\FlushMouseUI3DLL\"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
@@ -189,12 +190,13 @@ Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configu
 Start /wait /min cmd /c "$(SolutionDir)Sign_Modules.bat" $(OutDir)FlushMouseUI3DLL.dll
 Xcopy /Y "$(ProjectDir)FlushMouse.ico" "$(OutDir)"
 Xcopy /Y "$(SolutionDir)SynTP_Receiver\SynTP_Receiver.ico" "$(OutDir)"
-Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configuration)\net8.0-windows10.0.19041.0\*.xbf" "$(OutDir)"
-Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configuration)\net8.0-windows10.0.19041.0\*.pdb" "$(OutDir)"
+Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configuration)\net10.0-windows10.0.22621.0\*.xbf" "$(OutDir)"
+Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configuration)\net10.0-windows10.0.22621.0\*.pdb" "$(OutDir)"
 </Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">rem Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\$(BaseOutputPath)$(Platform)\$(Configuration)\FlushMouseUI3DLL*.nupkg" "$(SolutionDir)NuGet\FlushMouseUI3DLL\"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -269,6 +271,9 @@ Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configu
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\FlushMouseDLL\FlushMouseDLL.vcxproj">
+      <Project>{ec908a5d-8859-4b02-9ace-023ff407a3a3}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\MiscLIB\MiscLIB.vcxproj">
       <Project>{ccaf431f-ce8e-4879-9b1f-3f1df4ac2269}</Project>
     </ProjectReference>
@@ -282,16 +287,16 @@ Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configu
     <Import Project="..\..\packages\Microsoft.Windows.SDK.BuildTools.MSIX.1.7.20250829.1\build\Microsoft.Windows.SDK.BuildTools.MSIX.targets" Condition="Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.MSIX.1.7.20250829.1\build\Microsoft.Windows.SDK.BuildTools.MSIX.targets')" />
     <Import Project="..\..\packages\Microsoft.WindowsAppSDK.Base.1.8.250831001\build\native\Microsoft.WindowsAppSDK.Base.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.Base.1.8.250831001\build\native\Microsoft.WindowsAppSDK.Base.targets')" />
     <Import Project="..\..\packages\Microsoft.WindowsAppSDK.DWrite.1.8.25090401\build\Microsoft.WindowsAppSDK.DWrite.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.DWrite.1.8.25090401\build\Microsoft.WindowsAppSDK.DWrite.targets')" />
-    <Import Project="..\..\packages\Microsoft.WindowsAppSDK.InteractiveExperiences.1.8.250906004\build\native\Microsoft.WindowsAppSDK.InteractiveExperiences.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.InteractiveExperiences.1.8.250906004\build\native\Microsoft.WindowsAppSDK.InteractiveExperiences.targets')" />
-    <Import Project="..\..\packages\Microsoft.WindowsAppSDK.Foundation.1.8.250906002\build\native\Microsoft.WindowsAppSDK.Foundation.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.Foundation.1.8.250906002\build\native\Microsoft.WindowsAppSDK.Foundation.targets')" />
     <Import Project="..\..\packages\Microsoft.WindowsAppSDK.Widgets.1.8.250904007\build\native\Microsoft.WindowsAppSDK.Widgets.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.Widgets.1.8.250904007\build\native\Microsoft.WindowsAppSDK.Widgets.targets')" />
-    <Import Project="..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.250906003\build\native\Microsoft.WindowsAppSDK.WinUI.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.250906003\build\native\Microsoft.WindowsAppSDK.WinUI.targets')" />
-    <Import Project="..\..\packages\Microsoft.WindowsAppSDK.AI.1.8.38\build\native\Microsoft.WindowsAppSDK.AI.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.AI.1.8.38\build\native\Microsoft.WindowsAppSDK.AI.targets')" />
-    <Import Project="..\..\packages\Microsoft.Web.WebView2.1.0.3537.50\build\native\Microsoft.Web.WebView2.targets" Condition="Exists('..\..\packages\Microsoft.Web.WebView2.1.0.3537.50\build\native\Microsoft.Web.WebView2.targets')" />
-    <Import Project="..\..\packages\Microsoft.WindowsAppSDK.ML.1.8.2095\build\native\Microsoft.WindowsAppSDK.ML.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.ML.1.8.2095\build\native\Microsoft.WindowsAppSDK.ML.targets')" />
-    <Import Project="..\..\packages\Microsoft.WindowsAppSDK.Runtime.1.8.251003001\build\native\Microsoft.WindowsAppSDK.Runtime.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.Runtime.1.8.251003001\build\native\Microsoft.WindowsAppSDK.Runtime.targets')" />
-    <Import Project="..\..\packages\Microsoft.WindowsAppSDK.1.8.251003001\build\native\Microsoft.WindowsAppSDK.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.1.8.251003001\build\native\Microsoft.WindowsAppSDK.targets')" />
-    <Import Project="..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.6901\build\Microsoft.Windows.SDK.BuildTools.targets" Condition="Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.6901\build\Microsoft.Windows.SDK.BuildTools.targets')" />
+    <Import Project="..\..\packages\Microsoft.Web.WebView2.1.0.3595.46\build\native\Microsoft.Web.WebView2.targets" Condition="Exists('..\..\packages\Microsoft.Web.WebView2.1.0.3595.46\build\native\Microsoft.Web.WebView2.targets')" />
+    <Import Project="..\..\packages\Microsoft.WindowsAppSDK.InteractiveExperiences.1.8.251104001\build\native\Microsoft.WindowsAppSDK.InteractiveExperiences.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.InteractiveExperiences.1.8.251104001\build\native\Microsoft.WindowsAppSDK.InteractiveExperiences.targets')" />
+    <Import Project="..\..\packages\Microsoft.WindowsAppSDK.Foundation.1.8.251104000\build\native\Microsoft.WindowsAppSDK.Foundation.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.Foundation.1.8.251104000\build\native\Microsoft.WindowsAppSDK.Foundation.targets')" />
+    <Import Project="..\..\packages\Microsoft.WindowsAppSDK.AI.1.8.39\build\native\Microsoft.WindowsAppSDK.AI.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.AI.1.8.39\build\native\Microsoft.WindowsAppSDK.AI.targets')" />
+    <Import Project="..\..\packages\Microsoft.WindowsAppSDK.ML.1.8.2109\build\native\Microsoft.WindowsAppSDK.ML.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.ML.1.8.2109\build\native\Microsoft.WindowsAppSDK.ML.targets')" />
+    <Import Project="..\..\packages\Microsoft.WindowsAppSDK.Runtime.1.8.251106002\build\native\Microsoft.WindowsAppSDK.Runtime.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.Runtime.1.8.251106002\build\native\Microsoft.WindowsAppSDK.Runtime.targets')" />
+    <Import Project="..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.251105000\build\native\Microsoft.WindowsAppSDK.WinUI.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.251105000\build\native\Microsoft.WindowsAppSDK.WinUI.targets')" />
+    <Import Project="..\..\packages\Microsoft.WindowsAppSDK.1.8.251106002\build\native\Microsoft.WindowsAppSDK.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.1.8.251106002\build\native\Microsoft.WindowsAppSDK.targets')" />
+    <Import Project="..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7175\build\Microsoft.Windows.SDK.BuildTools.targets" Condition="Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7175\build\Microsoft.Windows.SDK.BuildTools.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -307,24 +312,24 @@ Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configu
     <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.Base.1.8.250831001\build\native\Microsoft.WindowsAppSDK.Base.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.Base.1.8.250831001\build\native\Microsoft.WindowsAppSDK.Base.targets'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.DWrite.1.8.25090401\build\Microsoft.WindowsAppSDK.DWrite.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.DWrite.1.8.25090401\build\Microsoft.WindowsAppSDK.DWrite.props'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.DWrite.1.8.25090401\build\Microsoft.WindowsAppSDK.DWrite.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.DWrite.1.8.25090401\build\Microsoft.WindowsAppSDK.DWrite.targets'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.InteractiveExperiences.1.8.250906004\build\native\Microsoft.WindowsAppSDK.InteractiveExperiences.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.InteractiveExperiences.1.8.250906004\build\native\Microsoft.WindowsAppSDK.InteractiveExperiences.props'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.InteractiveExperiences.1.8.250906004\build\native\Microsoft.WindowsAppSDK.InteractiveExperiences.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.InteractiveExperiences.1.8.250906004\build\native\Microsoft.WindowsAppSDK.InteractiveExperiences.targets'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.Foundation.1.8.250906002\build\native\Microsoft.WindowsAppSDK.Foundation.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.Foundation.1.8.250906002\build\native\Microsoft.WindowsAppSDK.Foundation.props'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.Foundation.1.8.250906002\build\native\Microsoft.WindowsAppSDK.Foundation.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.Foundation.1.8.250906002\build\native\Microsoft.WindowsAppSDK.Foundation.targets'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.Widgets.1.8.250904007\build\native\Microsoft.WindowsAppSDK.Widgets.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.Widgets.1.8.250904007\build\native\Microsoft.WindowsAppSDK.Widgets.props'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.Widgets.1.8.250904007\build\native\Microsoft.WindowsAppSDK.Widgets.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.Widgets.1.8.250904007\build\native\Microsoft.WindowsAppSDK.Widgets.targets'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.250906003\build\native\Microsoft.WindowsAppSDK.WinUI.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.250906003\build\native\Microsoft.WindowsAppSDK.WinUI.props'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.250906003\build\native\Microsoft.WindowsAppSDK.WinUI.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.250906003\build\native\Microsoft.WindowsAppSDK.WinUI.targets'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.AI.1.8.38\build\native\Microsoft.WindowsAppSDK.AI.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.AI.1.8.38\build\native\Microsoft.WindowsAppSDK.AI.props'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.AI.1.8.38\build\native\Microsoft.WindowsAppSDK.AI.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.AI.1.8.38\build\native\Microsoft.WindowsAppSDK.AI.targets'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.Web.WebView2.1.0.3537.50\build\native\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Web.WebView2.1.0.3537.50\build\native\Microsoft.Web.WebView2.targets'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.ML.1.8.2095\build\native\Microsoft.WindowsAppSDK.ML.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.ML.1.8.2095\build\native\Microsoft.WindowsAppSDK.ML.props'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.ML.1.8.2095\build\native\Microsoft.WindowsAppSDK.ML.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.ML.1.8.2095\build\native\Microsoft.WindowsAppSDK.ML.targets'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.Runtime.1.8.251003001\build\native\Microsoft.WindowsAppSDK.Runtime.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.Runtime.1.8.251003001\build\native\Microsoft.WindowsAppSDK.Runtime.props'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.Runtime.1.8.251003001\build\native\Microsoft.WindowsAppSDK.Runtime.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.Runtime.1.8.251003001\build\native\Microsoft.WindowsAppSDK.Runtime.targets'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.1.8.251003001\build\native\Microsoft.WindowsAppSDK.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.1.8.251003001\build\native\Microsoft.WindowsAppSDK.props'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.1.8.251003001\build\native\Microsoft.WindowsAppSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.1.8.251003001\build\native\Microsoft.WindowsAppSDK.targets'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.6901\build\Microsoft.Windows.SDK.BuildTools.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.6901\build\Microsoft.Windows.SDK.BuildTools.props'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.6901\build\Microsoft.Windows.SDK.BuildTools.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.6901\build\Microsoft.Windows.SDK.BuildTools.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.Web.WebView2.1.0.3595.46\build\native\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Web.WebView2.1.0.3595.46\build\native\Microsoft.Web.WebView2.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.InteractiveExperiences.1.8.251104001\build\native\Microsoft.WindowsAppSDK.InteractiveExperiences.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.InteractiveExperiences.1.8.251104001\build\native\Microsoft.WindowsAppSDK.InteractiveExperiences.props'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.InteractiveExperiences.1.8.251104001\build\native\Microsoft.WindowsAppSDK.InteractiveExperiences.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.InteractiveExperiences.1.8.251104001\build\native\Microsoft.WindowsAppSDK.InteractiveExperiences.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.Foundation.1.8.251104000\build\native\Microsoft.WindowsAppSDK.Foundation.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.Foundation.1.8.251104000\build\native\Microsoft.WindowsAppSDK.Foundation.props'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.Foundation.1.8.251104000\build\native\Microsoft.WindowsAppSDK.Foundation.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.Foundation.1.8.251104000\build\native\Microsoft.WindowsAppSDK.Foundation.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.AI.1.8.39\build\native\Microsoft.WindowsAppSDK.AI.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.AI.1.8.39\build\native\Microsoft.WindowsAppSDK.AI.props'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.AI.1.8.39\build\native\Microsoft.WindowsAppSDK.AI.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.AI.1.8.39\build\native\Microsoft.WindowsAppSDK.AI.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.ML.1.8.2109\build\native\Microsoft.WindowsAppSDK.ML.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.ML.1.8.2109\build\native\Microsoft.WindowsAppSDK.ML.props'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.ML.1.8.2109\build\native\Microsoft.WindowsAppSDK.ML.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.ML.1.8.2109\build\native\Microsoft.WindowsAppSDK.ML.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.Runtime.1.8.251106002\build\native\Microsoft.WindowsAppSDK.Runtime.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.Runtime.1.8.251106002\build\native\Microsoft.WindowsAppSDK.Runtime.props'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.Runtime.1.8.251106002\build\native\Microsoft.WindowsAppSDK.Runtime.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.Runtime.1.8.251106002\build\native\Microsoft.WindowsAppSDK.Runtime.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.251105000\build\native\Microsoft.WindowsAppSDK.WinUI.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.251105000\build\native\Microsoft.WindowsAppSDK.WinUI.props'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.251105000\build\native\Microsoft.WindowsAppSDK.WinUI.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.251105000\build\native\Microsoft.WindowsAppSDK.WinUI.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.1.8.251106002\build\native\Microsoft.WindowsAppSDK.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.1.8.251106002\build\native\Microsoft.WindowsAppSDK.props'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.1.8.251106002\build\native\Microsoft.WindowsAppSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.1.8.251106002\build\native\Microsoft.WindowsAppSDK.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7175\build\Microsoft.Windows.SDK.BuildTools.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7175\build\Microsoft.Windows.SDK.BuildTools.props'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7175\build\Microsoft.Windows.SDK.BuildTools.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7175\build\Microsoft.Windows.SDK.BuildTools.targets'))" />
   </Target>
 </Project>

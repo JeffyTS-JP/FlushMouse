@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Bundle.wxs for FlushMouseUI3 Copyright (C) 2023 JeffyTS -->
 
@@ -83,15 +83,15 @@
 		<bal:Condition Message ="[SearchPackageName] が既にインストールされているため、$(var.ProductNameUI3) のインストールを続行できません。既にインストールされている [SearchPackageName] を削除するには、設定の「アプリ」から「インストールされているアプリ」、またはコントロールパネルの「プログラムと機能」を使用します。">
 			<![CDATA[((NOT SearchPackageName) AND (NOT SearchBundleVersion)) OR (NOT (SearchPackageName <> "$(var.ProductNameUI3)"))]]>
 		</bal:Condition>
-		
+
 		<util:RegistrySearch
-			Id="SearchForSharedhostVersion"
+			Id="SearchForDotNetVersion"
 			ExpandEnvironmentVariables="yes"
 			Win64="yes"
 			Root="HKLM"
 			Key="SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedhost"
 			Value="Version"
-			Variable="SharedhostVersion" />
+			Variable="DotNetVersion" />
 
 		<Variable Name="AddDesktopShortcut" bal:Overridable="yes" Value="1" />
 		<Variable Name="AddDesktopShortcutVariable" bal:Overridable="yes" Value="[AddDesktopShortcut]" />
@@ -103,26 +103,26 @@
 		<Variable Name="RemoveAppRegstryVariable" bal:Overridable="yes" Value="[RemoveAppRegstry]" />
 		
 		<Chain>
-			<!-- TODO: Define the list of chained packages. -->
-			<ExePackage Id="windowsdesktop_runtime"
-				Name="windowsdesktop-runtime-8.0.1-win-x64.exe"
-				DownloadUrl="https://download.visualstudio.microsoft.com/download/pr/f18288f6-1732-415b-b577-7fb46510479a/a98239f751a7aed31bc4aa12f348a9bf/windowsdesktop-runtime-8.0.1-win-x64.exe"
-				Permanent="no"
+			<ExePackage Id="WindowsDesktop_Runtime"
+				Name="windowsdesktop-runtime-10.0.0-win-x64.exe"
+				DownloadUrl="https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/10.0.0/windowsdesktop-runtime-10.0.0-win-x64.exe"
+				Permanent="yes"
 				Cache="no"
 				Compressed="no"
 				PerMachine="yes"
 				Vital="yes"
 				InstallCommand="/install /norestart /quiet"
-				DetectCondition="(WixBundleInstalled = 0) AND (NOT SharedhostVersion)"
-				InstallCondition="(WixBundleInstalled = 0) AND (VersionNT64 &lt; v10.0) AND (SharedhostVersion >= v8.0)">
+				DetectCondition="DotNetVersion AND (DotNetVersion >= v10.0)"
+				InstallCondition="VersionNT64 AND NOT (DotNetVersion >= v10.0)" >
 				<RemotePayload
-					CertificatePublicKey="56AAC9F6573605D3646595D16BFF5061A76B0BDB"
-					CertificateThumbprint="50A04FFE627F8E21FD61AF1B73E5D03B4ADB100D"
-					Description="Microsoft Windows Desktop Runtime - 8.0.1 (x64)"
-					Hash="9989A83B65CDC89486A51A53256EB690565326EB"
-					ProductName="Microsoft Windows Desktop Runtime - 8.0.1 (x64)"
-					Size="58146456"
-					Version="8.0.1.33130" />
+					CertificatePublicKey="C6FE1068276FF20DECBBF3C243C8852471E51B99"
+					CertificateThumbprint="860AB2B78578D8EF61F692CF81AE4B1198CCBC94"
+					Description="Microsoft Windows Desktop Runtime 10.0.0 (x64)"
+					Hash="FFED598B05E9697AE3A0117DA62F985D502B9366"
+					ProductName="Microsoft Windows Desktop Runtime 10.0.0 (x64)"
+					Size="60222728"
+					Version="10.0.0.50000"
+				/>
 			</ExePackage>
 
 			<RollbackBoundary />

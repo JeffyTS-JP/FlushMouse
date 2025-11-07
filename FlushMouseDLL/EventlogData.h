@@ -1,5 +1,5 @@
 //
-// Eventlog.mc
+// EventlogData.mc
 //		Copyright (C) 2023 JeffyTS
 //
 // No.      Date		    Name		    Reason & Document

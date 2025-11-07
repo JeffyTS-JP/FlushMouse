@@ -1,4 +1,4 @@
-// Eventlog.cpp
+﻿// Eventlog.cpp
 //		Copyright (C) 2022 JeffyTS
 //
 // No.      Date		    Name		    Reason & Document

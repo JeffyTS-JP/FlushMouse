@@ -11,12 +11,8 @@
 // Include
 //
 #pragma once
-#include "CommonDef.h"
-#include "Ime.h"
 #include "CursorSub.h"
-#include "..\FlushMouseCursor\Resource.h"
 #include "..\MiscLIB\CThread.h"
-#include "..\MiscLIB\CWindow.h"
 
 //
 // Define
