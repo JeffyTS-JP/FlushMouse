@@ -255,7 +255,7 @@
   4. [https://GitHub.com/wixtoolset/wix3](https://GitHub.com/wixtoolset/wix3) から、Wix311.exeをダウンロードしてインストールします
   5. Visual Studioを起動して 右下の「コードなし」で起動します
   6. Tools -> Options -> Environment -> International Settings をクリックして、Languageを日本語にします
-  7. 拡張機能 -> 検索で　WiXと入力し「 WiX v3 - Visual Studio 2022 Extension」を選択して、Visual Studioを終了するとインストールが始まります
+  7. 拡張機能 -> 検索で　WiXと入力し「 WiX v3 - Visual Studio 2022 Extension」を選択して、Visual Studio を終了するとインストールが始まります
   8. .NET Framework SDK 10 を[https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-10.0.100-windows-x64-installer](https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-10.0.100-windows-x64-installer)からダウンロードしてインストールします
   9. Visual Studioを再起動して、リポジトリのクローン -> リポジトリの場所に [https://GitHub.com/JeffyTS-JP/FlushMouse.git](https://GitHub.com/JeffyTS-JP/FlushMouse.git)　を入力してクローンします
   10. NuGet CLI(nuget.exe)を[https://dist.nuget.org/win-x86-commandline/latest/nuget.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)からダウンロードして、FlushMouseをクローンしたフォルダの直下の「NuGet」フォルダ(デフォルトでは C:\Users\\[User]\source\repos\FlushMouse\NuGet です)に入れます
