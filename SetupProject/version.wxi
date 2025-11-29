@@ -1,13 +1,16 @@
 ﻿<Include>
-	
-	<!-- for wix Setup Project -->
-	<!-- Copyright (C) 2023 JeffyTS -->
+
+	<!-- version.wxi for wix Setup Project -->
+	<!--
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
+	-->
 	<?define Version = "3.8.0.10" ?>
 
 	<!-- Common -->
 	<?define ProductName = "FlushMouse" ?>
 	<?define Manufacturer = "JeffyTS" ?>
-	
+
 	<!-- Product.wxs -->
 	<?define Comments = "Mouse and IME UTY" ?>
 
@@ -17,6 +20,6 @@
 	<!-- Never change ProducdID and ReversedProductID in same application-->
 	<?define ProductID="{A117193D-ABED-461A-93B8-4D7E1E856740}"?>
 	<?define ReversedProductID="D391711ADEBAA164398BD4E7E1587604"?>
-	
+
 </Include>
 

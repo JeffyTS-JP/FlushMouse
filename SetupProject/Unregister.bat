@@ -1,9 +1,10 @@
-rem @echo off
+﻿rem @echo off
 
 rem ============================
 rem Unregister Registries & Files
-rem Copyright (C) 2023 JeffyTS
-rem    Unregister.bat PRODUCTED_ID BUNDLED_ID
+rem		Copyright (C) 1993- JeffyTS. All rights reserved.
+rem		Licensed under the MIT License.
+rem Unregister.bat PRODUCTED_ID BUNDLED_ID
 rem ============================
 
 set MANUFACTURER=JeffyTS

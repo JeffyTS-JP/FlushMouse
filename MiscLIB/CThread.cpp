@@ -1,5 +1,8 @@
-﻿// CThread.cpp
-//		Copyright (C) 2022 JeffyTS
+﻿//
+// CThread.cpp
+//
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
@@ -152,7 +155,7 @@ HANDLE	CThread::hGetHandle() const
 //
 VOID 	CThread::vUnregister()
 {
-#define	TIMEOUT	1000 
+#define	TIMEOUT	1000
 	if ((lpstThreadData == NULL) || (lpstThreadData->lpstSA == NULL) || (lpstThreadData->hEvent == NULL) || (lpstThreadData->hThread == NULL))	return;
 	lpstThreadData->bThreadSentinel = FALSE;
 	DWORD	dwExitCode = 0;
@@ -206,7 +209,7 @@ unsigned __stdcall	CThread::uThreadProc(void* pArguments)
 				break;
 			}
 			if (!(lpstThreadData->lpbCallbackRoutine)((LPVOID)lpstThreadData->lParamOption)) {
-				_endthreadex((unsigned)-1);	
+				_endthreadex((unsigned)-1);
 				return FALSE;
 			}
 			if (!lpstThreadData->bThreadSentinel)	break;

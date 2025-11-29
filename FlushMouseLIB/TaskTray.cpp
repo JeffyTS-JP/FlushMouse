@@ -1,6 +1,8 @@
 ﻿//
 // TaskTray.cpp
-//		Copyright (C) 2022 JeffyTS
+//
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
@@ -49,7 +51,7 @@
 
 //
 // Class CTaskTray
-// 
+//
 CTaskTray::CTaskTray()
 	: uTaskTrayID(NOTIFYICONDATA_ID), uTaskbarCreated(0)
 {
@@ -172,7 +174,7 @@ BOOL		CTaskTray::bReCreateTaskTrayWindow(HWND hWnd) const
 
 //
 // bDestroyTaskTrayWindow()
-// 
+//
 BOOL		CTaskTray::bDestroyTaskTrayWindow(HWND hWnd) const
 {
 	NOTIFYICONDATA nIco{};
@@ -198,7 +200,7 @@ BOOL		CTaskTray::bDestroyTaskTrayWindow(HWND hWnd) const
 
 //
 // bGetTaskTrayWindowRect()
-// 
+//
 BOOL		CTaskTray::bGetTaskTrayWindowRect(HWND hWnd, LPRECT lpRect) const
 {
 	NOTIFYICONIDENTIFIER	nii{};
@@ -344,7 +346,7 @@ BOOL		CTaskTray::bDisplayBalloon(HWND hWnd, DWORD dwInfoFlags, LPCTSTR szInfoTit
 	std::promise<BOOL> _promise;
 	_future = _promise.get_future();
 	try {
-		std::thread([&](std::promise<BOOL> _promise) { 
+		std::thread([&](std::promise<BOOL> _promise) {
 			(void)_promise;
 			NOTIFYICONDATA	nIco{};
 			nIco.cbSize = sizeof(NOTIFYICONDATA);

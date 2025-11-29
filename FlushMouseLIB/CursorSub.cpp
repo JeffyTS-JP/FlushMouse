@@ -1,6 +1,8 @@
 ﻿//
 // CursorSub.cpp
-//		Copyright (C) 2024 JeffyTS
+//
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
@@ -134,11 +136,11 @@ CCursorSub::~CCursorSub()
 BOOL		CCursorSub::bInitialize(HWND hWnd, LPCTSTR lpszCursorDataFileName)
 {
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
-	
+
 	BOOL	bRet = FALSE;
-	
+
 	if (!Cursor) goto Cleanup;
-	
+
 	if (!bGetCursorDataFullPath(lpszCursorDataFileName)) {
 		vMessageBox(hWnd, IDS_CANTLOADCURSOR, MessageBoxTYPE, __func__, __LINE__);
 		goto Cleanup;
@@ -199,7 +201,7 @@ BOOL		CCursorSub::bUnLoadCursorData()
 BOOL		CCursorSub::bGetCursorDataFullPath(LPCTSTR lpszCursorDataFileName)
 {
 #define FLUSHMOUSECURSORDIR			L"\\JeffyTS\\FlushMouse\\"
-	
+
 	LPTSTR	lpszBuffer = new TCHAR[_MAX_PATH];
 	if (lpszBuffer) {
 		ZeroMemory(lpszBuffer, _MAX_PATH);
@@ -364,7 +366,7 @@ Cleanup:
 BOOL		CCursorSub::bMakeOneUnitCursor(HMODULE hSrcMod, HANDLE hDstRes, LPFLUSHMOUSECURSOR lpstIMECursorData, int iIMEMode)
 {
 	BOOL	bRet = FALSE;
-	
+
 	if (!bMakeCursor(hSrcMod, hDstRes, IDC_HIDE_ARROW,	lpstIMECursorData[iIMEMode].stArrow.iResourceID,
 														lpstIMECursorData[iIMEMode].dwIMEMode,
 														lpstIMECursorData[iIMEMode].szMode,
@@ -385,7 +387,7 @@ BOOL		CCursorSub::bMakeOneUnitCursor(HMODULE hSrcMod, HANDLE hDstRes, LPFLUSHMOU
 														lpstIMECursorData[iIMEMode].bUnderLine))	goto Cleanup;
 
 	bRet = TRUE;
-	
+
 Cleanup:
 	return bRet;
 
@@ -441,10 +443,10 @@ BOOL		CCursorSub::bMakeCursor(HMODULE hSrcMod, HANDLE hDstRes, int iSrcResID, in
 	bRet = TRUE;
 
 Cleanup:
-	
+
 	if (lpMakeCursorData)	delete []	lpMakeCursorData;
 	lpMakeCursorData = NULL;
-	
+
 	return bRet;
 }
 
@@ -455,7 +457,7 @@ BOOL		CCursorSub::bMakeCursorSub(LPRTCURSORHEAD	lpRTCursorHead, LPRTCURSORHEAD l
 {
 	HDC		hDC = NULL, hCursorMemDC = NULL, hTextMemDC = NULL;
 	HBITMAP	hCursorBitmap = NULL, hTextBitmap = NULL;
-	HGDIOBJ	hCursorGDIObj = NULL, hTextGDIObj = NULL; 
+	HGDIOBJ	hCursorGDIObj = NULL, hTextGDIObj = NULL;
 	LPVOID	lpCursorBits = NULL, lpTextBits = NULL;
 	RTCURSORHEAD	RTCursorHead{};
 	RECT	rc{};
@@ -468,7 +470,7 @@ BOOL		CCursorSub::bMakeCursorSub(LPRTCURSORHEAD	lpRTCursorHead, LPRTCURSORHEAD l
 	if ((hTextMemDC = CreateCompatibleDC(hDC)) == NULL)	goto Cleanup;
 	if (hDC)	DeleteDC(hDC);
 	hDC = NULL;
-	
+
 	memcpy_s(&RTCursorHead, sizeof(RTCURSORHEAD), lpRTCursorHead, sizeof(RTCURSORHEAD));
 	RTCursorHead.BitmapInfoHeader.biHeight = -(RTCursorHead.BitmapInfoHeader.biHeight);
 	if ((hCursorBitmap = CreateDIBSection(hCursorMemDC, (LPBITMAPINFO)&(RTCursorHead.BitmapInfoHeader), DIB_RGB_COLORS, &lpCursorBits, NULL, 0)) == NULL)	goto Cleanup;
@@ -525,7 +527,7 @@ Cleanup:
 LPVOID		CCursorSub::FindAndLockResource(HMODULE hModule, int iResID, LPCTSTR ResType, LPDWORD lpdwResSize)
 {
 	if (!hModule)	return NULL;
-	
+
 	HRSRC	hRes = NULL;
 	HGLOBAL hResLoad = NULL;
 	LPVOID	lpVOID = NULL;
@@ -625,7 +627,7 @@ BOOL		CCursorWindow::bRegister(HINSTANCE hInstance, LPCTSTR szWindowClassName)
 
 //
 // vSetModeStringAndColor()
-// 
+//
 VOID		CCursorWindow::vSetModeStringColorFont(LPCTSTR _lpszIMEMode, COLORREF dwRGB, LPCTSTR _lpszFontFace)
 {
 	lpszIMEMode = (LPTSTR)_lpszIMEMode;

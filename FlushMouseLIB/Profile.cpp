@@ -1,6 +1,8 @@
 ﻿//
 // Profile.cpp
-//		Copyright (C) 2022 JeffyTS
+//
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
@@ -78,7 +80,7 @@ CProfile::CProfile()
 		lpstAppRegData->dwDisplayIMEModeMethod = 0;					// マウスカーソルのIMEモード表示方法 (0 = リソース 1 = 直接描画 2 = 併用)
 		lpstAppRegData->bDisplayIMEModeIMEOFF = FALSE;				// IME OFFの時のIMEモード表示
 		lpstAppRegData->bDisplayFocusWindowIME = FALSE;				// フォーカスウィンドウのIMEモードを表示する(TRUE)/マウスカーソル下のウィンドウのIMEモードを表示する(FALSE)
-		
+
 		_tcsncpy_s(lpstAppRegData->szNearDrawMouseIMEOFFChar, MAX_IMEMODECHAR, L"A", _TRUNCATE);
 		_tcsncpy_s(lpstAppRegData->szNearDrawMouseHANEISU_IMEONChar, MAX_IMEMODECHAR, L"_A", _TRUNCATE);
 		_tcsncpy_s(lpstAppRegData->szNearDrawMouseHANKANA_IMEONChar, MAX_IMEMODECHAR, L"_ｱ", _TRUNCATE);
@@ -112,7 +114,7 @@ CProfile::CProfile()
 
 		lpstAppRegData->bOffChangedFocus = FALSE;					// アプリケーションが切り替わったときIMEをOFFにする(bDisplayFocusWindowIMEとは排他的動作になる)
 		lpstAppRegData->bDrawNearCaret = FALSE;						// Caretの横にIMEモードを表示
-		lpstAppRegData->bMoveIMEToolbar = FALSE;					// New IMEのToolbarを移動する 
+		lpstAppRegData->bMoveIMEToolbar = FALSE;					// New IMEのToolbarを移動する
 
 		lpstAppRegData->bSynTPStarted1 = FALSE;						// SynTP_Helperが起動状態か
 		lpstAppRegData->dwSynTPPadX = 528;							// TouchPad X
@@ -314,12 +316,12 @@ BOOL		CProfile::bGetProfileData4Mouse() const
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DenyChangedByApp"), (LPBOOL)&(lpstAppRegData->bDenyChangedByApp), lpstAppRegData->bDenyChangedByApp))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("SupportVirtualDesktop"), (LPBOOL)&(lpstAppRegData->bSupportVirtualDesktop), lpstAppRegData->bSupportVirtualDesktop))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("UseBigArrow"), (LPBOOL)&(lpstAppRegData->bUseBigArrow), lpstAppRegData->bUseBigArrow))	goto Cleanup;
-	
+
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayFocusWindowIME"), (LPBOOL)&(lpstAppRegData->bDisplayFocusWindowIME), lpstAppRegData->bDisplayFocusWindowIME))	goto Cleanup;
-	
+
 	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("CheckFocusTimerTickValue"), (LPDWORD)&lpstAppRegData->nCheckFocusTimerTickValue, lpstAppRegData->nCheckFocusTimerTickValue))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("CheckProcTimerTickValue"), (LPDWORD)&lpstAppRegData->nCheckProcTimerTickValue, lpstAppRegData->nCheckProcTimerTickValue))	goto Cleanup;
-	
+
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByMouseBttnUp"), (LPBOOL)&(lpstAppRegData->bDoModeDispByMouseBttnUp), lpstAppRegData->bDoModeDispByMouseBttnUp))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByIMEKeyDown"), (LPBOOL)&(lpstAppRegData->bDoModeDispByIMEKeyDown), lpstAppRegData->bDoModeDispByIMEKeyDown))	goto Cleanup;
 	if (!CReg->bGetSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByCtrlUp"), (LPBOOL)&(lpstAppRegData->bDoModeDispByCtrlUp), lpstAppRegData->bDoModeDispByCtrlUp))	goto Cleanup;
@@ -367,10 +369,10 @@ BOOL		CProfile::bSetProfileData4Mouse() const
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("UseBigArrow"), lpstAppRegData->bUseBigArrow))	goto Cleanup;
 
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DisplayFocusWindowIME"), lpstAppRegData->bDisplayFocusWindowIME))	goto Cleanup;
-	
+
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("CheckFocusTimerTickValue"), lpstAppRegData->nCheckFocusTimerTickValue))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORD(PROFILE_HKEY, PROFILE_SUBKEY, _T("CheckProcTimerTickValue"), lpstAppRegData->nCheckProcTimerTickValue))	goto Cleanup;
-	
+
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByIMEKeyDown"), lpstAppRegData->bDoModeDispByIMEKeyDown))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByCtrlUp"), lpstAppRegData->bDoModeDispByCtrlUp))	goto Cleanup;
 	if (!CReg->bSetRegValueDWORDasBOOL(PROFILE_HKEY, PROFILE_SUBKEY, _T("DoModeDispByMouseBttnUp"), lpstAppRegData->bDoModeDispByMouseBttnUp))	goto Cleanup;

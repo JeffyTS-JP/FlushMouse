@@ -1,6 +1,8 @@
 ﻿//
 // SynTP_Receiver.h
-//		Copyright (C) 2024 JeffyTS
+//
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -

@@ -1,11 +1,13 @@
 ﻿//
 // FlushMouse.cpp
 //		for Windows10/11 Win32 API msi Package App.
-//		Copyright (C) 1993 JeffyTS
+//
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
 //
 //  FlushMouse.exe
 //      	マウスカーソルにIMEの状態を表示する
-//      
+//
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
 // #0000	1993/11/17  JeffyTS  	New edit.
@@ -70,14 +72,14 @@ int APIENTRY	wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_ASSERTE(_CrtCheckMemory());
 #endif
-	
+
 	SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
 
 	int	iRet = 0;
 	if ((iRet = iCheckCmdLine(lpCmdLine)) != 1) {
 		return (iRet);
 	}
-	
+
 	if (!bWinMain(hInstance, hPrevInstance, lpCmdLine, nShowCmd)) {
 		return (-1);
 	}
@@ -88,7 +90,7 @@ int APIENTRY	wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	}
 
 #if defined _DEBUG
-	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG); 
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 	_CrtDumpMemoryLeaks();
 #endif // _DEBUG
 

@@ -1,5 +1,9 @@
 ﻿FlushMouse FlushMouseUI3
-	Copyright © 1983 - JeffyTS (X (Twitter)  @JeffyTSonTW)
+
+	Copyright (C) 1993- JeffyTS. All rights reserved.
+	Licensed under the GPL-2.0 License.
+
+	X (Twitter)  @JeffyTSonTW
 
 	Files
 		%ProgramFiles%\JeffyTS\FlushMouse
@@ -24,11 +28,11 @@
 			SynTP_Receiver.ico
 			(some).xbf files
 			(some UI3 files)
-	
+
 	Registry
 		HKEY_CURRENT_USER\Software\JeffyTS\FlushMouse
 		HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\EventLog\Application\FlushMouse
-		
+
 
 SynTP_Receiver
 	Copyright © 2024 -  JeffyTS (X (Twitter)  @JeffyTSonTW)
@@ -41,6 +45,6 @@ SynTP_Receiver
 		1) Extract the zip file to your favorite folder.
 		2) Make shortcut link with option bellow.
 			"Your folder path"\SynTP_Receiver.exe /Port <number> (50000 - 59999)
-		*) If you want to scroll all of applications, you need to give an Administrator rights(UAC) to SynTP_Receiver. 
+		*) If you want to scroll all of applications, you need to give an Administrator rights(UAC) to SynTP_Receiver.
 
 /* = EOF = */

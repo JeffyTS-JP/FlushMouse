@@ -1,6 +1,8 @@
 ﻿//
 // FlushMouseSub.cpp
-//		Copyright (C) 2022 JeffyTS
+//
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
@@ -97,7 +99,7 @@ BOOL		bSettingsEx(HWND hWnd, int iCode, int iSubCode)
 		case SETTINGSEX_SETTINGS_SETREGISTRY:
 			vSettingDialogApply();
 			return Profile->bSetProfileData4Settings();
-		case SETTINGSEX_SETTINGS_GENERAL_SETREGISTRY: 
+		case SETTINGSEX_SETTINGS_GENERAL_SETREGISTRY:
 			vSettingDialogApply();
 			if (!Profile->bSetProfileData4Mouse())	return FALSE;
 			return TRUE;
@@ -567,7 +569,7 @@ CPowerNotification::~CPowerNotification()
 BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting)
 {
 	UNREFERENCED_PARAMETER(hWnd);
-	
+
 	TCHAR	CommandLine[] = L"/Start";
 	switch (Type) {
 	case PBT_APMSUSPEND:
@@ -720,7 +722,7 @@ void CALLBACK CEventHook::vHandleEventIME(HWINEVENTHOOK hook, DWORD dwEvent, HWN
 }
 
 //
-// class CFlushMouseHook 
+// class CFlushMouseHook
 //
 CFlushMouseHook::CFlushMouseHook()
 	: hHook64Dll(NULL), bShellHook64(FALSE), bGlobalHook64(FALSE), bHook32Dll(FALSE),
@@ -814,7 +816,7 @@ BOOL	 	CFlushMouseHook::bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name)
 //
 BOOL 	CFlushMouseHook::bHook32DllStop() const
 {
-#define	TIMEOUT	3000 
+#define	TIMEOUT	3000
 	if (!bHook32Dll)		return TRUE;
 	BOOL		bRet = FALSE;
 	if (lpstProcessInformation != NULL) {
@@ -1146,7 +1148,7 @@ BOOL	 	bCreateProcess(LPCTSTR lpszExecName, LPTSTR lpCommandLine)
 				if (_lpCommandLine) {
 					ZeroMemory(_lpCommandLine, size);
 					_sntprintf_s(_lpCommandLine, size, _TRUNCATE, _T("%s %s"), lpszBuffer, lpCommandLine);
-					PROCESS_INFORMATION	ProcessInformation{};	
+					PROCESS_INFORMATION	ProcessInformation{};
 					STARTUPINFO	StartupInfo{};		StartupInfo.cb = sizeof(STARTUPINFO);
 #define	CREATIONFLAGS	0
 					if (CreateProcess(NULL, _lpCommandLine, NULL, NULL, FALSE, CREATIONFLAGS, NULL, NULL, &StartupInfo, &ProcessInformation) != FALSE) {

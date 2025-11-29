@@ -1,7 +1,9 @@
-﻿// MojoWindow.Xaml.cpp for FlushMouseSettings
-//		Copyright (C) 2022 JeffyTS
+﻿//
+// MojoWindow.Xaml.cpp for FlushMouseSettings
 //
-//	  
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
+//
 // No.	  Date			Name			Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
 // #0000		2022/07/16  JeffyTS  	New edit.
@@ -279,7 +281,7 @@ void		SettingsApply()
 		Profile->lpstAppRegData->dwSettingsY = m_Settings.dwSettingsY();
 		Profile->lpstAppRegData->dwSettingsWidth = m_Settings.dwSettingsWidth();
 		Profile->lpstAppRegData->dwSettingsHeight = m_Settings.dwSettingsHeight();
-		
+
 		Profile->lpstAppRegData->bDisplayFocusWindowIME = m_Settings.bDisplayFocusWindowIME();
 		Profile->lpstAppRegData->dwDisplayIMEModeMethod = m_Settings.dwDisplayIMEModeMethod();
 
@@ -294,7 +296,7 @@ void		SettingsApply()
 		Profile->lpstAppRegData->bSupportVirtualDesktop = m_Settings.bSupportVirtualDesktop();
 		Profile->lpstAppRegData->bIMEModeForced = m_Settings.bIMEModeForced();
 		Profile->lpstAppRegData->bEnableEPHelper = m_Settings.bEnableEPHelper();
-		
+
 		Profile->lpstAppRegData->iCursorSize = m_Settings.iCursorSize();
 		Profile->lpstAppRegData->iIMEModeDistance = m_Settings.iIMEModeDistance();
 		Profile->lpstAppRegData->iModeMouseSize = m_Settings.iModeMouseSize();
@@ -305,7 +307,7 @@ void		SettingsApply()
 		Profile->lpstAppRegData->dwDisplayModeTime = m_Settings.dwDisplayModeTime();
 		Profile->lpstAppRegData->dwAdditionalWaitTime = m_Settings.dwAdditionalWaitTime();
 		Profile->lpstAppRegData->dwWaitWaveTime = m_Settings.dwWaitWaveTime();
-		
+
 		_tcsncpy_s(Profile->lpstAppRegData->szNearDrawMouseIMEOFFChar, MAX_IMEMODECHAR, (LPCTSTR)(m_Settings.szNearDrawMouseIMEOFFChar().c_str()), _TRUNCATE);
 		_tcsncpy_s(Profile->lpstAppRegData->szNearDrawMouseHANEISU_IMEONChar, MAX_IMEMODECHAR, (LPCTSTR)(m_Settings.szNearDrawMouseHANEISU_IMEONChar().c_str()), _TRUNCATE);
 		_tcsncpy_s(Profile->lpstAppRegData->szNearDrawMouseHANKANA_IMEONChar, MAX_IMEMODECHAR, (LPCTSTR)(m_Settings.szNearDrawMouseHANKANA_IMEONChar().c_str()), _TRUNCATE);
@@ -354,7 +356,7 @@ void		SettingsApply()
 		Profile->lpstAppRegData->dwSynTPEdgeX = m_Settings.dwSynTPEdgeX();
 		Profile->lpstAppRegData->dwSynTPEdgeY = m_Settings.dwSynTPEdgeY();
 		ZeroMemory(Profile->lpstAppRegData->szSynTPSendIPAddr1, (MAX_IPV4_ADDRESS * sizeof(TCHAR)));
-		if (_sntprintf_s(Profile->lpstAppRegData->szSynTPSendIPAddr1, MAX_IPV4_ADDRESS, _TRUNCATE, L"%s.%s.%s.%s", 
+		if (_sntprintf_s(Profile->lpstAppRegData->szSynTPSendIPAddr1, MAX_IPV4_ADDRESS, _TRUNCATE, L"%s.%s.%s.%s",
 				(LPCTSTR)(m_Settings.szSynTPSendIPAddr1_1().c_str()), (LPCTSTR)(m_Settings.szSynTPSendIPAddr1_2().c_str()), (LPCTSTR)(m_Settings.szSynTPSendIPAddr1_3().c_str()), (LPCTSTR)(m_Settings.szSynTPSendIPAddr1_4().c_str())) <= 0) {
 		}
 		ZeroMemory(Profile->lpstAppRegData->szSynTPSendHostname1, (MAX_FQDN * sizeof(TCHAR)));

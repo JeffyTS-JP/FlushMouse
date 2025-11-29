@@ -1,6 +1,8 @@
 ﻿//
 // Cursor.cpp
-//		Copyright (C) 2022 JeffyTS
+//
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
@@ -124,13 +126,13 @@ CCursor::CCursor()
 	ZeroMemory(&stIMECursorData, sizeof(stIMECursorData));
 	stIMECursorData.dwIMEModeCursor = (DWORD)(-1);
 	stIMECursorData.dwIMEModeMouseWindow = IMEHIDE;
-	
+
 	stIMECursorData.lpstNearDrawMouseCursor = static_cast<LPFLUSHMOUSECURSOR>(new FLUSHMOUSECURSOR[sizeof(stFlushMouseCursor)]);
 	if (stIMECursorData.lpstNearDrawMouseCursor) {
 		ZeroMemory(stIMECursorData.lpstNearDrawMouseCursor, sizeof(stFlushMouseCursor));
 		memcpy_s(stIMECursorData.lpstNearDrawMouseCursor, sizeof(stFlushMouseCursor), stFlushMouseCursor, sizeof(stFlushMouseCursor));
 	}
-	stIMECursorData.lpstNearDrawCaretCursor = static_cast<LPFLUSHMOUSECURSOR>(new FLUSHMOUSECURSOR[sizeof(stFlushMouseCursor)]); 
+	stIMECursorData.lpstNearDrawCaretCursor = static_cast<LPFLUSHMOUSECURSOR>(new FLUSHMOUSECURSOR[sizeof(stFlushMouseCursor)]);
 	if (stIMECursorData.lpstNearDrawCaretCursor) {
 		ZeroMemory(stIMECursorData.lpstNearDrawCaretCursor, sizeof(stFlushMouseCursor));
 		memcpy_s(stIMECursorData.lpstNearDrawCaretCursor, sizeof(stFlushMouseCursor), stFlushMouseCursor, sizeof(stFlushMouseCursor));
@@ -234,23 +236,23 @@ BOOL			CCursor::bReloadCursor()
 	vSetParamFromRegistry();
 
 	if (!CursorSub->bMakeAllCursor(stIMECursorData.lpstNearDrawMouseByWndCursor))	goto Cleanup;
-	
+
 	if (!CursorSub->hLoadCursorData())	goto Cleanup;
-	
+
 	if (!stIMECursorData.CursorWindow) {
 		stIMECursorData.CursorWindow = new CCursorWindow;
 		if (stIMECursorData.CursorWindow == NULL)	goto Cleanup;
 		if (!stIMECursorData.CursorWindow->bRegister((HINSTANCE)GetWindowLongPtr(m_hMainWnd, GWLP_HINSTANCE), CLASS_CURSORWINDOW))	goto Cleanup;
 	}
 	stIMECursorData.CursorWindow->vSetModeStringColorFont(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEHIDE].szMode, stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEHIDE].dwColor, stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEHIDE].szFont);
-	
+
 	if (!stIMECursorData.CaretWindow) {
 		stIMECursorData.CaretWindow = new CCursorWindow;
 		if (stIMECursorData.CaretWindow == NULL)	goto Cleanup;
 		if (!stIMECursorData.CaretWindow->bRegister((HINSTANCE)GetWindowLongPtr(m_hMainWnd, GWLP_HINSTANCE), CLASS_CARETWINDOW))	goto Cleanup;
 	}
 	stIMECursorData.CaretWindow->vSetModeStringColorFont(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEHIDE].szMode, stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEHIDE].dwColor, stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEHIDE].szFont);
-	
+
 	if (stIMECursorData.MouseWindow) {
 		delete	stIMECursorData.MouseWindow;
 		stIMECursorData.MouseWindow = NULL;
@@ -261,7 +263,7 @@ BOOL			CCursor::bReloadCursor()
 		if (!stIMECursorData.MouseWindow->bRegister((HINSTANCE)GetWindowLongPtr(m_hMainWnd, GWLP_HINSTANCE), CLASS_MOUSEWINDOW))	goto Cleanup;
 	}
 	stIMECursorData.MouseWindow->vSetModeStringColorFont(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_IMEHIDE].szMode, stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_IMEHIDE].dwColor, stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_IMEHIDE].szFont);
-	
+
 	if (!DrawIMEModeCaretThread) {
 		DrawIMEModeCaretThread = new CThread;
 		if (DrawIMEModeCaretThread == NULL)	goto Cleanup;
@@ -412,7 +414,7 @@ VOID			CCursor::vSetParamFromRegistry()
 		stIMECursorData.bDenyChangedByApp = Profile->lpstAppRegData->bDenyChangedByApp;
 		stIMECursorData.bUseBigArrow = Profile->lpstAppRegData->bUseBigArrow;
 	}
-}	
+}
 
 //
 // bStartIMECursorChangeThread()
@@ -869,7 +871,7 @@ BOOL		CCursor::bIsIMECursorChanged(LPIMECURSORDATA lpstCursorData)
 BOOL		CCursor::bDrawIMEModeOnDisplay(LPIMECURSORDATA lpstCursorData)
 {
 	if (lpstCursorData == NULL)	return FALSE;
-	
+
 	BOOL	bRet = FALSE;
 	RECT	rc{};
 	int	iModeSizeX = lpstCursorData->iModeMouseSize;
@@ -944,7 +946,7 @@ BOOL		CCursor::bCalcDisplayModeRect(LPINT iModeSizeX, LPINT iModeSizeY, LPRECT l
 
 //
 // hGetCaretPosByAccessibleObjectFromWindow()
-// 
+//
 HWND		CCursor::hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPRECT lprcCaret, BOOL bAttachThreadInput)
 {
 	HWND	hWnd = NULL;
@@ -1021,7 +1023,7 @@ HWND		CCursor::hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPRECT lp
 									if (((pt.x == 0) && (pt.y == 0)) || (pt.x <= rcTop.left + MARGIN_X) || (pt.y <= rcTop.top + MARGIN_Y)) {
 #undef MARGIN_X
 #undef MARGIN_y
-										lprcCaret->left = 0;	lprcCaret->right = 0;	
+										lprcCaret->left = 0;	lprcCaret->right = 0;
 										lprcCaret->top = 0;		lprcCaret->bottom = 0;
 										hWnd = NULL;
 									}
@@ -1278,7 +1280,7 @@ int			CCursor::iGetCursorID(DWORD dwIMEMode, const LPFLUSHMOUSECURSOR lpstCursor
 BOOL		CCursor::bChangeFlushMouseCursor(UINT uCurID, LPIMECURSORDATA lpstCursorData, BOOL bUnderLine)
 {
 	if (lpstCursorData == NULL)	return FALSE;
-	
+
 	int		i = bUnderLine ? IMEMODE_IMEOFF_CAPSON : IMEMODE_IMEOFF;
 	while (uCurID != lpstCursorData->lpstNearDrawMouseCursor[i].dwIMEMode) {
 		++i;
@@ -1299,7 +1301,7 @@ BOOL		CCursor::bChangeFlushMouseCursor(UINT uCurID, LPIMECURSORDATA lpstCursorDa
 BOOL		CCursor::bSetSystemCursor(LPMOUSECURSOR lpstMC, int iCursorSizeX, int iCursorSizeY)
 {
 	if (lpstMC == NULL)	return FALSE;
-	
+
 	HCURSOR	hCur = NULL;
 	static const UINT	fuLoad = (LR_VGACOLOR | LR_DEFAULTSIZE | LR_DEFAULTCOLOR | LR_CREATEDIBSECTION);
 	HMODULE	hMod = NULL;

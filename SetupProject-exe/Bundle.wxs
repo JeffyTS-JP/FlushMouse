@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Bundle.wxs for FlushMouse Copyright (C) 2023 JeffyTS -->
+<!-- Bundle.wxs for FlushMouse
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
+-->
 
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
 	 xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
@@ -12,7 +15,7 @@
 
 	<?define LocalizationSrc = "customtheme.wxl" ?>
 	<?define CustomThemeSrc = "customtheme.xml" ?>
-	
+
 	<Bundle Name="$(var.ProductName)"
 			Version="$(var.Version)"
 			Manufacturer="$(var.Manufacturer)"
@@ -22,7 +25,7 @@
 			UpgradeCode="{2590C08A-B975-41F3-ACA2-1DA69A22DA1D}"
 			DisableModify="yes"
 			DisableRemove="yes">
-		
+
 		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
 			<bal:WixStandardBootstrapperApplication
 				LicenseFile="$(var.LicenseSrc)"
@@ -35,7 +38,7 @@
 				LocalizationFile="$(var.LocalizationSrc)"
 				/>
 		</BootstrapperApplicationRef>
-		
+
 		<OptionalUpdateRegistration Name="$(var.ProductName)"/>
 		<Variable Name="SearchProductVersion" bal:Overridable="yes" Type="string" Value="" />
 		<Variable Name="SearchBundleVersion" bal:Overridable="yes" Type="string" Value=""/>
@@ -101,7 +104,7 @@
 		<Variable Name="StartApplicationVariable" bal:Overridable="yes" Value="[StartApplication]" />
 		<Variable Name="RemoveAppRegstry" bal:Overridable="yes" Value="0" />
 		<Variable Name="RemoveAppRegstryVariable" bal:Overridable="yes" Value="[RemoveAppRegstry]" />
-		
+
 		<Chain>
 			<ExePackage Id="WindowsDesktop_Runtime"
 				Name="windowsdesktop-runtime-10.0.0-win-x64.exe"
@@ -126,7 +129,7 @@
 			</ExePackage>
 
 			<RollbackBoundary />
-			
+
 			<MsiPackage Id="MainPackage"
 						SourceFile="..\SetupProject\bin\x64\Release\ja-JP\$(var.ProductName)_x64.msi"
 						Description="$(var.ProductName) by $(var.Manufacturer)"

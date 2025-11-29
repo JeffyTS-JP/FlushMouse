@@ -1,6 +1,8 @@
 ﻿//
 // SynTP.cpp
-//		Copyright (C) 2022 JeffyTS
+//
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
@@ -326,7 +328,7 @@ BOOL		CSynTP::bSendInput(DWORD dwFlags, int xPos, int yPos, int zDelta)
 	return FALSE;
 }
 
-// 
+//
 // WM_INPUT
 // Cls_OnInput()
 //
@@ -338,7 +340,7 @@ void		CSynTP::Cls_OnInput(HWND hWnd, DWORD dwFlags, HRAWINPUT hRawInput)
 	if (HIDRawInput)	vRawInputDevicesHandler(hWnd, dwFlags, hRawInput);
 }
 
-// 
+//
 // WM_INPUT_DEVICE_CHANGE
 // Cls_OnInputDeviceChange()
 //
@@ -447,7 +449,7 @@ void		CSynTP::vSynTPMouseData(PCHAR Report)
 					else if (deltaX > 0) {
 						lpSynTPData->iXStart = RIGHT;
 						vSynTPSendMouseData(WM_MOUSEHWHEEL, (-WHEEL_DELTA));
-					}	
+					}
 				}
 				return;
 			}

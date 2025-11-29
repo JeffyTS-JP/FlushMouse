@@ -1,6 +1,9 @@
 ﻿//
 // CRawInput.cpp
 //
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
+//
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
 // #0000	2024/03/20  JeffyTS  	New edit.
@@ -15,7 +18,7 @@
 
 //
 // Define
-// 
+//
 
 //
 // class CRawInput
@@ -118,7 +121,7 @@ BOOL		CRawInput::bGetRawInputDeviceInfo(HANDLE hDevice)
 		LPTSTR lpszDeviceName = new TCHAR[cbSize + 1];
 		if (lpszDeviceName) {
 			ZeroMemory(lpszDeviceName, ((cbSize + 1) * sizeof(TCHAR)) );
-			uResult = GetRawInputDeviceInfo(hDevice, RIDI_DEVICENAME, lpszDeviceName, &cbSize); 
+			uResult = GetRawInputDeviceInfo(hDevice, RIDI_DEVICENAME, lpszDeviceName, &cbSize);
 			if ((uResult != 0) && (uResult != (UINT)(-1))) {
 				LPRID_DEVICE_INFO lpRIDDeviceInfo = new RID_DEVICE_INFO[sizeof(RID_DEVICE_INFO)];
 				if (lpRIDDeviceInfo) {

@@ -10,7 +10,7 @@
 * **(主な変更点)**
    * 開発環境を VisualStudio 2026 に移行しました
    * .NET Framework 8 から .NET Framework 10 に移行しました
-	* 上記の移行に伴い、マイナーバージョンを 3.7.x.x.x から 3.8.x.x に変更しました
+    * 上記の移行に伴い、マイナーバージョンを 3.7.x.x.x から 3.8.x.x に変更しました
    * その他、細かなバグの修正や機能改善をしました
    
 #### DEMO
@@ -31,7 +31,7 @@
    * プログラム的には、WinMain に入ってくるまでと、抜けた後の処理でリークしているようです (Ver.3.2 から WinMain を使っていませんが同様の症状がでます)。このため、当方に直す方法はなく、Microsoft の SDK 内の問題であり、アプリやシステムには影響はないものと考えています
 
 #### Copyright
-   * Copyright (C) 1993 - JeffyTS. All rights reserved.
+   * Copyright (C) 1993 - JeffyTS. All rights reserved. Licensed under the GPL-2.0 License.
    * 詳しくはインストール時に表示される「ソフトウェア使用許諾契約」をお読みください。
    * FlushMouse を最初に作成したのは、1993年でしたが、使い物になるようなものではありませんでした。その後、2022年に偶然見つけて開発を続けています
 

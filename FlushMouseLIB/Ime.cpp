@@ -1,6 +1,8 @@
 ﻿//
 // Ime.cpp
-//		Copyright (C) 2022 JeffyTS
+//
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
@@ -37,7 +39,7 @@
 
 //
 // Class CIME
-// 
+//
 CIME::CIME()
 {
 }
@@ -162,9 +164,9 @@ VOID		CIME::vActivateIME(HWND hWndObserved)
 	EnumChildWindows(hWndObserved, &bEnumChildProcActivateIME, NULL);
 }
 
-// 
+//
 // bEnumChildProcActivateIME()
-// 
+//
 BOOL CALLBACK CIME::bEnumChildProcActivateIME(HWND hWnd, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);

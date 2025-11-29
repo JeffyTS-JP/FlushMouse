@@ -1,6 +1,8 @@
 ﻿//
 // CommonDef.h
-//		Copyright (C) 1993 JeffyTS
+//
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
@@ -102,7 +104,7 @@ typedef struct tagSIZED
 
 //
 // Message Handler Define
-// 
+//
 
 // void Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg);
 #define WM_TASKTRAYEX						(WM_USER + 0x0001)
@@ -173,7 +175,7 @@ typedef struct tagSIZED
 #define SETTINGSEX_SETTINGS_SETREGISTRY				12
 #define SETTINGSEX_SETTINGS_GENERAL_SETREGISTRY		13
 #define SETTINGSEX_SETTINGS_IMEMODE_SETREGISTRY		14
-#define SETTINGSEX_SETTINGS_CLOSE					15 
+#define SETTINGSEX_SETTINGS_CLOSE					15
 #define SETTINGSEX_SYNTP_START						20
 #define SETTINGSEX_SYNTP_IS_STARTED					21
 #define SETTINGSEX_SYNTP_STOP						22
@@ -207,8 +209,8 @@ typedef struct tagSIZED
 #define KEY_IME_OFF			(WM_USER + VK_IME_OFF)					// IME OFF(0x1a)
 #define KEY_CONVERT			(WM_USER + VK_CONVERT)					// IME convert    (0x1c)
 #define KEY_NONCONVERT		(WM_USER + VK_NONCONVERT)				// IME nonconvert (0x1d)
-#define KEY_F5				(WM_USER + VK_F5)						// F5  (0x74) 
-#define KEY_F6				(WM_USER + VK_F6)						// F6  (0x75) 
+#define KEY_F5				(WM_USER + VK_F5)						// F5  (0x74)
+#define KEY_F6				(WM_USER + VK_F6)						// F6  (0x75)
 #define KEY_F7				(WM_USER + VK_F7)						// F7  (0x76)
 #define KEY_F8				(WM_USER + VK_F8)						// F8  (0x77)
 #define KEY_F9				(WM_USER + VK_F9)						// F9  (0x78)

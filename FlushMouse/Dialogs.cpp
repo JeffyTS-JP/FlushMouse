@@ -1,6 +1,8 @@
 ﻿//
 // Dialogs.cpp
-//		Copyright (C) 2022 JeffyTS
+//
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
@@ -41,7 +43,7 @@
 // Local Prototype Define
 //
 
-// 
+//
 // vMessageBox()
 //
 void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine)
@@ -65,7 +67,7 @@ void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine)
 				return;
 			}
 			catch (...) {
-				return;	
+				return;
 			}
 		}
 	}

@@ -1,7 +1,9 @@
-﻿// FlushMouseSettings.Xaml.cpp for FlushMouseSettings
-//		Copyright (C) 2022 JeffyTS
+﻿//
+// FlushMouseSettings.Xaml.cpp for FlushMouseSettings
 //
-//	  
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
+//
 // No.	  Date			Name			Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
 // #0000	2022/07/23  JeffyTS  	New edit.
@@ -87,7 +89,7 @@ static BOOL		Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct);
 static void		Cls_OnDestroy(HWND hWnd);
 static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, int iSubCode);
 
-// 
+//
 // vMessageBox()
 //
 void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine)
@@ -191,7 +193,7 @@ void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_ASSERTE(_CrtCheckMemory());
 #endif
-	
+
 	LPCTSTR	_lpCmdLine = GetCommandLine();
 	int		iNumArgs = 0;
 	LPTSTR	*_lpArgv = CommandLineToArgvW(_lpCmdLine, &iNumArgs);
@@ -220,9 +222,9 @@ void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 
 	hMicrosoft_ui_xaml_dll = LoadLibrary(L"Microsoft.ui.xaml.dll");
 	hFlushMouseUI3DLL = LoadLibrary(FLUSHMOUSEUI3_DLL);
-	
+
 	MojoWindowExec();
-	
+
 	if (!bSettingsWinMain((HINSTANCE)m_hInstance, NULL, NULL, SW_HIDE)) {
 	}
 
@@ -232,10 +234,10 @@ void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 	if (hMicrosoft_ui_xaml_dll)	FreeLibrary(hMicrosoft_ui_xaml_dll);
 
 #if defined _DEBUG
-	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG); 
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 	_CrtDumpMemoryLeaks();
 #endif // _DEBUG
-	
+
 	PostQuitMessage(0);
 	return;
 }
@@ -264,7 +266,7 @@ static BOOL		bSettingsWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrev
 	}
 
 	if (!bSetHeapInformation())	return FALSE;
-	
+
 	Resource = new CResource(FLUSHMOUSESETTINGS_EXE);
 	if (Resource && Resource->hLoad() == NULL) {
 		delete	Resource;
@@ -446,7 +448,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 static void Cls_OnDestroy(HWND hWnd)
 {
 	UNREFERENCED_PARAMETER(hWnd);
-	
+
 	if (Profile != NULL) {
 		delete	Profile;
 		Profile = NULL;
@@ -465,7 +467,7 @@ static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, int iSubCode)
 	if (!hWnd || !Profile)	return FALSE;
 
 	switch (iCode) {
-		case SETTINGSEX_OK:	
+		case SETTINGSEX_OK:
 			vSettingDialogApply();
 			if (!Profile->bSetProfileData())	return FALSE;
 			vSettingDialogClose();

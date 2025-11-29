@@ -1,6 +1,8 @@
 ﻿//
 // Cursor.h
-//		Copyright (C) 2022 JeffyTS
+//
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
@@ -52,7 +54,7 @@
 #define OCR_PIN				32671		// IDC_PIN (WinUser.h)
 #endif // !OCR_PIN
 #ifndef OCR_PERSON
-#define	OCR_PERSON			32672		// IDC_PERSON (WinUser.h)	
+#define	OCR_PERSON			32672		// IDC_PERSON (WinUser.h)
 #endif // !OCR_PERSON
 #define	OCR_HIDE			32896		// Hide Cursor
 
@@ -107,7 +109,7 @@ typedef struct tagIMECursorData
 	BOOL		bIMEDrawIMEModeThreadSentinel;
 
 	ULONGLONG	uuMouseWindowDiffTick;
-	
+
 	CCursorWindow	*CursorWindow;
 	CCursorWindow	*CaretWindow;
 	CCursorWindow	*MouseWindow;
@@ -130,7 +132,7 @@ typedef struct tagIMECursorData
 
 //
 // Class CCursor
-// 
+//
 class CCursor
 {
 	public:

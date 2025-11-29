@@ -1,9 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
 // Settings.Xaml for FlushMouseUI3DLL
-//		Copyright (C) 2024 JeffyTS
 //
-//	  
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
+//
 // No.		Date			Name			Reason & Document
 // #0000	2024/07/15		JeffyTS  		New edit.
 //
@@ -18,7 +19,7 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
-	mc:Ignorable="d"	
+	mc:Ignorable="d"
 	Title = "FlushMouse 設定"
 	Closed="Window_Closed"
 	>
@@ -37,9 +38,9 @@
 				</StackPanel>
 			</Grid>
 			<Grid Grid.Row="1">
-				<NavigationView x:Name="navigationView" 
+				<NavigationView x:Name="navigationView"
 							Loading="navigationView_Loading" PaneDisplayMode="Left" Height="910"
-							IsSettingsVisible="False" IsBackButtonVisible="Collapsed" IsPaneOpen="True" 
+							IsSettingsVisible="False" IsBackButtonVisible="Collapsed" IsPaneOpen="True"
 							PaneClosing="navigationView_PaneClosing" PaneClosed="navigationView_PaneClosed"
 							PaneOpening="navigationView_PaneOpening" PaneOpened="navigationView_PaneOpened"
 							BackRequested="navigationView_BackRequested" SelectionChanged="navigationView_SelectionChanged"

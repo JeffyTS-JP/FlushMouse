@@ -1,6 +1,8 @@
 ﻿//
 // FlushMouse32.cpp
-//		Copyright (C) 2022 JeffyTS
+//
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
@@ -96,7 +98,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_ASSERTE(_CrtCheckMemory());
-#endif	
+#endif
 
 	HANDLE	hHandle = GetCurrentProcess();
 	if (hHandle != NULL) {
@@ -153,7 +155,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	if (!InitInstance(hInstance, nCmdShow)) {
 		return (-1);
 	}
-	
+
 	MSG		msg{};
 	BOOL	bRet = NULL;
 	while ((bRet = GetMessage(&msg, NULL, 0, 0)) != 0) {
@@ -170,10 +172,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	}
 
 #if defined _DEBUG
-	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG); 
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 	_CrtDumpMemoryLeaks();
 #endif // _DEBUG
-	
+
 	return (int)msg.wParam;
 }
 
@@ -234,7 +236,7 @@ static BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 #define HANDLE_WM_POWERBROADCAST(hWnd, wParam, lParam, fn) (LRESULT)(DWORD)(BOOL)((fn)((hWnd), (ULONG)(wParam), (POWERBROADCAST_SETTING *)(lParam)))
-	
+
 	switch (message) {
 		HANDLE_MSG(hWnd, WM_CREATE, Cls_OnCreate);
 		HANDLE_MSG(hWnd, WM_DESTROY, Cls_OnDestroy);
@@ -261,7 +263,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 {
 	UNREFERENCED_PARAMETER(lpCreateStruct);
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
-	
+
 	if ((uTaskbarCreated = RegisterWindowMessage(_T("TaskbarCreated"))) == 0) {
 		vMessageBox(hWnd, IDS_NOTREGISTEHOOK, MessageBoxTYPE, __func__, __LINE__);
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
@@ -345,7 +347,7 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 
 //
 // bDestroyTaskTrayWindow()
-// 
+//
 BOOL		bDestroyTaskTrayWindow(HWND hWnd)
 {
 	UNREFERENCED_PARAMETER(hWnd);
@@ -412,7 +414,7 @@ static void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dw
 				return;
 			}
 			catch (...) {
-				return;	
+				return;
 			}
 		}
 	}

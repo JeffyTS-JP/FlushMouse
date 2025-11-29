@@ -1,9 +1,11 @@
 ﻿//
 // SynTP_Receiver.cpp
-//		Copyright (C) 2024 JeffyTS
+//
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
 //
 //  SynTP_Receiver.exe
-//      
+//
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
 // #0000	2024/03/26  JeffyTS  	New edit.
@@ -89,7 +91,7 @@ int APIENTRY	wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		vMessageBox(hInstance, NULL, IDS_BADARGS, MessageBoxTYPE);
 		return (iRet);
 	}
-	
+
 	if (iPort == 0) {
 		vMessageBox(hInstance, NULL, IDS_BADARGS, MessageBoxTYPE);
 		return (-1);
@@ -148,7 +150,7 @@ int APIENTRY	wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	if (SynTP_Receiver)	delete SynTP_Receiver;
 
 #if defined _DEBUG
-	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG); 
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 	_CrtDumpMemoryLeaks();
 #endif // _DEBUG
 
@@ -198,7 +200,7 @@ static LPCTSTR* lpCheckCmdLine(LPCTSTR lpCmdLine, int* argc)
 CSynTP_Receiver::CSynTP_Receiver()
 	:	SynTP()
 {
-	
+
 }
 
 CSynTP_Receiver::~CSynTP_Receiver()
@@ -303,7 +305,7 @@ void		CSynTP_Receiver::Cls_OnDestroy(HWND hWnd)
 	PostQuitMessage(0);
 }
 
-// 
+//
 // vMessageBox()
 //
 static void		vMessageBox(HINSTANCE hInstance, HWND hWnd, UINT uID, UINT uType)

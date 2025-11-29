@@ -1,6 +1,8 @@
 ﻿//
 // CursorSub.h
-//		Copyright (C) 2024 JeffyTS
+//
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
@@ -91,7 +93,7 @@ extern VOID		vAdjustFontXRightPosition(DWORD dwIMEMode,LPCTSTR szMode, LPINT lpi
 
 //
 // Class CCursorSub
-// 
+//
 class CCursorSub
 {
 	public:
@@ -118,9 +120,9 @@ class CCursorSub
 		static void	MakeAlphaBlend(LPDWORD lpData, int cx, int cy, COLORREF aRGB);
 
 	public:
-	
+
 	private:
-		LPTSTR		lpszCursorDataFullPath;	
+		LPTSTR		lpszCursorDataFullPath;
 		LPTSTR		lpszCursorDataTempFullPath;
 		HMODULE		hCursorData;
 		int			iCursorDataLoadCount;

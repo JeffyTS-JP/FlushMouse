@@ -1,4 +1,8 @@
-﻿// CWindow.h
+﻿//
+// CWindow.h
+//
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
@@ -27,7 +31,7 @@ class CWindow
 			_In_ int nWidth, _In_ int nHeight, _In_opt_ HWND hWndParent, _In_opt_ HMENU hMenu);
 		BOOL		bCreateWindowEx(_In_ DWORD dwExStyle, _In_opt_ LPCTSTR lpWindowName, _In_ DWORD dwStyle, _In_ int X, _In_ int Y,
 			_In_ int nWidth, _In_ int nHeight, _In_opt_ HWND hWndParent, _In_opt_ HMENU hMenu);
-		virtual LRESULT WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);		
+		virtual LRESULT WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 		HINSTANCE	hGetInstance() const {return _hInstance; }
 		HWND		hGetHWND() const { return _hWnd; }

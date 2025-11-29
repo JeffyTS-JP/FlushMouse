@@ -1,7 +1,9 @@
-﻿// MojoWindow.Xaml.cpp for FlushMouseUI3
-//		Copyright (C) 2022 JeffyTS
+﻿//
+// MojoWindow.Xaml.cpp for FlushMouseUI3
 //
-//	  
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
+//
 // No.	  Date			Name			Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
 // #0000		2022/07/16  JeffyTS  	New edit.
@@ -129,7 +131,7 @@ void		SettingsExec(HWND hWnd, UINT32 uMsg, INT32 iSelectedPane)
 			m_Settings.dwSettingsY(Profile->lpstAppRegData->dwSettingsY);
 			m_Settings.dwSettingsWidth(Profile->lpstAppRegData->dwSettingsWidth);
 			m_Settings.dwSettingsHeight(Profile->lpstAppRegData->dwSettingsHeight);
-			
+
 			m_Settings.bDisplayFocusWindowIME(Profile->lpstAppRegData->bDisplayFocusWindowIME);
 			m_Settings.dwDisplayIMEModeMethod(Profile->lpstAppRegData->dwDisplayIMEModeMethod);
 
@@ -144,7 +146,7 @@ void		SettingsExec(HWND hWnd, UINT32 uMsg, INT32 iSelectedPane)
 			m_Settings.bSupportVirtualDesktop(Profile->lpstAppRegData->bSupportVirtualDesktop);
 			m_Settings.bIMEModeForced(Profile->lpstAppRegData->bIMEModeForced);
 			m_Settings.bEnableEPHelper(Profile->lpstAppRegData->bEnableEPHelper);
-			
+
 			m_Settings.iCursorSize(Profile->lpstAppRegData->iCursorSize);
 			m_Settings.iIMEModeDistance(Profile->lpstAppRegData->iIMEModeDistance);
 			m_Settings.iModeMouseSize(Profile->lpstAppRegData->iModeMouseSize);
@@ -155,7 +157,7 @@ void		SettingsExec(HWND hWnd, UINT32 uMsg, INT32 iSelectedPane)
 			m_Settings.dwDisplayModeTime(Profile->lpstAppRegData->dwDisplayModeTime);
 			m_Settings.dwAdditionalWaitTime(Profile->lpstAppRegData->dwAdditionalWaitTime);
 			m_Settings.dwWaitWaveTime(Profile->lpstAppRegData->dwWaitWaveTime);
-			
+
 			m_Settings.szNearDrawMouseIMEOFFChar(Profile->lpstAppRegData->szNearDrawMouseIMEOFFChar);
 			m_Settings.szNearDrawMouseHANEISU_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseHANEISU_IMEONChar);
 			m_Settings.szNearDrawMouseHANKANA_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseHANKANA_IMEONChar);
@@ -174,7 +176,7 @@ void		SettingsExec(HWND hWnd, UINT32 uMsg, INT32 iSelectedPane)
 			m_Settings.szNearDrawMouseByWndZENEISU_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseByWndZENEISU_IMEONChar);
 			m_Settings.szNearDrawMouseByWndZENHIRA_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseByWndZENHIRA_IMEONChar);
 			m_Settings.szNearDrawMouseByWndZENKANA_IMEONChar(Profile->lpstAppRegData->szNearDrawMouseByWndZENKANA_IMEONChar);
-			
+
 			m_Settings.dwNearDrawMouseIMEOFFColor(Profile->lpstAppRegData->dwNearDrawMouseIMEOFFColor);
 			m_Settings.dwNearDrawMouseHANEISU_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseHANEISU_IMEONColor);
 			m_Settings.dwNearDrawMouseHANKANA_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseHANKANA_IMEONColor);
@@ -193,7 +195,7 @@ void		SettingsExec(HWND hWnd, UINT32 uMsg, INT32 iSelectedPane)
 			m_Settings.dwNearDrawMouseByWndZENEISU_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseByWndZENEISU_IMEONColor);
 			m_Settings.dwNearDrawMouseByWndZENHIRA_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseByWndZENHIRA_IMEONColor);
 			m_Settings.dwNearDrawMouseByWndZENKANA_IMEONColor(Profile->lpstAppRegData->dwNearDrawMouseByWndZENKANA_IMEONColor);
-			
+
 			m_Settings.szNearDrawMouseFont(Profile->lpstAppRegData->szNearDrawMouseFont);
 			m_Settings.szNearDrawCaretFont(Profile->lpstAppRegData->szNearDrawCaretFont);
 			m_Settings.szNearDrawMouseByWndFont(Profile->lpstAppRegData->szNearDrawMouseByWndFont);
@@ -290,7 +292,7 @@ void		SettingsApply()
 		Profile->lpstAppRegData->dwSettingsY = m_Settings.dwSettingsY();
 		Profile->lpstAppRegData->dwSettingsWidth = m_Settings.dwSettingsWidth();
 		Profile->lpstAppRegData->dwSettingsHeight = m_Settings.dwSettingsHeight();
-		
+
 		Profile->lpstAppRegData->bDisplayFocusWindowIME = m_Settings.bDisplayFocusWindowIME();
 		Profile->lpstAppRegData->dwDisplayIMEModeMethod = m_Settings.dwDisplayIMEModeMethod();
 
@@ -305,7 +307,7 @@ void		SettingsApply()
 		Profile->lpstAppRegData->bSupportVirtualDesktop = m_Settings.bSupportVirtualDesktop();
 		Profile->lpstAppRegData->bIMEModeForced = m_Settings.bIMEModeForced();
 		Profile->lpstAppRegData->bEnableEPHelper = m_Settings.bEnableEPHelper();
-		
+
 		Profile->lpstAppRegData->iCursorSize = m_Settings.iCursorSize();
 		Profile->lpstAppRegData->iIMEModeDistance = m_Settings.iIMEModeDistance();
 		Profile->lpstAppRegData->iModeMouseSize = m_Settings.iModeMouseSize();
@@ -316,7 +318,7 @@ void		SettingsApply()
 		Profile->lpstAppRegData->dwDisplayModeTime = m_Settings.dwDisplayModeTime();
 		Profile->lpstAppRegData->dwAdditionalWaitTime = m_Settings.dwAdditionalWaitTime();
 		Profile->lpstAppRegData->dwWaitWaveTime = m_Settings.dwWaitWaveTime();
-				
+
 		_tcsncpy_s(Profile->lpstAppRegData->szNearDrawMouseIMEOFFChar, MAX_IMEMODECHAR, (LPCTSTR)(m_Settings.szNearDrawMouseIMEOFFChar().c_str()), _TRUNCATE);
 		_tcsncpy_s(Profile->lpstAppRegData->szNearDrawMouseHANEISU_IMEONChar, MAX_IMEMODECHAR, (LPCTSTR)(m_Settings.szNearDrawMouseHANEISU_IMEONChar().c_str()), _TRUNCATE);
 		_tcsncpy_s(Profile->lpstAppRegData->szNearDrawMouseHANKANA_IMEONChar, MAX_IMEMODECHAR, (LPCTSTR)(m_Settings.szNearDrawMouseHANKANA_IMEONChar().c_str()), _TRUNCATE);
@@ -335,7 +337,7 @@ void		SettingsApply()
 		_tcsncpy_s(Profile->lpstAppRegData->szNearDrawMouseByWndZENEISU_IMEONChar, MAX_IMEMODECHAR, (LPCTSTR)(m_Settings.szNearDrawMouseByWndZENEISU_IMEONChar().c_str()), _TRUNCATE);
 		_tcsncpy_s(Profile->lpstAppRegData->szNearDrawMouseByWndZENHIRA_IMEONChar, MAX_IMEMODECHAR, (LPCTSTR)(m_Settings.szNearDrawMouseByWndZENHIRA_IMEONChar().c_str()), _TRUNCATE);
 		_tcsncpy_s(Profile->lpstAppRegData->szNearDrawMouseByWndZENKANA_IMEONChar, MAX_IMEMODECHAR, (LPCTSTR)(m_Settings.szNearDrawMouseByWndZENKANA_IMEONChar().c_str()), _TRUNCATE);
-		
+
 		Profile->lpstAppRegData->dwNearDrawMouseIMEOFFColor = m_Settings.dwNearDrawMouseIMEOFFColor();
 		Profile->lpstAppRegData->dwNearDrawMouseHANEISU_IMEONColor = m_Settings.dwNearDrawMouseHANEISU_IMEONColor();
 		Profile->lpstAppRegData->dwNearDrawMouseHANKANA_IMEONColor = m_Settings.dwNearDrawMouseHANKANA_IMEONColor();
@@ -354,7 +356,7 @@ void		SettingsApply()
 		Profile->lpstAppRegData->dwNearDrawMouseByWndZENEISU_IMEONColor = m_Settings.dwNearDrawMouseByWndZENEISU_IMEONColor();
 		Profile->lpstAppRegData->dwNearDrawMouseByWndZENHIRA_IMEONColor = m_Settings.dwNearDrawMouseByWndZENHIRA_IMEONColor();
 		Profile->lpstAppRegData->dwNearDrawMouseByWndZENKANA_IMEONColor = m_Settings.dwNearDrawMouseByWndZENKANA_IMEONColor();
-		
+
 		_tcsncpy_s(Profile->lpstAppRegData->szNearDrawMouseFont, LF_FACESIZE, (LPCTSTR)(m_Settings.szNearDrawMouseFont().c_str()), _TRUNCATE);
 		_tcsncpy_s(Profile->lpstAppRegData->szNearDrawCaretFont, LF_FACESIZE, (LPCTSTR)(m_Settings.szNearDrawCaretFont().c_str()), _TRUNCATE);
 		_tcsncpy_s(Profile->lpstAppRegData->szNearDrawMouseByWndFont, LF_FACESIZE, (LPCTSTR)(m_Settings.szNearDrawMouseByWndFont().c_str()), _TRUNCATE);
@@ -365,7 +367,7 @@ void		SettingsApply()
 		Profile->lpstAppRegData->dwSynTPEdgeX = m_Settings.dwSynTPEdgeX();
 		Profile->lpstAppRegData->dwSynTPEdgeY = m_Settings.dwSynTPEdgeY();
 		ZeroMemory(Profile->lpstAppRegData->szSynTPSendIPAddr1, (MAX_IPV4_ADDRESS * sizeof(TCHAR)));
-		if (_sntprintf_s(Profile->lpstAppRegData->szSynTPSendIPAddr1, MAX_IPV4_ADDRESS, _TRUNCATE, L"%s.%s.%s.%s", 
+		if (_sntprintf_s(Profile->lpstAppRegData->szSynTPSendIPAddr1, MAX_IPV4_ADDRESS, _TRUNCATE, L"%s.%s.%s.%s",
 				(LPCTSTR)(m_Settings.szSynTPSendIPAddr1_1().c_str()), (LPCTSTR)(m_Settings.szSynTPSendIPAddr1_2().c_str()), (LPCTSTR)(m_Settings.szSynTPSendIPAddr1_3().c_str()), (LPCTSTR)(m_Settings.szSynTPSendIPAddr1_4().c_str())) <= 0) {
 		}
 		ZeroMemory(Profile->lpstAppRegData->szSynTPSendHostname1, (MAX_FQDN * sizeof(TCHAR)));

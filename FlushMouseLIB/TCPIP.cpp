@@ -1,6 +1,8 @@
 ﻿//
 // TCPIP.cpp
-//		Copyright (C) 2022 JeffyTS
+//
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
@@ -39,7 +41,7 @@ static BOOL	bIsPrivateIPv4Addr(DWORD dwIPv4Addr);
 
 //
 // dwGetString2IPAddr()
-// 
+//
 DWORD		dwGetString2IPv4Addr(LPCTSTR lpszIPAddress)
 {
 	if (lpszIPAddress == NULL)	return (DWORD)(-1);
@@ -53,7 +55,7 @@ DWORD		dwGetString2IPv4Addr(LPCTSTR lpszIPAddress)
 
 //
 // bGetString2IPv4Addr()
-// 
+//
 BOOL		bGetString2IPv4Addr(LPCTSTR lpszIPAddress, LPTSTR addr1, LPTSTR addr2, LPTSTR addr3, LPTSTR addr4)
 {
 	if ((lpszIPAddress == NULL) || (addr1 == NULL) || (addr2 == NULL) || (addr3 == NULL) || (addr4 == NULL))	return FALSE;
@@ -96,7 +98,7 @@ static BOOL	bIsPrivateIPv4Addr(DWORD dwIPv4Addr)
 }
 
 //
-// bCheckExistHostnameIPv4() 
+// bCheckExistHostnameIPv4()
 //
 BOOL		bCheckExistHostnameIPv4(LPCTSTR lpszHostname, int iTimeOut)
 {
@@ -119,7 +121,7 @@ BOOL		bCheckExistHostnameIPv4(LPCTSTR lpszHostname, int iTimeOut)
 				return FALSE;
 			}
 
-			ADDRINFOW	pHints{};	
+			ADDRINFOW	pHints{};
 			ZeroMemory(&pHints, sizeof(ADDRINFOW));
 			pHints.ai_flags  = AI_V4MAPPED;
 			pHints.ai_family = PF_INET;
@@ -166,7 +168,7 @@ BOOL		bCheckExistHostnameIPv4(LPCTSTR lpszHostname, int iTimeOut)
 CTCPIP::CTCPIP()
 	: lpWSAData(NULL), lpszIPAddr(NULL),  pSocket(NULL), iPortNo(0), SockAddr_IN(0)
 {
-	
+
 }
 
 CTCPIP::~CTCPIP()
@@ -194,7 +196,7 @@ BOOL		CTCPIP::bOpenPortForReceiveUDPv4(int Port)
 	if (lpWSAData == NULL)	lpWSAData = new WSADATA[sizeof(WSADATA)];
 	if (lpWSAData)	ZeroMemory(lpWSAData, sizeof(WSADATA));
 	else return FALSE;
-	
+
 	if (WSAStartup(MAKEWORD(2, 2), lpWSAData) != 0)	return FALSE;
 	if ((pSocket = WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, NULL, 0, WSA_FLAG_OVERLAPPED)) == INVALID_SOCKET) {
 		WSACleanup();
@@ -254,7 +256,7 @@ BOOL		CTCPIP::bOpenPortForSendUDPv4(LPCTSTR lpszIPAddress, int Port)
 	int		iRet = 0;
 	BOOL	bRet = FALSE;
 	PADDRINFOW	ppResult = NULL;
-	
+
 	if (lpszIPAddress == NULL)	return FALSE;
 	if (lpszIPAddr == NULL)	lpszIPAddr = new TCHAR[MAX_FQDN];
 	if (lpszIPAddr) {
@@ -278,7 +280,7 @@ BOOL		CTCPIP::bOpenPortForSendUDPv4(LPCTSTR lpszIPAddress, int Port)
 	SockAddr_IN.sin_family = AF_INET;
 	iRet = InetPton(SockAddr_IN.sin_family, lpszIPAddr, &SockAddr_IN.sin_addr.S_un.S_addr);
 	if (iRet == 0) {
-		ADDRINFOW	pHints{};	
+		ADDRINFOW	pHints{};
 		ZeroMemory(&pHints, sizeof(ADDRINFOW));
 		pHints.ai_flags  = AI_V4MAPPED;
 		pHints.ai_family = PF_INET;

@@ -1,6 +1,8 @@
 ﻿//
 // FlushMouseLIB.cpp
-//		Copyright (C) 1993 JeffyTS
+//
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
 //
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
@@ -366,7 +368,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 	}
 
 	if (!bStartThreadHookTimer(hWnd)) {
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);	
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		return FALSE;
 	}
 
@@ -395,7 +397,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		}
 		else {
 			vMessageBox(hWnd, IDS_NOTREGISTERTT, MessageBoxTYPE, __func__, __LINE__);
-			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);	
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			return FALSE;
 		}
 	}
@@ -411,7 +413,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 	PowerNotification = new CPowerNotification(hWnd);
 	if (PowerNotification == NULL) {
 		vMessageBox(hWnd, IDS_NOTRREGISTEVH, MessageBoxTYPE, __func__, __LINE__);
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);	
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		return FALSE;
 	}
 	return TRUE;
@@ -494,7 +496,7 @@ static LRESULT	Cls_OnPowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTIN
 	return PowerNotification->PowerBroadcast(hWnd, Type, lpSetting);
 }
 
-// 
+//
 // WM_INPUT
 // Cls_OnInput()
 //
@@ -708,7 +710,7 @@ static void		Cls_OnCheckIMEStartConvertingEx(HWND hWnd, BOOL bStartConverting, D
 {
 	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(vkCode);
-	
+
 	bIMEInConverting = bStartConverting;
 }
 
@@ -720,7 +722,7 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 {
 	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(flags);
-	
+
 	if (!Profile || !Cursor)	return;
 	if (((cRepeat & 0xfffe) != 0) || ((flags & 0x4000) != 0))	return;
 
@@ -1189,7 +1191,7 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 	if (Cursor == NULL) {
 		Cursor = new CCursor;
 		if (!Cursor || !Cursor->bInitialize(hWnd)) {
-			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);	
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			return FALSE;
 		}
 	}
@@ -1212,7 +1214,7 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 		EventHook = new CEventHook;
 		if (!EventHook || !EventHook->bEventSet(hWnd)) {
 			vMessageBox(hWnd, IDS_NOTRREGISTEVH, MessageBoxTYPE, __func__, __LINE__);
-			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);	
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			return FALSE;
 		}
 	}
@@ -1235,7 +1237,7 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 	}
 	else {
 		vMessageBox(hWnd, IDS_NOTIMERESOUCE, MessageBoxTYPE, __func__, __LINE__);
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);		
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		return FALSE;
 	}
 	return TRUE;

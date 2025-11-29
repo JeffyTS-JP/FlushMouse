@@ -1,7 +1,9 @@
-﻿// FlushMouseUI3.Xaml.cpp for FlushMouseUI3
-//		Copyright (C) 2022 JeffyTS
+﻿//
+// FlushMouseUI3.Xaml.cpp for FlushMouseUI3
 //
-//	  
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
+//
 // No.	  Date			Name			Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
 // #0000	2022/07/23  JeffyTS  	New edit.
@@ -65,7 +67,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 // Local Prototype Define
 //
 
-// 
+//
 // vMessageBox()
 //
 void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine)
@@ -158,10 +160,10 @@ App::App()
 App::~App()
 {
 #if defined _DEBUG
-	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG); 
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 	_CrtDumpMemoryLeaks();
 #endif // _DEBUG
-	
+
 	return;
 }
 
@@ -175,12 +177,12 @@ void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 		MessageBox(NULL, L"EXCEPTION", L"FlushMouseUI3", (MB_ICONSTOP | MB_OK));
 		});
 #endif // _DEBUG
-	
+
 #if defined _DEBUG
 	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_ASSERTE(_CrtCheckMemory());
 #endif
-	
+
 	LPCTSTR	_lpCmdLine = GetCommandLine();
 	int		iNumArgs = 0;
 	LPTSTR	*_lpArgv = CommandLineToArgvW(_lpCmdLine, &iNumArgs);
@@ -192,7 +194,7 @@ void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 		}
 	}
 	if (_lpArgv)	LocalFree(_lpArgv);
-	
+
 	if ((m_hInstance = GetModuleHandle(NULL)) == NULL) {
 		PostQuitMessage(0);
 		return;
@@ -212,10 +214,10 @@ void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 	if (hMicrosoft_ui_xaml_dll)	FreeLibrary(hMicrosoft_ui_xaml_dll);
 
 #if defined _DEBUG
-	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG); 
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 	_CrtDumpMemoryLeaks();
 #endif // _DEBUG
-	
+
 	PostQuitMessage(0);
 	return;
 }
