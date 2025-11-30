@@ -167,7 +167,7 @@
 
 #### (β機能) SynTP_Helper機能 (Synaptics社製タッチパッドと、VMware Workstation / Playerでの Two Finger Scroll) について
   * 動作環境 (検証環境)
-    * Panasonic社製 Let's note CF-SV1 搭載の Synaptics社製 Wheel Pad (Touch Pad) および Windows 11 Pro (Version 23H2)
+    * Panasonic社製 Let's note CF-SV1 搭載の Synaptics社製 Wheel Pad (Touch Pad) および Windows 11 Pro (Version 25H2)
     * Broadcom (VMware)社製 VMware(R) Workstation Pro 25H2 / VMware(R) Workstation Player 25H2
     * Guest OS は、主に Windows 11 Pro (Version 25H2)
     
