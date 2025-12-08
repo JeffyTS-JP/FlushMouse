@@ -38,7 +38,7 @@ class CTaskTray
 		BOOL		bDestroyTaskTrayWindow(HWND hWnd) const;
 		BOOL		bGetTaskTrayWindowRect(HWND hWnd, LPRECT lpRect) const;
 		static int	iCheckTaskTrayMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-		BOOL		bDisplayBalloon(HWND hWnd, DWORD dwInfoFlags, LPCTSTR szInfoTitle, LPCTSTR szInfo);
+		BOOL		bDisplayBalloon(HWND hWnd, DWORD dwInfoFlags, LPCTSTR szInfoTitle, LPCTSTR szInfo) const;
 		BOOL		bModifyToolHints(HWND hWnd, LPCTSTR lpszToolHints) const;
 
 	private:

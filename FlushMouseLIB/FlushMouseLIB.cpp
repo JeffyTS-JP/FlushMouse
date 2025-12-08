@@ -22,6 +22,7 @@
 #include "Eventlog.h"
 #include "CommonDef.h"
 #include "..\FlushMouseDLL\EventlogData.h"
+#include "..\MiscLIB\CWindow.h"
 
 //
 // Define
@@ -49,13 +50,15 @@ BOOL		bIMEInConverting = FALSE;
 //
 // Local Data
 //
+constexpr UINT FOCUSINITTIMERVALUE = 500;
 constexpr UINT_PTR CHECKFOCUSTIMERID = 1;
-static UINT     nCheckFocusTimerTickValue = 0;
+static UINT     nCheckFocusTimerTickValue = FOCUSINITTIMERVALUE;
 static UINT_PTR nCheckFocusTimerID = CHECKFOCUSTIMERID;
 static UINT_PTR	uCheckFocusTimer = NULL;
 
+constexpr UINT PROCINITTIMERVALUE = 1000;
 constexpr UINT_PTR CHECKPROCTIMERID = 2;
-static UINT     nCheckProcTimerTickValue = 0;
+static UINT     nCheckProcTimerTickValue = PROCINITTIMERVALUE;
 static UINT_PTR nCheckProcTimerID = CHECKPROCTIMERID;
 static UINT_PTR	uCheckProcTimer = NULL;
 
@@ -63,6 +66,9 @@ static CFlushMouseHook		*FlushMouseHook = NULL;
 static CEventHook			*EventHook = NULL;
 static CPowerNotification	*PowerNotification = NULL;
 static CRawInputDevice		*RawInput = NULL;
+
+static BOOL					bFlushMouseCSInitialized = FALSE;
+static CRITICAL_SECTION		FlushMouseProcGlobalsCS {};
 
 //
 // Global Prototype Define
@@ -94,7 +100,8 @@ static void		Cls_OnCheckIMEStartConvertingEx(HWND hWnd, BOOL bStartConverting, D
 // Sub
 static VOID CALLBACK	vCheckFocusTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
 static VOID CALLBACK	vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DWORD dwTime);
-static BOOL		bNotInTaskBar(LPCTSTR lpClassName);
+static DWORD WINAPI		CheckProcWorker(LPVOID lpParameter);
+static BOOL		bNotInTaskBarCached(HWND _hWnd);
 
 //
 //  bWinMain()
@@ -105,11 +112,7 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_o
 
 	HANDLE	hHandle = GetCurrentProcess();
 	if (hHandle != NULL) {
-		if (!SetPriorityClass(hHandle, NORMAL_PRIORITY_CLASS)) {
-			CloseHandle(hHandle);
-			return FALSE;
-		}
-		CloseHandle(hHandle);
+		(void)SetPriorityClass(hHandle, NORMAL_PRIORITY_CLASS);
 	}
 
 	if (!bSetHeapInformation())	return FALSE;
@@ -123,6 +126,8 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_o
 
 	SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 	SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+
+	(void)bInitializeWindowCache();
 
 	if (!hPrevInstance) {
 		if (!MyRegisterClass(hInstance)) {
@@ -142,21 +147,16 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_o
 	UpdateWindow(hWnd);
 	g_hMainWnd = hWnd;
 
+	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_FLUSHMOUSE));
+
 	MSG		msg{};
 	BOOL	bRet = FALSE;
-	while (TRUE) {
-		try {
-			bRet = GetMessage(&msg, NULL, 0, 0);
-		}
-		catch (...) {
-			throw;
-		}
-		if ((bRet == 0) || (bRet == (-1))) {
+	while ((bRet = GetMessage(&msg, NULL, 0, 0)) != 0) {
+		if (bRet == (-1)) {
 			break;
 		}
 		else {
-			HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_FLUSHMOUSE));
-			if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
+			if (!hAccelTable || !TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
@@ -317,6 +317,11 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 
 	g_hMainWnd = hWnd;
 
+	if (!bFlushMouseCSInitialized) {
+		(void)InitializeCriticalSectionAndSpinCount(&FlushMouseProcGlobalsCS, 0x00000400);
+		bFlushMouseCSInitialized = TRUE;
+	}
+
 	CHANGEFILTERSTRUCT	cf{};
 	cf.cbSize = sizeof(CHANGEFILTERSTRUCT);
 	if (!ChangeWindowMessageFilterEx(hWnd, WM_SETTINGSEX, MSGFLT_ALLOW, &cf)) {
@@ -352,6 +357,9 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		}
 	}
 
+	const LPAPPREGDATA lpAppRegData = (Profile ? Profile->lpstAppRegData : NULL);
+	if (!lpAppRegData)	return FALSE;
+
 	constexpr UINT uiNumDevices = 2;
 	RAWINPUTDEVICE	RawInputDevice[uiNumDevices]{};
 	RawInputDevice[0].hwndTarget = hWnd;	RawInputDevice[0].dwFlags = (RIDEV_INPUTSINK | RIDEV_DEVNOTIFY);
@@ -372,7 +380,7 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		return FALSE;
 	}
 
-	if ((bCheckExistingJPIME() && Profile->lpstAppRegData->bEnableEPHelper)) {
+	if ((bCheckExistingJPIME() && lpAppRegData->bEnableEPHelper)) {
 		bForExplorerPatcherSWS(GetForegroundWindow(), TRUE, TRUE, NULL, NULL);
 	}
 
@@ -402,11 +410,11 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		}
 	}
 
-	if (Profile != NULL) {
-		if ((Profile->lpstAppRegData->dwSynTPHelper1 == SYNTPH_SENDERIPV4_START)
-			|| (Profile->lpstAppRegData->dwSynTPHelper1 == SYNTPH_RECEIVERIPV4_START)
-			|| (Profile->lpstAppRegData->dwSynTPHelper1 == SYNTPH_SENDERHOSNAMEIPV4_START)) {
-			bStartSynTPHelper(g_hMainWnd, Profile->lpstAppRegData->dwSynTPHelper1, TRUE);
+	if (lpAppRegData != NULL) {
+		if ((lpAppRegData->dwSynTPHelper1 == SYNTPH_SENDERIPV4_START)
+			|| (lpAppRegData->dwSynTPHelper1 == SYNTPH_RECEIVERIPV4_START)
+			|| (lpAppRegData->dwSynTPHelper1 == SYNTPH_SENDERHOSNAMEIPV4_START)) {
+			bStartSynTPHelper(g_hMainWnd, lpAppRegData->dwSynTPHelper1, TRUE);
 		}
 	}
 
@@ -433,7 +441,7 @@ static void Cls_OnDestroy(HWND hWnd)
 	}
 
 	WTSUnRegisterSessionNotification(hWnd);
-
+	vUninitializeWindowCache();
 	PostQuitMessage(0);
 }
 
@@ -452,6 +460,9 @@ void		vDestroyWindow(HWND hWnd)
 	if (_hWnd != NULL) {
 		SendMessage(_hWnd, WM_DESTROY, 0, 0);
 	}
+
+	if (bFlushMouseCSInitialized) EnterCriticalSection(&FlushMouseProcGlobalsCS);
+
 	if (SynTP) {
 		delete SynTP;
 		SynTP = NULL;
@@ -484,7 +495,15 @@ void		vDestroyWindow(HWND hWnd)
 		delete PowerNotification;
 		PowerNotification = NULL;
 	}
+
+	if (bFlushMouseCSInitialized) LeaveCriticalSection(&FlushMouseProcGlobalsCS);
+
 	SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
+
+	if (bFlushMouseCSInitialized) {
+		DeleteCriticalSection(&FlushMouseProcGlobalsCS);
+		bFlushMouseCSInitialized = FALSE;
+	}
 }
 
 //
@@ -536,11 +555,13 @@ static void	Cls_OnDisplayChange(HWND hWnd, UINT bitsPerPixel, UINT cxScreen, UIN
 	UNREFERENCED_PARAMETER(bitsPerPixel);
 	UNREFERENCED_PARAMETER(cxScreen);
 	UNREFERENCED_PARAMETER(cyScreen);
-	if (bCheckExistingJPIME() && (Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
-		if (Profile->lpstAppRegData->bEnableEPHelper) {
+	const LPAPPREGDATA lpAppRegData = (Profile ? Profile->lpstAppRegData : NULL);
+	if (!lpAppRegData)	return;
+	if (bCheckExistingJPIME() && ((lpAppRegData->bEnableEPHelper || lpAppRegData->bIMEModeForced))) {
+		if (lpAppRegData->bEnableEPHelper) {
 			bForExplorerPatcherSWS(GetForegroundWindow(), TRUE, TRUE, NULL, NULL);
 		}
-		if (Profile->lpstAppRegData->bIMEModeForced) {
+		if (lpAppRegData->bIMEModeForced) {
 			bChromium_Helper(GetForegroundWindow());
 		}
 	}
@@ -559,22 +580,25 @@ void Cls_OnLButtonDownEx(HWND hWnd, int x, int y, HWND hForeground)
 
 	if (!Profile || !Cursor)	return;
 
+	const LPAPPREGDATA lpAppRegData = (Profile->lpstAppRegData ? Profile->lpstAppRegData : NULL);
+	if (!lpAppRegData)	return;
+
 	TCHAR	szBuffer[_MAX_PATH]{};
-	if (Profile->lpstAppRegData->bSupportVirtualDesktop) {
+	if (lpAppRegData->bSupportVirtualDesktop) {
 		if (GetClassName(hForeground, szBuffer, _MAX_PATH) != 0) {
 			if ((szBuffer[0] != _T('\0')) && (_tcscmp(szBuffer, L"TscShellContainerClass") == 0)) {
 				return;
 			}
 		}
 	}
-	if (bCheckExistingJPIME() && (Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
-		if (Profile->lpstAppRegData->bEnableEPHelper) {
-			HWND	hWndHidemaru = FindWindow(_T("Hidemaru32Class"), NULL);
+	if (bCheckExistingJPIME() && ((lpAppRegData->bEnableEPHelper || lpAppRegData->bIMEModeForced))) {
+		if (lpAppRegData->bEnableEPHelper) {
+			HWND	hWndHidemaru = hGetCachedWindowByClassName(_T("Hidemaru32Class"));
 			if ((!hWndHidemaru) || (hForeground != hWndHidemaru)) {
 				bForExplorerPatcherSWS(hForeground, TRUE, FALSE, NULL, NULL);
 			}
 		}
-		if (Profile->lpstAppRegData->bIMEModeForced) {
+		if (lpAppRegData->bIMEModeForced) {
 			bChromium_Helper(hForeground);
 		}
 	}
@@ -592,7 +616,10 @@ void Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground)
 	UNREFERENCED_PARAMETER(y);
 	UNREFERENCED_PARAMETER(hForeground);
 	if (!Profile || !Cursor || !EventHook)	return;
-	if (Profile->lpstAppRegData->bSupportVirtualDesktop) {
+	const LPAPPREGDATA lpAppRegData = (Profile->lpstAppRegData ? Profile->lpstAppRegData : NULL);
+	if (!lpAppRegData)	return;
+
+	if (lpAppRegData->bSupportVirtualDesktop) {
 		TCHAR	szBuffer[_MAX_PATH]{};
 		if (GetClassName(hForeground, szBuffer, _MAX_PATH) != 0) {
 			if ((szBuffer[0] != _T('\0')) && (_tcscmp(szBuffer, L"TscShellContainerClass") == 0)) {
@@ -600,7 +627,7 @@ void Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground)
 			}
 		}
 	}
-	if (Profile->lpstAppRegData->bDoModeDispByMouseBttnUp) {
+	if (lpAppRegData->bDoModeDispByMouseBttnUp) {
 		HWND	hWndObserved = NULL;
 		POINT	pt{};
 		if (GetCursorPos(&pt)) {
@@ -630,25 +657,29 @@ static void		Cls_OnInputLangChangeEx(HWND hWnd, UINT CodePage, HKL hkl)
 {
 	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(CodePage);
+
 	if (!Profile || !Cursor)	return;
+	const LPAPPREGDATA lpAppRegData = (Profile->lpstAppRegData ? Profile->lpstAppRegData : NULL);
+	if (!lpAppRegData)	return;
+
 	HWND	hForeWnd = NULL;
 	HKL		hNewHKL = NULL;
 	HKL		hPreviousHKL = NULL;
 	if ((hForeWnd = GetForegroundWindow()) != NULL) {
-		if ((bCheckExistingJPIME() && Profile->lpstAppRegData->bEnableEPHelper)) {
+		if ((bCheckExistingJPIME() && lpAppRegData->bEnableEPHelper)) {
 			if (hkl == US_ENG) {
 				bForExplorerPatcherSWS(hForeWnd, TRUE, TRUE, &hNewHKL, &hPreviousHKL);
 			}
 		}
 		HWND	hWndObserved = NULL;
 		POINT	pt{};
-		if (Profile->lpstAppRegData->bDoModeDispByMouseBttnUp && GetCursorPos(&pt)) {
+		if (lpAppRegData->bDoModeDispByMouseBttnUp && GetCursorPos(&pt)) {
 			if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return;
-			if (Profile->lpstAppRegData->bDisplayFocusWindowIME) {
+			if (lpAppRegData->bDisplayFocusWindowIME) {
 				hWndObserved = hForeWnd;
 			}
 			if (Cursor->bStartIMECursorChangeThread(hWndObserved)) {
-				if (Profile->lpstAppRegData->bDoModeDispByIMEKeyDown) {
+				if (lpAppRegData->bDoModeDispByIMEKeyDown) {
 					if (!bCheckDrawIMEModeArea(hWndObserved))	return;
 					if (!Cursor->bStartDrawIMEModeThread(hWndObserved))	return;
 				}
@@ -670,7 +701,10 @@ static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd)
 	if (Cursor->bIsDisplayWindow(hForeWnd))	{
 		return;
 	}
-	if (Profile->lpstAppRegData->bSupportVirtualDesktop) {
+	const LPAPPREGDATA lpAppRegData = (Profile ? Profile->lpstAppRegData : NULL);
+	if (!lpAppRegData)	return;
+
+	if (lpAppRegData->bSupportVirtualDesktop) {
 		TCHAR	szBuffer[_MAX_PATH]{};
 		if (GetClassName(hForeWnd, szBuffer, _MAX_PATH) != 0) {
 			if ((szBuffer[0] != _T('\0')) && (_tcscmp(szBuffer, L"TscShellContainerClass") == 0)) {
@@ -678,7 +712,7 @@ static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd)
 			}
 		}
 	}
-	CURSORINFO	CursorInfo{ CursorInfo.cbSize = sizeof(CURSORINFO) };
+	CURSORINFO	CursorInfo { CursorInfo.cbSize = sizeof(CursorInfo) };
 	if (!GetCursorInfo(&CursorInfo)) {
 		_Post_equals_last_error_ DWORD err = GetLastError();
 		if (err == ERROR_ACCESS_DENIED) {
@@ -686,17 +720,17 @@ static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd)
 		}
 		return;
 	}
-	if (Profile->lpstAppRegData->bOffChangedFocus) {
+	if (lpAppRegData->bOffChangedFocus) {
 		if (Cime)	Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 	}
 	if (CursorInfo.flags != CURSOR_SHOWING)	return;
 	HWND hWndObserved = hGetObservedWnd();
 	if (!hWndObserved)	return;
 	if (!Cursor->bStartIMECursorChangeThreadWait(hWndObserved, 100))	return;
-	if (Profile->lpstAppRegData->bDoModeDispByMouseBttnUp) {
+	if (lpAppRegData->bDoModeDispByMouseBttnUp) {
 		if (!bCheckDrawIMEModeArea(hWndObserved))	return;
 #define	DELAYTIME	300
-		if (!Cursor->bStartDrawIMEModeThreadWait(hForeWnd,(Profile->lpstAppRegData->dwAdditionalWaitTime + DELAYTIME)))	return;
+		if (!Cursor->bStartDrawIMEModeThreadWait(hForeWnd, (lpAppRegData->dwAdditionalWaitTime + DELAYTIME)))	return;
 #undef	DELAYTIME
 	}
 	return;
@@ -726,11 +760,19 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 	if (!Profile || !Cursor)	return;
 	if (((cRepeat & 0xfffe) != 0) || ((flags & 0x4000) != 0))	return;
 
+	const LPAPPREGDATA lpAppRegData = (Profile ? Profile->lpstAppRegData : NULL);
+	if (!lpAppRegData)	return;
+
 	HKL		hNewHKL = NULL;
 	HKL		hPreviousHKL = NULL;
 	HWND	hWndObserved = NULL, hForeWnd = NULL;
 	DWORD	dwBeforeIMEMode = IMEOFF;
 	POINT	pt{};
+	
+	HWND	hWndHidemaru = NULL;
+	if (lpAppRegData->bEnableEPHelper || lpAppRegData->bIMEModeForced) {
+		hWndHidemaru = hGetCachedWindowByClassName(_T("Hidemaru32Class"));
+	}
 
 	if ((fDown == FALSE)) {											// Key up
 		switch (vk) {
@@ -747,10 +789,10 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 		case KEY_ONLY_CTRLUP:			// VK_ONLY_CTRLUP	(0xe8)
 			if (bIMEInConverting)	return;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
-			if (Profile->lpstAppRegData->bEnableEPHelper)	bForExplorerPatcherSWS(hForeWnd, FALSE, FALSE, NULL, NULL);
+			if (lpAppRegData->bEnableEPHelper)	bForExplorerPatcherSWS(hForeWnd, FALSE, FALSE, NULL, NULL);
 			if (GetCursorPos(&pt)) {
-				if (Profile->lpstAppRegData->bDoModeDispByCtrlUp) {
-					if (!Cursor->bStartDrawIMEModeThreadWait(WindowFromPoint(pt), Profile->lpstAppRegData->dwWaitWaveTime))	return;
+				if (lpAppRegData->bDoModeDispByCtrlUp) {
+					if (!Cursor->bStartDrawIMEModeThreadWait(WindowFromPoint(pt), lpAppRegData->dwWaitWaveTime))	return;
 				}
 			}
 			return;
@@ -785,7 +827,7 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 			return;
 		case KEY_IME_ON:				// IME ON			(0x16)
 			if (bIMEInConverting)	return;
-			if (Profile->lpstAppRegData->bIMEModeForced) {
+			if (lpAppRegData->bIMEModeForced) {
 				if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 				Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
 			}
@@ -794,16 +836,14 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 			if (bIMEInConverting)	return;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
-			if ((Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
-				HWND	hWndHidemaru = FindWindow(_T("Hidemaru32Class"), NULL);
+			if ((lpAppRegData->bEnableEPHelper || lpAppRegData->bIMEModeForced)) {
 				if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
 					SleepEx(50, FALSE);
 				}
 				else {
-					if (!bForExplorerPatcherSWS(hForeWnd, TRUE, Profile->lpstAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL))	return;
-
+					if (!bForExplorerPatcherSWS(hForeWnd, TRUE, lpAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL))	return;
 				}
-				if (Profile->lpstAppRegData->bIMEModeForced) {
+				if (lpAppRegData->bIMEModeForced) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
 						if (dwBeforeIMEMode != IMEOFF) {
 							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
@@ -826,11 +866,11 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 					}
 				}
 			}
-			if (Profile->lpstAppRegData->bForceHiragana && !(dwBeforeIMEMode != IMEOFF))	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
+			if (lpAppRegData->bForceHiragana && !(dwBeforeIMEMode != IMEOFF))	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
 			break;
 		case KEY_IME_OFF:				// IME OFF					(0x1a)
 			if (bIMEInConverting)	return;
-			if (Profile->lpstAppRegData->bIMEModeForced) {
+			if (lpAppRegData->bIMEModeForced) {
 				if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 				Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 				bIMEInConverting = FALSE;
@@ -842,15 +882,14 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 			if (bIMEInConverting)	return;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
-			if ((Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
+			if ((lpAppRegData->bEnableEPHelper || lpAppRegData->bIMEModeForced)) {
 				if (dwBeforeIMEMode != IMEOFF) {
-					if (Profile->lpstAppRegData->bIMEModeForced) {
-						HWND	hWndHidemaru = FindWindow(_T("Hidemaru32Class"), NULL);
+					if (lpAppRegData->bIMEModeForced) {
 						if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
 							SleepEx(50, FALSE);
 						}
 						else {
-							if (!bForExplorerPatcherSWS(hForeWnd, TRUE, Profile->lpstAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL))	return;
+							if (!bForExplorerPatcherSWS(hForeWnd, TRUE, lpAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL))	return;
 
 						}
 						Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
@@ -863,16 +902,15 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 			if (bIMEInConverting)	return;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
-			if ((Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
-				HWND	hWndHidemaru = FindWindow(_T("Hidemaru32Class"), NULL);
+			if ((lpAppRegData->bEnableEPHelper || lpAppRegData->bIMEModeForced)) {
 				if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
 					SleepEx(50, FALSE);
 				}
 				else {
-					if (!bForExplorerPatcherSWS(hForeWnd, TRUE, Profile->lpstAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL))	return;
+					if (!bForExplorerPatcherSWS(hForeWnd, TRUE, lpAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL))	return;
 
 				}
-				if (Profile->lpstAppRegData->bIMEModeForced) {
+				if (lpAppRegData->bIMEModeForced) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
 						if (dwBeforeIMEMode != IMEOFF) {
 							Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
@@ -901,22 +939,21 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 					}
 				}
 			}
-			if (Profile->lpstAppRegData->bForceHiragana && !(dwBeforeIMEMode != IMEOFF))	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
+			if (lpAppRegData->bForceHiragana && !(dwBeforeIMEMode != IMEOFF))	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
 			break;
 		case KEY_OEM_IME_ON:				// JP(IME/ENG) IME ON		(0xf4)
 			if (bIMEInConverting)	return;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
-			if ((Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
-				HWND	hWndHidemaru = FindWindow(_T("Hidemaru32Class"), NULL);
+			if ((lpAppRegData->bEnableEPHelper || lpAppRegData->bIMEModeForced)) {
 				if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
 					SleepEx(50, FALSE);
 				}
 				else {
-					if (!bForExplorerPatcherSWS(hForeWnd, TRUE, Profile->lpstAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL))	return;
+					if (!bForExplorerPatcherSWS(hForeWnd, TRUE, lpAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL))	return;
 
 				}
-				if (Profile->lpstAppRegData->bIMEModeForced) {
+				if (lpAppRegData->bIMEModeForced) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
 						if (dwBeforeIMEMode != IMEOFF) {
 							Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
@@ -944,23 +981,22 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 					}
 				}
 			}
-			if (Profile->lpstAppRegData->bForceHiragana && !(dwBeforeIMEMode != IMEOFF))	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
+			if (lpAppRegData->bForceHiragana && !(dwBeforeIMEMode != IMEOFF))	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
 			break;
 		case KEY_OEM_BACKTAB:				// OEM Alt+カタカナ/ひらがな	(0xf5)
 		case KEY_FF:						// US(ENG) 変換/ひら/カタ	(0xff)
 			if (bIMEInConverting)	return;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
-			if ((Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
+			if ((lpAppRegData->bEnableEPHelper || lpAppRegData->bIMEModeForced)) {
 				SetFocus(hForeWnd);
-				HWND	hWndHidemaru = FindWindow(_T("Hidemaru32Class"), NULL);
 				if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
 					SleepEx(50, FALSE);
 				}
 				else {
-					if (!bForExplorerPatcherSWS(hForeWnd, TRUE, Profile->lpstAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL))	return;
+					if (!bForExplorerPatcherSWS(hForeWnd, TRUE, lpAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL))	return;
 
 				}
-				if (Profile->lpstAppRegData->bIMEModeForced) {
+				if (lpAppRegData->bIMEModeForced) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
 						Cime->vIMEOpenCloseForced(hForeWnd, IMEOPEN);
 						bChromium_Helper(hForeWnd);
@@ -971,7 +1007,7 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 					}
 				}
 			}
-			if (Profile->lpstAppRegData->bForceHiragana)	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
+			if (lpAppRegData->bForceHiragana)	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
 			break;
 		default:
 			return;
@@ -981,22 +1017,21 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 		switch (vk) {
 		case KEY_IME_ON:				// IME ON					(0x16)
 		case KEY_CONVERT:				// JP(IME/ENG) 変換			(0x1c)
-			if (bIMEInConverting && (Profile->lpstAppRegData->bIMEModeForced == FALSE)) {
+			if (bIMEInConverting && ((lpAppRegData->bIMEModeForced == FALSE))) {
 				return;
 			}
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
-			if ((Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
+			if ((lpAppRegData->bEnableEPHelper || lpAppRegData->bIMEModeForced)) {
 				if (dwBeforeIMEMode == IMEOFF) {
-					HWND	hWndHidemaru = FindWindow(_T("Hidemaru32Class"), NULL);
 					if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
 						SleepEx(50, FALSE);
 					}
 					else {
-						if (!bForExplorerPatcherSWS(hForeWnd, TRUE, Profile->lpstAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL))	return;
+						if (!bForExplorerPatcherSWS(hForeWnd, TRUE, lpAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL))	return;
 
 					}
-					if (Profile->lpstAppRegData->bIMEModeForced) {
+					if (lpAppRegData->bIMEModeForced) {
 						if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
 							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 							SleepEx(10, FALSE);
@@ -1015,23 +1050,22 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 			else {
 				if (bIMEInConverting)	return;
 			}
-			if (Profile->lpstAppRegData->bForceHiragana && !(dwBeforeIMEMode != IMEOFF))	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
+			if (lpAppRegData->bForceHiragana && !(dwBeforeIMEMode != IMEOFF))	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
 			break;
 		case KEY_NONCONVERT:			// JP(IME/ENG) 無変換		(0x1d)
 			if (bIMEInConverting)	return;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
-			if ((Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
+			if ((lpAppRegData->bEnableEPHelper || lpAppRegData->bIMEModeForced)) {
 				if (dwBeforeIMEMode != IMEOFF) {
-					HWND	hWndHidemaru = FindWindow(_T("Hidemaru32Class"), NULL);
 					if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
 						SleepEx(50, FALSE);
 					}
 					else {
-						if (!bForExplorerPatcherSWS(hForeWnd, TRUE, Profile->lpstAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL))	return;
+						if (!bForExplorerPatcherSWS(hForeWnd, TRUE, lpAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL))	return;
 
 					}
-					if (Profile->lpstAppRegData->bIMEModeForced) {
+					if (lpAppRegData->bIMEModeForced) {
 						if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
 							if (((UINT64)hPreviousHKL & LANG_MASK) != LANG_IME) {
 								PostMessage(hWnd, WM_SYSKEYDOWNUPEX, KEY_OEM_PA1, (0x80000000));
@@ -1054,9 +1088,10 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 				bIMEInConverting = FALSE;
 			}
 			if ((GetKeyState(VK_SHIFT) & 0x8000) || (GetKeyState(VK_LSHIFT) & 0x8000) || (GetKeyState(VK_RSHIFT) & 0x8000)) {
-				if (Profile->lpstAppRegData->bForceHiragana && (dwBeforeIMEMode != IMEOFF))
+				if (lpAppRegData->bForceHiragana && (dwBeforeIMEMode != IMEOFF)) {
 					Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
 					bChromium_Helper(hForeWnd);
+				}
 			}
 			break;
 		case KEY_OEM_ATTN:				// JP(IME/ENG) 英数/CapsLock(0xf0)
@@ -1064,17 +1099,16 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 			if ((GetKeyState(VK_SHIFT) & 0x8000) || (GetKeyState(VK_LSHIFT) & 0x8000) || (GetKeyState(VK_RSHIFT) & 0x8000))	break;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
-			if ((Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
+			if ((lpAppRegData->bEnableEPHelper || lpAppRegData->bIMEModeForced)) {
 				if (dwBeforeIMEMode != IMEOFF) {
-					HWND	hWndHidemaru = FindWindow(_T("Hidemaru32Class"), NULL);
 					if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
 						SleepEx(50, FALSE);
 					}
 					else {
-						if (!bForExplorerPatcherSWS(hForeWnd, TRUE, Profile->lpstAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL))	return;
+						if (!bForExplorerPatcherSWS(hForeWnd, TRUE, lpAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL))	return;
 
 					}
-					if (Profile->lpstAppRegData->bIMEModeForced) {
+					if (lpAppRegData->bIMEModeForced) {
 						if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
 							Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 							bIMEInConverting = FALSE;
@@ -1095,20 +1129,19 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 			break;
 		case KEY_OEM_FINISH:			// JP(IME/ENG) OEM カタカナ	(0xf1)
 			if (bIMEInConverting)	return;
-			if ((Profile->lpstAppRegData->bIMEModeForced == FALSE)) {
+			if ((lpAppRegData == NULL) || (lpAppRegData->bIMEModeForced == FALSE)) {
 				return;
 			}
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
-			if ((Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
-				HWND	hWndHidemaru = FindWindow(_T("Hidemaru32Class"), NULL);
+			if ((lpAppRegData->bEnableEPHelper || lpAppRegData->bIMEModeForced)) {
 				if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
 					SleepEx(50, FALSE);
 				}
 				else {
-					if (!bForExplorerPatcherSWS(hForeWnd, TRUE, Profile->lpstAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL))	return;
+					if (!bForExplorerPatcherSWS(hForeWnd, TRUE, lpAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL))	return;
 
 				}
-				if (Profile->lpstAppRegData->bIMEModeForced) {
+				if (lpAppRegData->bIMEModeForced) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
 						Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 						SleepEx(10, FALSE);
@@ -1125,24 +1158,23 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 					}
 				}
 			}
-			if (Profile->lpstAppRegData->bForceHiragana)	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
+			if (lpAppRegData->bForceHiragana)	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
 			break;
 		case KEY_OEM_COPY:				// JP(IME/ENG) OEM ひらがな	(0xf2)
 			if (bIMEInConverting)	return;
-			if ((Profile->lpstAppRegData->bIMEModeForced == FALSE)) {
+			if ((lpAppRegData == NULL) || (lpAppRegData->bIMEModeForced == FALSE)) {
 				return;
 			}
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
-			if ((Profile->lpstAppRegData->bEnableEPHelper || Profile->lpstAppRegData->bIMEModeForced)) {
-				HWND	hWndHidemaru = FindWindow(_T("Hidemaru32Class"), NULL);
+			if ((lpAppRegData->bEnableEPHelper || lpAppRegData->bIMEModeForced)) {
 				if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
 					SleepEx(50, FALSE);
 				}
 				else {
-					if (!bForExplorerPatcherSWS(hForeWnd, TRUE, Profile->lpstAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL))	return;
+					if (!bForExplorerPatcherSWS(hForeWnd, TRUE, lpAppRegData->bEnableEPHelper, &hNewHKL, &hPreviousHKL))	return;
 
 				}
-				if (Profile->lpstAppRegData->bIMEModeForced) {
+				if (lpAppRegData->bIMEModeForced) {
 					if ((hPreviousHKL != JP_IME) && (hNewHKL == JP_IME)) {
 						Cime->vIMEOpenCloseForced(hForeWnd, IMECLOSE);
 						SleepEx(10, FALSE);
@@ -1159,7 +1191,7 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 					}
 				}
 			}
-			if (Profile->lpstAppRegData->bForceHiragana)	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
+			if (lpAppRegData->bForceHiragana)	Cime->vIMEConvertModeChangeForced(hForeWnd, ZENHIRA_IMEON);
 			break;
 		case KEY_OEM_IME_OFF:			// JP(IME/ENG) IME OFF		(0xf3)
 		case KEY_OEM_IME_ON:			// JP(IME/ENG) IME ON		(0xf4)
@@ -1168,12 +1200,12 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 		default:
 			return;
 		}
-		}
+	}
 	hWndObserved = hGetObservedWnd();
 	if (!hWndObserved)	return;
-	if (Profile->lpstAppRegData->bDoModeDispByIMEKeyDown) {
+	if (lpAppRegData->bDoModeDispByIMEKeyDown) {
 		if (!bIMEInConverting) {
-			if (!Cursor->bStartDrawIMEModeThreadWait(hWndObserved, Profile->lpstAppRegData->dwAdditionalWaitTime))	return;	// error
+			if (!Cursor->bStartDrawIMEModeThreadWait(hWndObserved, lpAppRegData->dwAdditionalWaitTime))	return;
 		}
 	}
 	if (!Cursor->bStartIMECursorChangeThread(hWndObserved))	return;
@@ -1188,6 +1220,7 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 #define MessageBoxTYPE (MB_ICONSTOP | MB_OK | MB_TOPMOST)
 
 	if (!Profile)	return FALSE;
+	const LPAPPREGDATA lpAppRegData = (Profile->lpstAppRegData ? Profile->lpstAppRegData : NULL);
 	if (Cursor == NULL) {
 		Cursor = new CCursor;
 		if (!Cursor || !Cursor->bInitialize(hWnd)) {
@@ -1202,44 +1235,54 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 			if ((dwErr == ERROR_MOD_NOT_FOUND) || (dwErr == ERROR_SHARING_VIOLATION) || (dwErr == ERROR_ENVVAR_NOT_FOUND)) {
 				Sleep(3000);
 				if (!FlushMouseHook || !FlushMouseHook->bHookSet(hWnd, FLUSHMOUSE_DLL, FLUSHMOUSE32_EXE)) {
+					if (FlushMouseHook) { delete FlushMouseHook; FlushMouseHook = NULL; }
 					bReportEvent(MSG_THREAD_HOOK_TIMER_START_FAILED, APPLICATION_CATEGORY);
 					vMessageBox(hWnd, IDS_NOTREGISTERHOOK, MessageBoxTYPE, __func__, __LINE__);
 					PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 					return FALSE;
 				}
 			}
+			else return FALSE;
 		}
 	}
 	if (EventHook == NULL) {
 		EventHook = new CEventHook;
 		if (!EventHook || !EventHook->bEventSet(hWnd)) {
+			if (EventHook) { delete EventHook; EventHook = NULL; }
 			vMessageBox(hWnd, IDS_NOTRREGISTEVH, MessageBoxTYPE, __func__, __LINE__);
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			return FALSE;
 		}
 	}
 	BOOL	bBool = FALSE;
+	if (bFlushMouseCSInitialized) EnterCriticalSection(&FlushMouseProcGlobalsCS);
 	if (SetUserObjectInformation(GetCurrentProcess(), UOI_TIMERPROC_EXCEPTION_SUPPRESSION, &bBool, sizeof(BOOL)) != FALSE) {
 		if (uCheckFocusTimer == NULL) {
-			if ((uCheckFocusTimer = SetTimer(hWnd, nCheckFocusTimerID, Profile->lpstAppRegData->nCheckFocusTimerTickValue, (TIMERPROC)&vCheckFocusTimerProc)) == 0) {
-				vMessageBox(hWnd, IDS_NOTIMERESOUCE, MessageBoxTYPE, __func__, __LINE__);
+			const UINT nTick = (lpAppRegData ? lpAppRegData->nCheckFocusTimerTickValue : nCheckFocusTimerTickValue);
+			if ((uCheckFocusTimer = SetTimer(hWnd, nCheckFocusTimerID, nTick, (TIMERPROC)&vCheckFocusTimerProc)) == 0) {
+				vMessageBox(hWnd, IDS_NOTIMERRESOUCE, MessageBoxTYPE, __func__, __LINE__);
 				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+				if (bFlushMouseCSInitialized) LeaveCriticalSection(&FlushMouseProcGlobalsCS);
 				return FALSE;
 			}
 		}
 		if (uCheckProcTimer == NULL) {
-			if ((uCheckProcTimer = SetTimer(hWnd, nCheckProcTimerID, Profile->lpstAppRegData->nCheckProcTimerTickValue, (TIMERPROC)&vCheckProcTimerProc)) == 0) {
-				vMessageBox(hWnd, IDS_NOTIMERESOUCE, MessageBoxTYPE, __func__, __LINE__);
+			const UINT nTick2 = (lpAppRegData ? lpAppRegData->nCheckProcTimerTickValue : nCheckProcTimerTickValue);
+			if ((uCheckProcTimer = SetTimer(hWnd, nCheckProcTimerID, nTick2, (TIMERPROC)&vCheckProcTimerProc)) == 0) {
+				vMessageBox(hWnd, IDS_NOTIMERRESOUCE, MessageBoxTYPE, __func__, __LINE__);
 				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+				if (bFlushMouseCSInitialized) LeaveCriticalSection(&FlushMouseProcGlobalsCS);
 				return FALSE;
 			}
 		}
 	}
 	else {
-		vMessageBox(hWnd, IDS_NOTIMERESOUCE, MessageBoxTYPE, __func__, __LINE__);
+		vMessageBox(hWnd, IDS_NOTIMERRESOUCE, MessageBoxTYPE, __func__, __LINE__);
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+		if (bFlushMouseCSInitialized) LeaveCriticalSection(&FlushMouseProcGlobalsCS);
 		return FALSE;
 	}
+	if (bFlushMouseCSInitialized) LeaveCriticalSection(&FlushMouseProcGlobalsCS);
 	return TRUE;
 }
 
@@ -1251,6 +1294,8 @@ VOID	vStopThreadHookTimer(HWND hWnd)
 	UNREFERENCED_PARAMETER(hWnd);
 
 	if (Cursor)	Cursor->vStopIMECursorChangeThread();
+
+	if (bFlushMouseCSInitialized) EnterCriticalSection(&FlushMouseProcGlobalsCS);
 
 	if (EventHook != NULL) {
 		delete EventHook;
@@ -1264,6 +1309,8 @@ VOID	vStopThreadHookTimer(HWND hWnd)
 		delete Cursor;
 		Cursor = NULL;
 	}
+	if (bFlushMouseCSInitialized) LeaveCriticalSection(&FlushMouseProcGlobalsCS);
+
 	SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
 }
 
@@ -1279,8 +1326,9 @@ static VOID CALLBACK vCheckFocusTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, D
 	if (!Profile || !Cursor)	return;
 	if (uTimerID == nCheckFocusTimerID) {
 		HWND hWndObserved = hGetObservedWnd();
-		if (!hWndObserved)	return;
-		if (!Cursor->bStartIMECursorChangeThreadTimer(hWndObserved))	return;
+		if (hWndObserved) {
+			(void)Cursor->bStartIMECursorChangeThreadTimer(hWndObserved);
+		}
 	}
 	return;
 }
@@ -1295,61 +1343,84 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 	UNREFERENCED_PARAMETER(dwTime);
 
 	if (uTimerID == nCheckProcTimerID) {
-		if (FindWindow(CLASS_FLUSHMOUSE32, NULL) == NULL) {
+		if (!QueueUserWorkItem(CheckProcWorker, (LPVOID)hWnd, WT_EXECUTEDEFAULT)) {
 			bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION_CATEGORY);
-			SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
-			if (FlushMouseHook != NULL) {
-				delete	FlushMouseHook;
-				FlushMouseHook = NULL;
-			}
-			Sleep(1000);
-			if (FlushMouseHook == NULL) {
-				FlushMouseHook = new CFlushMouseHook;
-				if (!FlushMouseHook || !FlushMouseHook->bHookSet(hWnd, FLUSHMOUSE_DLL, FLUSHMOUSE32_EXE)) {
-					if (GetLastError() == ERROR_MOD_NOT_FOUND) {
-						Sleep(3000);
-						if (!FlushMouseHook || !FlushMouseHook->bHookSet(hWnd, FLUSHMOUSE_DLL, FLUSHMOUSE32_EXE)) {
-							bReportEvent(MSG_THREAD_HOOK_TIMER_RESTART_FAILED, APPLICATION_CATEGORY);
-							bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
-							PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-							return;
-						}
-					}
-				}
-			}
 		}
-		if (bNotInTaskBar(CLASS_FLUSHMOUSE)) {
-			if (bNotInTaskBar(CLASS_CURSORWINDOW)) {
-				if (bNotInTaskBar(CLASS_CARETWINDOW)) {
-					if (bNotInTaskBar(CLASS_MOUSEWINDOW)) {
-						return;
-					}
-
-				}
-			}
-		}
-		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 	}
+	return;
 }
 
 //
-// bNotInTaskBar()
+// CheckProcWorker()
 //
-static BOOL bNotInTaskBar(LPCTSTR lpClassName)
+static DWORD WINAPI CheckProcWorker(LPVOID lpParameter)
 {
-	HWND	_hWnd = NULL;
-	LONG	ExStyle = 0;
-	if ((_hWnd = FindWindow(lpClassName, NULL)) != NULL) {
-		if (!(GetWindowLong(_hWnd, GWL_STYLE) & WS_VISIBLE))	return TRUE;
-		if (((ExStyle = GetWindowLong(_hWnd, GWL_EXSTYLE) & WS_EX_TOOLWINDOW)))	return TRUE;
-		if (ExStyle & WS_EX_NOREDIRECTIONBITMAP)	return TRUE;
-		if (!(GetWindow(_hWnd, GW_OWNER) && (!(ExStyle & WS_EX_APPWINDOW) || IsIconic(_hWnd))))	return TRUE;
-		return FALSE;
+	HWND	_hWnd = reinterpret_cast<HWND>(lpParameter);
+	
+	HWND	_hWnd32 = hGetCachedWindowByClassName(CLASS_FLUSHMOUSE32);
+	HWND	_hWndFlushMouse = hGetCachedWindowByClassName(CLASS_FLUSHMOUSE);
+	HWND	_hWndCursor = hGetCachedWindowByClassName(CLASS_CURSORWINDOW);
+	HWND	_hWndCaret = hGetCachedWindowByClassName(CLASS_CARETWINDOW);
+	HWND	_hWndMouse = hGetCachedWindowByClassName(CLASS_MOUSEWINDOW);
+	
+	if (_hWnd32 == NULL) {
+		bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION_CATEGORY);
+		SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
+		if (bFlushMouseCSInitialized) EnterCriticalSection(&FlushMouseProcGlobalsCS);
+		if (FlushMouseHook != NULL) {
+			delete	FlushMouseHook;
+			FlushMouseHook = NULL;
+		}
+		if (bFlushMouseCSInitialized) LeaveCriticalSection(&FlushMouseProcGlobalsCS);
+		Sleep(100);
+		if (bFlushMouseCSInitialized) EnterCriticalSection(&FlushMouseProcGlobalsCS);
+		if (FlushMouseHook == NULL) {
+			FlushMouseHook = new CFlushMouseHook;
+			if (!FlushMouseHook || !FlushMouseHook->bHookSet(_hWnd, FLUSHMOUSE_DLL, FLUSHMOUSE32_EXE)) {
+				if (GetLastError() == ERROR_MOD_NOT_FOUND) {
+					Sleep(3000);
+					if (!FlushMouseHook || !FlushMouseHook->bHookSet(_hWnd, FLUSHMOUSE_DLL, FLUSHMOUSE32_EXE)) {
+						if (FlushMouseHook) { delete FlushMouseHook; FlushMouseHook = NULL; }
+						if (bFlushMouseCSInitialized) LeaveCriticalSection(&FlushMouseProcGlobalsCS);
+						bReportEvent(MSG_THREAD_HOOK_TIMER_RESTART_FAILED, APPLICATION_CATEGORY);
+						bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+						if (IsWindow(_hWnd)) PostMessage(_hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+						return 0;
+					}
+				}
+			}
+		}
+		if (bFlushMouseCSInitialized) LeaveCriticalSection(&FlushMouseProcGlobalsCS);
 	}
-	return TRUE;
+	
+	if (!bNotInTaskBarCached(_hWndFlushMouse) || !bNotInTaskBarCached(_hWndCursor) 
+		|| !bNotInTaskBarCached(_hWndCaret) || !bNotInTaskBarCached(_hWndMouse)) {
+		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+		if (IsWindow(_hWnd)) PostMessage(_hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+	}
+	return 0;
 }
 
+//
+// bNotInTaskBarCached()
+//
+static BOOL bNotInTaskBarCached(HWND _hWnd)
+{
+	if (_hWnd == NULL)	return TRUE;
+	
+	LONG style = GetWindowLong(_hWnd, GWL_STYLE);
+	if (style == 0 || !(style & WS_VISIBLE))	return TRUE;
+	
+	LONG ExStyle = GetWindowLong(_hWnd, GWL_EXSTYLE);
+	if (ExStyle == 0)	return TRUE;
+	if ((ExStyle & WS_EX_TOOLWINDOW) || (ExStyle & WS_EX_NOREDIRECTIONBITMAP))	return TRUE;
+	
+	HWND hOwner = GetWindow(_hWnd, GW_OWNER);
+	if (!hOwner)	return TRUE;
+	if ((ExStyle & WS_EX_APPWINDOW) && !IsIconic(_hWnd))	return TRUE;
+	
+	return FALSE;
+}
 
 
 /* = EOF = */

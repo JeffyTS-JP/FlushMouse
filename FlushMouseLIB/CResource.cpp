@@ -27,6 +27,8 @@
 //
 // Local Data
 //
+static CRITICAL_SECTION	csResource;
+static std::once_flag	csInitFlag;
 
 //
 // Local Prototype Define
@@ -42,15 +44,17 @@ CResource::CResource(LPCTSTR lpszResFile)
 		ZeroMemory(szResFile, sizeof(TCHAR) * _MAX_PATH);
 		_tcsncpy_s(szResFile, _MAX_PATH, lpszResFile, _TRUNCATE);
 	}
+	std::call_once(csInitFlag, []() {
+		InitializeCriticalSection(&csResource);
+	});
 }
 
 CResource::~CResource()
 {
-	bUnload();
-	hModRes = NULL;
-	iResourceLoadCount = 0;
-	if (szResFile)	delete []	szResFile;
+	(void)bUnload();
+	if (szResFile) delete[] szResFile;
 	szResFile = NULL;
+	iResourceLoadCount = 0;
 }
 
 //
@@ -58,13 +62,30 @@ CResource::~CResource()
 //
 HMODULE		CResource::hLoad()
 {
-	if ((hModRes == NULL) && (iResourceLoadCount == 0)) {
-		if ((hModRes = LoadLibraryEx(szResFile, NULL, (LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))) == NULL) {
+	if (!szResFile) return NULL;
+
+	std::call_once(csInitFlag, []() {
+		InitializeCriticalSection(&csResource);
+	});
+
+	EnterCriticalSection(&csResource);
+
+	HMODULE hRes = NULL;
+	if (hModRes == NULL) {
+		hRes = LoadLibraryEx(szResFile, NULL, (LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE));
+		if (hRes == NULL) {
+			LeaveCriticalSection(&csResource);
 			return NULL;
 		}
+		hModRes = hRes;
+		iResourceLoadCount = 0;
 	}
+
 	++iResourceLoadCount;
-	return hModRes;
+
+	hRes = hModRes;
+	LeaveCriticalSection(&csResource);
+	return hRes;
 }
 
 //
@@ -72,13 +93,20 @@ HMODULE		CResource::hLoad()
 //
 BOOL		CResource::bUnload()
 {
-	if ((hModRes != NULL) && (iResourceLoadCount == 1)) {
+	BOOL bRet = TRUE;
+	std::call_once(csInitFlag, []() {
+		InitializeCriticalSection(&csResource);
+				   });
+	EnterCriticalSection(&csResource);
+	if (hModRes != NULL) {
+		while (iResourceLoadCount > 0) iResourceLoadCount--;
 		if (!FreeLibrary(hModRes)) {
-			return FALSE;
+			bRet = FALSE;
 		}
+		hModRes = NULL;
 	}
-	--iResourceLoadCount;
-	return TRUE;
+	LeaveCriticalSection(&csResource);
+	return bRet;
 }
 
 

@@ -25,21 +25,21 @@
 
 //
 // Global Data
-//
+// 
 
 //
 // Local Data
-//
+// 
 
 //
 // Local Prototype Define
-//
+// 
 
 //
 //class CSynTP : private CWindow, private CRawInput
 //
 CSynTP::CSynTP(DWORD dwSynTPPadX, DWORD dwSynTPPadY, DWORD dwSynTPEdgeX, DWORD dwSynTPEdgeY)
-	: HIDRawInput(NULL), lpSynTPData(new SYNTPDATA[sizeof(SYNTPDATA)]), uuTickCount64(0), Sender(NULL), Receiver(NULL), ReceivePacketThread(NULL)
+	: HIDRawInput(NULL), lpSynTPData(new SYNTPDATA), uuTickCount64(0), Sender(NULL), Receiver(NULL), ReceivePacketThread(NULL)
 {
 	if (lpSynTPData) {
 		ZeroMemory(lpSynTPData, sizeof(SYNTPDATA));
@@ -53,7 +53,7 @@ CSynTP::CSynTP(DWORD dwSynTPPadX, DWORD dwSynTPPadY, DWORD dwSynTPEdgeX, DWORD d
 }
 
 CSynTP::CSynTP(const CSynTP& other)
-	: HIDRawInput(NULL), lpSynTPData(new SYNTPDATA[sizeof(SYNTPDATA)]), uuTickCount64(0), Sender(NULL), Receiver(NULL), ReceivePacketThread(NULL)
+	: HIDRawInput(NULL), lpSynTPData(new SYNTPDATA), uuTickCount64(0), Sender(NULL), Receiver(NULL), ReceivePacketThread(NULL)
 {
 	if (lpSynTPData != NULL) {
 		*lpSynTPData = *other.lpSynTPData;
@@ -65,7 +65,7 @@ CSynTP& CSynTP::operator = (const CSynTP& other)
 	if (this != &other) {
 		HIDRawInput = NULL;
 		if (lpSynTPData != NULL) {
-			delete[] lpSynTPData;
+			delete lpSynTPData;
 		}
 		lpSynTPData = new SYNTPDATA;
 		if (lpSynTPData != NULL) {
@@ -94,7 +94,7 @@ CSynTP::~CSynTP()
 	}
 	if (Receiver)	delete Receiver;
 	Receiver = NULL;
-	if (lpSynTPData)	delete [] lpSynTPData;
+	if (lpSynTPData)	delete lpSynTPData;
 	lpSynTPData = NULL;
 	if (HIDRawInput)	delete HIDRawInput;
 	HIDRawInput = NULL;
@@ -334,9 +334,17 @@ BOOL		CSynTP::bSendInput(DWORD dwFlags, int xPos, int yPos, int zDelta)
 //
 void		CSynTP::Cls_OnInput(HWND hWnd, DWORD dwFlags, HRAWINPUT hRawInput)
 {
-	if (!FindWindowEx(NULL, NULL, L"VMUIFrame", NULL) && !FindWindowEx(NULL, NULL, L"VMPlayerFrame", NULL) && !FindWindowEx(NULL, NULL, L"TscShellContainerClass", NULL)) {
-		return;
+	static const LPCTSTR szTargetClasses[] = { L"VMUIFrame", L"VMPlayerFrame", L"TscShellContainerClass" };
+	static const size_t targetClassCount = _countof(szTargetClasses);
+	
+	BOOL bFoundTarget = FALSE;
+	for (size_t i = 0; i < targetClassCount; i++) {
+		if (hGetCachedWindowExByClassName(NULL, NULL, szTargetClasses[i])) {
+			bFoundTarget = TRUE;
+			break;
+		}
 	}
+	if (!bFoundTarget)	return;
 	if (HIDRawInput)	vRawInputDevicesHandler(hWnd, dwFlags, hRawInput);
 }
 
@@ -356,32 +364,32 @@ void	CSynTP::vRawInputHIDHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawInput
 	UNREFERENCED_PARAMETER(lpRawInput);
 
 	RAWHID		RawHID = (RAWHID)lpRawInput->data.hid;
-	NTSTATUS	ntStatus = 0;
 	UINT		uPreparsedDataSize = 0;
 	UINT		uResult;
 	if((uResult = GetRawInputDeviceInfo(lpRawInput->header.hDevice, RIDI_PREPARSEDDATA, NULL, &uPreparsedDataSize)) == (UINT)(-1))	return;
-	HANDLE	hPreparsedDataHeap = GetProcessHeap();
-	PHIDP_PREPARSED_DATA pPreparsedData = (PHIDP_PREPARSED_DATA)HeapAlloc(hPreparsedDataHeap, 0, uPreparsedDataSize);
-	if (pPreparsedData != NULL) {
-		ZeroMemory(pPreparsedData, uPreparsedDataSize);
+
+	try {
+		std::vector<BYTE> preparseBuf;
+		preparseBuf.resize(uPreparsedDataSize);
+		PHIDP_PREPARSED_DATA pPreparsedData = reinterpret_cast<PHIDP_PREPARSED_DATA>(preparseBuf.data());
 		uResult = GetRawInputDeviceInfo(lpRawInput->header.hDevice, RIDI_PREPARSEDDATA, pPreparsedData, &uPreparsedDataSize);
 		if ((uResult != 0) && (uResult != (UINT)(-1))) {
 			HIDP_CAPS	Capabilities{};
-			ntStatus = HidP_GetCaps(pPreparsedData, &Capabilities);
+			NTSTATUS ntStatus = HidP_GetCaps(pPreparsedData, &Capabilities);
 			if (ntStatus == HIDP_STATUS_SUCCESS) {
 				USHORT	ValueCapsLength = Capabilities.NumberInputValueCaps;
-				HANDLE	hInputValueCapsHeap = GetProcessHeap();
-				PHIDP_VALUE_CAPS pInputValueCaps = (PHIDP_VALUE_CAPS)HeapAlloc(hInputValueCapsHeap, 0, ValueCapsLength * sizeof(HIDP_VALUE_CAPS));
-				if (pInputValueCaps != NULL) {
-					ZeroMemory(pInputValueCaps, ValueCapsLength);
-					ntStatus = HidP_GetValueCaps(HidP_Input, pInputValueCaps, &ValueCapsLength, pPreparsedData);
+				if (ValueCapsLength > 0) {
+					std::vector<HIDP_VALUE_CAPS> valueCaps;
+					valueCaps.resize(ValueCapsLength);
+					USHORT valueCapsCount = ValueCapsLength;
+					ntStatus = HidP_GetValueCaps(HidP_Input, valueCaps.data(), &valueCapsCount, pPreparsedData);
 					if (ntStatus == HIDP_STATUS_SUCCESS) {
 						DWORD	dwCount = lpRawInput->data.hid.dwCount;
 						for (DWORD dwDataCount = 0; dwDataCount < dwCount ; dwDataCount++) {
-							for (int i = 0; i < ValueCapsLength; i++) {
+							for (int i = 0; i < (int)valueCapsCount; i++) {
 								PCHAR	Report = (PCHAR)(lpRawInput->data.hid.bRawData) + (dwDataCount * (lpRawInput->data.hid.dwSizeHid));
 								ULONG	UsageValue = 0;
-								ntStatus = HidP_GetUsageValue(HidP_Input, pInputValueCaps[i].UsagePage, pInputValueCaps[i].LinkCollection, pInputValueCaps[i].NotRange.Usage, &UsageValue, pPreparsedData, Report, lpRawInput->data.hid.dwSizeHid);
+								ntStatus = HidP_GetUsageValue(HidP_Input, valueCaps[i].UsagePage, valueCaps[i].LinkCollection, valueCaps[i].NotRange.Usage, &UsageValue, pPreparsedData, Report, lpRawInput->data.hid.dwSizeHid);
 								if (ntStatus == HIDP_STATUS_SUCCESS) {
 									vSynTPMouseData(Report);
 								}
@@ -391,11 +399,11 @@ void	CSynTP::vRawInputHIDHandler(HWND hWnd, DWORD dwFlags, LPRAWINPUT lpRawInput
 							}
 						}
 					}
-					HeapFree(hInputValueCapsHeap, 0, pInputValueCaps);
 				}
 			}
 		}
-		HeapFree(hPreparsedDataHeap, 0, pPreparsedData);
+	}
+	catch (...) {
 	}
 }
 
@@ -423,7 +431,7 @@ void		CSynTP::vSynTPMouseData(PCHAR Report)
 		SHORT	deltaY = newY - makeAxis(lpSynTPData->stSynRawData.stFinger1.hiY, lpSynTPData->stSynRawData.stFinger1.loY);
 
 		if (lpSynTPRawData->stFinger1.bTouched == 0) {
-			ZeroMemory(&(lpSynTPData->stSynRawData), sizeof(SYNTPRAWDATA));
+			ZeroMemory(&(lpSynTPData->stSynRawData), sizeof(lpSynTPData->stSynRawData));
 			lpSynTPData->iYStart = STOP;
 			lpSynTPData->iXStart = STOP;
 			lpSynTPData->iWheelStart = STOP;
@@ -533,7 +541,7 @@ void		CSynTP::vSynTPMouseData(PCHAR Report)
 				}
 			}
 		}
-		memcpy_s(&(lpSynTPData->stSynRawData), sizeof(SynTPRawData), Report, sizeof(SynTPRawData));
+		memcpy_s(&(lpSynTPData->stSynRawData), sizeof(lpSynTPData->stSynRawData), Report, sizeof(lpSynTPData->stSynRawData));
 	}
 }
 
@@ -549,9 +557,8 @@ BOOL		CSynTP::bReceivePacketThreadRoutine(LPVOID lpvParam)
 	ULONGLONG	uuTickCount64 = 0, _uuTickCount64 = 0;
 	CHAR	szReceiveData[SYNTP_DATA_BUFFER_SIZE]{};
 
-	if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST)) {
-		return FALSE;
-	}
+	(void)SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+
 	do {
 		ZeroMemory(szReceiveData, sizeof(szReceiveData));
 		if (This->Receiver)	This->Receiver->bReceivePacket(szReceiveData, sizeof(szReceiveData));
@@ -560,7 +567,7 @@ BOOL		CSynTP::bReceivePacketThreadRoutine(LPVOID lpvParam)
 		if ((_uuTickCount64 - uuTickCount64) > RECEIVE_LAP_TIME) {
 			uuTickCount64 = _uuTickCount64;
 			size_t	size = strnlen_s(szReceiveData, SYNTP_DATA_BUFFER_SIZE);
-			if (size < SYNTP_DATA_BUFFER_SIZE)	szReceiveData[size] = NULL;
+			if (size < SYNTP_DATA_BUFFER_SIZE)	szReceiveData[size] = '\0';
 			POINT	pt{};
 			GetCursorPos(&pt);
 			int	iMouseData = atoi(&szReceiveData[2]);

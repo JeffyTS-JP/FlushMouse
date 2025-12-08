@@ -32,6 +32,12 @@
 //
 // Struct Define
 //
+typedef struct tagBALLOON_PARAM {
+	HWND	hWnd;
+	DWORD	dwInfoFlags;
+	TCHAR	szInfoTitle[ARRAYSIZE(((NOTIFYICONDATA*)0)->szInfoTitle)];
+	TCHAR	szInfo[ARRAYSIZE(((NOTIFYICONDATA*)0)->szInfo)];
+} BALLOON_PARAM, *PBALLOON_PARAM, *LPBALLOON_PARAM;
 
 //
 // Global Data
@@ -44,6 +50,7 @@
 //
 // Local Prototype Define
 //
+static DWORD WINAPI	BalloonThreadProc(LPVOID lpParam);
 
 //
 // iCheckTaskTrayMessage()
@@ -85,55 +92,22 @@ BOOL		CTaskTray::bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle
 	nIco.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
 	nIco.hIcon = hIcon;
 	_tcsncpy_s(nIco.szTip, ARRAYSIZE(nIco.szTip), lpszTitle, _TRUNCATE);
-	try {
-		throw Shell_NotifyIcon(NIM_ADD, &nIco);
-	}
-	catch (BOOL bRet) {
-		if (!bRet) {
-			_Post_equals_last_error_ DWORD err = GetLastError();
-			if (err == ERROR_TIMEOUT) {
-				Sleep(2000);
-				try {
-					throw Shell_NotifyIcon(NIM_MODIFY, &nIco);
-				}
-				catch (BOOL bRet) {
-					if (!bRet) {
-						_Post_equals_last_error_ err = GetLastError();
-						if (err == ERROR_TIMEOUT) {
-							Sleep(2000);
-							try {
-								throw Shell_NotifyIcon(NIM_ADD, &nIco);
-							}
-							catch (BOOL bRet) {
-								if (!bRet) {
-									bReportEvent(MSG_TASKTRAY_REGISTER_FAILD, APPLICATION_CATEGORY);
-									return FALSE;
-								}
-							}
-							catch (...) {
-								return FALSE;
-							}
-						}
-						else {
-							bReportEvent(MSG_TASKTRAY_REGISTER_FAILD, APPLICATION_CATEGORY);
-							return FALSE;
-						}
-					}
-				}
-				catch (...) {
-					return FALSE;
-				}
-			}
-			else {
-				bReportEvent(MSG_TASKTRAY_REGISTER_FAILD, APPLICATION_CATEGORY);
-				return FALSE;
-			}
+
+	BOOL bRet = Shell_NotifyIcon(NIM_ADD, &nIco);
+	if (bRet) return TRUE;
+
+	DWORD err = GetLastError();
+	if (err == ERROR_TIMEOUT) {
+		Sleep(2000);
+		if (Shell_NotifyIcon(NIM_MODIFY, &nIco)) return TRUE;
+		err = GetLastError();
+		if (err == ERROR_TIMEOUT) {
+			Sleep(2000);
+			if (Shell_NotifyIcon(NIM_ADD, &nIco)) return TRUE;
 		}
 	}
-	catch (...) {
-		return FALSE;
-	}
-	return TRUE;
+	bReportEvent(MSG_TASKTRAY_REGISTER_FAILD, APPLICATION_CATEGORY);
+	return FALSE;
 }
 
 //
@@ -159,8 +133,7 @@ BOOL		CTaskTray::bReCreateTaskTrayWindow(HWND hWnd) const
 			}
 		}
 		else {
-			if (!bDestroyTaskTrayWindow(hWnd)) {
-			}
+			bDestroyTaskTrayWindow(hWnd);
 			bReportEvent(MSG_TASKTRAY_REGISTER_FAILD, APPLICATION_CATEGORY);
 			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
@@ -182,20 +155,9 @@ BOOL		CTaskTray::bDestroyTaskTrayWindow(HWND hWnd) const
 	nIco.hWnd = hWnd;
 	nIco.uID = uTaskTrayID;
 	nIco.guidItem = GUID_NULL;
-	try {
-		throw Shell_NotifyIcon(NIM_DELETE, &nIco);
-	}
-	catch (BOOL bRet) {
-		if (bRet) {
-			return TRUE;
-		}
-		else {
-			return FALSE;
-		}
-	}
-	catch (...) {
-		return FALSE;
-	}
+
+	BOOL bRet = Shell_NotifyIcon(NIM_DELETE, &nIco);
+	return bRet ? TRUE : FALSE;
 }
 
 //
@@ -208,19 +170,14 @@ BOOL		CTaskTray::bGetTaskTrayWindowRect(HWND hWnd, LPRECT lpRect) const
 	nii.hWnd = hWnd;
 	nii.uID = uTaskTrayID;
 	nii.guidItem = GUID_NULL;
-	try {
-		throw Shell_NotifyIconGetRect(&nii, lpRect);
-	}
-	catch (HRESULT	hResult) {
-		if (hResult != S_OK) {
-			return FALSE;
-		}
-		return TRUE;
-	}
-	catch (...) {
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+
+	HRESULT hResult = Shell_NotifyIconGetRect(&nii, lpRect);
+	if (hResult == S_OK) return TRUE;
+	if (hResult == HRESULT_FROM_WIN32(ERROR_TIMEOUT) || hResult == HRESULT_FROM_WIN32(ERROR_PROC_NOT_FOUND)) {
 		return FALSE;
 	}
+	PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+	return FALSE;
 }
 
 //
@@ -340,51 +297,62 @@ void		CTaskTray::Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg)
 //
 // bDisplayBalloon()
 //
-BOOL		CTaskTray::bDisplayBalloon(HWND hWnd, DWORD dwInfoFlags, LPCTSTR szInfoTitle, LPCTSTR szInfo)
+BOOL		CTaskTray::bDisplayBalloon(HWND hWnd, DWORD dwInfoFlags, LPCTSTR szInfoTitle, LPCTSTR szInfo) const
 {
-	std::future<BOOL> _future;
-	std::promise<BOOL> _promise;
-	_future = _promise.get_future();
-	try {
-		std::thread([&](std::promise<BOOL> _promise) {
-			(void)_promise;
-			NOTIFYICONDATA	nIco{};
-			nIco.cbSize = sizeof(NOTIFYICONDATA);
-			nIco.hWnd = hWnd;
-			nIco.uID = uTaskTrayID;
-			nIco.guidItem = GUID_NULL;
-			nIco.dwState = NIS_HIDDEN | NIS_SHAREDICON;
-			nIco.dwInfoFlags = dwInfoFlags;
-			nIco.hIcon = NULL;
-			nIco.uVersion = NOTIFYICON_VERSION_4;
-			nIco.uFlags = NIF_INFO;
+	BALLOON_PARAM *BalloonParam = new BALLOON_PARAM();
+	if (!BalloonParam) return FALSE;
+	ZeroMemory(BalloonParam, sizeof(BALLOON_PARAM));
+	BalloonParam->hWnd = hWnd;
+	BalloonParam->dwInfoFlags = dwInfoFlags;
+	if (szInfoTitle) _tcsncpy_s(BalloonParam->szInfoTitle, ARRAYSIZE(BalloonParam->szInfoTitle), szInfoTitle, _TRUNCATE);
+	if (szInfo) _tcsncpy_s(BalloonParam->szInfo, ARRAYSIZE(BalloonParam->szInfo), szInfo, _TRUNCATE);
 
-			if (szInfoTitle)	_tcsncpy_s(nIco.szInfoTitle, ARRAYSIZE(nIco.szInfoTitle), szInfoTitle, _TRUNCATE);
-			if (szInfo)			_tcsncpy_s(nIco.szInfo, ARRAYSIZE(nIco.szInfo), szInfo, _TRUNCATE);
+	HANDLE hThread = CreateThread(NULL, 0, BalloonThreadProc, BalloonParam, 0, NULL);
+	if (hThread) {
+		CloseHandle(hThread);
+		return TRUE;
+	}
+	NOTIFYICONDATA	nIco{};
+	nIco.cbSize = sizeof(NOTIFYICONDATA);
+	nIco.hWnd = hWnd;
+	nIco.uID = uTaskTrayID;
+	nIco.guidItem = GUID_NULL;
+	nIco.dwState = NIS_HIDDEN | NIS_SHAREDICON;
+	nIco.dwInfoFlags = dwInfoFlags;
+	nIco.hIcon = NULL;
+	nIco.uVersion = NOTIFYICON_VERSION_4;
+	nIco.uFlags = NIF_INFO;
+	if (szInfoTitle)	_tcsncpy_s(nIco.szInfoTitle, ARRAYSIZE(nIco.szInfoTitle), szInfoTitle, _TRUNCATE);
+	if (szInfo)			_tcsncpy_s(nIco.szInfo, ARRAYSIZE(nIco.szInfo), szInfo, _TRUNCATE);
+	BOOL bRet = Shell_NotifyIcon(NIM_MODIFY, &nIco);
+	return bRet ? TRUE : FALSE;
+}
 
-			try {
-				throw Shell_NotifyIcon(NIM_MODIFY, &nIco);
-			}
-			catch (BOOL bRet) {
-				if (bRet) {
-					return TRUE;
-				}
-				else {
-				}
-			}
-			catch (...) {
-			}
-			return TRUE;
-			}, std::move(_promise)).detach();
-#define TIMEOUT		100
-		if(std::future_status::ready == _future.wait_until(std::chrono::system_clock::now() + std::chrono::milliseconds(TIMEOUT))) {
-			return TRUE;
-		}
-#undef TIMEOUT
-	}
-	catch (...) {
-	}
-	return FALSE;
+//
+// BalloonThreadProc()
+//
+static DWORD WINAPI	BalloonThreadProc(LPVOID lpParam)
+{
+	BALLOON_PARAM *BalloonParam = reinterpret_cast<BALLOON_PARAM*>(lpParam);
+	if (!BalloonParam) return 1;
+
+	NOTIFYICONDATA	nIco{};
+	nIco.cbSize = sizeof(NOTIFYICONDATA);
+	nIco.hWnd = BalloonParam->hWnd;
+	nIco.uID = NOTIFYICONDATA_ID;
+	nIco.guidItem = GUID_NULL;
+	nIco.dwState = NIS_HIDDEN | NIS_SHAREDICON;
+	nIco.dwInfoFlags = BalloonParam->dwInfoFlags;
+	nIco.hIcon = NULL;
+	nIco.uVersion = NOTIFYICON_VERSION_4;
+	nIco.uFlags = NIF_INFO;
+	_tcsncpy_s(nIco.szInfoTitle, ARRAYSIZE(nIco.szInfoTitle), BalloonParam->szInfoTitle, _TRUNCATE);
+	_tcsncpy_s(nIco.szInfo, ARRAYSIZE(nIco.szInfo), BalloonParam->szInfo, _TRUNCATE);
+
+	(void)Shell_NotifyIcon(NIM_MODIFY, &nIco);
+
+	delete BalloonParam;
+	return 0;
 }
 
 //
@@ -405,18 +373,7 @@ BOOL		CTaskTray::bModifyToolHints(HWND hWnd, LPCTSTR lpszToolHints) const
 	if (lpszToolHints)	_tcsncpy_s(nIco.szTip, ARRAYSIZE(nIco.szTip), lpszToolHints, _TRUNCATE);
 
 	for (int i = 0; i < 10; i++) {
-		try {
-			throw Shell_NotifyIcon(NIM_MODIFY, &nIco);
-		}
-		catch (BOOL bRet) {
-			if (bRet) {
-				return TRUE;
-			}
-			else {
-			}
-		}
-		catch (...) {
-		}
+		if (Shell_NotifyIcon(NIM_MODIFY, &nIco)) return TRUE;
 		Sleep(1000);
 	}
 	return FALSE;

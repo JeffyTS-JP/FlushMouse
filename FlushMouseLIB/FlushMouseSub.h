@@ -135,4 +135,5 @@ class CFlushMouseHook
 		LPPROCESS_INFORMATION	lpstProcessInformation;
 };
 
+
 /* = EOF = */

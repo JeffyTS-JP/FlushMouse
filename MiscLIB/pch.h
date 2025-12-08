@@ -15,4 +15,10 @@
 #include <varargs.h>
 #include <memoryapi.h>
 
+#include <unordered_map>
+#include <vector>
+#include <memory>
+#include <algorithm>
+#include <iterator>
+
 #endif //PCH_H

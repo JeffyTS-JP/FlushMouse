@@ -18,7 +18,7 @@
 #define IDM_EXIT                        152
 #define IDD_SYNTPHELPERBOX              163
 #define IDS_APP_TITLE                   200
-#define IDS_NOTIMERESOUCE               201
+#define IDS_NOTIMERRESOUCE              201
 #define IDS_NOTREGISTEHOOK              202
 #define IDS_NOTREGISTERHOOK             202
 #define IDS_NOTREGISTERKB               203
@@ -44,7 +44,7 @@
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1

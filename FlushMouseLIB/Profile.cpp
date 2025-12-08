@@ -35,7 +35,7 @@
 // Class CProfile
 //
 CProfile::CProfile()
-	: lpstAppRegData(new APPREGDATA[sizeof(APPREGDATA)])
+	: lpstAppRegData(new APPREGDATA)
 {
 	if (lpstAppRegData != NULL) {
 		ZeroMemory(lpstAppRegData, sizeof(APPREGDATA));
@@ -139,7 +139,7 @@ CProfile::CProfile()
 }
 
 CProfile::CProfile(const CProfile& other)
-	: lpstAppRegData(new APPREGDATA[sizeof(APPREGDATA)])
+	: lpstAppRegData(new APPREGDATA)
 {
 	if (lpstAppRegData != NULL) {
 		*lpstAppRegData = *other.lpstAppRegData;
@@ -163,7 +163,7 @@ CProfile& CProfile::operator = (const CProfile& other)
 CProfile::~CProfile()
 {
 	if (lpstAppRegData != NULL) {
-		delete[]	lpstAppRegData;
+		delete lpstAppRegData;
 		lpstAppRegData = NULL;
 	}
 }

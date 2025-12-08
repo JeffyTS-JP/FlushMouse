@@ -18,9 +18,9 @@
 #include "Resource.h"
 #include "..\FlushMouseLIB\CommonDef.h"
 #include "..\FlushMouseDLL\EventlogData.h"
+#include "..\MiscLIB\CWindow.h"
 
 #ifdef _DEBUG
-#include <stdlib.h>
 #include <crtdbg.h>
 #define DEBUG_CLIENTBLOCK   new( _CLIENT_BLOCK, __FILE__, __LINE__)
 #define new DEBUG_CLIENTBLOCK
@@ -40,7 +40,7 @@
 // Define
 //
 // Timer
-constexpr UINT PROCINITTIMERVALUE = 1000;
+constexpr UINT PROCINITTIMERVALUE = 2000;
 constexpr UINT_PTR CHECKPROCTIMERID = 2;
 static UINT     nCheckProcTimerTickValue = PROCINITTIMERVALUE;
 static UINT_PTR nCheckProcTimerID = CHECKPROCTIMERID;
@@ -85,6 +85,7 @@ static VOID CALLBACK	vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 static BOOL				bReportEvent(DWORD dwEventID, WORD wCategory);
 static BOOL				bDestroyTaskTrayWindow(HWND hWnd);
 static void				vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine);
+static DWORD WINAPI		CheckProcWorker(LPVOID lpParameter);
 
 //
 // wWinMain()
@@ -102,12 +103,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 	HANDLE	hHandle = GetCurrentProcess();
 	if (hHandle != NULL) {
-		if (!SetPriorityClass(hHandle, NORMAL_PRIORITY_CLASS)) {
-			CloseHandle(hHandle);
-			return (-1);
-		}
-		CloseHandle(hHandle);
+		(void)SetPriorityClass(hHandle, NORMAL_PRIORITY_CLASS);
 	}
+
+	(void)bInitializeWindowCache();
 
 	HWND	hWnd = NULL;
 	if ((hWnd = FindWindow(CLASS_FLUSHMOUSE32, NULL)) != NULL) {
@@ -120,6 +119,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 				PostMessage(hWnd, WM_DESTROY, NULL, NULL);
 				if (i == 1) {
 					vMessageBox(NULL, IDS_ALREADYRUN, MessageBoxTYPE, NULL, 0);
+					vUninitializeWindowCache();
 					return (-1);
 				}
 			}
@@ -130,29 +130,39 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	if (*lpCmdLine == _T('\0')) {
 		if ((hParentWnd = FindWindow(CLASS_FLUSHMOUSE, NULL)) == NULL) {
 			vMessageBox(NULL, IDS_NOTFORKBY64, MessageBoxTYPE, NULL, 0);
+			vUninitializeWindowCache();
 			return (-1);
 		}
 	}
 	else {
 		unsigned long long ll = 0;
-		if ((ll = _tstoll(lpCmdLine)) == 0) return (-1);
+		if ((ll = _tstoll(lpCmdLine)) == 0) {
+			vUninitializeWindowCache();
+			return (-1);
+		}
 		hParentWnd = (HWND)ll;
 		if (hParentWnd != FindWindow(CLASS_FLUSHMOUSE, NULL)) {
 			hParentWnd = NULL;
 			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION32_CATEGORY);
+			vUninitializeWindowCache();
 			return(-1);
 		}
 	}
 
-	if (LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING) == 0) return (-1);
+	if (LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING) == 0) {
+		vUninitializeWindowCache();
+		return (-1);
+	}
 
 	if (!hPrevInstance) {
 		if (!MyRegisterClass(hInstance)) {
+			vUninitializeWindowCache();
 			return (-1);
 		}
 	}
 
 	if (!InitInstance(hInstance, nCmdShow)) {
+		vUninitializeWindowCache();
 		return (-1);
 	}
 
@@ -311,7 +321,8 @@ static void Cls_OnDestroy(HWND hWnd)
 		delete PowerNotification;
 		PowerNotification = NULL;
 	}
-
+	vInvalidateAllWindowCache();
+	vUninitializeWindowCache();
 	PostQuitMessage(0);
 }
 
@@ -334,15 +345,29 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 	UNREFERENCED_PARAMETER(dwTime);
 
 	if (uTimerID == nCheckProcTimerID) {
-		HWND	_hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
-		if (!_hWnd || (_hWnd != hParentWnd)) {
-			bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION32_CATEGORY);
-			if (hParentWnd)	bDestroyTaskTrayWindow(hParentWnd);
-			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION32_CATEGORY);
-			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+		if (!QueueUserWorkItem(CheckProcWorker, (LPVOID)hWnd, WT_EXECUTEDEFAULT)) {
+			bReportEvent(MSG_WORKER_QUEUE_FAIL, APPLICATION32_CATEGORY);
 		}
 	}
 	return;
+}
+
+//
+// CheckProcWorker()
+//
+static DWORD WINAPI CheckProcWorker(LPVOID lpParameter)
+{
+	HWND	_hWnd = reinterpret_cast<HWND>(lpParameter);
+	HWND	_hWnd64 = hGetCachedWindowByClassName(CLASS_FLUSHMOUSE);
+	if (!_hWnd64 || (_hWnd64 != hParentWnd)) {
+		bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION32_CATEGORY);
+		if (hParentWnd)	bDestroyTaskTrayWindow(hParentWnd);
+		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION32_CATEGORY);
+		if (IsWindow(_hWnd)) {
+			PostMessage(_hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+		}
+	}
+	return 0;
 }
 
 //
@@ -358,16 +383,9 @@ BOOL		bDestroyTaskTrayWindow(HWND hWnd)
 	nIco.uID = NOTIFYICONDATA_ID;
 	nIco.guidItem = GUID_NULL;
 	nIco.uFlags = 0;
-	try {
-		throw Shell_NotifyIcon(NIM_DELETE, &nIco);
-	}
-	catch (BOOL bRet) {
-		if (!bRet) {
-		}
-	}
-	catch (...) {
-	}
-	return TRUE;
+
+	BOOL bRet = Shell_NotifyIcon(NIM_DELETE, &nIco) != FALSE;
+	return bRet ? TRUE : FALSE;
 }
 
 //
@@ -377,50 +395,61 @@ static BOOL	bReportEvent(DWORD dwEventID, WORD wCategory)
 {
 	BOOL	bRet = FALSE;
 	HANDLE	hEvent = RegisterEventSource(NULL, FLUSHMOUSE);
-	if (hEvent != NULL) {
-		if (ReportEvent(hEvent, (0x0000000c & (dwEventID >> 28)), wCategory, dwEventID, NULL, 0, 0, NULL, NULL) != 0) {
-			bRet = TRUE;
-		}
-		else {
-		}
-		if (DeregisterEventSource(hEvent) == 0) {
-			bRet = FALSE;
-		}
+	if (!hEvent)	return FALSE;
+
+	DWORD	severity = (dwEventID >> 30) & 0x3;
+	WORD	wType = EVENTLOG_SUCCESS;
+	switch (severity) {
+	case STATUS_SEVERITY_INFORMATIONAL:
+		wType = EVENTLOG_INFORMATION_TYPE;
+		break;
+	case STATUS_SEVERITY_WARNING:
+		wType = EVENTLOG_WARNING_TYPE;
+		break;
+	case STATUS_SEVERITY_ERROR:
+		wType = EVENTLOG_ERROR_TYPE;
+		break;
+	default:
+			break;
+	}
+	if (ReportEvent(hEvent, wType, wCategory, dwEventID, NULL, 0, 0, NULL, NULL) != 0) {
+		bRet = TRUE;
+	}
+	if (DeregisterEventSource(hEvent) == 0) {
+		bRet = FALSE;
 	}
 	return bRet;
 }
-
 //
 // vMessageBox()
 //
 static void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine)
 {
-	TCHAR	_lpFunc[MAX_LOADSTRING]{};
+	TCHAR	szRes[MAX_LOADSTRING]{};
+	TCHAR	szFuncT[MAX_LOADSTRING]{};
 	TCHAR	lpText[(MAX_LOADSTRING * 2)]{};
 
-	try {
-		throw LoadString(hInst, uID, lpText, MAX_LOADSTRING);
+	int	nLoaded = 0;
+	if (hInst) {
+		nLoaded = LoadString(hInst, uID, szRes, MAX_LOADSTRING);
 	}
-	catch (int i) {
-		if (i != 0) {
-			if (lpFunc && (dwLine != 0)) {
-				MultiByteToWideChar (CP_ACP, 0, lpFunc, -1, _lpFunc, MAX_LOADSTRING);
-				_sntprintf_s(lpText, (MAX_LOADSTRING * 2), _TRUNCATE, L"%s\n\n (%s : %d : 0x%08X)", lpText, _lpFunc, dwLine, GetLastError());
-			}
-			try {
-				throw MessageBox(hWnd, lpText, szTitle, uType);
-			}
-			catch (int) {
-				return;
-			}
-			catch (...) {
-				return;
-			}
-		}
-	}
-	catch (...) {
+	if (nLoaded == 0) {
 		return;
 	}
+
+	if (lpFunc && (dwLine != 0)) {
+#ifdef UNICODE
+		MultiByteToWideChar(CP_ACP, 0, lpFunc, -1, szFuncT, MAX_LOADSTRING);
+#else
+		_strncpy_s(szFuncT, MAX_LOADSTRING, lpFunc, _TRUNCATE);
+#endif
+		_sntprintf_s(lpText, (MAX_LOADSTRING * 2), _TRUNCATE, _T("%s\r\n\r\n (%s : %d : 0x%08X)"), szRes, szFuncT, dwLine, GetLastError());
+	}
+	else {
+		_tcsncpy_s(lpText, (MAX_LOADSTRING * 2), szRes, _TRUNCATE);
+	}
+
+	(void)MessageBox(hWnd, lpText, szTitle, uType);
 }
 
 //
@@ -456,7 +485,7 @@ CPowerNotification32::~CPowerNotification32()
 //
 // PowerBroadcast()
 //
-BOOL		CPowerNotification32::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting)
+BOOL	CPowerNotification32::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting)
 {
 	UNREFERENCED_PARAMETER(hWnd);
 	UNREFERENCED_PARAMETER(Type);

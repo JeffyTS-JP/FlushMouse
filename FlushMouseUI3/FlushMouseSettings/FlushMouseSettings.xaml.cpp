@@ -100,7 +100,7 @@ void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine)
 	LoadString(Resource->hLoad(), uID, lpText, MAX_LOADSTRING);
 	if (lpFunc && (dwLine != 0)) {
 		MultiByteToWideChar (CP_ACP, 0, lpFunc, -1, _lpFunc, MAX_LOADSTRING);
-		_sntprintf_s(lpText, (MAX_LOADSTRING * 2), _TRUNCATE, L"%s\n\n (%s : %d : 0x%08X)", lpText, _lpFunc, dwLine, GetLastError());
+		_sntprintf_s(lpText, (MAX_LOADSTRING * 2), _TRUNCATE, _T("%s\n\n (%s : %d : 0x%08X)"), lpText, _lpFunc, dwLine, GetLastError());
 	}
 	MessageBox(hWnd, lpText, szTitle, uType);
 	return;
@@ -270,11 +270,13 @@ static BOOL		bSettingsWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrev
 	Resource = new CResource(FLUSHMOUSESETTINGS_EXE);
 	if (Resource && Resource->hLoad() == NULL) {
 		delete	Resource;
+		Resource = NULL;
 		return FALSE;
 	}
 
 	if (Resource && LoadString(Resource->hLoad(), IDS_APP_TITLE, szTitle, MAX_LOADSTRING) == 0) {
 		delete	Resource;
+		Resource = NULL;
 		return FALSE;
 	}
 
@@ -284,6 +286,7 @@ static BOOL		bSettingsWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrev
 	if (!hPrevInstance) {
 		if (!MyRegisterClass(hInstance)) {
 			if (Resource)	delete	Resource;
+			Resource = NULL;
 			return FALSE;
 		}
 	}
@@ -291,6 +294,7 @@ static BOOL		bSettingsWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrev
 	HWND	hWnd = NULL;
 	if ((hWnd = InitInstance(hInstance, nCmdShow)) == NULL) {
 		if (Resource)	delete	Resource;
+		Resource = NULL;
 		return FALSE;
 	}
 	ShowWindow(hWnd, SW_HIDE);
@@ -298,27 +302,21 @@ static BOOL		bSettingsWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrev
 	hMainWnd = hWnd;
 
 	MSG		msg{};
-	BOOL	bRet = FALSE;
-	while (TRUE) {
-		try {
-			bRet = GetMessage(&msg, NULL, 0, 0);
-		}
-		catch (...) {
-			throw;
-		}
-		if ((bRet == 0) || (bRet == (-1))) {
+	int		iRet = 0;
+	while ((iRet = GetMessage(&msg, NULL, 0, 0)) != 0) {
+		if (iRet == -1) {
+			// Error
 			break;
 		}
-		else {
-			HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_FLUSHMOUSESETTINGS));
-			if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
+		HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_FLUSHMOUSESETTINGS));
+		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
 		}
 	}
 
 	if (Resource)	delete	Resource;
+	Resource = NULL;
 	return TRUE;
 }
 

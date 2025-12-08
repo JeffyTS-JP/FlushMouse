@@ -48,38 +48,37 @@
 //
 void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine)
 {
-	TCHAR	_lpFunc[MAX_LOADSTRING]{};
+	TCHAR	szRes[MAX_LOADSTRING]{};
+	TCHAR	szFuncT[MAX_LOADSTRING]{};
 	TCHAR	lpText[(MAX_LOADSTRING * 2)]{};
 
-	try {
-		throw LoadString(Resource->hLoad(), uID, lpText, MAX_LOADSTRING);
+	int	nLoaded = 0;
+	if (Resource && Resource->hLoad()) {
+		nLoaded = LoadString(Resource->hLoad(), uID, szRes, MAX_LOADSTRING);
 	}
-	catch (int i) {
-		if (i != 0) {
-			if (lpFunc && (dwLine != 0)) {
-				MultiByteToWideChar (CP_ACP, 0, lpFunc, -1, _lpFunc, MAX_LOADSTRING);
-				_sntprintf_s(lpText, (MAX_LOADSTRING * 2), _TRUNCATE, L"%s\n\n (%s : %d : 0x%08X)", lpText, _lpFunc, dwLine, GetLastError());
-			}
-			try {
-				throw MessageBox(hWnd, lpText, g_szWindowTitle, uType);
-			}
-			catch (int) {
-				return;
-			}
-			catch (...) {
-				return;
-			}
-		}
-	}
-	catch (...) {
+	if (nLoaded == 0) {
 		return;
 	}
+
+	if (lpFunc && (dwLine != 0)) {
+#ifdef UNICODE
+		MultiByteToWideChar(CP_ACP, 0, lpFunc, -1, szFuncT, MAX_LOADSTRING);
+#else
+		_strncpy_s(szFuncT, MAX_LOADSTRING, lpFunc, _TRUNCATE);
+#endif
+		_sntprintf_s(lpText, (MAX_LOADSTRING * 2), _TRUNCATE, _T("%s\r\n\r\n (%s : %d : 0x%08X)"), szRes, szFuncT, dwLine, GetLastError());
+	}
+	else {
+		_tcsncpy_s(lpText, (MAX_LOADSTRING * 2), szRes, _TRUNCATE);
+	}
+
+	(void)MessageBox(hWnd, lpText, g_szWindowTitle, uType);
 }
 
 //
 // vSettingDialog()
 //
-VOID		vSettingDialog(HWND hWnd, INT32 iSelectedPane)
+VOID vSettingDialog(HWND hWnd, INT32 iSelectedPane)
 {
 	UNREFERENCED_PARAMETER(hWnd);
 
@@ -89,15 +88,15 @@ VOID		vSettingDialog(HWND hWnd, INT32 iSelectedPane)
 		SendMessage(_hWnd, WM_SETTINGSEX, SETTINGSEX_SETTINGS_CHANGE_PANE, iSelectedPane);
 	}
 	else {
-		if (Cursor)	Cursor->vStopIMECursorChangeThread();
-		TCHAR	CommandLine[2]{};
-		if (_itow_s(iSelectedPane, CommandLine, (sizeof(CommandLine) - sizeof(TCHAR)), 10) != 0)	return;
+		if (Cursor) Cursor->vStopIMECursorChangeThread();
+		TCHAR	CommandLine[16]{};
+		errno_t err = _itow_s(iSelectedPane, CommandLine, ARRAYSIZE(CommandLine), 10);
+		if (err != 0) return;
 		if (!bCreateProcess(RELATIVE_FLUSHMOUSESETTINGS_EXE, CommandLine)) {
 			return;
 		}
 	}
 }
-
 
 
 /* = EOF = */

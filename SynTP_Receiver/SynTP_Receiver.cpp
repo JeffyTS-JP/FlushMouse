@@ -20,7 +20,6 @@
 #include "Resource.h"
 
 #ifdef _DEBUG
-#include <stdlib.h>
 #include <crtdbg.h>
 #define DEBUG_CLIENTBLOCK   new( _CLIENT_BLOCK, __FILE__, __LINE__)
 #define new DEBUG_CLIENTBLOCK
@@ -30,8 +29,6 @@
 
 #ifdef _DEBUG
 #define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
-// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the
-// allocations to be of _CLIENT_BLOCK type
 #else
 #define DBG_NEW new
 #endif
@@ -129,21 +126,12 @@ int APIENTRY	wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 	MSG		msg{};
 	BOOL	bRet = FALSE;
-	while (TRUE) {
-		try {
-			bRet = GetMessage(&msg, NULL, 0, 0);
-		}
-		catch (...) {
-		}
-		if ((bRet == 0) || (bRet == (-1))) {
-			break;
-		}
-		else {
-			HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SYNTP_RECEIVER));
-			if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
+	while ((bRet = GetMessage(&msg, NULL, 0, 0)) != 0) {
+		if (bRet == -1) break;
+		HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SYNTP_RECEIVER));
+		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
 		}
 	}
 
@@ -168,13 +156,15 @@ static int			iCheckCmdLine(LPCTSTR lpCmdLine)
 	for (int i = 0; i < argc; i++) {
 		if (lpRet == NULL)	break;
 		if ((*lpRet[i] != L'\0') && (_tcscmp(lpRet[i], L"/Port") == 0)) {
-			if ((i < argc) && (*lpRet[i + 1] != L'\0')) {
+			if ((i + 1) < argc && *lpRet[i + 1] != L'\0') {
 				if ((iPort = _wtoi(lpRet[i + 1])) == 0) {
+					LocalFree((HLOCAL)lpRet);
 					return (-1);
 				}
 			}
 		}
 	}
+	if (lpRet) LocalFree((HLOCAL)lpRet);
 	return (1);
 }
 
@@ -189,9 +179,8 @@ static LPCTSTR* lpCheckCmdLine(LPCTSTR lpCmdLine, int* argc)
 		*argc = 0;
 		return NULL;
 	}
-	LPCTSTR*	lpRet = (LPCTSTR *)CommandLineToArgvW((LPCWSTR)lpCmdLine, argc);
-	if (lpRet != NULL)	return lpRet;
-	return NULL;
+	LPWSTR *lpRet = CommandLineToArgvW((LPCWSTR)lpCmdLine, argc);
+	return (LPCTSTR*)lpRet;
 }
 
 //
@@ -310,26 +299,15 @@ void		CSynTP_Receiver::Cls_OnDestroy(HWND hWnd)
 //
 static void		vMessageBox(HINSTANCE hInstance, HWND hWnd, UINT uID, UINT uType)
 {
-	TCHAR	lpText[MAX_LOADSTRING];
-	try {
-		throw LoadString(hInstance, uID, lpText, MAX_LOADSTRING);
+	TCHAR	lpText[MAX_LOADSTRING] = { 0 };
+	int nLoaded = 0;
+	if (hInstance) {
+		nLoaded = LoadString(hInstance, uID, lpText, MAX_LOADSTRING);
 	}
-	catch (int i) {
-		if (i != 0) {
-			try {
-				throw MessageBox(hWnd, lpText, szTitle, uType);
-			}
-			catch (int) {
-				return;
-			}
-			catch (...) {
-				return;
-			}
-		}
+	if (nLoaded == 0) {
+		_sntprintf_s(lpText, MAX_LOADSTRING, _TRUNCATE, _T("Error: 0x%08X"), uID);
 	}
-	catch (...) {
-		return;
-	}
+	(void)MessageBox(hWnd, lpText, szTitle, uType);
 }
 
 

@@ -19,6 +19,7 @@
 //
 // Define
 //
+constexpr UINT MAX_RAWINPUT_SIZE = 1u << 20;
 
 //
 // class CRawInput
@@ -43,33 +44,42 @@ BOOL		CRawInput::bRegisterRawInputDevices(PCRAWINPUTDEVICE pRawInputDevices, UIN
 //
 void		CRawInput::vRawInputDevicesHandler(HWND hWnd, DWORD dwFlags, HRAWINPUT hRawInput)
 {
-	UINT	uBufferSize = 0;
 	UINT	cbSize = 0;
-	if ((uBufferSize = GetRawInputData(hRawInput, RID_INPUT, NULL, &cbSize, sizeof(RAWINPUTHEADER))) != (-1)) {
-		HANDLE	hRawInputHeap = GetProcessHeap();
-		if (hRawInputHeap != NULL) {
-			LPRAWINPUT	lpRawInput = (LPRAWINPUT)HeapAlloc(hRawInputHeap, 0, cbSize);
-			if (lpRawInput != NULL) {
-				ZeroMemory(lpRawInput, cbSize);
-				if ((uBufferSize = GetRawInputData(hRawInput, RID_INPUT, lpRawInput, &cbSize, sizeof(RAWINPUTHEADER))) != (-1)) {
-					switch (lpRawInput->header.dwType) {
-					case RIM_TYPEMOUSE:
-						vRawInputMouseHandler(hWnd, dwFlags, lpRawInput);
-						break;
-					case RIM_TYPEKEYBOARD:
-						vRawInputKeyboardHandler(hWnd, dwFlags, lpRawInput);
-						break;
-					case RIM_TYPEHID:
-						vRawInputHIDHandler(hWnd, dwFlags, lpRawInput);
-						break;
-					default:
-						break;
-					}
+	if (GetRawInputData(hRawInput, RID_INPUT, NULL, &cbSize, sizeof(RAWINPUTHEADER)) == (UINT)(-1)) {
+		return;
+	}
 
-				}
-				HeapFree(hRawInputHeap, 0, lpRawInput);
-			}
-		}
+	if (cbSize == 0 || cbSize > MAX_RAWINPUT_SIZE) {
+		return;
+	}
+
+	std::vector<BYTE> buffer;
+	try {
+		buffer.resize(cbSize);
+	}
+	catch (...) {
+		return;
+	}
+
+	if (GetRawInputData(hRawInput, RID_INPUT, buffer.data(), &cbSize, sizeof(RAWINPUTHEADER)) == (UINT)(-1)) {
+		return;
+	}
+
+	LPRAWINPUT lpRawInput = reinterpret_cast<LPRAWINPUT>(buffer.data());
+	if (!lpRawInput) return;
+
+	switch (lpRawInput->header.dwType) {
+		case RIM_TYPEMOUSE:
+			vRawInputMouseHandler(hWnd, dwFlags, lpRawInput);
+			break;
+		case RIM_TYPEKEYBOARD:
+			vRawInputKeyboardHandler(hWnd, dwFlags, lpRawInput);
+			break;
+		case RIM_TYPEHID:
+			vRawInputHIDHandler(hWnd, dwFlags, lpRawInput);
+			break;
+		default:
+			break;
 	}
 }
 
@@ -77,33 +87,41 @@ void	CRawInput::vInputDeviceChange(HWND hWnd, WPARAM wParam, HANDLE hDevice)
 {
 	UNREFERENCED_PARAMETER(hWnd);
 	switch (wParam) {
-	case GIDC_ARRIVAL:
-		if (hDevice != NULL)	bGetRawInputDeviceInfo(hDevice);
-		break;
-	case GIDC_REMOVAL:
-		break;
+		case GIDC_ARRIVAL:
+			if (hDevice != NULL)	bGetRawInputDeviceInfo(hDevice);
+			break;
+		case GIDC_REMOVAL:
+			break;
 	}
 }
 
 //
-// bGetRawInputDeviceList()
+// vGetRawInputDeviceList()
 //
 void		CRawInput::vGetRawInputDeviceList()
 {
 	UINT uiNumDevices = 0;
-	GetRawInputDeviceList(NULL, &uiNumDevices, sizeof(RAWINPUTDEVICELIST));
-	PRAWINPUTDEVICELIST	pRawInputDeviceList = new RAWINPUTDEVICELIST[sizeof(RAWINPUTDEVICELIST) * uiNumDevices];
-	if (pRawInputDeviceList) {
-		ZeroMemory(pRawInputDeviceList, sizeof(RAWINPUTDEVICELIST) * uiNumDevices);
-		UINT	uResult;
-		if ((uResult = GetRawInputDeviceList(pRawInputDeviceList, &uiNumDevices, sizeof(RAWINPUTDEVICELIST))) != (UINT)(-1)) {
-			for(UINT i = 0; i < uiNumDevices; i++ ) {
-				if (pRawInputDeviceList[i].hDevice != NULL) {
-					if (!bGetRawInputDeviceInfo(pRawInputDeviceList[i].hDevice))	break;
-				}
-			}
+	if (GetRawInputDeviceList(NULL, &uiNumDevices, sizeof(RAWINPUTDEVICELIST)) == (UINT)(-1)) {
+		return;
+	}
+	if (uiNumDevices == 0) return;
+
+	std::vector<RAWINPUTDEVICELIST> list;
+	try {
+		list.resize(uiNumDevices);
+	}
+	catch (...) {
+		return;
+	}
+
+	if (GetRawInputDeviceList(list.data(), &uiNumDevices, sizeof(RAWINPUTDEVICELIST)) == (UINT)(-1)) {
+		return;
+	}
+
+	for (UINT i = 0; i < uiNumDevices; i++) {
+		if (list[i].hDevice != NULL) {
+			(void)bGetRawInputDeviceInfo(list[i].hDevice);
 		}
-		if (pRawInputDeviceList)	delete [] pRawInputDeviceList;
 	}
 }
 
@@ -113,32 +131,34 @@ void		CRawInput::vGetRawInputDeviceList()
 BOOL		CRawInput::bGetRawInputDeviceInfo(HANDLE hDevice)
 {
 	if (hDevice == NULL)	return FALSE;
-	BOOL	bRet = FALSE;
-	UINT	uResult;
 	UINT	cbSize = 0;
-	uResult = GetRawInputDeviceInfo(hDevice, RIDI_DEVICENAME, NULL, &cbSize);
-	if (uResult != (UINT)(-1)) {
-		LPTSTR lpszDeviceName = new TCHAR[cbSize + 1];
-		if (lpszDeviceName) {
-			ZeroMemory(lpszDeviceName, ((cbSize + 1) * sizeof(TCHAR)) );
-			uResult = GetRawInputDeviceInfo(hDevice, RIDI_DEVICENAME, lpszDeviceName, &cbSize);
-			if ((uResult != 0) && (uResult != (UINT)(-1))) {
-				LPRID_DEVICE_INFO lpRIDDeviceInfo = new RID_DEVICE_INFO[sizeof(RID_DEVICE_INFO)];
-				if (lpRIDDeviceInfo) {
-					ZeroMemory(lpRIDDeviceInfo, sizeof(RID_DEVICE_INFO));
-					lpRIDDeviceInfo->cbSize = sizeof(RID_DEVICE_INFO);
-					cbSize = lpRIDDeviceInfo->cbSize;
-					uResult = GetRawInputDeviceInfo(hDevice, RIDI_DEVICEINFO, lpRIDDeviceInfo, &cbSize);
-					if ((uResult != 0) && (uResult != (UINT)(-1))) {
-						bRet = TRUE;
-					}
-					if (lpRIDDeviceInfo)	delete [] lpRIDDeviceInfo;
-				}
-			}
-			if (lpszDeviceName)	delete [] lpszDeviceName;
-		}
+	UINT uResult = GetRawInputDeviceInfo(hDevice, RIDI_DEVICENAME, NULL, &cbSize);
+	if (uResult == (UINT)(-1) || cbSize == 0) {
+		return FALSE;
 	}
-	return bRet;
+
+	std::vector<TCHAR> nameBuf;
+	try {
+		nameBuf.resize(static_cast<std::vector<TCHAR, std::allocator<wchar_t>>::size_type>(cbSize) + 1);
+	}
+	catch (...) {
+		return FALSE;
+	}
+	ZeroMemory(nameBuf.data(), (cbSize + 1) * sizeof(TCHAR));
+
+	uResult = GetRawInputDeviceInfo(hDevice, RIDI_DEVICENAME, nameBuf.data(), &cbSize);
+	if (uResult == (UINT)(-1) || uResult == 0) {
+		return FALSE;
+	}
+
+	RID_DEVICE_INFO info{};
+	UINT infoSize = sizeof(RID_DEVICE_INFO);
+	uResult = GetRawInputDeviceInfo(hDevice, RIDI_DEVICEINFO, &info, &infoSize);
+	if (uResult == (UINT)(-1) || infoSize == 0) {
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
 //

@@ -303,117 +303,118 @@ Cleanup:
 //
 VOID			CCursor::vSetParamFromRegistry()
 {
-	if (Profile && Profile->lpstAppRegData) {
-		stIMECursorData.iCursorSize = Profile->lpstAppRegData->iCursorSize;
-		stIMECursorData.iIMEModeDistance = Profile->lpstAppRegData->iIMEModeDistance;
-		stIMECursorData.iModeMouseSize = Profile->lpstAppRegData->iModeMouseSize;
-		stIMECursorData.iModeCaretSize = Profile->lpstAppRegData->iModeCaretSize;
-		stIMECursorData.iModeByWndSize = Profile->lpstAppRegData->iModeByWndSize;
-		stIMECursorData.iModeMouseDistanceX = Profile->lpstAppRegData->iModeMouseDistanceX;
-		stIMECursorData.iModeCaretDistanceX = Profile->lpstAppRegData->iModeCaretDistanceX;
-		stIMECursorData.dwInThreadSleepTime = Profile->lpstAppRegData->dwInThreadSleepTime;
-		stIMECursorData.dwDisplayModeTime = Profile->lpstAppRegData->dwDisplayModeTime;
-		stIMECursorData.bDisplayFocusWindowIME = Profile->lpstAppRegData->bDisplayFocusWindowIME;
-		stIMECursorData.bDisplayIMEModeOnCursor = Profile->lpstAppRegData->bDisplayIMEModeOnCursor;
-		stIMECursorData.dwDisplayIMEModeMethod = Profile->lpstAppRegData->dwDisplayIMEModeMethod;
-		stIMECursorData.bDisplayIMEModeIMEOFF = Profile->lpstAppRegData->bDisplayIMEModeIMEOFF;
-		stIMECursorData.bForceHiragana = Profile->lpstAppRegData->bForceHiragana;
-		stIMECursorData.bDrawNearCaret = Profile->lpstAppRegData->bDrawNearCaret;
-		stIMECursorData.bSupportVirtualDesktop = Profile->lpstAppRegData->bSupportVirtualDesktop;
-		stIMECursorData.uuMouseWindowDiffTickDrawByResource = Profile->lpstAppRegData->uuMouseWindowDiffTickDrawByResource;
-		stIMECursorData.uuMouseWindowDiffTickDrawByWindow = Profile->lpstAppRegData->uuMouseWindowDiffTickDrawByWindow;
-		stIMECursorData.uuMouseWindowDiffTickNotDrawing = Profile->lpstAppRegData->uuMouseWindowDiffTickNotDrawing;
-		stIMECursorData.uuMouseWindowDiffTickInVDT = Profile->lpstAppRegData->uuMouseWindowDiffTickInVDT;
+	const LPAPPREGDATA lpAppRegData = (Profile ? Profile->lpstAppRegData : NULL);
+	if (lpAppRegData == NULL) return;
 
-		stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseIMEOFFColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseIMEOFFColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_HANEISU_IMEON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseHANEISU_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseHANEISU_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_HANKANA_IMEON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseHANKANA_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseHANKANA_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENEISU_IMEON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseZENEISU_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseZENEISU_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENHIRA_IMEON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseZENHIRA_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseZENHIRA_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENKANA_IMEON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseZENKANA_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseZENKANA_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF_CAPSON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseIMEOFFColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseIMEOFFColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_HANEISU_IMEON_CAPSON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseHANEISU_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseHANEISU_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_HANKANA_IMEON_CAPSON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseHANKANA_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseHANKANA_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENEISU_IMEON_CAPSON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseZENEISU_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseZENEISU_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENHIRA_IMEON_CAPSON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseZENHIRA_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseZENHIRA_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENKANA_IMEON_CAPSON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseZENKANA_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseZENKANA_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF_CAPSON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseIMEOFFColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseIMEOFFColor & 0x00ffffff);
+	stIMECursorData.iCursorSize = lpAppRegData->iCursorSize;
+	stIMECursorData.iIMEModeDistance = lpAppRegData->iIMEModeDistance;
+	stIMECursorData.iModeMouseSize = lpAppRegData->iModeMouseSize;
+	stIMECursorData.iModeCaretSize = lpAppRegData->iModeCaretSize;
+	stIMECursorData.iModeByWndSize = lpAppRegData->iModeByWndSize;
+	stIMECursorData.iModeMouseDistanceX = lpAppRegData->iModeMouseDistanceX;
+	stIMECursorData.iModeCaretDistanceX = lpAppRegData->iModeCaretDistanceX;
+	stIMECursorData.dwInThreadSleepTime = lpAppRegData->dwInThreadSleepTime;
+	stIMECursorData.dwDisplayModeTime = lpAppRegData->dwDisplayModeTime;
+	stIMECursorData.bDisplayFocusWindowIME = lpAppRegData->bDisplayFocusWindowIME;
+	stIMECursorData.bDisplayIMEModeOnCursor = lpAppRegData->bDisplayIMEModeOnCursor;
+	stIMECursorData.dwDisplayIMEModeMethod = lpAppRegData->dwDisplayIMEModeMethod;
+	stIMECursorData.bDisplayIMEModeIMEOFF = lpAppRegData->bDisplayIMEModeIMEOFF;
+	stIMECursorData.bForceHiragana = lpAppRegData->bForceHiragana;
+	stIMECursorData.bDrawNearCaret = lpAppRegData->bDrawNearCaret;
+	stIMECursorData.bSupportVirtualDesktop = lpAppRegData->bSupportVirtualDesktop;
+	stIMECursorData.uuMouseWindowDiffTickDrawByResource = lpAppRegData->uuMouseWindowDiffTickDrawByResource;
+	stIMECursorData.uuMouseWindowDiffTickDrawByWindow = lpAppRegData->uuMouseWindowDiffTickDrawByWindow;
+	stIMECursorData.uuMouseWindowDiffTickNotDrawing = lpAppRegData->uuMouseWindowDiffTickNotDrawing;
+	stIMECursorData.uuMouseWindowDiffTickInVDT = lpAppRegData->uuMouseWindowDiffTickInVDT;
 
-		stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEOFF].dwColor = (~Profile->lpstAppRegData->dwNearDrawCaretIMEOFFColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawCaretIMEOFFColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_HANEISU_IMEON].dwColor = (~Profile->lpstAppRegData->dwNearDrawCaretHANEISU_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawCaretHANEISU_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_HANKANA_IMEON].dwColor = (~Profile->lpstAppRegData->dwNearDrawCaretHANKANA_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawCaretHANKANA_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENEISU_IMEON].dwColor = (~Profile->lpstAppRegData->dwNearDrawCaretZENEISU_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawCaretZENEISU_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENHIRA_IMEON].dwColor = (~Profile->lpstAppRegData->dwNearDrawCaretZENHIRA_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawCaretZENHIRA_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENKANA_IMEON].dwColor = (~Profile->lpstAppRegData->dwNearDrawCaretZENKANA_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawCaretZENKANA_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEOFF_CAPSON].dwColor = (~Profile->lpstAppRegData->dwNearDrawCaretIMEOFFColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawCaretIMEOFFColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_HANEISU_IMEON_CAPSON].dwColor = (~Profile->lpstAppRegData->dwNearDrawCaretHANEISU_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawCaretHANEISU_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_HANKANA_IMEON_CAPSON].dwColor = (~Profile->lpstAppRegData->dwNearDrawCaretHANKANA_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawCaretHANKANA_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENEISU_IMEON_CAPSON].dwColor = (~Profile->lpstAppRegData->dwNearDrawCaretZENEISU_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawCaretZENEISU_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENHIRA_IMEON_CAPSON].dwColor = (~Profile->lpstAppRegData->dwNearDrawCaretZENHIRA_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawCaretZENHIRA_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENKANA_IMEON_CAPSON].dwColor = (~Profile->lpstAppRegData->dwNearDrawCaretZENKANA_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawCaretZENKANA_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF].dwColor = (~lpAppRegData->dwNearDrawMouseIMEOFFColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseIMEOFFColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_HANEISU_IMEON].dwColor = (~lpAppRegData->dwNearDrawMouseHANEISU_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseHANEISU_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_HANKANA_IMEON].dwColor = (~lpAppRegData->dwNearDrawMouseHANKANA_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseHANKANA_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENEISU_IMEON].dwColor = (~lpAppRegData->dwNearDrawMouseZENEISU_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseZENEISU_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENHIRA_IMEON].dwColor = (~lpAppRegData->dwNearDrawMouseZENHIRA_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseZENHIRA_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENKANA_IMEON].dwColor = (~lpAppRegData->dwNearDrawMouseZENKANA_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseZENKANA_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF_CAPSON].dwColor = (~lpAppRegData->dwNearDrawMouseIMEOFFColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseIMEOFFColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_HANEISU_IMEON_CAPSON].dwColor = (~lpAppRegData->dwNearDrawMouseHANEISU_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseHANEISU_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_HANKANA_IMEON_CAPSON].dwColor = (~lpAppRegData->dwNearDrawMouseHANKANA_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseHANKANA_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENEISU_IMEON_CAPSON].dwColor = (~lpAppRegData->dwNearDrawMouseZENEISU_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseZENEISU_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENHIRA_IMEON_CAPSON].dwColor = (~lpAppRegData->dwNearDrawMouseZENHIRA_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseZENHIRA_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENKANA_IMEON_CAPSON].dwColor = (~lpAppRegData->dwNearDrawMouseZENKANA_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseZENKANA_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF_CAPSON].dwColor = (~lpAppRegData->dwNearDrawMouseIMEOFFColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseIMEOFFColor & 0x00ffffff);
 
-		stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseByWndIMEOFFColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseByWndIMEOFFColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_HANEISU_IMEON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseByWndHANEISU_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseByWndHANEISU_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_HANKANA_IMEON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseByWndHANKANA_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseByWndHANKANA_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENEISU_IMEON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseByWndZENEISU_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseByWndZENEISU_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENHIRA_IMEON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseByWndZENHIRA_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseByWndZENHIRA_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENKANA_IMEON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseByWndZENKANA_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseByWndZENKANA_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF_CAPSON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseByWndIMEOFFColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseByWndIMEOFFColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_HANEISU_IMEON_CAPSON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseByWndHANEISU_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseByWndHANEISU_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_HANKANA_IMEON_CAPSON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseByWndHANKANA_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseByWndHANKANA_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENEISU_IMEON_CAPSON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseByWndZENEISU_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseByWndZENEISU_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENHIRA_IMEON_CAPSON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseByWndZENHIRA_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseByWndZENHIRA_IMEONColor & 0x00ffffff);
-		stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENKANA_IMEON_CAPSON].dwColor = (~Profile->lpstAppRegData->dwNearDrawMouseByWndZENKANA_IMEONColor & 0xff000000) | (Profile->lpstAppRegData->dwNearDrawMouseByWndZENKANA_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEOFF].dwColor = (~lpAppRegData->dwNearDrawCaretIMEOFFColor & 0xff000000) | (lpAppRegData->dwNearDrawCaretIMEOFFColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_HANEISU_IMEON].dwColor = (~lpAppRegData->dwNearDrawCaretHANEISU_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawCaretHANEISU_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_HANKANA_IMEON].dwColor = (~lpAppRegData->dwNearDrawCaretHANKANA_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawCaretHANKANA_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENEISU_IMEON].dwColor = (~lpAppRegData->dwNearDrawCaretZENEISU_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawCaretZENEISU_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENHIRA_IMEON].dwColor = (~lpAppRegData->dwNearDrawCaretZENHIRA_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawCaretZENHIRA_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENKANA_IMEON].dwColor = (~lpAppRegData->dwNearDrawCaretZENKANA_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawCaretZENKANA_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEOFF_CAPSON].dwColor = (~lpAppRegData->dwNearDrawCaretIMEOFFColor & 0xff000000) | (lpAppRegData->dwNearDrawCaretIMEOFFColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_HANEISU_IMEON_CAPSON].dwColor = (~lpAppRegData->dwNearDrawCaretHANEISU_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawCaretHANEISU_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_HANKANA_IMEON_CAPSON].dwColor = (~lpAppRegData->dwNearDrawCaretHANKANA_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawCaretHANKANA_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENEISU_IMEON_CAPSON].dwColor = (~lpAppRegData->dwNearDrawCaretZENEISU_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawCaretZENEISU_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENHIRA_IMEON_CAPSON].dwColor = (~lpAppRegData->dwNearDrawCaretZENHIRA_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawCaretZENHIRA_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENKANA_IMEON_CAPSON].dwColor = (~lpAppRegData->dwNearDrawCaretZENKANA_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawCaretZENKANA_IMEONColor & 0x00ffffff);
 
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseIMEOFFChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENHIRA_IMEON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseZENHIRA_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_HANEISU_IMEON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseHANEISU_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_HANKANA_IMEON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseHANKANA_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENEISU_IMEON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseZENEISU_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENKANA_IMEON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseZENKANA_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF_CAPSON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseIMEOFFChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENHIRA_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseZENHIRA_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_HANEISU_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseHANEISU_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_HANKANA_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseHANKANA_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENEISU_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseZENEISU_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENKANA_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseZENKANA_IMEONChar, _TRUNCATE);
+	stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF].dwColor = (~lpAppRegData->dwNearDrawMouseByWndIMEOFFColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseByWndIMEOFFColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_HANEISU_IMEON].dwColor = (~lpAppRegData->dwNearDrawMouseByWndHANEISU_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseByWndHANEISU_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_HANKANA_IMEON].dwColor = (~lpAppRegData->dwNearDrawMouseByWndHANKANA_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseByWndHANKANA_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENEISU_IMEON].dwColor = (~lpAppRegData->dwNearDrawMouseByWndZENEISU_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseByWndZENEISU_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENHIRA_IMEON].dwColor = (~lpAppRegData->dwNearDrawMouseByWndZENHIRA_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseByWndZENHIRA_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENKANA_IMEON].dwColor = (~lpAppRegData->dwNearDrawMouseByWndZENKANA_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseByWndZENKANA_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF_CAPSON].dwColor = (~lpAppRegData->dwNearDrawMouseByWndIMEOFFColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseByWndIMEOFFColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_HANEISU_IMEON_CAPSON].dwColor = (~lpAppRegData->dwNearDrawMouseByWndHANEISU_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseByWndHANEISU_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_HANKANA_IMEON_CAPSON].dwColor = (~lpAppRegData->dwNearDrawMouseByWndHANKANA_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseByWndHANKANA_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENEISU_IMEON_CAPSON].dwColor = (~lpAppRegData->dwNearDrawMouseByWndZENEISU_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseByWndZENEISU_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENHIRA_IMEON_CAPSON].dwColor = (~lpAppRegData->dwNearDrawMouseByWndZENHIRA_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseByWndZENHIRA_IMEONColor & 0x00ffffff);
+	stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENKANA_IMEON_CAPSON].dwColor = (~lpAppRegData->dwNearDrawMouseByWndZENKANA_IMEONColor & 0xff000000) | (lpAppRegData->dwNearDrawMouseByWndZENKANA_IMEONColor & 0x00ffffff);
 
-		_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEOFF].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawCaretIMEOFFChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENHIRA_IMEON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawCaretZENHIRA_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_HANEISU_IMEON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawCaretHANEISU_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_HANKANA_IMEON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawCaretHANKANA_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENEISU_IMEON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawCaretZENEISU_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENKANA_IMEON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawCaretZENKANA_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEOFF_CAPSON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawCaretIMEOFFChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENHIRA_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawCaretZENHIRA_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_HANEISU_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawCaretHANEISU_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_HANKANA_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawCaretHANKANA_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENEISU_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawCaretZENEISU_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENKANA_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawCaretZENKANA_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseIMEOFFChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENHIRA_IMEON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseZENHIRA_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_HANEISU_IMEON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseHANEISU_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_HANKANA_IMEON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseHANKANA_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENEISU_IMEON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseZENEISU_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENKANA_IMEON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseZENKANA_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF_CAPSON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseIMEOFFChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENHIRA_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseZENHIRA_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_HANEISU_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseHANEISU_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_HANKANA_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseHANKANA_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENEISU_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseZENEISU_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_ZENKANA_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseZENKANA_IMEONChar, _TRUNCATE);
 
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseByWndIMEOFFChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENHIRA_IMEON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseByWndZENHIRA_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_HANEISU_IMEON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseByWndHANEISU_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_HANKANA_IMEON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseByWndHANKANA_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENEISU_IMEON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseByWndZENEISU_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENKANA_IMEON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseByWndZENKANA_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF_CAPSON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseByWndIMEOFFChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENHIRA_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseByWndZENHIRA_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_HANEISU_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseByWndHANEISU_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_HANKANA_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseByWndHANKANA_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENEISU_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseByWndZENEISU_IMEONChar, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENKANA_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, Profile->lpstAppRegData->szNearDrawMouseByWndZENKANA_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEOFF].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawCaretIMEOFFChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENHIRA_IMEON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawCaretZENHIRA_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_HANEISU_IMEON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawCaretHANEISU_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_HANKANA_IMEON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawCaretHANKANA_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENEISU_IMEON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawCaretZENEISU_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENKANA_IMEON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawCaretZENKANA_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEOFF_CAPSON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawCaretIMEOFFChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENHIRA_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawCaretZENHIRA_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_HANEISU_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawCaretHANEISU_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_HANKANA_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawCaretHANKANA_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENEISU_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawCaretZENEISU_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_ZENKANA_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawCaretZENKANA_IMEONChar, _TRUNCATE);
 
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF].szFont, LF_FACESIZE, Profile->lpstAppRegData->szNearDrawMouseFont, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEOFF].szFont, LF_FACESIZE, Profile->lpstAppRegData->szNearDrawCaretFont, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF].szFont, LF_FACESIZE, Profile->lpstAppRegData->szNearDrawMouseByWndFont, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF_CAPSON].szFont, LF_FACESIZE, Profile->lpstAppRegData->szNearDrawMouseFont, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEOFF_CAPSON].szFont, LF_FACESIZE, Profile->lpstAppRegData->szNearDrawCaretFont, _TRUNCATE);
-		_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF_CAPSON].szFont, LF_FACESIZE, Profile->lpstAppRegData->szNearDrawMouseByWndFont, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseByWndIMEOFFChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENHIRA_IMEON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseByWndZENHIRA_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_HANEISU_IMEON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseByWndHANEISU_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_HANKANA_IMEON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseByWndHANKANA_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENEISU_IMEON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseByWndZENEISU_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENKANA_IMEON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseByWndZENKANA_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF_CAPSON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseByWndIMEOFFChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENHIRA_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseByWndZENHIRA_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_HANEISU_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseByWndHANEISU_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_HANKANA_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseByWndHANKANA_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENEISU_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseByWndZENEISU_IMEONChar, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_ZENKANA_IMEON_CAPSON].szMode, MAX_IMEMODECHAR, lpAppRegData->szNearDrawMouseByWndZENKANA_IMEONChar, _TRUNCATE);
 
-		stIMECursorData.bDenyChangedByApp = Profile->lpstAppRegData->bDenyChangedByApp;
-		stIMECursorData.bUseBigArrow = Profile->lpstAppRegData->bUseBigArrow;
-	}
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF].szFont, LF_FACESIZE, lpAppRegData->szNearDrawMouseFont, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEOFF].szFont, LF_FACESIZE, lpAppRegData->szNearDrawCaretFont, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF].szFont, LF_FACESIZE, lpAppRegData->szNearDrawMouseByWndFont, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEOFF_CAPSON].szFont, LF_FACESIZE, lpAppRegData->szNearDrawMouseFont, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEOFF_CAPSON].szFont, LF_FACESIZE, lpAppRegData->szNearDrawCaretFont, _TRUNCATE);
+	_tcsncpy_s(stIMECursorData.lpstNearDrawMouseByWndCursor[IMEMODE_IMEOFF_CAPSON].szFont, LF_FACESIZE, lpAppRegData->szNearDrawMouseByWndFont, _TRUNCATE);
+
+	stIMECursorData.bDenyChangedByApp = lpAppRegData->bDenyChangedByApp;
+	stIMECursorData.bUseBigArrow = lpAppRegData->bUseBigArrow;
 }
 
 //
@@ -468,7 +469,11 @@ BOOL		CCursor::bStartIMECursorChangeThreadSub(HWND hWndObserved)
 {
 	vSetParamFromRegistry();
 	stIMECursorData.hWndObserved = hWndObserved;
-	if (Profile->lpstAppRegData->bDisplayIMEModeOnCursor && (Profile->lpstAppRegData->dwDisplayIMEModeMethod != DisplayIMEModeMethod_RESOURCE)) {
+
+	const LPAPPREGDATA lpAppRegData = (Profile ? Profile->lpstAppRegData : NULL);
+	if (!lpAppRegData)	return FALSE;
+
+	if (lpAppRegData->bDisplayIMEModeOnCursor && (lpAppRegData->dwDisplayIMEModeMethod != DisplayIMEModeMethod_RESOURCE)) {
 		if (!stIMECursorData.MouseWindow) {
 			if (!bReloadCursor())	return FALSE;
 		}
@@ -476,10 +481,10 @@ BOOL		CCursor::bStartIMECursorChangeThreadSub(HWND hWndObserved)
 			if (!bRegisterDrawIMEModeMouseByWndThread(m_hMainWnd))	return FALSE;
 		}
 		if (stIMECursorData.MouseWindow && (stIMECursorData.MouseWindow->hGetHWND() == hWndObserved))	return TRUE;
-		if (Profile->lpstAppRegData->dwDisplayIMEModeMethod == DisplayIMEModeMethod_ByWindow) {
+		if (lpAppRegData->dwDisplayIMEModeMethod == DisplayIMEModeMethod_ByWindow) {
 			stIMECursorData.uuMouseWindowDiffTick = stIMECursorData.uuMouseWindowDiffTickDrawByWindow;
 		}
-		else if (Profile->lpstAppRegData->dwDisplayIMEModeMethod == DisplayIMEModeMethod_RES_AND_Window) {
+		else if (lpAppRegData->dwDisplayIMEModeMethod == DisplayIMEModeMethod_RES_AND_Window) {
 			stIMECursorData.uuMouseWindowDiffTick = stIMECursorData.uuMouseWindowDiffTickDrawByResource;
 		}
 		if (!DrawIMEModeMouseByWndThread->bStart())	return FALSE;
@@ -625,10 +630,11 @@ BOOL		CCursor::bIMECursorChangeRoutine(LPVOID lpvParam)
 //
 BOOL		CCursor::bRegisterDrawIMEModeMouseByWndThread(HWND hWnd)
 {
-	if (!stIMECursorData.MouseWindow || !Profile)	return FALSE;
+	if (!stIMECursorData.MouseWindow)	return FALSE;
 	stIMECursorData.bIMEModeByWindowThreadSentinel = FALSE;
 	SleepEx(50, FALSE);
 	vSetParamFromRegistry();
+
 	if (DrawIMEModeMouseByWndThread == NULL) {
 		DrawIMEModeMouseByWndThread = new CThread;
 		if (!DrawIMEModeMouseByWndThread)	return FALSE;
@@ -715,10 +721,10 @@ BOOL CCursor::bIMEModeMouseByWndThreadRoutine(LPVOID lpvParam)
 		if (!GetCursorInfo(&CursorInfo)) { bRet = FALSE; break; }
 		if (lpstCursorData->bSupportVirtualDesktop) {
 			static const LPCTSTR szTargetClasses[] = { L"VMUIFrame", L"VMPlayerFrame", L"TscShellContainerClass" };
-			constexpr int iClassCount = sizeof(szTargetClasses) / sizeof(szTargetClasses[0]);
-			HWND hTargetWnd[iClassCount]{};
-			for (int i = 0; i < iClassCount; ++i) {
-				hTargetWnd[i] = FindWindowEx(NULL, NULL, szTargetClasses[i], NULL);
+			static const size_t targetClassCount = _countof(szTargetClasses);
+			HWND hTargetWnd[targetClassCount]{};
+			for (int i = 0; i < targetClassCount; ++i) {
+				hTargetWnd[i] = hGetCachedWindowExByClassName(NULL, NULL, szTargetClasses[i]);
 			}
 			std::function<BOOL()> hideCursorAndReturn = [&]() {
 				if (lpstCursorData->MouseWindow)	if (!lpstCursorData->MouseWindow->bSetWindowPos(HWND_NOTOPMOST, 0, 0, 0, 0, SWP_DEFERERASE | SWP_HIDEWINDOW | SWP_NOACTIVATE))	return FALSE;
@@ -732,14 +738,14 @@ BOOL CCursor::bIMEModeMouseByWndThreadRoutine(LPVOID lpvParam)
 				};
 			HWND	hWndAtPoint = WindowFromPoint(CursorInfo.ptScreenPos);
 			HWND	hWndForeground = GetForegroundWindow();
-			for (int i = 0; i < iClassCount; ++i) {
+			for (int i = 0; i < targetClassCount; ++i) {
 				if (hWndAtPoint == hTargetWnd[i] || hWndForeground == hTargetWnd[i]) {
 					return hideCursorAndReturn();
 				}
 			}
 			TCHAR	szBuffer[_MAX_PATH]{};
 			if (GetClassName(lpstCursorData->hWndObserved, szBuffer, _MAX_PATH) != 0 && szBuffer[0] != _T('\0')) {
-				for (int i = 0; i < iClassCount; ++i) {
+				for (int i = 0; i < targetClassCount; ++i) {
 					if (_tcscmp(szBuffer, szTargetClasses[i]) == 0) {
 						return hideCursorAndReturn();
 					}
@@ -1019,7 +1025,7 @@ HWND		CCursor::hGetCaretPosByAccessibleObjectFromWindow(HWND hForeWnd, LPRECT lp
 								RECT	rcTop{};
 								if (GetWindowRect(lpGuiThreadInfo->hwndCaret, &rcTop)) {
 #define	MARGIN_X		2
-#define	MARGIN_Y		2
+#define MARGIN_Y		2
 									if (((pt.x == 0) && (pt.y == 0)) || (pt.x <= rcTop.left + MARGIN_X) || (pt.y <= rcTop.top + MARGIN_Y)) {
 #undef MARGIN_X
 #undef MARGIN_y

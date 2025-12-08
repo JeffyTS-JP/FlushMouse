@@ -33,7 +33,6 @@ static LRESULT CALLBACK lpShellHookProc(int, WPARAM, LPARAM);
 #pragma data_seg("FLUSHMOUSEDLL_SEG")
 static HWND				hWndShellParent = NULL;
 static HHOOK			hHookShell = NULL;
-
 #pragma data_seg()
 
 //
@@ -42,19 +41,24 @@ static HHOOK			hHookShell = NULL;
 DLLEXPORT BOOL  __stdcall bShellHookSet(HWND hWnd)
 {
 	hWndShellParent = hWnd;
-	CHANGEFILTERSTRUCT	cf{};	cf.cbSize = sizeof(CHANGEFILTERSTRUCT);
-	if (ChangeWindowMessageFilterEx(hWnd, WM_INPUTLANGCHANGEEX, MSGFLT_ALLOW, &cf)) {
-		MINIMIZEDMETRICS	mm{};	mm.cbSize = sizeof(MINIMIZEDMETRICS);	mm.iArrange = ARW_HIDE;
-		if (SystemParametersInfo(SPI_SETMINIMIZEDMETRICS, sizeof(MINIMIZEDMETRICS), (PVOID)&mm, SPIF_SENDCHANGE)) {
-			hHookShell = SetWindowsHookEx(WH_SHELL, (HOOKPROC)lpShellHookProc, hGetInstance(), 0);
-			if (hHookShell) {
-				return TRUE;
-			}
-			hWndShellParent = NULL;
-			hHookShell = NULL;
-		}
+
+	HINSTANCE hInst = hGetInstance();
+	if (hInst == NULL) {
+		hWndShellParent = NULL;
+		return FALSE;
 	}
-	return FALSE;
+
+	CHANGEFILTERSTRUCT cf{};
+	cf.cbSize = sizeof(CHANGEFILTERSTRUCT);
+	(void)ChangeWindowMessageFilterEx(hWnd, WM_INPUTLANGCHANGEEX, MSGFLT_ALLOW, &cf);
+
+	hHookShell = SetWindowsHookEx(WH_SHELL, (HOOKPROC)lpShellHookProc, hInst, 0);
+	if (hHookShell == NULL) {
+		hWndShellParent = NULL;
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
 //
@@ -62,32 +66,35 @@ DLLEXPORT BOOL  __stdcall bShellHookSet(HWND hWnd)
 //
 DLLEXPORT BOOL __stdcall bShellHookUnset()
 {
-	BOOL	bRet = FALSE;
-	if (hHookShell) {
-		if (UnhookWindowsHookEx(hHookShell)) {
+	BOOL bRet = FALSE;
+	if (hHookShell != NULL) {
+		if (UnhookWindowsHookEx(hHookShell) != FALSE) {
 			bRet = TRUE;
 		}
+		hHookShell = NULL;
 	}
+
 	hWndShellParent = NULL;
-	hHookShell = NULL;
 	return bRet;
 }
 
 //
 // lpShellHookProc()
-//		フックの処理
 //
 static LRESULT CALLBACK lpShellHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
 	if (nCode < 0) {
-		return CallNextHookEx(NULL, nCode, wParam, lParam);
+		return CallNextHookEx(hHookShell, nCode, wParam, lParam);
 	}
 	switch (nCode) {
 		case HSHELL_LANGUAGE:
-			PostMessage(hWndShellParent, WM_INPUTLANGCHANGEEX, wParam, lParam);
+			if (hWndShellParent != NULL) {
+				PostMessage(hWndShellParent, WM_INPUTLANGCHANGEEX, wParam, lParam);
+			}
 			break;
 	}
-	return CallNextHookEx(NULL, nCode, wParam, lParam);
+
+	return CallNextHookEx(hHookShell, nCode, wParam, lParam);
 }
 
 

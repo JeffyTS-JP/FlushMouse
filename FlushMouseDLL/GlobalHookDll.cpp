@@ -37,7 +37,6 @@ static UINT					WM_HOOKEX = 0;
 static HINSTANCE			hGLInstance = NULL;
 static HWND					hWndGLParent = NULL;
 static HHOOK				hHookGL = NULL;
-static HWND					hPrevWnd = NULL;
 static BOOL					bSubclassed = FALSE;
 static HMODULE				hModule = NULL;
 #pragma data_seg()
@@ -48,24 +47,26 @@ static HMODULE				hModule = NULL;
 DLLEXPORT BOOL  __stdcall bGlobalHookSet(HWND hWnd)
 {
 	hWndGLParent = hWnd;
-	if ((hGLInstance = hGetInstance()) == NULL)	return FALSE;
-	if (WM_HOOKEX == 0)	WM_HOOKEX = RegisterWindowMessage(L"FlushMouseDLL_GlobalHook");
+	if ((hGLInstance = hGetInstance()) == NULL) return FALSE;
+
+	if (WM_HOOKEX == 0) WM_HOOKEX = RegisterWindowMessage(L"FlushMouseDLL_GlobalHook");
 	if (WM_HOOKEX == 0) return FALSE;
-	HHOOK	hHook = SetWindowsHookEx(WH_CALLWNDPROCRET, (HOOKPROC)lpGlobalHookProc, hGLInstance, 0);
-	if (hHook) {
-		hHookGL = hHook;
-		if (hWnd) {
-			SendMessage(hWnd, WM_HOOKEX, 0, INJECT_HOOK);
-			return TRUE;
-		}
-		UnhookWindowsHookEx(hHook);
+
+	HHOOK hHook = SetWindowsHookEx(WH_CALLWNDPROCRET, (HOOKPROC)lpGlobalHookProc, hGLInstance, 0);
+	if (hHook == NULL) {
+		// failed
+		hGLInstance = NULL;
+		hWndGLParent = NULL;
+		return FALSE;
 	}
-	hGLInstance = NULL;
-	hWndGLParent = NULL;
-	hHookGL = NULL;
-	hPrevWnd = NULL;
-	bSubclassed = FALSE;
-	return FALSE;
+
+	hHookGL = hHook;
+
+	if (hWnd) {
+		PostMessage(hWnd, WM_HOOKEX, 0, INJECT_HOOK);
+	}
+
+	return TRUE;
 }
 
 //
@@ -73,22 +74,34 @@ DLLEXPORT BOOL  __stdcall bGlobalHookSet(HWND hWnd)
 //
 DLLEXPORT BOOL __stdcall bGlobalHookUnset()
 {
-	BOOL		bRet = FALSE;
-	hHookGL = SetWindowsHookEx(WH_CALLWNDPROCRET, (HOOKPROC)lpGlobalHookProc, hGLInstance, GetWindowThreadProcessId(hWndGLParent, NULL));
-	if (hHookGL) {
-		SendMessage(hWndGLParent, WM_HOOKEX, 0, REMOVE_HOOK);
-		if ((bSubclassed == FALSE))	bRet = TRUE;
+	BOOL bRet = FALSE;
+
+	if (hHookGL != NULL) {
+		if (UnhookWindowsHookEx(hHookGL) != FALSE) {
+			bRet = TRUE;
+		}
+		hHookGL = NULL;
 	}
+
+	if (hWndGLParent != NULL) {
+		PostMessage(hWndGLParent, WM_HOOKEX, 0, REMOVE_HOOK);
+	}
+
+	if (hModule != NULL) {
+		FreeLibrary(hModule);
+		hModule = NULL;
+		bSubclassed = FALSE;
+	}
+
 	hGLInstance = NULL;
 	hWndGLParent = NULL;
-	hHookGL = NULL;
-	hPrevWnd = NULL;
 	bSubclassed = FALSE;
+
 	return bRet;
 }
 
 //
-//フックの処理
+// lpGlobalHookProc()
 //
 template<typename T1, typename T2>
 constexpr DWORD WORD2DWORD(T1 h, T2  l) { return (DWORD)(((((DWORD)(l)) << 16) & 0xffff0000) | ((DWORD)(h) & 0xffff)); }
@@ -96,49 +109,52 @@ constexpr DWORD WORD2DWORD(T1 h, T2  l) { return (DWORD)(((((DWORD)(l)) << 16) &
 static LRESULT CALLBACK lpGlobalHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
 	if (nCode < 0) {
-		return CallNextHookEx(NULL, nCode, wParam, lParam);
+		return CallNextHookEx(hHookGL, nCode, wParam, lParam);
 	}
-	LPCWPRETSTRUCT	lpCW = (LPCWPRETSTRUCT)lParam;
-	if (nCode == HC_ACTION) {
+
+	LPCWPRETSTRUCT lpCW = reinterpret_cast<LPCWPRETSTRUCT>(lParam);
+	if (nCode == HC_ACTION && lpCW != NULL) {
 		switch (lpCW->message) {
 		case WM_IME_STARTCOMPOSITION:
-			if (lpCW->lResult != 0) {
-				SendMessage(hWndGLParent, WM_CHECKIMESTARTCONVEX, (WPARAM)TRUE, (LPARAM)0);
+			if (lpCW->lResult != 0 && hWndGLParent) {
+				PostMessage(hWndGLParent, WM_CHECKIMESTARTCONVEX, (WPARAM)TRUE, 0);
 			}
-			return CallNextHookEx(NULL, nCode, wParam, lParam);
+			return CallNextHookEx(hHookGL, nCode, wParam, lParam);
 		case WM_IME_ENDCOMPOSITION:
-			if (lpCW->lResult != 0) {
-				SendMessage(hWndGLParent, WM_CHECKIMESTARTCONVEX, (WPARAM)FALSE, (LPARAM)0);
+			if (lpCW->lResult != 0 && hWndGLParent) {
+				PostMessage(hWndGLParent, WM_CHECKIMESTARTCONVEX, (WPARAM)FALSE, 0);
 			}
-			return CallNextHookEx(NULL, nCode, wParam, lParam);
+			return CallNextHookEx(hHookGL, nCode, wParam, lParam);
 		default:
 			if (lpCW->message == WM_HOOKEX) {
 				if (lpCW->lParam == INJECT_HOOK) {
 					if (!bSubclassed) {
-						if (hHookGL == NULL)	break;
-						if (UnhookWindowsHookEx(hHookGL) != FALSE) {
-							if ((hModule = LoadLibraryEx(FLUSHMOUSE_DLL, NULL, 0))) {
+						if (hModule == NULL) {
+							hModule = LoadLibraryEx(FLUSHMOUSE_DLL, NULL, 0);
+							if (hModule != NULL) {
 								bSubclassed = TRUE;
 							}
+						}
+						if (hHookGL != NULL) {
+							UnhookWindowsHookEx(hHookGL);
 							hHookGL = NULL;
 						}
 					}
 				}
 				else {
 					if (bSubclassed) {
-						if (hHookGL == NULL)	break;
-						if (UnhookWindowsHookEx(hHookGL) != FALSE) {
-							if (FreeLibrary(hGLInstance)) {
-								bSubclassed = FALSE;
-							}
+						if (hModule != NULL) {
+							FreeLibrary(hModule);
+							hModule = NULL;
 						}
+						bSubclassed = FALSE;
 					}
 				}
 			}
-			return CallNextHookEx(NULL, nCode, wParam, lParam);
+			return CallNextHookEx(hHookGL, nCode, wParam, lParam);
 		}
 	}
-	return CallNextHookEx(NULL, nCode, wParam, lParam);
+	return CallNextHookEx(hHookGL, nCode, wParam, lParam);
 }
 
 

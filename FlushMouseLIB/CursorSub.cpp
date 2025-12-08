@@ -34,6 +34,7 @@
 
 //
 // Class Define
+//
 
 //
 // Local Data
@@ -49,7 +50,9 @@ static BOOL		TextDraw(HDC hDC, RECT rcSize, LPTSTR szIMEMode, COLORREF dwRGB, LP
 //
 VOID		vAdjustFontXLeftPosition(DWORD dwIMEMode,LPCTSTR szMode, LPINT lpiXSize, LPRECT lprc)
 {
-	int		len = (int)wcsnlen_s(szMode, sizeof(szMode));
+	if (!szMode) return;
+	
+	int	len = (int)wcsnlen_s(szMode, MAX_IMEMODECHAR);
 	if ((len < 2) && ((dwIMEMode == IMEOFF) || (dwIMEMode == HANEISU_IMEON) || (dwIMEMode == HANKANA_IMEON))) {
 		*lpiXSize = (*lpiXSize * 2) / 3;	lprc->left = lprc->left + (*lpiXSize / 3);	lprc->right = lprc->left + *lpiXSize;
 	}
@@ -63,7 +66,9 @@ VOID		vAdjustFontXLeftPosition(DWORD dwIMEMode,LPCTSTR szMode, LPINT lpiXSize, L
 //
 VOID		vAdjustFontXRightPosition(DWORD dwIMEMode,LPCTSTR szMode, LPINT lpiXSize, LPRECT lprc)
 {
-	int		len = (int)wcsnlen_s(szMode, sizeof(szMode));
+	if (!szMode) return;
+	
+	int	len = (int)wcsnlen_s(szMode, MAX_IMEMODECHAR);
 	if ((len < 2) && ((dwIMEMode == IMEOFF) || (dwIMEMode == HANEISU_IMEON) || (dwIMEMode == HANKANA_IMEON))) {
 		*lpiXSize = (*lpiXSize * 2) / 3;	lprc->left = lprc->left + (*lpiXSize / 8);	lprc->right = lprc->left + *lpiXSize;
 	}
@@ -77,37 +82,34 @@ VOID		vAdjustFontXRightPosition(DWORD dwIMEMode,LPCTSTR szMode, LPINT lpiXSize, 
 //
 static BOOL		TextDraw(HDC hDC, RECT rcSize, LPTSTR szIMEMode, COLORREF dwRGB, LPCTSTR szFontFace, int cWeight, DWORD dwUnderline)
 {
+	if (!hDC || !szIMEMode) return FALSE;
+	
+	if (SetBkMode(hDC, TRANSPARENT) == 0) return FALSE;
+	COLORREF	dwColorPrev = SetTextColor(hDC, dwRGB & 0x80ffffff);
+	if (dwColorPrev == CLR_INVALID) return FALSE;
 	BOOL bRet = FALSE;
-	if (hDC != NULL) {
-		if (SetBkMode(hDC, TRANSPARENT) != 0) {
-			COLORREF	dwColorPrev = 0;
-			if ((dwColorPrev = SetTextColor(hDC, dwRGB & 0x80ffffff)) != CLR_INVALID) {
-				int	iBkModePrev = 0;
-				if ((iBkModePrev = SetBkMode(hDC, TRANSPARENT)) != 0) {
-					HFONT	hFont = NULL;
-					if ((hFont = CreateFont((rcSize.bottom - rcSize.top), (rcSize.right - rcSize.left) / 2, 0, 0, cWeight, FALSE, dwUnderline, FALSE,
-						SHIFTJIS_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, (FIXED_PITCH | FF_DONTCARE), szFontFace)) != NULL) {
-						HFONT	hFontPrev = NULL;
-						if ((hFontPrev = (HFONT)SelectObject(hDC, hFont)) != NULL) {
-							if (szIMEMode != NULL) {
-								SIZE	sz{};
-								int		len = (int)wcsnlen_s(szIMEMode, sizeof(szIMEMode));
-								if (GetTextExtentExPoint(hDC, szIMEMode, len, 0, NULL, NULL, &sz)) {
-									rcSize.left = rcSize.right - sz.cx;
-									if (DrawTextEx(hDC, szIMEMode, -1, &rcSize, DT_RIGHT | DT_SINGLELINE | DT_VCENTER, NULL) != 0) {
-										bRet = TRUE;
-									}
-								}
-							}
-						}
-						DeleteObject(hFont);
-					}
-					SetBkMode(hDC, iBkModePrev);
-				}
-				SetTextColor(hDC, dwColorPrev);
+	int	cbHeight = rcSize.bottom - rcSize.top;
+	int	cbWidth = max(1, (rcSize.right - rcSize.left) / 2);
+	HFONT hFont = CreateFont(cbHeight, cbWidth, 0, 0, cWeight, FALSE, (BYTE)dwUnderline, FALSE,
+		SHIFTJIS_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, (FIXED_PITCH | FF_DONTCARE), szFontFace);
+	if (!hFont) {
+		SetTextColor(hDC, dwColorPrev);
+		return FALSE;
+	}
+	HFONT hFontPrev = (HFONT)SelectObject(hDC, hFont);
+	if (hFontPrev) {
+		SIZE sz{};
+		int len = (int)wcsnlen_s(szIMEMode, MAX_IMEMODECHAR);
+		if (GetTextExtentExPoint(hDC, szIMEMode, len, 0, NULL, NULL, &sz)) {
+			rcSize.left = rcSize.right - sz.cx;
+			if (DrawTextEx(hDC, szIMEMode, -1, &rcSize, DT_RIGHT | DT_SINGLELINE | DT_VCENTER, NULL) != 0) {
+				bRet = TRUE;
 			}
 		}
+		SelectObject(hDC, hFontPrev);
 	}
+	DeleteObject(hFont);
+	SetTextColor(hDC, dwColorPrev);
 	return bRet;
 }
 
@@ -149,8 +151,7 @@ BOOL		CCursorSub::bInitialize(HWND hWnd, LPCTSTR lpszCursorDataFileName)
 		vMessageBox(hWnd, IDS_CANTLOADCURSOR, MessageBoxTYPE, __func__, __LINE__);
 		goto Cleanup;
 	}
-	if (!DeleteFile(lpszCursorDataTempFullPath)) {
-	}
+	(void)DeleteFile(lpszCursorDataTempFullPath);
 	if (!bCopyFile(lpszCursorDataTempFullPath, lpszCursorDataFullPath)) {
 		vMessageBox(hWnd, IDS_CANTLOADCURSOR, MessageBoxTYPE, __func__, __LINE__);
 		goto Cleanup;
@@ -204,7 +205,7 @@ BOOL		CCursorSub::bGetCursorDataFullPath(LPCTSTR lpszCursorDataFileName)
 
 	LPTSTR	lpszBuffer = new TCHAR[_MAX_PATH];
 	if (lpszBuffer) {
-		ZeroMemory(lpszBuffer, _MAX_PATH);
+		ZeroMemory(lpszBuffer, _MAX_PATH * sizeof(TCHAR));
 		DWORD	dwSize = 0;
 		GetCurrentDirectory(_MAX_PATH, lpszBuffer);
 		_tcsncat_s(lpszBuffer, _MAX_PATH, L"\\", _TRUNCATE);
@@ -212,19 +213,19 @@ BOOL		CCursorSub::bGetCursorDataFullPath(LPCTSTR lpszCursorDataFileName)
 		dwSize = ExpandEnvironmentStrings(lpszBuffer, NULL, 0);
 		lpszCursorDataFullPath = new TCHAR[dwSize];
 		if (lpszCursorDataFullPath) {
-			ZeroMemory(lpszCursorDataFullPath, dwSize);
+			ZeroMemory(lpszCursorDataFullPath, dwSize * sizeof(TCHAR));
 			dwSize = ExpandEnvironmentStrings(lpszBuffer, lpszCursorDataFullPath, dwSize);
 			if (GetFileAttributes(lpszCursorDataFullPath) == INVALID_FILE_ATTRIBUTES) {
 				delete[]	lpszCursorDataFullPath;
 				lpszCursorDataFullPath = NULL;
-				ZeroMemory(lpszBuffer, _MAX_PATH);
+				ZeroMemory(lpszBuffer, _MAX_PATH * sizeof(TCHAR));
 				_tcsncat_s(lpszBuffer, _MAX_PATH, L"%ALLUSERSPROFILE%", _TRUNCATE);
 				_tcsncat_s(lpszBuffer, _MAX_PATH, FLUSHMOUSECURSORDIR, _TRUNCATE);
-				_tcsncat_s(lpszBuffer, _MAX_PATH, lpszCursorDataFileName, wcsnlen_s(lpszCursorDataFileName, _TRUNCATE));
+				_tcsncat_s(lpszBuffer, _MAX_PATH, lpszCursorDataFileName, _TRUNCATE);
 				dwSize = ExpandEnvironmentStrings(lpszBuffer, NULL, 0);
 				lpszCursorDataFullPath = new TCHAR[dwSize];
 				if (lpszCursorDataFullPath) {
-					ZeroMemory(lpszCursorDataFullPath, dwSize);
+					ZeroMemory(lpszCursorDataFullPath, dwSize * sizeof(TCHAR));
 					dwSize = ExpandEnvironmentStrings(lpszBuffer, lpszCursorDataFullPath, dwSize);
 					if (GetFileAttributes(lpszCursorDataFullPath) == INVALID_FILE_ATTRIBUTES) {
 						delete[]	lpszCursorDataFullPath;
@@ -256,10 +257,10 @@ BOOL		CCursorSub::bGetCursorDataTempFullPath(LPCTSTR lpszCursorDataFileName)
 	LPTSTR	ext = new TCHAR[_MAX_EXT];
 
 	if (lpszBuffer && lpszBuffer2) {
-		ZeroMemory(lpszBuffer, _MAX_PATH + 1);
-		ZeroMemory(lpszBuffer2, _MAX_PATH + 1);
-		ZeroMemory(fname, _MAX_FNAME);
-		ZeroMemory(ext, _MAX_EXT);
+		ZeroMemory(lpszBuffer, (_MAX_PATH + 1) * sizeof(TCHAR));
+		ZeroMemory(lpszBuffer2, (_MAX_PATH + 1) * sizeof(TCHAR));
+		ZeroMemory(fname, _MAX_FNAME * sizeof(TCHAR));
+		ZeroMemory(ext, _MAX_EXT * sizeof(TCHAR));
 
 		GetTempPath(_MAX_PATH, lpszBuffer);
 
@@ -270,7 +271,7 @@ BOOL		CCursorSub::bGetCursorDataTempFullPath(LPCTSTR lpszCursorDataFileName)
 		size_t	size = wcsnlen_s(lpszBuffer, _MAX_PATH + 1);
 		lpszCursorDataTempFullPath = new TCHAR[size + 1];
 		if (lpszCursorDataTempFullPath) {
-			ZeroMemory(lpszCursorDataTempFullPath, size + 1);
+			ZeroMemory(lpszCursorDataTempFullPath, (size + 1) * sizeof(TCHAR));
 			_tcsncpy_s(lpszCursorDataTempFullPath, size + 1, lpszBuffer, _TRUNCATE);
 		}
 	}
@@ -290,35 +291,42 @@ BOOL		CCursorSub::bCopyFile(LPCTSTR lpszDstPath, LPCTSTR lpszSrcPath)
 	HANDLE	hSrcFile = NULL;
 	LARGE_INTEGER	SrcSize{};
 	HANDLE	hDstFile = NULL;
-	DWORD	dwFileSize = 0;
-	LPBYTE	lpBuffer = NULL;
 	DWORD	dwNumberOfBytesRead = 0;
+	DWORD	dwNumberOfBytesWritten = 0;
+	LPBYTE	lpBuffer = NULL;
 	BOOL	bRet = FALSE;
 
-	if ((hSrcFile = CreateFile(lpszSrcPath, (FILE_SHARE_READ), FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE)	goto Cleanup;
+	hSrcFile = CreateFile(lpszSrcPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hSrcFile == INVALID_HANDLE_VALUE)	goto Cleanup;
 	if (!GetFileSizeEx(hSrcFile, &SrcSize))	goto Cleanup;
 
-	if ((hDstFile = CreateFile(lpszDstPath, (FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE), FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL)) == INVALID_HANDLE_VALUE)	goto Cleanup;
-	if ((dwFileSize = GetFileSize(hSrcFile, NULL)) == INVALID_FILE_SIZE)	goto Cleanup;
+	hDstFile = CreateFile(lpszDstPath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL);
+	if (hDstFile == INVALID_HANDLE_VALUE)	goto Cleanup;
 
-#define	BUFFERSIZE	(1024 * 1024)
+#define	BUFFERSIZE	(6 * 1024 * 1024)
 	lpBuffer = new BYTE[BUFFERSIZE];
 	if (!lpBuffer)	goto Cleanup;
-	for (DWORD i = 0; i < dwFileSize; i++) {
-		if (!ReadFile(hSrcFile, lpBuffer, BUFFERSIZE, &dwNumberOfBytesRead, NULL))	goto Cleanup;
-		if (!WriteFile(hDstFile, lpBuffer, dwNumberOfBytesRead, NULL, NULL))		goto Cleanup;
-		if (dwNumberOfBytesRead < BUFFERSIZE)	break;
+	while (TRUE) {
+		if (!ReadFile(hSrcFile, lpBuffer, BUFFERSIZE, &dwNumberOfBytesRead, NULL)) goto Cleanup;
+		if (dwNumberOfBytesRead == 0) break;
+		if (!WriteFile(hDstFile, lpBuffer, dwNumberOfBytesRead, &dwNumberOfBytesWritten, NULL)) goto Cleanup;
+		if (dwNumberOfBytesWritten != dwNumberOfBytesRead) goto Cleanup;
 	}
-
+#undef BUFFERSIZE
+	
 	bRet = TRUE;
 
 Cleanup:
 	if (lpBuffer)	delete [] 	lpBuffer;
 	lpBuffer = NULL;
-	if (hDstFile)	CloseHandle(hSrcFile);
-	hSrcFile = NULL;
-	if (hDstFile)	CloseHandle(hDstFile);
-	hDstFile = NULL;
+	if (hSrcFile && (hSrcFile != INVALID_HANDLE_VALUE)) {
+		CloseHandle(hSrcFile);
+		hSrcFile = NULL;
+	}
+	if (hDstFile && (hDstFile != INVALID_HANDLE_VALUE)) {
+		CloseHandle(hDstFile);
+		hDstFile = NULL;
+	}
 	return bRet;
 }
 
@@ -457,7 +465,7 @@ BOOL		CCursorSub::bMakeCursorSub(LPRTCURSORHEAD	lpRTCursorHead, LPRTCURSORHEAD l
 {
 	HDC		hDC = NULL, hCursorMemDC = NULL, hTextMemDC = NULL;
 	HBITMAP	hCursorBitmap = NULL, hTextBitmap = NULL;
-	HGDIOBJ	hCursorGDIObj = NULL, hTextGDIObj = NULL;
+	HGDIOBJ	hCursorPrevObj = NULL, hTextPrevObj = NULL;
 	LPVOID	lpCursorBits = NULL, lpTextBits = NULL;
 	RTCURSORHEAD	RTCursorHead{};
 	RECT	rc{};
@@ -468,14 +476,14 @@ BOOL		CCursorSub::bMakeCursorSub(LPRTCURSORHEAD	lpRTCursorHead, LPRTCURSORHEAD l
 	if ((hDC = GetDC(NULL)) == NULL)	goto Cleanup;
 	if ((hCursorMemDC = CreateCompatibleDC(hDC)) == NULL)	goto Cleanup;
 	if ((hTextMemDC = CreateCompatibleDC(hDC)) == NULL)	goto Cleanup;
-	if (hDC)	DeleteDC(hDC);
+	if (hDC)	ReleaseDC(NULL, hDC);
 	hDC = NULL;
 
 	memcpy_s(&RTCursorHead, sizeof(RTCURSORHEAD), lpRTCursorHead, sizeof(RTCURSORHEAD));
 	RTCursorHead.BitmapInfoHeader.biHeight = -(RTCursorHead.BitmapInfoHeader.biHeight);
 	if ((hCursorBitmap = CreateDIBSection(hCursorMemDC, (LPBITMAPINFO)&(RTCursorHead.BitmapInfoHeader), DIB_RGB_COLORS, &lpCursorBits, NULL, 0)) == NULL)	goto Cleanup;
-	hCursorGDIObj = SelectObject(hCursorMemDC, hCursorBitmap);
-	if ((hCursorGDIObj == NULL) || (hCursorGDIObj == HGDI_ERROR))	goto Cleanup;
+	hCursorPrevObj = SelectObject(hCursorMemDC, hCursorBitmap);
+	if ((hCursorPrevObj == NULL) || (hCursorPrevObj == HGDI_ERROR))	goto Cleanup;
 	CursorBytes = static_cast<unsigned long long>(cx * cy * (lpRTCursorHead->BitmapInfoHeader.biBitCount / 8));
 	memcpy_s((LPBYTE)lpCursorBits, CursorBytes, (LPBYTE)&(lpRTCursorHead->lpData), CursorBytes);
 
@@ -491,8 +499,8 @@ BOOL		CCursorSub::bMakeCursorSub(LPRTCURSORHEAD	lpRTCursorHead, LPRTCURSORHEAD l
 	RTCursorHead.BitmapInfoHeader.biClrUsed = 0;
 	RTCursorHead.BitmapInfoHeader.biClrImportant = 0;
 	if ((hTextBitmap = CreateDIBSection(hTextMemDC, (LPBITMAPINFO)&(RTCursorHead.BitmapInfoHeader), DIB_RGB_COLORS, &lpTextBits, NULL, 0)) == NULL)	goto Cleanup;
-	hTextGDIObj = SelectObject(hTextMemDC, hTextBitmap);
-	if ((hTextGDIObj == NULL) || (hTextGDIObj == HGDI_ERROR))	goto Cleanup;
+	hTextPrevObj = SelectObject(hTextMemDC, hTextBitmap);
+	if ((hTextPrevObj == NULL) || (hTextPrevObj == HGDI_ERROR))	goto Cleanup;
 
 	rc.left = cx / 3 + 2;	rc.right = rc.left + cx * 2 / 3;	rc.top = cy / 3;	rc.bottom = rc.top + cy * 2 / 3 + 2;
 	iXSize = rc.right - rc.left;
@@ -511,13 +519,13 @@ BOOL		CCursorSub::bMakeCursorSub(LPRTCURSORHEAD	lpRTCursorHead, LPRTCURSORHEAD l
 	bRet = TRUE;
 
 Cleanup:
-	if (hCursorGDIObj)	DeleteObject(hCursorGDIObj);
+	if (hCursorPrevObj && hCursorMemDC)	SelectObject(hCursorMemDC, hCursorPrevObj);
 	if (hCursorBitmap)	DeleteObject(hCursorBitmap);
 	if (hCursorMemDC)	DeleteDC(hCursorMemDC);
-	if (hTextGDIObj)	DeleteObject(hTextGDIObj);
+	if (hTextPrevObj && hTextMemDC)	SelectObject(hTextMemDC, hTextPrevObj);
 	if (hTextBitmap)	DeleteObject(hTextBitmap);
 	if (hTextMemDC)		DeleteDC(hTextMemDC);
-	if (hDC)			DeleteDC(hDC);
+	if (hDC)	ReleaseDC(NULL, hDC);
 	return bRet;
 }
 
@@ -546,12 +554,16 @@ Cleanup:
 //
 void		CCursorSub::ReverseDataTopDown(LPDWORD lpData, int cx, int cy)
 {
-	DWORD	data = 0;
-	for (int y1 = 0, y2 = cy - 1; y1 < cy / 2; y1++, y2--) {
+	if (!lpData || cx <= 0 || cy <= 1) return;
+	
+	const int halfCy = cy / 2;
+	for (int y1 = 0, y2 = cy - 1; y1 < halfCy; y1++, y2--) {
+		LPDWORD pRow1 = lpData + (y1 * cx);
+		LPDWORD pRow2 = lpData + (y2 * cx);
 		for (int x = 0; x < cx; x++) {
-			data = lpData[(y2 * cx + x)];
-			lpData[(y2 * cx + x)] = lpData[(y1 * cx + x)];
-			lpData[(y1 * cx + x)] = data;
+			DWORD temp = pRow1[x];
+			pRow1[x] = pRow2[x];
+			pRow2[x] = temp;
 		}
 	}
 }
@@ -561,14 +573,14 @@ void		CCursorSub::ReverseDataTopDown(LPDWORD lpData, int cx, int cy)
 //
 void		CCursorSub::MakeAlphaBlend(LPDWORD lpData, int cx, int cy, COLORREF aRGB)
 {
-	for (int y = 0; y < cy; y++) {
-		for (int x = 0; x < cx; x++) {
-			if (*lpData)	*lpData = ((aRGB & 0xff000000) | ((aRGB << 16) & 0x00ff0000)) | ((aRGB) & 0x0000ff00) | ((aRGB >> 16) & 0x000000ff);
-			lpData++;
-		}
+	if (!lpData || cx <= 0 || cy <= 0) return;
+	
+	const DWORD color = ((aRGB & 0xff000000) | ((aRGB << 16) & 0x00ff0000)) | ((aRGB) & 0x0000ff00) | ((aRGB >> 16) & 0x000000ff);
+	const int totalPixels = cx * cy;
+	for (int i = 0; i < totalPixels; i++) {
+		if (lpData[i]) lpData[i] = color;
 	}
 }
-
 //
 //class CCursorWindow : public CWindow
 //
@@ -687,12 +699,14 @@ void		CCursorWindow::Cls_OnPaint(HWND hWnd) const
 			if (GetClientRect(hWnd, &rcSize)) {
 				HBRUSH	hBrush = NULL;
 				if ((hBrush = CreateSolidBrush(dwBackColor & 0x00ffffff)) != NULL) {
-					if (SelectObject(hDC, hBrush) != HGDI_ERROR) {
+					HBRUSH hPrev = (HBRUSH)SelectObject(hDC, hBrush);
+					if (hPrev != HGDI_ERROR) {
 						if (FillRect(hDC, &rcSize, hBrush) != 0) {
 							DWORD	dwUnderline = 0;
 							if (GetKeyState(VK_CAPITAL) & 0x0001) dwUnderline = TRUE;	else dwUnderline = FALSE;
 							TextDraw(hDC, rcSize, lpszIMEMode, dwTextColor, lpszFontFace, FW_BOLD, dwUnderline);
 						}
+						SelectObject(hDC, hPrev);
 					}
 					DeleteObject(hBrush);
 				}

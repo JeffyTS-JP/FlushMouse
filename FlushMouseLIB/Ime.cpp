@@ -7,7 +7,6 @@
 // No.      Date		    Name		    Reason & Document
 // -------+-----------+-----------+-------------------------------------------- -
 // #0000	2022/03/03  JeffyTS  	New edit.
-// #0001	2023/06/30	JeffyTS		Divided from cursor.cpp
 //
 
 // Include
@@ -25,6 +24,7 @@
 //
 // Define
 //
+#define SENDMESSAGETIMEOUT	100
 
 //
 // Struct Define
@@ -75,13 +75,15 @@ VOID		CIME::vIMEConvertModeChangeForced(HWND hWnd, DWORD dwConvertMode)
 //
 BOOL CALLBACK CIME::bEnumChildProcIMEConvertMode(HWND hWnd, LPARAM lParam)
 {
-	if (hWnd == NULL)	return FALSE;
-	HWND    hIMWnd = NULL;
-	if ((hIMWnd = ImmGetDefaultIMEWnd(hWnd)) != NULL) {
-		if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETOPENSTATUS, (LPARAM)TRUE) == 0) {
-			if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETCONVERSIONMODE, (LPARAM)lParam) == 0) {
-			}
-		}
+	if (hWnd == NULL) return FALSE;
+	HWND hIMWnd = ImmGetDefaultIMEWnd(hWnd);
+	if (hIMWnd == NULL) return TRUE;
+	DWORD_PTR dwRes = 0;
+	LRESULT lResult = SendMessageTimeout(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETOPENSTATUS, (LPARAM)TRUE,
+											SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
+	if ((lResult == 0) || (dwRes == 0)) {
+		(void)SendMessageTimeout(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETCONVERSIONMODE, lParam,
+											SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
 	}
 	return TRUE;
 }
@@ -94,8 +96,9 @@ BOOL CALLBACK CIME::bEnumChildProcIMEOpenClose(HWND hWnd, LPARAM lParam)
 	if (hWnd == NULL)	return FALSE;
 	HWND    hIMWnd = NULL;
 	if ((hIMWnd = ImmGetDefaultIMEWnd(hWnd)) != NULL) {
-		if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETOPENSTATUS, lParam) == 0) {
-		}
+		DWORD_PTR dwRes = 0;
+		(void)SendMessageTimeout(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETOPENSTATUS, lParam,
+											SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
 	}
 	return TRUE;
 }
@@ -105,55 +108,50 @@ BOOL CALLBACK CIME::bEnumChildProcIMEOpenClose(HWND hWnd, LPARAM lParam)
 //
 DWORD		CIME::dwIMEMode(HWND hWnd, BOOL bForceHiragana)
 {
-	if (hWnd != NULL) {
-		HWND    hIMWnd = NULL;
-		HKL		hkl = NULL;
-		DWORD   dwConvertMode = 0;
-		if ((hIMWnd = ImmGetDefaultIMEWnd(hWnd)) != NULL) {
-			if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETOPENSTATUS, NULL) != 0) {
-				if ((dwConvertMode = (DWORD)SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETCONVERSIONMODE, NULL)) != 0) {
-					switch (dwConvertMode) {
-					case IME_CMODE_NATIVE:
-						dwConvertMode = IMEOFF;
-						break;
-					case ZENHIRA_IMEON:
-					case (ZENHIRA_IMEON ^ IME_CMODE_ROMAN):
-						dwConvertMode = ZENHIRA_IMEON;
-						break;
-					case HANEISU_IMEON:
-					case (HANEISU_IMEON ^ IME_CMODE_ROMAN):
-						dwConvertMode = HANEISU_IMEON;
-						break;
-					case HANKANA_IMEON:
-					case (HANKANA_IMEON ^ IME_CMODE_ROMAN):
-						dwConvertMode = HANKANA_IMEON;
-						break;
-					case ZENEISU_IMEON:
-					case (ZENEISU_IMEON ^ IME_CMODE_ROMAN):
-						dwConvertMode = ZENEISU_IMEON;
-						break;
-					case ZENKANA_IMEON:
-					case (ZENKANA_IMEON ^ IME_CMODE_ROMAN):
-						dwConvertMode = ZENKANA_IMEON;
-						break;
-					default:
-						dwConvertMode = IMEOFF;
-					}
-					if ((bForceHiragana != FALSE) && (dwConvertMode != ZENHIRA_IMEON)) {
-						vIMEConvertModeChangeForced(hWnd, ZENHIRA_IMEON);
-						dwConvertMode = ZENHIRA_IMEON;
-					}
-					if ((hkl = hklGetInputLocale(hWnd)) != (HKL)0) {
-						if (hkl != JP_IME) {
-							dwConvertMode = IMEOFF;
-						}
-					}
-					return dwConvertMode;
-				}
-			}
-		}
+	if (hWnd == NULL) return IMEOFF;
+	HWND hIMWnd = ImmGetDefaultIMEWnd(hWnd);
+	if (hIMWnd == NULL) return IMEOFF;
+	DWORD_PTR dwRes = 0;
+	LRESULT lResult = SendMessageTimeout(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETOPENSTATUS, NULL,
+											SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
+	if ((lResult == 0) || (dwRes == 0)) return IMEOFF;
+	lResult = SendMessageTimeout(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETCONVERSIONMODE, NULL,
+									SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
+	if ((lResult == 0) || (dwRes == 0)) return IMEOFF;
+	DWORD dwConvertMode = (DWORD)dwRes;
+	DWORD dwResult = IMEOFF;
+	const DWORD dwBaseMode = dwConvertMode & ~IME_CMODE_ROMAN;
+	switch (dwBaseMode) {
+		case IME_CMODE_NATIVE:
+			dwResult = IMEOFF;
+			break;
+		case (ZENHIRA_IMEON & ~IME_CMODE_ROMAN):
+			dwResult = ZENHIRA_IMEON;
+			break;
+		case (HANEISU_IMEON & ~IME_CMODE_ROMAN):
+			dwResult = HANEISU_IMEON;
+			break;
+		case (HANKANA_IMEON & ~IME_CMODE_ROMAN):
+			dwResult = HANKANA_IMEON;
+			break;
+		case (ZENEISU_IMEON & ~IME_CMODE_ROMAN):
+			dwResult = ZENEISU_IMEON;
+			break;
+		case (ZENKANA_IMEON & ~IME_CMODE_ROMAN):
+			dwResult = ZENKANA_IMEON;
+			break;
+		default:
+			dwResult = IMEOFF;
 	}
-	return IMEOFF;
+	if (bForceHiragana && (dwResult != ZENHIRA_IMEON)) {
+		vIMEConvertModeChangeForced(hWnd, ZENHIRA_IMEON);
+		dwResult = ZENHIRA_IMEON;
+	}
+	HKL hkl = hklGetInputLocale(hWnd);
+	if (hkl != (HKL)0 && hkl != JP_IME) {
+		dwResult = IMEOFF;
+	}
+	return dwResult;
 }
 
 //
@@ -161,6 +159,7 @@ DWORD		CIME::dwIMEMode(HWND hWnd, BOOL bForceHiragana)
 //
 VOID		CIME::vActivateIME(HWND hWndObserved)
 {
+	if (!hWndObserved) return;
 	EnumChildWindows(hWndObserved, &bEnumChildProcActivateIME, NULL);
 }
 
@@ -171,22 +170,19 @@ BOOL CALLBACK CIME::bEnumChildProcActivateIME(HWND hWnd, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 
-	HWND	hIMWnd = ImmGetDefaultIMEWnd(hWnd);
-	if (hIMWnd != NULL) {
-		SendMessage(hIMWnd, WM_ACTIVATE, (WPARAM)WA_ACTIVE, (LPARAM)NULL);
-		LPTSTR	lpszBuffer = new TCHAR[_MAX_PATH];
-		if (lpszBuffer) {
-			ZeroMemory(lpszBuffer, (sizeof(TCHAR) * _MAX_PATH));
-			if (GetClassName(hIMWnd, lpszBuffer, _MAX_PATH) != 0) {
-				HWND	hIMEWnd = FindWindow(lpszBuffer, NULL);
-				if (hIMEWnd != NULL) {
-					SendMessage(hIMEWnd, WM_ACTIVATE, (WPARAM)WA_ACTIVE, (LPARAM)NULL);
-					delete[] lpszBuffer;
-					return TRUE;
-				}
-			}
-			delete[] lpszBuffer;
-		}
+	HWND hIMWnd = ImmGetDefaultIMEWnd(hWnd);
+	if (hIMWnd == NULL) return TRUE;
+	DWORD_PTR dwRes = 0;
+	(void)SendMessageTimeout(hIMWnd, WM_ACTIVATE, (WPARAM)WA_ACTIVE, (LPARAM)NULL,
+								SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
+	TCHAR szBuffer[_MAX_PATH];
+	if (GetClassName(hIMWnd, szBuffer, _MAX_PATH) == 0) {
+		return TRUE;
+	}
+	HWND hIMEWnd = FindWindow(szBuffer, NULL);
+	if (hIMEWnd != NULL) {
+		(void)SendMessageTimeout(hIMEWnd, WM_ACTIVATE, (WPARAM)WA_ACTIVE, (LPARAM)NULL,
+									SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
 	}
 	return TRUE;
 }
@@ -201,8 +197,7 @@ DWORD		CIME::dwGetInputLocale()
 	DWORD	dwInputLocale = 0;
 	CRegistry	*CReg = new CRegistry;
 	if (CReg) {
-		if (!CReg->bReadSystemRegValueDWORD(HKEY_LOCAL_MACHINE, SUBKEY, VALUE, &dwInputLocale)) {
-		}
+		(void)CReg->bReadSystemRegValueDWORD(HKEY_LOCAL_MACHINE, SUBKEY, VALUE, &dwInputLocale);
 		delete	CReg;
 	}
 	return (dwInputLocale & 0x0000ffff);
@@ -215,19 +210,18 @@ DWORD		CIME::dwGetInputLocale()
 //
 HKL		CIME::hklGetInputLocale(HWND hWndObserved)
 {
-
-	DWORD	dwProcessID = 0;
-	DWORD	dwThreadID = 0;
-	HKL		hkl = NULL;
-	if (!hWndObserved)	return (HKL)0;
-	if ((dwThreadID = GetWindowThreadProcessId(hWndObserved, &dwProcessID)) != 0) {
-		if ((hkl = GetKeyboardLayout(dwThreadID)) != NULL) {
-			int	iKeyboardType = GetKeyboardType(1);
-			if ((iKeyboardType != 2) || (hkl != JP_IME))	hkl = US_ENG;
-			return hkl;
-		}
+	if (!hWndObserved) return (HKL)0;
+	
+	DWORD dwProcessID = 0;
+	DWORD dwThreadID = GetWindowThreadProcessId(hWndObserved, &dwProcessID);
+	if (dwThreadID == 0) return (HKL)0;
+	HKL hkl = GetKeyboardLayout(dwThreadID);
+	if (hkl == NULL) return (HKL)0;
+	int iKeyboardType = GetKeyboardType(1);
+	if ((iKeyboardType != 2) || (hkl != JP_IME)) {
+		hkl = US_ENG;
 	}
-	return (HKL)0;
+	return hkl;
 }
 
 

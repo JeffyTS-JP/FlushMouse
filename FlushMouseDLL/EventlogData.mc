@@ -452,5 +452,17 @@ Language=Japanese
 Changed session to Unlock (WTS).
 .
 
+MessageId=0x020B
+Severity=Informational
+Facility=Application
+SymbolicName=MSG_WORKER_QUEUE_FAIL
+Language=English
+Worker Queue Fail.
+.
+
+Language=Japanese
+Worker Queue Fail.
+.
+
 
 ;///* = EOF = */

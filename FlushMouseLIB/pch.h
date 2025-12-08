@@ -62,4 +62,8 @@ typedef unsigned short USHORT;
 #include <wtsapi32.h>
 #pragma comment(lib, "Wtsapi32.lib")
 
+#include <mutex>
+#include <vector>
+#include <cstring>
+
 #endif //PCH_H

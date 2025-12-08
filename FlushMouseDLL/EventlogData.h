@@ -383,4 +383,13 @@
 //
 #define MSG_WTSSESSION_CHANGE_SESSION_UNLOCK ((DWORD)0x4000020AL)
 
+//
+// MessageId: MSG_WORKER_QUEUE_FAIL
+//
+// MessageText:
+//
+// Worker Queue Fail.
+//
+#define MSG_WORKER_QUEUE_FAIL            ((DWORD)0x4000020BL)
+
 ///* = EOF = */

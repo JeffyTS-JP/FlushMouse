@@ -75,12 +75,18 @@ void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine)
 	TCHAR	_lpFunc[MAX_LOADSTRING]{};
 	TCHAR	lpText[(MAX_LOADSTRING * 2)]{};
 
-	LoadString(Resource->hLoad(), uID, lpText, MAX_LOADSTRING);
+	int nLoaded = 0;
+	if (Resource && Resource->hLoad()) {
+		nLoaded = LoadString(Resource->hLoad(), uID, lpText, MAX_LOADSTRING);
+	}
+	if (nLoaded == 0) {
+		_sntprintf_s(lpText, (MAX_LOADSTRING * 2), _TRUNCATE, _T("Error: 0x%08X"), uID);
+	}
 	if (lpFunc && (dwLine != 0)) {
 		MultiByteToWideChar (CP_ACP, 0, lpFunc, -1, _lpFunc, MAX_LOADSTRING);
-		_sntprintf_s(lpText, (MAX_LOADSTRING * 2), _TRUNCATE, L"%s\n\n (%s : %d : 0x%08X)", lpText, _lpFunc, dwLine, GetLastError());
+		_sntprintf_s(lpText, (MAX_LOADSTRING * 2), _TRUNCATE, _T("%s\r\n\r\n (%s : %d : 0x%08X)"), lpText, _lpFunc, dwLine, GetLastError());
 	}
-	MessageBox(hWnd, lpText, g_szWindowTitle, uType);
+	(void)MessageBox(hWnd, lpText, g_szWindowTitle, uType);
 	return;
 }
 
@@ -146,7 +152,7 @@ void GetMonitorDPIandRect(HWND hWnd, LPUINT lpUint,LPRECT lpRect)
 App::App()
 {
 
-#ifdef _DEBUG
+#if defined _DEBUG
 	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_ASSERTE(_CrtCheckMemory());
 #endif
@@ -185,15 +191,17 @@ void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 
 	LPCTSTR	_lpCmdLine = GetCommandLine();
 	int		iNumArgs = 0;
-	LPTSTR	*_lpArgv = CommandLineToArgvW(_lpCmdLine, &iNumArgs);
-	if (iNumArgs != 0) {
-		if (iCheckCmdLine((LPCTSTR)_lpArgv) != 1) {
-			LocalFree(_lpArgv);
+	LPTSTR *argv = nullptr;
+
+	argv = CommandLineToArgvW(_lpCmdLine, &iNumArgs);
+	if (argv != nullptr) {
+		if (iCheckCmdLine((LPCTSTR)argv) != 1) {
+			LocalFree(argv);
 			PostQuitMessage(0);
 			return;
 		}
+		LocalFree(argv);
 	}
-	if (_lpArgv)	LocalFree(_lpArgv);
 
 	if ((m_hInstance = GetModuleHandle(NULL)) == NULL) {
 		PostQuitMessage(0);
@@ -201,14 +209,32 @@ void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 	}
 
 	hMicrosoft_ui_xaml_dll = LoadLibrary(L"Microsoft.ui.xaml.dll");
+	if (!hMicrosoft_ui_xaml_dll) {
+	}
 	hFlushMouseUI3DLL = LoadLibrary(FLUSHMOUSEUI3_DLL);
+	if (!hFlushMouseUI3DLL) {
+	}
 
-	MojoWindowExec();
+	try {
+		MojoWindowExec();
+	}
+	catch (winrt::hresult_error const & e) {
+		UNREFERENCED_PARAMETER(e);
+	}
+	catch (std::exception const & e) {
+		UNREFERENCED_PARAMETER(e);
+	}
+	catch (...) {
+	}
 
 	if (!bWinMain((HINSTANCE)m_hInstance, NULL, NULL, SW_HIDE)) {
 	}
 
-	MojoWindowClose();
+	try {
+		MojoWindowClose();
+	}
+	catch (...) {
+	}
 
 	if (hFlushMouseUI3DLL)	FreeLibrary(hFlushMouseUI3DLL);
 	if (hMicrosoft_ui_xaml_dll)	FreeLibrary(hMicrosoft_ui_xaml_dll);
@@ -228,7 +254,6 @@ void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 void App::OnSuspending([[maybe_unused]] IInspectable const& sender, [[maybe_unused]] Windows::ApplicationModel::SuspendingEventArgs const& e)
 {
 }
-
 
 
 /* = EOF = */

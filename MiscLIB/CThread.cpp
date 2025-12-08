@@ -18,12 +18,17 @@
 // CThread::
 //
 CThread::CThread()
-	: lpstThreadData(new THREAD_DATA[sizeof(THREAD_DATA)])
+	: lpstThreadData(new THREAD_DATA())
 {
 	if (lpstThreadData) {
 		ZeroMemory(lpstThreadData, sizeof(THREAD_DATA));
-		if ((lpstThreadData->lpstSA = new SECURITY_ATTRIBUTES[sizeof(SECURITY_ATTRIBUTES)]))	ZeroMemory(lpstThreadData->lpstSA, sizeof(SECURITY_ATTRIBUTES));
-		else return;
+		lpstThreadData->lpstSA = new SECURITY_ATTRIBUTES();
+		if (lpstThreadData->lpstSA == NULL) {
+			delete lpstThreadData;
+			lpstThreadData = NULL;
+			return;
+		}
+		ZeroMemory(lpstThreadData->lpstSA, sizeof(SECURITY_ATTRIBUTES));
 	}
 	else return;
 
@@ -33,10 +38,16 @@ CThread::CThread()
 }
 
 CThread::CThread(const CThread& other)
-	: lpstThreadData(new THREAD_DATA[sizeof(THREAD_DATA)])
+	: lpstThreadData(new THREAD_DATA())
 {
-	if (lpstThreadData != NULL) {
+	if (lpstThreadData != NULL && other.lpstThreadData != NULL) {
 		*lpstThreadData = *other.lpstThreadData;
+		if (other.lpstThreadData->lpstSA != NULL) {
+			lpstThreadData->lpstSA = new SECURITY_ATTRIBUTES();
+			if (lpstThreadData->lpstSA) {
+				*(lpstThreadData->lpstSA) = *(other.lpstThreadData->lpstSA);
+			}
+		}
 	}
 }
 
@@ -44,11 +55,18 @@ CThread& CThread::operator = (const CThread& other)
 {
 	if (this != &other) {
 		if (lpstThreadData != NULL) {
-			delete[]	lpstThreadData;
+			if (lpstThreadData->lpstSA != NULL) delete lpstThreadData->lpstSA;
+			delete lpstThreadData;
 		}
-		lpstThreadData = new THREAD_DATA;
-		if (lpstThreadData != NULL) {
+		lpstThreadData = new THREAD_DATA();
+		if (lpstThreadData != NULL && other.lpstThreadData != NULL) {
 			*lpstThreadData = *other.lpstThreadData;
+			if (other.lpstThreadData->lpstSA != NULL) {
+				lpstThreadData->lpstSA = new SECURITY_ATTRIBUTES();
+				if (lpstThreadData->lpstSA) {
+					*(lpstThreadData->lpstSA) = *(other.lpstThreadData->lpstSA);
+				}
+			}
 		}
 	}
 	return *this;
@@ -58,8 +76,8 @@ CThread::~CThread()
 {
 	vUnregister();
 	if (lpstThreadData) {
-		if (lpstThreadData->lpstSA != NULL)	delete[]	lpstThreadData->lpstSA;
-		delete[]	lpstThreadData;
+		if (lpstThreadData->lpstSA != NULL) delete lpstThreadData->lpstSA;
+		delete lpstThreadData;
 	}
 	lpstThreadData = NULL;
 }
@@ -73,13 +91,17 @@ BOOL 	CThread::bRegister(LPCTSTR lpszThreadName, DWORD dwThreadID, LPTHREAD_STAR
 	lpstThreadData->lpszThreadName = lpszThreadName;				lpstThreadData->dwThreadID = dwThreadID;
 	lpstThreadData->lpbCallbackRoutine = lpbCallbackRoutine;		lpstThreadData->lParamOption = lParamOption;
 	lpstThreadData->dwSleepTime = dwSleepTime;						lpstThreadData->bThreadSentinel = TRUE;
-	if ((lpstThreadData->hEvent = CreateEvent(NULL, TRUE, FALSE, lpstThreadData->lpszThreadName)) != NULL) {
-		if ((lpstThreadData->hThread = reinterpret_cast<HANDLE>(_beginthreadex(lpstThreadData->lpstSA, 0, &uThreadProc, lpstThreadData, CREATE_SUSPENDED, reinterpret_cast<UINT*>(&lpstThreadData->dwThreadID)))) != 0) {
-			return TRUE;
-		}
+	lpstThreadData->hEvent = CreateEvent(NULL, TRUE, FALSE, lpstThreadData->lpszThreadName);
+	if (lpstThreadData->hEvent == NULL) return FALSE;
+
+	uintptr_t threadHandle = _beginthreadex(lpstThreadData->lpstSA, 0, &uThreadProc, lpstThreadData, CREATE_SUSPENDED, reinterpret_cast<unsigned int*>(&lpstThreadData->dwThreadID));
+	if (threadHandle == 0) {
 		CloseHandle(lpstThreadData->hEvent);
+		lpstThreadData->hEvent = NULL;
+		return FALSE;
 	}
-	return FALSE;
+	lpstThreadData->hThread = reinterpret_cast<HANDLE>(threadHandle);
+	return TRUE;
 }
 
 //
@@ -92,7 +114,7 @@ BOOL 	CThread::bStart()
 	DWORD	dwExitCode = 0;
 	if (GetExitCodeThread((HANDLE)lpstThreadData->hThread, &dwExitCode)) {
 		if (dwExitCode == STILL_ACTIVE) {
-			if (ResumeThread(lpstThreadData->hThread) != -1) {
+			if (ResumeThread(lpstThreadData->hThread) != (DWORD)-1) {
 				if (lpstThreadData->hEvent != NULL) {
 					if (SetEvent(lpstThreadData->hEvent)) {
 						return TRUE;
@@ -128,6 +150,7 @@ BOOL	CThread::bSetSentinel(BOOL bSentinel)
 	if ((lpstThreadData == NULL) || (lpstThreadData->lpstSA == NULL) || (lpstThreadData->hEvent == NULL) || (lpstThreadData->hThread == NULL))	return FALSE;
 	BOOL	bRet = lpstThreadData->bThreadSentinel;
 	lpstThreadData->bThreadSentinel = bSentinel;
+	if (lpstThreadData->hEvent != NULL) SetEvent(lpstThreadData->hEvent);
 	return bRet;
 }
 
@@ -158,27 +181,18 @@ VOID 	CThread::vUnregister()
 #define	TIMEOUT	1000
 	if ((lpstThreadData == NULL) || (lpstThreadData->lpstSA == NULL) || (lpstThreadData->hEvent == NULL) || (lpstThreadData->hThread == NULL))	return;
 	lpstThreadData->bThreadSentinel = FALSE;
+	if (lpstThreadData->hEvent != NULL) SetEvent(lpstThreadData->hEvent);
+
 	DWORD	dwExitCode = 0;
 	if (GetExitCodeThread(reinterpret_cast<HANDLE>(lpstThreadData->hThread), &dwExitCode)) {
 		if (dwExitCode == STILL_ACTIVE) {
-			if (ResumeThread(lpstThreadData->hThread) != -1) {
-				if (SetEvent(lpstThreadData->hEvent)) {
-					DWORD	dwRet = WaitForSingleObject((HANDLE)lpstThreadData->hThread, TIMEOUT);
-					switch (dwRet) {
-					case WAIT_OBJECT_0:
-						break;
-					case WAIT_ABANDONED:
-					case WAIT_TIMEOUT:
-					case WAIT_FAILED:
-					default:
+			ResumeThread(lpstThreadData->hThread);
+			DWORD	dwRet = WaitForSingleObject((HANDLE)lpstThreadData->hThread, TIMEOUT);
+			if (dwRet != WAIT_OBJECT_0) {
 #pragma warning(push)
 #pragma warning(disable : 6258)
-						if (!TerminateThread(lpstThreadData->hThread, 2)) {
-						}
+				TerminateThread(lpstThreadData->hThread, 2);
 #pragma warning(pop)
-						break;
-					}
-				}
 			}
 		}
 	}
@@ -195,38 +209,38 @@ VOID 	CThread::vUnregister()
 unsigned __stdcall	CThread::uThreadProc(void* pArguments)
 {
 	LPTHREAD_DATA lpstThreadData = reinterpret_cast<LPTHREAD_DATA>(pArguments);
+	if (!lpstThreadData) {
+		_endthreadex((unsigned)-3);
+		return (unsigned)-3;
+	}
+	
 	do {
-		if ((lpstThreadData != NULL) && (lpstThreadData->lpstSA != NULL) && (lpstThreadData->hEvent != NULL) && (lpstThreadData->hThread != NULL)) {
-			if (!lpstThreadData->bThreadSentinel)	break;
+		if ((lpstThreadData->lpstSA != NULL) && (lpstThreadData->hEvent != NULL) && (lpstThreadData->hThread != NULL)) {
+			if (!lpstThreadData->bThreadSentinel) break;
 			DWORD	dwRet = WaitForSingleObject(lpstThreadData->hEvent, INFINITE);
-			switch (dwRet) {
-			case WAIT_OBJECT_0:
-				break;
-			case WAIT_ABANDONED:
-			case WAIT_TIMEOUT:
-			case WAIT_FAILED:
-			default:
-				break;
+			(void)dwRet;
+			if (lpstThreadData->lpbCallbackRoutine) {
+				BOOL cbRet = lpstThreadData->lpbCallbackRoutine(lpstThreadData->lParamOption);
+				if (!cbRet) {
+					_endthreadex((unsigned)-1);
+					return (unsigned)-1;
+				}
 			}
-			if (!(lpstThreadData->lpbCallbackRoutine)((LPVOID)lpstThreadData->lParamOption)) {
-				_endthreadex((unsigned)-1);
-				return FALSE;
-			}
-			if (!lpstThreadData->bThreadSentinel)	break;
-			if (lpstThreadData->dwSleepTime != 0)	SleepEx(lpstThreadData->dwSleepTime, TRUE);
-			if (SuspendThread(lpstThreadData->hThread) == -1) {
+			if (!lpstThreadData->bThreadSentinel) break;
+			if (lpstThreadData->dwSleepTime != 0) SleepEx(lpstThreadData->dwSleepTime, TRUE);
+			if (SuspendThread(lpstThreadData->hThread) == (DWORD)-1) {
 				_endthreadex((unsigned)-2);
-				return FALSE;
+				return (unsigned)-2;
 			}
 		}
 		else {
 			_endthreadex((unsigned)-3);
-			return FALSE;
+			return (unsigned)-3;
 		}
 		SleepEx(0, TRUE);
-	} while (lpstThreadData && lpstThreadData->bThreadSentinel);
+	} while (lpstThreadData->bThreadSentinel);
 	_endthreadex(0);
-	return TRUE;
+	return 0;
 }
 
 /* = EOF = */

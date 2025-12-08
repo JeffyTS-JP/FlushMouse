@@ -24,6 +24,7 @@
 #include "..\FlushMouseDLL\ShellHookDll.h"
 #include "..\FlushMouseDLL\GlobalHookDll.h"
 #include "..\MiscLIB\CRegistry.h"
+#include "..\MiscLIB\CWindow.h"
 
 //
 // Define
@@ -109,7 +110,7 @@ BOOL		bSettingsEx(HWND hWnd, int iCode, int iSubCode)
 			Cursor->vSetParamFromRegistry();
 			return TRUE;
 		case SETTINGSEX_SETTINGS_CLOSE:
-			if (!FindWindow(CLASS_FLUSHMOUSESETTINGS, NULL)) {
+			if (!hGetCachedWindowByClassName(CLASS_FLUSHMOUSESETTINGS)) {
 				vSettingDialogClose();
 			}
 			return TRUE;
@@ -139,17 +140,20 @@ BOOL		bSettingsEx(HWND hWnd, int iCode, int iSubCode)
 BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
 {
 	if (!Profile || !TaskTray)	return FALSE;
-	Profile->lpstAppRegData->bSynTPStarted1 = FALSE;
-	if (SynTP == NULL)	SynTP = new CSynTP(Profile->lpstAppRegData->dwSynTPPadX, Profile->lpstAppRegData->dwSynTPPadY, Profile->lpstAppRegData->dwSynTPEdgeX, Profile->lpstAppRegData->dwSynTPEdgeY);
+	const LPAPPREGDATA lpAppRegData = (Profile->lpstAppRegData ? Profile->lpstAppRegData : NULL);
+	if (!lpAppRegData)	return FALSE;
+
+	lpAppRegData->bSynTPStarted1 = FALSE;
+	if (SynTP == NULL)	SynTP = new CSynTP(lpAppRegData->dwSynTPPadX, lpAppRegData->dwSynTPPadY, lpAppRegData->dwSynTPEdgeX, lpAppRegData->dwSynTPEdgeY);
 	if (SynTP) {
 		TCHAR	szInfo[MAX_LOADSTRING];
 		switch (dwSynTPHelper) {
 		case SYNTPH_SENDERIPV4:
 		case SYNTPH_SENDERIPV4_START:
-			if (bIsPrivateAddress(Profile->lpstAppRegData->szSynTPSendIPAddr1)) {
+			if (bIsPrivateAddress(lpAppRegData->szSynTPSendIPAddr1)) {
 				SynTP->bStopSender();
-				if (SynTP->bStartSender(g_hMainWnd, Profile->lpstAppRegData->szSynTPSendIPAddr1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
-					Profile->lpstAppRegData->bSynTPStarted1 = TRUE;
+				if (SynTP->bStartSender(g_hMainWnd, lpAppRegData->szSynTPSendIPAddr1, lpAppRegData->dwSynTPPortNo1)) {
+					lpAppRegData->bSynTPStarted1 = TRUE;
 					break;
 				}
 				else {
@@ -172,10 +176,10 @@ BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
 		case SYNTPH_SENDERHOSNAMEIPV4_START:
 		case SYNTPH_SENDERHOSNAMEIPV6:
 		case SYNTPH_SENDERHOSNAMEIPV6_START:
-			if (bCheckExistHostnameIPv4(Profile->lpstAppRegData->szSynTPSendHostname1, Profile->lpstAppRegData->dwSynTPTimeOut)) {
+			if (bCheckExistHostnameIPv4(lpAppRegData->szSynTPSendHostname1, lpAppRegData->dwSynTPTimeOut)) {
 				SynTP->bStopSender();
-				if (SynTP->bStartSender(g_hMainWnd, Profile->lpstAppRegData->szSynTPSendHostname1, Profile->lpstAppRegData->dwSynTPPortNo1)) {
-					Profile->lpstAppRegData->bSynTPStarted1 = TRUE;
+				if (SynTP->bStartSender(g_hMainWnd, lpAppRegData->szSynTPSendHostname1, lpAppRegData->dwSynTPPortNo1)) {
+					lpAppRegData->bSynTPStarted1 = TRUE;
 					break;
 				}
 				else {
@@ -199,8 +203,8 @@ BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
 		case SYNTPH_RECEIVERIPV6:
 		case SYNTPH_RECEIVERIPV6_START:
 			SynTP->vStopReceiver();
-			if (SynTP->bStartReceiver(g_hMainWnd, Profile->lpstAppRegData->dwSynTPPortNo1)) {
-				Profile->lpstAppRegData->bSynTPStarted1 = TRUE;
+			if (SynTP->bStartReceiver(g_hMainWnd, lpAppRegData ? lpAppRegData->dwSynTPPortNo1 : 50008)) {
+				if (lpAppRegData) lpAppRegData->bSynTPStarted1 = TRUE;
 				break;
 			}
 			else {
@@ -215,23 +219,15 @@ BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
 		}
 	}
 	Profile->bSetProfileData();
-	if (Profile->lpstAppRegData->bSynTPStarted1) {
-		LPTSTR	lpszToolHints = new TCHAR[MAX_LOADSTRING];
-		if (lpszToolHints) {
-			ZeroMemory(lpszToolHints, MAX_LOADSTRING);
-			_tcsncpy_s(lpszToolHints, MAX_LOADSTRING, g_szWindowTitle, _TRUNCATE);
-			LPTSTR	lpszBuff = new TCHAR[MAX_LOADSTRING];
-			if (lpszBuff) {
-				ZeroMemory(lpszBuff, MAX_LOADSTRING);
-				LoadString(Resource->hLoad(), IDS_SYNTPRUNNING, lpszBuff, MAX_LOADSTRING);
-				_tcsncat_s(lpszToolHints, MAX_LOADSTRING, lpszBuff, _TRUNCATE);
-				TaskTray->bModifyToolHints(hWnd,lpszToolHints);
-				delete []	lpszBuff;
-			}
-			delete []	lpszToolHints;
-		}
+	if (lpAppRegData->bSynTPStarted1) {
+		TCHAR	lpszToolHints[MAX_LOADSTRING];
+		_tcsncpy_s(lpszToolHints, MAX_LOADSTRING, g_szWindowTitle, _TRUNCATE);
+		TCHAR	lpszBuff[MAX_LOADSTRING];
+		LoadString(Resource->hLoad(), IDS_SYNTPRUNNING, lpszBuff, MAX_LOADSTRING);
+		_tcsncat_s(lpszToolHints, MAX_LOADSTRING, lpszBuff, _TRUNCATE);
+		TaskTray->bModifyToolHints(hWnd, lpszToolHints);
 	}
-	return Profile->lpstAppRegData->bSynTPStarted1;
+	return (lpAppRegData->bSynTPStarted1);
 }
 
 //
@@ -245,9 +241,10 @@ BOOL		bStopSynTPHelper(HWND hWnd)
 		delete SynTP;
 		SynTP = NULL;
 		if (Profile) {
-			Profile->lpstAppRegData->bSynTPStarted1 = FALSE;
+			const LPAPPREGDATA lpAppRegData = (Profile->lpstAppRegData ? Profile->lpstAppRegData : NULL);
+			if (lpAppRegData) lpAppRegData->bSynTPStarted1 = FALSE;
 			Profile->bSetProfileData();
-			if (!Profile->lpstAppRegData->bSynTPStarted1)	TaskTray->bModifyToolHints(hWnd, g_szWindowTitle);
+			if (lpAppRegData && !lpAppRegData->bSynTPStarted1)	TaskTray->bModifyToolHints(hWnd, g_szWindowTitle);
 			return TRUE;
 		}
 		return TRUE;
@@ -261,7 +258,8 @@ BOOL		bStopSynTPHelper(HWND hWnd)
 BOOL		bCheckDrawIMEModeArea(HWND hWndObserved)
 {
 	if (g_hMainWnd == hWndObserved)	return FALSE;
-	if (FindWindow(L"Shell_TrayWnd", NULL) == hWndObserved)	return FALSE;
+	HWND hShellTray = hGetCachedWindowByClassName(L"Shell_TrayWnd");
+	if (hShellTray == hWndObserved)	return FALSE;
 	POINT	pt{};
 	if (GetCursorPos(&pt)) {
 		if (WindowFromPoint(pt) != NULL) {
@@ -497,9 +495,6 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 			if ((RawKeyboard.Message == WM_KEYDOWN)) {
 				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_FINISH, bKeyDown, 1, 0);
 			}
-			else {
-				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_COPY, bKeyDown, 1, 0);
-			}
 			return;
 		case VK_OEM_COPY:		// OEM ひらがな (0xf2)
 			bOnlyCtrlLL = FALSE;
@@ -566,7 +561,7 @@ CPowerNotification::~CPowerNotification()
 //
 // PowerBroadcast()
 //
-BOOL		CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting)
+BOOL	CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTING* lpSetting)
 {
 	UNREFERENCED_PARAMETER(hWnd);
 
@@ -779,12 +774,10 @@ BOOL	 	CFlushMouseHook::bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name)
 	dwSize = ExpandEnvironmentStrings(lpszExec32Name, NULL, 0);
 	LPTSTR	lpszBuffer = new TCHAR[dwSize];
 	if (lpszBuffer) {
-		ZeroMemory(lpszBuffer, dwSize);
 		dwSize = ExpandEnvironmentStrings(lpszExec32Name, lpszBuffer, dwSize);
 		LPTSTR	lpszCommandLine = NULL;
 		lpszCommandLine = new TCHAR[dwSize + COMAMANDLINESIZE];
 		if (lpszCommandLine) {
-			ZeroMemory(lpszCommandLine, (size_t)(dwSize + COMAMANDLINESIZE));
 			_sntprintf_s(lpszCommandLine, (dwSize + COMAMANDLINESIZE), _TRUNCATE, _T("%s %llu"), lpszBuffer, (unsigned long long)hWnd);
 			if (lpstProcessInformation) {
 				STARTUPINFO	stStartupInfo{};	stStartupInfo.cb = sizeof(STARTUPINFO);
@@ -792,7 +785,7 @@ BOOL	 	CFlushMouseHook::bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name)
 					NORMAL_PRIORITY_CLASS, NULL, NULL, &stStartupInfo, lpstProcessInformation)) != FALSE) {
 					for (int i = 5; i > 0; i--) {
 						Sleep(500);
-						if (FindWindow(CLASS_FLUSHMOUSE32, NULL) != NULL) {
+						if (hGetCachedWindowByClassName(CLASS_FLUSHMOUSE32) != NULL) {
 							bHook32Dll = TRUE;
 							bRet = TRUE;
 							break;
@@ -941,7 +934,7 @@ BOOL		bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, BOOL bIMEModeForc
 								}
 							}
 							else {
-								HWND	hWnd = FindWindow(_T("Hidemaru32Class"), NULL);
+								HWND	hWnd = hGetCachedWindowByClassName(_T("Hidemaru32Class"));
 								if ((hWnd != NULL) && (hForeWnd == hWnd)) {
 									hkl = US_ENG;
 									bRet = FALSE;
@@ -985,7 +978,6 @@ static BOOL	bChangeHKLbySendInput(HKL hNewHKL, HKL hPreviousHKL, BOOL bForce)
 	if ((iKBList = GetKeyboardLayoutList(0, NULL)) != 0) {
 		LPHKL	lpHKL = NULL;
 		if ((lpHKL = new HKL[sizeof(HKL) * iKBList]) != NULL) {
-			ZeroMemory(lpHKL, (sizeof(HKL) * iKBList));
 			if (GetKeyboardLayoutList(iKBList, lpHKL) != 0) {
 				int	iPreviousKB = 0, iNewKB = 0;
 				for (int i = 0; i < iKBList; i++) {
@@ -1009,13 +1001,13 @@ static BOOL	bChangeHKLbySendInput(HKL hNewHKL, HKL hPreviousHKL, BOOL bForce)
 						if (bSendInputSub((UINT)(iKB * 2 + 2), lpInputs)) {
 							bRet = TRUE;
 						}
-						if (lpInputs)	delete[]	lpInputs;
+						delete[]	lpInputs;
 					}
 				}
 				else bRet = TRUE;
 
 			}
-			if (lpHKL)	delete[]	lpHKL;
+			delete[]	lpHKL;
 		}
 	}
 	return bRet;
@@ -1045,7 +1037,6 @@ BOOL		bCheckExistingJPIME()
 	int		iKBList = 0;
 	if ((iKBList = GetKeyboardLayoutList(0, NULL)) != 0) {
 		if ((lpHKL = new HKL[sizeof(HKL) * iKBList]) != NULL) {
-			ZeroMemory(lpHKL, (sizeof(HKL) * iKBList));
 			if ((iKBList = GetKeyboardLayoutList(iKBList, lpHKL)) != 0) {
 				for (int i = 0; i < iKBList; i++) {
 					if (lpHKL[i] == JP_IME) {
@@ -1054,7 +1045,7 @@ BOOL		bCheckExistingJPIME()
 					}
 				}
 			}
-			if (lpHKL)	delete[]	lpHKL;
+			delete[]	lpHKL;
 		}
 	}
 	return bRet;
@@ -1113,9 +1104,12 @@ BOOL	bChromium_Helper(HWND hForeWnd)
 HWND	 	hGetObservedWnd()
 {
 	if (!Profile)	return FALSE;
+	const LPAPPREGDATA lpAppRegData = (Profile->lpstAppRegData ? Profile->lpstAppRegData : NULL);
+	if (!lpAppRegData)	return NULL;
+
 	HWND	hWndObserved = NULL;
 	POINT	pt{};
-	if (Profile->lpstAppRegData->bDisplayFocusWindowIME) {
+	if (lpAppRegData->bDisplayFocusWindowIME) {
 		if ((hWndObserved = GetForegroundWindow()) == NULL)	return NULL;
 	}
 	else {
@@ -1137,7 +1131,6 @@ BOOL	 	bCreateProcess(LPCTSTR lpszExecName, LPTSTR lpCommandLine)
 	dwSize = ExpandEnvironmentStrings(lpszExecName, NULL, 0);
 	LPTSTR	lpszBuffer = new TCHAR[dwSize];
 	if (lpszBuffer) {
-		ZeroMemory(lpszBuffer, dwSize);
 		dwSize = ExpandEnvironmentStrings(lpszExecName, lpszBuffer, dwSize);
 		if (dwSize < MAX_PATH) {
 			size_t	size = 0x7fff;
@@ -1146,7 +1139,6 @@ BOOL	 	bCreateProcess(LPCTSTR lpszExecName, LPTSTR lpCommandLine)
 				size = (size_t)dwSize + size + 2;
 				LPTSTR	_lpCommandLine = new TCHAR[size];
 				if (_lpCommandLine) {
-					ZeroMemory(_lpCommandLine, size);
 					_sntprintf_s(_lpCommandLine, size, _TRUNCATE, _T("%s %s"), lpszBuffer, lpCommandLine);
 					PROCESS_INFORMATION	ProcessInformation{};
 					STARTUPINFO	StartupInfo{};		StartupInfo.cb = sizeof(STARTUPINFO);
