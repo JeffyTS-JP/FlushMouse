@@ -121,8 +121,8 @@
       <UACUIAccess>false</UACUIAccess>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>Xcopy /Y "$(ProjectDir)$(TargetFileName).manifest" "$(OutDir)"
+</Command>
     </PostBuildEvent>
     <Manifest>
       <InputResourceManifests>
@@ -155,6 +155,7 @@
     </Link>
     <PostBuildEvent>
       <Command>Start /min /wait cmd /c "$(SolutionDir)\Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
+Xcopy /Y "$(ProjectDir)$(TargetFileName).manifest" "$(OutDir)"
 </Command>
     </PostBuildEvent>
     <Manifest>
@@ -240,6 +241,9 @@
   <ItemGroup>
     <Image Include="..\FlushMouseLIB\FlushMouse.ico" />
     <Image Include="..\FlushMouseLIB\small.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="FlushMouse32.exe.manifest" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -40,7 +40,7 @@
 // Define
 //
 // Timer
-constexpr UINT PROCINITTIMERVALUE = 2000;
+constexpr UINT PROCINITTIMERVALUE = 3000;
 constexpr UINT_PTR CHECKPROCTIMERID = 2;
 static UINT     nCheckProcTimerTickValue = PROCINITTIMERVALUE;
 static UINT_PTR nCheckProcTimerID = CHECKPROCTIMERID;
@@ -85,7 +85,6 @@ static VOID CALLBACK	vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 static BOOL				bReportEvent(DWORD dwEventID, WORD wCategory);
 static BOOL				bDestroyTaskTrayWindow(HWND hWnd);
 static void				vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine);
-static DWORD WINAPI		CheckProcWorker(LPVOID lpParameter);
 
 //
 // wWinMain()
@@ -345,29 +344,16 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 	UNREFERENCED_PARAMETER(dwTime);
 
 	if (uTimerID == nCheckProcTimerID) {
-		if (!QueueUserWorkItem(CheckProcWorker, (LPVOID)hWnd, WT_EXECUTEDEFAULT)) {
-			bReportEvent(MSG_WORKER_QUEUE_FAIL, APPLICATION32_CATEGORY);
+		HWND	_hWnd64 = hGetCachedWindowByClassName(CLASS_FLUSHMOUSE);
+		if (!_hWnd64 || (_hWnd64 != hParentWnd)) {
+			if (hParentWnd)	bDestroyTaskTrayWindow(hParentWnd);
+			SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
+			bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION32_CATEGORY);
+			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION32_CATEGORY);
+			if (hWnd) PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		}
 	}
 	return;
-}
-
-//
-// CheckProcWorker()
-//
-static DWORD WINAPI CheckProcWorker(LPVOID lpParameter)
-{
-	HWND	_hWnd = reinterpret_cast<HWND>(lpParameter);
-	HWND	_hWnd64 = hGetCachedWindowByClassName(CLASS_FLUSHMOUSE);
-	if (!_hWnd64 || (_hWnd64 != hParentWnd)) {
-		bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION32_CATEGORY);
-		if (hParentWnd)	bDestroyTaskTrayWindow(hParentWnd);
-		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION32_CATEGORY);
-		if (IsWindow(_hWnd)) {
-			PostMessage(_hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-		}
-	}
-	return 0;
 }
 
 //
@@ -384,8 +370,7 @@ BOOL		bDestroyTaskTrayWindow(HWND hWnd)
 	nIco.guidItem = GUID_NULL;
 	nIco.uFlags = 0;
 
-	BOOL bRet = Shell_NotifyIcon(NIM_DELETE, &nIco) != FALSE;
-	return bRet ? TRUE : FALSE;
+	return Shell_NotifyIcon(NIM_DELETE, &nIco) != FALSE;
 }
 
 //

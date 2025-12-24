@@ -56,7 +56,7 @@ static UINT     nCheckFocusTimerTickValue = FOCUSINITTIMERVALUE;
 static UINT_PTR nCheckFocusTimerID = CHECKFOCUSTIMERID;
 static UINT_PTR	uCheckFocusTimer = NULL;
 
-constexpr UINT PROCINITTIMERVALUE = 1000;
+constexpr UINT PROCINITTIMERVALUE = 3000;
 constexpr UINT_PTR CHECKPROCTIMERID = 2;
 static UINT     nCheckProcTimerTickValue = PROCINITTIMERVALUE;
 static UINT_PTR nCheckProcTimerID = CHECKPROCTIMERID;
@@ -73,7 +73,6 @@ static CRITICAL_SECTION		FlushMouseProcGlobalsCS {};
 //
 // Global Prototype Define
 //
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow);
 
 //
 // Local Prototype Define
@@ -162,7 +161,6 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_o
 			}
 		}
 	}
-
 	if (Resource)	delete	Resource;
 	Resource = NULL;
 	return TRUE;
@@ -173,31 +171,72 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_o
 //
 int			iCheckCmdLine(LPCTSTR lpCmdLine)
 {
-	HWND	hWnd = NULL;
-	DWORD	dwProcessId = GetCurrentProcessId();
-	if ((hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL)) != NULL) {
-		SetFocus(GetLastActivePopup(hWnd));
-		if (dwProcessId != GetWindowThreadProcessId(hWnd, NULL))	PostMessage(hWnd, WM_DESTROY, NULL, NULL);
-		for (int i = 10; i > 0; i--) {
-			Sleep(500);
-			if ((hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL)) != NULL) {
-				SetFocus(GetLastActivePopup(hWnd));
-				if (dwProcessId != GetWindowThreadProcessId(hWnd, NULL))	PostMessage(hWnd, WM_DESTROY, NULL, NULL);
-				else break;
-				if (i == 1) {
-					bReportEvent(MSG_FLUSHMOUSE_ALREADY_RUN, APPLICATION_CATEGORY);
-					return (-1);
-				}
-			}
-			else break;
-		}
-	}
 	if ((*lpCmdLine != _T('\0')) && (_tcscmp(lpCmdLine, L"/Start") == 0)) {
 		bReportEvent(MSG_START_FLUSHMOUSE_EVENT, Shortcut_CATEGORY);
 		return (0);
 	}
 	if ((*lpCmdLine != _T('\0')) && (_tcscmp(lpCmdLine, L"/Quit") == 0)) {
+		HWND	hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
+		DWORD	dwCurrentProcessId = GetCurrentProcessId();
+		if (hWnd != NULL) {
+			DWORD	dwExistingProcessId = 0;
+			GetWindowThreadProcessId(hWnd, &dwExistingProcessId);
+			if (dwExistingProcessId != dwCurrentProcessId) {
+				HANDLE	hProcess = OpenProcess(PROCESS_TERMINATE | SYNCHRONIZE, FALSE, dwExistingProcessId);
+				if (hProcess != NULL) {
+					PostMessage(hWnd, WM_DESTROY, NULL, NULL);
+					DWORD	dwWaitResult = WaitForSingleObject(hProcess, 3000);
+					if (dwWaitResult == WAIT_TIMEOUT) {
+						TerminateProcess(hProcess, 1);
+						WaitForSingleObject(hProcess, 1000);
+					}
+					CloseHandle(hProcess);
+					for (int i = 0; i < 10; i++) {
+						if (FindWindow(CLASS_FLUSHMOUSE, NULL) == NULL) {
+							return (0);
+						}
+						Sleep(100);
+					}
+				}
+				else {
+					return (-1);
+				}
+			}
+		}
 		return (0);
+	}
+	HANDLE	hMutex = CreateMutex(NULL, TRUE, CLASS_FLUSHMOUSE);
+	if (hMutex == NULL) {
+		bReportEvent(MSG_FLUSHMOUSE_ALREADY_RUN, APPLICATION_CATEGORY);
+		return (-1);
+	}
+	if (GetLastError() == ERROR_ALREADY_EXISTS) {
+		HWND	hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
+		if (hWnd != NULL) {
+			DWORD dwExistingProcessId = 0;
+			DWORD dwCurrentProcessId = GetCurrentProcessId();
+			GetWindowThreadProcessId(hWnd, &dwExistingProcessId);
+			if (dwExistingProcessId != dwCurrentProcessId) {
+				SetFocus(GetLastActivePopup(hWnd));
+				PostMessage(hWnd, WM_DESTROY, NULL, NULL);
+				for (int i = 0; i < 10; i++) {
+					if (FindWindow(CLASS_FLUSHMOUSE, NULL) == NULL) {
+						return (1);
+					}
+					Sleep(500);
+				}
+				bReportEvent(MSG_FLUSHMOUSE_ALREADY_RUN, APPLICATION_CATEGORY);
+				return (-1);
+			}
+		}
+		else {
+			CloseHandle(hMutex);
+			hMutex = CreateMutex(NULL, TRUE, CLASS_FLUSHMOUSE);
+			if (hMutex == NULL || GetLastError() == ERROR_ALREADY_EXISTS) {
+				bReportEvent(MSG_FLUSHMOUSE_ALREADY_RUN, APPLICATION_CATEGORY);
+				return (0);
+			}
+		}
 	}
 	return (1);
 }
@@ -463,6 +502,7 @@ void		vDestroyWindow(HWND hWnd)
 
 	if (bFlushMouseCSInitialized) EnterCriticalSection(&FlushMouseProcGlobalsCS);
 
+	vStopThreadHookTimer(hWnd);
 	if (SynTP) {
 		delete SynTP;
 		SynTP = NULL;
@@ -471,12 +511,6 @@ void		vDestroyWindow(HWND hWnd)
 		delete RawInput;
 		RawInput = NULL;
 	}
-	if (uCheckProcTimer != NULL) {
-		if (KillTimer(hWnd, nCheckProcTimerID)) {
-			uCheckProcTimer = NULL;
-		}
-	}
-	vStopThreadHookTimer(hWnd);
 	if (FlushMouseHook != NULL) {
 		delete	FlushMouseHook;
 		FlushMouseHook = NULL;
@@ -1221,10 +1255,14 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 
 	if (!Profile)	return FALSE;
 	const LPAPPREGDATA lpAppRegData = (Profile->lpstAppRegData ? Profile->lpstAppRegData : NULL);
+	if (!lpAppRegData)	return FALSE;
+
+	if (bFlushMouseCSInitialized) EnterCriticalSection(&FlushMouseProcGlobalsCS);
 	if (Cursor == NULL) {
 		Cursor = new CCursor;
 		if (!Cursor || !Cursor->bInitialize(hWnd)) {
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			if (bFlushMouseCSInitialized) LeaveCriticalSection(&FlushMouseProcGlobalsCS);
 			return FALSE;
 		}
 	}
@@ -1239,10 +1277,10 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 					bReportEvent(MSG_THREAD_HOOK_TIMER_START_FAILED, APPLICATION_CATEGORY);
 					vMessageBox(hWnd, IDS_NOTREGISTERHOOK, MessageBoxTYPE, __func__, __LINE__);
 					PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+					if (bFlushMouseCSInitialized) LeaveCriticalSection(&FlushMouseProcGlobalsCS);
 					return FALSE;
 				}
 			}
-			else return FALSE;
 		}
 	}
 	if (EventHook == NULL) {
@@ -1251,11 +1289,11 @@ BOOL		bStartThreadHookTimer(HWND hWnd)
 			if (EventHook) { delete EventHook; EventHook = NULL; }
 			vMessageBox(hWnd, IDS_NOTRREGISTEVH, MessageBoxTYPE, __func__, __LINE__);
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			if (bFlushMouseCSInitialized) LeaveCriticalSection(&FlushMouseProcGlobalsCS);
 			return FALSE;
 		}
 	}
 	BOOL	bBool = FALSE;
-	if (bFlushMouseCSInitialized) EnterCriticalSection(&FlushMouseProcGlobalsCS);
 	if (SetUserObjectInformation(GetCurrentProcess(), UOI_TIMERPROC_EXCEPTION_SUPPRESSION, &bBool, sizeof(BOOL)) != FALSE) {
 		if (uCheckFocusTimer == NULL) {
 			const UINT nTick = (lpAppRegData ? lpAppRegData->nCheckFocusTimerTickValue : nCheckFocusTimerTickValue);
@@ -1293,17 +1331,27 @@ VOID	vStopThreadHookTimer(HWND hWnd)
 {
 	UNREFERENCED_PARAMETER(hWnd);
 
-	if (Cursor)	Cursor->vStopIMECursorChangeThread();
-
 	if (bFlushMouseCSInitialized) EnterCriticalSection(&FlushMouseProcGlobalsCS);
 
-	if (EventHook != NULL) {
-		delete EventHook;
-		EventHook = NULL;
+	if (uCheckProcTimer != NULL) {
+		if (KillTimer(hWnd, nCheckProcTimerID)) {
+			uCheckProcTimer = NULL;
+		}
+	}
+	if (uCheckFocusTimer != NULL) {
+		if (KillTimer(hWnd, uCheckFocusTimer)) {
+			uCheckFocusTimer = NULL;
+		}
 	}
 	if (FlushMouseHook != NULL) {
 		delete FlushMouseHook;
 		FlushMouseHook = NULL;
+	}
+	Sleep(1000);
+	if (Cursor)	Cursor->vStopIMECursorChangeThread();
+	if (EventHook != NULL) {
+		delete EventHook;
+		EventHook = NULL;
 	}
 	if (Cursor != NULL) {
 		delete Cursor;
@@ -1343,9 +1391,23 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 	UNREFERENCED_PARAMETER(dwTime);
 
 	if (uTimerID == nCheckProcTimerID) {
-		if (!QueueUserWorkItem(CheckProcWorker, (LPVOID)hWnd, WT_EXECUTEDEFAULT)) {
+		HWND	_hWnd32 = hGetCachedWindowByClassName(CLASS_FLUSHMOUSE32);
+		if (_hWnd32 == NULL) {
 			bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION_CATEGORY);
+			vStopThreadHookTimer(hWnd);
+			if (FlushMouseHook == NULL) {
+				Sleep(1000);
+				if (!bStartThreadHookTimer(hWnd)) {
+					bReportEvent(MSG_THREAD_HOOK_TIMER_RESTART_FAILED, APPLICATION_CATEGORY);
+					bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+					if (IsWindow(hWnd)) PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+					return;
+				}
+				bReportEvent(MSG_THREAD_HOOK_TIMER_RESTARTED, APPLICATION_CATEGORY);
+			}
+			return;
 		}
+		(void)QueueUserWorkItem(CheckProcWorker, (LPVOID)hWnd, WT_EXECUTEDEFAULT);
 	}
 	return;
 }
@@ -1357,47 +1419,18 @@ static DWORD WINAPI CheckProcWorker(LPVOID lpParameter)
 {
 	HWND	_hWnd = reinterpret_cast<HWND>(lpParameter);
 	
-	HWND	_hWnd32 = hGetCachedWindowByClassName(CLASS_FLUSHMOUSE32);
+	if (bFlushMouseCSInitialized) EnterCriticalSection(&FlushMouseProcGlobalsCS);
 	HWND	_hWndFlushMouse = hGetCachedWindowByClassName(CLASS_FLUSHMOUSE);
 	HWND	_hWndCursor = hGetCachedWindowByClassName(CLASS_CURSORWINDOW);
 	HWND	_hWndCaret = hGetCachedWindowByClassName(CLASS_CARETWINDOW);
 	HWND	_hWndMouse = hGetCachedWindowByClassName(CLASS_MOUSEWINDOW);
-	
-	if (_hWnd32 == NULL) {
-		bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION_CATEGORY);
-		SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
-		if (bFlushMouseCSInitialized) EnterCriticalSection(&FlushMouseProcGlobalsCS);
-		if (FlushMouseHook != NULL) {
-			delete	FlushMouseHook;
-			FlushMouseHook = NULL;
-		}
-		if (bFlushMouseCSInitialized) LeaveCriticalSection(&FlushMouseProcGlobalsCS);
-		Sleep(100);
-		if (bFlushMouseCSInitialized) EnterCriticalSection(&FlushMouseProcGlobalsCS);
-		if (FlushMouseHook == NULL) {
-			FlushMouseHook = new CFlushMouseHook;
-			if (!FlushMouseHook || !FlushMouseHook->bHookSet(_hWnd, FLUSHMOUSE_DLL, FLUSHMOUSE32_EXE)) {
-				if (GetLastError() == ERROR_MOD_NOT_FOUND) {
-					Sleep(3000);
-					if (!FlushMouseHook || !FlushMouseHook->bHookSet(_hWnd, FLUSHMOUSE_DLL, FLUSHMOUSE32_EXE)) {
-						if (FlushMouseHook) { delete FlushMouseHook; FlushMouseHook = NULL; }
-						if (bFlushMouseCSInitialized) LeaveCriticalSection(&FlushMouseProcGlobalsCS);
-						bReportEvent(MSG_THREAD_HOOK_TIMER_RESTART_FAILED, APPLICATION_CATEGORY);
-						bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
-						if (IsWindow(_hWnd)) PostMessage(_hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-						return 0;
-					}
-				}
-			}
-		}
-		if (bFlushMouseCSInitialized) LeaveCriticalSection(&FlushMouseProcGlobalsCS);
-	}
-	
+
 	if (!bNotInTaskBarCached(_hWndFlushMouse) || !bNotInTaskBarCached(_hWndCursor) 
 		|| !bNotInTaskBarCached(_hWndCaret) || !bNotInTaskBarCached(_hWndMouse)) {
 		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
 		if (IsWindow(_hWnd)) PostMessage(_hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 	}
+	if (bFlushMouseCSInitialized) LeaveCriticalSection(&FlushMouseProcGlobalsCS);
 	return 0;
 }
 

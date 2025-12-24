@@ -163,8 +163,8 @@
       </Message>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>Xcopy /Y "$(ProjectDir)$(TargetFileName).manifest" "$(OutDir)"
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -206,6 +206,7 @@
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>Start /min /wait cmd /c "$(SolutionDir)Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
+Xcopy /Y "$(ProjectDir)$(TargetFileName).manifest" "$(OutDir)"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -255,6 +256,9 @@
     <ProjectReference Include="..\MiscLIB\MiscLIB.vcxproj">
       <Project>{ccaf431f-ce8e-4879-9b1f-3f1df4ac2269}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="FlushMouseDLL.dll.manifest" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

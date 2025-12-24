@@ -471,14 +471,26 @@
 			<Component Id="$(var.MainExeFileName)" Guid="{25BEEEA7-583D-4C15-9566-FFA42716A1C9}">
 				<File Id="$(var.MainExeFileName)" Name="$(var.MainExeFileName)" Source="$(var.TargetDir01)$(var.MainExeFileName)" />
 			</Component>
+			<Component Id="$(var.MainExeFileName).manifest" Guid="{69C987AB-E9C6-4BA0-8AA8-80FE0DB0FF2D}">
+				<File Id="$(var.MainExeFileName).manifest" Name="$(var.MainExeFileName).manifest" Source="$(var.TargetDir01)$(var.MainExeFileName).manifest" />
+			</Component>
 			<Component Id="$(var.ProductName)DLL.dll" Guid="{3C81EF6B-D231-4739-8361-496FE5BE93D3}">
 				<File Id="$(var.ProductName)DLL.dll" Name="$(var.ProductName)DLL.dll" Source="$(var.TargetDir01)$(var.ProductName)DLL.dll" />
+			</Component>
+			<Component Id="$(var.ProductName)DLL.dll.manifest" Guid="{FAF9CCA1-F88D-4D85-9D93-53B6A6DED7BE}">
+				<File Id="$(var.ProductName)DLL.dll.manifest" Name="$(var.ProductName)DLL.dll.manifest" Source="$(var.TargetDir01)$(var.ProductName)DLL.dll.manifest" />
 			</Component>
 			<Component Id="$(var.ProductName)32.exe" Guid="{CB3543F9-1CA7-4773-9105-CB1BD98F49FD}">
 				<File Id="$(var.ProductName)32.exe" Name="$(var.ProductName)32.exe" Source="$(var.TargetDir02)$(var.ProductName)32.exe" />
 			</Component>
+			<Component Id="$(var.ProductName)32.exe.manifest" Guid="{67A9E0BA-158B-4C62-BBCB-F1EECCFDE177}">
+				<File Id="$(var.ProductName)32.exe.manifest" Name="$(var.ProductName)32.exe.manifest" Source="$(var.TargetDir02)$(var.ProductName)32.exe.manifest" />
+			</Component>
 			<Component Id="$(var.ProductName)DLL32.dll" Guid="{CCBA3647-0988-463A-89E4-0BFD5EA13DA0}">
 				<File Id="$(var.ProductName)DLL32.dll" Name="$(var.ProductName)DLL32.dll" Source="$(var.TargetDir02)$(var.ProductName)DLL32.dll" />
+			</Component>
+			<Component Id="$(var.ProductName)DLL32.dll.manifest" Guid="{9BC29B56-A57B-4955-A5C5-AF238483D897}">
+				<File Id="$(var.ProductName)DLL32.dll.manifest" Name="$(var.ProductName)DLL32.dll.manifest" Source="$(var.TargetDir02)$(var.ProductName)DLL32.dll.manifest" />
 			</Component>
 			<Component Id="Register_TaskScheduler.xml" Guid="{3FA0C6AB-6E9C-4B55-BE44-A02A3B6A0C3E}">
 				<File Id="Register_TaskScheduler.xml" Name="Register_TaskScheduler.xml" Source="$(var.TargetDir04)Register_TaskScheduler.xml" />
@@ -537,6 +549,9 @@
 			<!-- DLL -->
 			<Component Id="WinUI3_DLL_01" Guid="{9F85333C-F9D6-4166-8DF3-F1E001DFB240}">
 				<File Id="WinUI3__DLL_01" Name="FlushMouseUI3DLL.dll" Source="$(var.TargetDir05)FlushMouseUI3DLL.dll" />
+			</Component>
+			<Component Id="WinUI3_DLL_02" Guid="{96979E26-36C0-4E13-8BC0-C3C7C8971F5B}">
+				<File Id="WinUI3__DLL_02" Name="FlushMouseUI3DLL.dll.appxmanifest" Source="$(var.TargetDir05)FlushMouseUI3DLL.dll.appxmanifest" />
 			</Component>
 			<!-- Icon -->
 			<Component Id="WinUI3_Icon_01" Guid="{592E3E6A-D526-4FBB-AB23-2E259DB76A05}">

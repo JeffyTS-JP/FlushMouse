@@ -50,4 +50,7 @@
       <Filter>リソース ファイル</Filter>
     </ResourceCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="FlushMouseDLL32.dll.manifest" />
+  </ItemGroup>
 </Project>

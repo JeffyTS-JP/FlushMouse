@@ -53,10 +53,6 @@ typedef struct tagBALLOON_PARAM {
 static DWORD WINAPI	BalloonThreadProc(LPVOID lpParam);
 
 //
-// iCheckTaskTrayMessage()
-//
-
-//
 // Class CTaskTray
 //
 CTaskTray::CTaskTray()
@@ -93,8 +89,7 @@ BOOL		CTaskTray::bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle
 	nIco.hIcon = hIcon;
 	_tcsncpy_s(nIco.szTip, ARRAYSIZE(nIco.szTip), lpszTitle, _TRUNCATE);
 
-	BOOL bRet = Shell_NotifyIcon(NIM_ADD, &nIco);
-	if (bRet) return TRUE;
+	if (Shell_NotifyIcon(NIM_ADD, &nIco))	return TRUE;
 
 	DWORD err = GetLastError();
 	if (err == ERROR_TIMEOUT) {
@@ -116,10 +111,7 @@ BOOL		CTaskTray::bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle
 BOOL		CTaskTray::bReCreateTaskTrayWindow(HWND hWnd) const
 {
 	if (!Resource || !Cursor)	return FALSE;
-	if (!bDestroyTaskTrayWindow(hWnd)) {
-		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
-	}
+	(void)bDestroyTaskTrayWindow(hWnd);
 	HICON	hIcon = NULL;
 	if ((hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE))) != NULL) {
 		BOOL	bRet = FALSE;
@@ -130,13 +122,13 @@ BOOL		CTaskTray::bReCreateTaskTrayWindow(HWND hWnd) const
 		if (bRet) {
 			if (!Cursor->bReloadCursor()) {
 				bReportEvent(MSG_THREAD_HOOK_TIMER_RESTART_FAILED, APPLICATION_CATEGORY);
+				return FALSE;
 			}
 		}
 		else {
 			bDestroyTaskTrayWindow(hWnd);
 			bReportEvent(MSG_TASKTRAY_REGISTER_FAILD, APPLICATION_CATEGORY);
-			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
-			PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
+			return FALSE;
 		}
 	}
 	else {
@@ -156,8 +148,7 @@ BOOL		CTaskTray::bDestroyTaskTrayWindow(HWND hWnd) const
 	nIco.uID = uTaskTrayID;
 	nIco.guidItem = GUID_NULL;
 
-	BOOL bRet = Shell_NotifyIcon(NIM_DELETE, &nIco);
-	return bRet ? TRUE : FALSE;
+	return Shell_NotifyIcon(NIM_DELETE, &nIco);
 }
 
 //
@@ -176,7 +167,6 @@ BOOL		CTaskTray::bGetTaskTrayWindowRect(HWND hWnd, LPRECT lpRect) const
 	if (hResult == HRESULT_FROM_WIN32(ERROR_TIMEOUT) || hResult == HRESULT_FROM_WIN32(ERROR_PROC_NOT_FOUND)) {
 		return FALSE;
 	}
-	PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 	return FALSE;
 }
 

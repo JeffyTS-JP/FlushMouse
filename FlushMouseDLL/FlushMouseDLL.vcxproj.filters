@@ -70,4 +70,7 @@
       <Filter>ソース ファイル</Filter>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="FlushMouseDLL.dll.manifest" />
+  </ItemGroup>
 </Project>

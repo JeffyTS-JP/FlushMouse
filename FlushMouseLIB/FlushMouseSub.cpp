@@ -805,13 +805,13 @@ BOOL	 	CFlushMouseHook::bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name)
 }
 
 //
-// bKeyboardHookUnset32()
+// bHook32DllStop()
 //
-BOOL 	CFlushMouseHook::bHook32DllStop() const
+BOOL 	CFlushMouseHook::bHook32DllStop()
 {
 #define	TIMEOUT	3000
 	if (!bHook32Dll)		return TRUE;
-	BOOL		bRet = FALSE;
+	BOOL	bRet = FALSE;
 	if (lpstProcessInformation != NULL) {
 		if (lpstProcessInformation->hProcess != NULL) {
 			if (!EnumWindows((WNDENUMPROC)&CFlushMouseHook::bEnumWindowsProcHookStop, (LPARAM)lpstProcessInformation)) {
@@ -842,6 +842,7 @@ BOOL 	CFlushMouseHook::bHook32DllStop() const
 			}
 		}
 	}
+	bHook32Dll = FALSE;
 	return bRet;
 }
 
@@ -1018,13 +1019,17 @@ static BOOL	bChangeHKLbySendInput(HKL hNewHKL, HKL hPreviousHKL, BOOL bForce)
 //
 static BOOL CALLBACK bEnumChildProcChangeHKL(HWND hWnd, LPARAM lParam)
 {
+#define SENDMESSAGETIMEOUT	100
 	HWND	hIMWnd = NULL;
+	DWORD_PTR dwRes = 0;
 	if (ActivateKeyboardLayout((HKL)lParam, KLF_SETFORPROCESS) != 0) {
 		if ((hIMWnd = ImmGetDefaultIMEWnd(hWnd)) != NULL) {
-			SendMessage(hIMWnd, WM_INPUTLANGCHANGEREQUEST, (WPARAM)INPUTLANGCHANGE_SYSCHARSET, lParam);
+			(void)SendMessageTimeout(hIMWnd, WM_INPUTLANGCHANGEREQUEST, (WPARAM)INPUTLANGCHANGE_SYSCHARSET, lParam,
+									 SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
 		}
 	}
 	return TRUE;
+#undef SENDMESSAGETIMEOUT
 }
 
 //
@@ -1068,6 +1073,8 @@ static BOOL		bSendInputSub(UINT cInputs, LPINPUT pInputs)
 //
 BOOL	bChromium_Helper(HWND hForeWnd)
 {
+#define SENDMESSAGETIMEOUT	100
+	DWORD_PTR dwRes = 0;
 	DWORD	dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
 	if (dwBeforeIMEMode != IMEOFF) {
 		TCHAR	szBuffer[_MAX_PATH]{};
@@ -1077,10 +1084,15 @@ BOOL	bChromium_Helper(HWND hForeWnd)
 				return _tcscmp(szBuffer, szClassName) == 0;})) {
 				HWND    hIMWnd = NULL;
 				if ((hIMWnd = ImmGetDefaultIMEWnd(hForeWnd)) != NULL) {
-					DWORD	dwSentenceMode = 0;
-					if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETOPENSTATUS, NULL) != 0) {
-						if ((dwSentenceMode = (DWORD)SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETSENTENCEMODE, NULL)) == 0) {
-							if (SendMessage(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETSENTENCEMODE, (LPARAM)IME_SMODE_PHRASEPREDICT) != 0) {
+					(void)SendMessageTimeout(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETOPENSTATUS, NULL,
+											 SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
+					if (dwRes != 0) {
+						(void)SendMessageTimeout(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETSENTENCEMODE, NULL,
+												 SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
+						if (dwRes == 0) {
+							(void)SendMessageTimeout(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETSENTENCEMODE, (LPARAM)IME_SMODE_PHRASEPREDICT,
+													 SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
+							if (dwRes == 0) {
 								return TRUE;
 							}
 							else return FALSE;
@@ -1096,6 +1108,7 @@ BOOL	bChromium_Helper(HWND hForeWnd)
 		else return FALSE;
 	}
 	return TRUE;
+#undef SENDMESSAGETIMEOUT
 }
 
 //

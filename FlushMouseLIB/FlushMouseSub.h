@@ -122,7 +122,7 @@ class CFlushMouseHook
 
 	private:
 		BOOL		bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name);
-		BOOL		bHook32DllStop() const;
+		BOOL		bHook32DllStop();
 		static BOOL CALLBACK bEnumWindowsProcHookStop(HWND hWnd, LPARAM lParam);
 
 	private:

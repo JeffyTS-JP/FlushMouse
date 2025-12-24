@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7175\build\Microsoft.Windows.SDK.BuildTools.props" Condition="Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7175\build\Microsoft.Windows.SDK.BuildTools.props')" />
+  <Import Project="..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7463\build\Microsoft.Windows.SDK.BuildTools.props" Condition="Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7463\build\Microsoft.Windows.SDK.BuildTools.props')" />
   <Import Project="..\..\packages\Microsoft.WindowsAppSDK.1.8.251106002\build\native\Microsoft.WindowsAppSDK.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.1.8.251106002\build\native\Microsoft.WindowsAppSDK.props')" />
   <Import Project="..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.251105000\build\native\Microsoft.WindowsAppSDK.WinUI.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.251105000\build\native\Microsoft.WindowsAppSDK.WinUI.props')" />
   <Import Project="..\..\packages\Microsoft.WindowsAppSDK.Runtime.1.8.251106002\build\native\Microsoft.WindowsAppSDK.Runtime.props" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.Runtime.1.8.251106002\build\native\Microsoft.WindowsAppSDK.Runtime.props')" />
@@ -139,6 +139,7 @@
     </Link>
     <PostBuildEvent>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Xcopy /Y "$(ProjectDir)FlushMouse.ico" "$(OutDir)"
+Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\FlushMouseUI3DLL.dll.appxmanifest" "$(OutDir)"
 Xcopy /Y "$(SolutionDir)SynTP_Receiver\SynTP_Receiver.ico" "$(OutDir)"
 Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configuration)\net10.0-windows10.0.22621.0\*.xbf" "$(OutDir)"
 Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configuration)\net10.0-windows10.0.22621.0\*.pdb" "$(OutDir)"
@@ -189,6 +190,7 @@ Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configu
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Start /wait /min cmd /c "$(SolutionDir)Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
 Start /wait /min cmd /c "$(SolutionDir)Sign_Modules.bat" $(OutDir)FlushMouseUI3DLL.dll
 Xcopy /Y "$(ProjectDir)FlushMouse.ico" "$(OutDir)"
+Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\FlushMouseUI3DLL.dll.appxmanifest" "$(OutDir)"
 Xcopy /Y "$(SolutionDir)SynTP_Receiver\SynTP_Receiver.ico" "$(OutDir)"
 Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configuration)\net10.0-windows10.0.22621.0\*.xbf" "$(OutDir)"
 Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configuration)\net10.0-windows10.0.22621.0\*.pdb" "$(OutDir)"
@@ -295,8 +297,8 @@ Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configu
     <Import Project="..\..\packages\Microsoft.WindowsAppSDK.Runtime.1.8.251106002\build\native\Microsoft.WindowsAppSDK.Runtime.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.Runtime.1.8.251106002\build\native\Microsoft.WindowsAppSDK.Runtime.targets')" />
     <Import Project="..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.251105000\build\native\Microsoft.WindowsAppSDK.WinUI.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.251105000\build\native\Microsoft.WindowsAppSDK.WinUI.targets')" />
     <Import Project="..\..\packages\Microsoft.WindowsAppSDK.1.8.251106002\build\native\Microsoft.WindowsAppSDK.targets" Condition="Exists('..\..\packages\Microsoft.WindowsAppSDK.1.8.251106002\build\native\Microsoft.WindowsAppSDK.targets')" />
-    <Import Project="..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7175\build\Microsoft.Windows.SDK.BuildTools.targets" Condition="Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7175\build\Microsoft.Windows.SDK.BuildTools.targets')" />
     <Import Project="..\..\packages\Microsoft.Web.WebView2.1.0.3650.58\build\native\Microsoft.Web.WebView2.targets" Condition="Exists('..\..\packages\Microsoft.Web.WebView2.1.0.3650.58\build\native\Microsoft.Web.WebView2.targets')" />
+    <Import Project="..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7463\build\Microsoft.Windows.SDK.BuildTools.targets" Condition="Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7463\build\Microsoft.Windows.SDK.BuildTools.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -328,8 +330,8 @@ Xcopy /Y "$(SolutionDir)FlushMouseUI3\FlushMouseUI3DLL\bin\$(Platform)\$(Configu
     <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.251105000\build\native\Microsoft.WindowsAppSDK.WinUI.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.WinUI.1.8.251105000\build\native\Microsoft.WindowsAppSDK.WinUI.targets'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.1.8.251106002\build\native\Microsoft.WindowsAppSDK.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.1.8.251106002\build\native\Microsoft.WindowsAppSDK.props'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.WindowsAppSDK.1.8.251106002\build\native\Microsoft.WindowsAppSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.WindowsAppSDK.1.8.251106002\build\native\Microsoft.WindowsAppSDK.targets'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7175\build\Microsoft.Windows.SDK.BuildTools.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7175\build\Microsoft.Windows.SDK.BuildTools.props'))" />
-    <Error Condition="!Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7175\build\Microsoft.Windows.SDK.BuildTools.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7175\build\Microsoft.Windows.SDK.BuildTools.targets'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.Web.WebView2.1.0.3650.58\build\native\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Web.WebView2.1.0.3650.58\build\native\Microsoft.Web.WebView2.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7463\build\Microsoft.Windows.SDK.BuildTools.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7463\build\Microsoft.Windows.SDK.BuildTools.props'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7463\build\Microsoft.Windows.SDK.BuildTools.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7463\build\Microsoft.Windows.SDK.BuildTools.targets'))" />
   </Target>
 </Project>

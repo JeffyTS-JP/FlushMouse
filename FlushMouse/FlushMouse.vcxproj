@@ -175,10 +175,13 @@
       <EnableUAC>false</EnableUAC>
     </Link>
     <PostBuildEvent>
-      <Command>Xcopy /Y "$(SolutionDir)$(Platform)\$(Configuration)\FlushMouseCursor.dat" "$(ProjectDir)"
+      <Command>Xcopy /Y "$(ProjectDir)$(TargetFileName).manifest" "$(OutDir)"
+Xcopy /Y "$(SolutionDir)$(Platform)\$(Configuration)\FlushMouseCursor.dat" "$(ProjectDir)"
 Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouse32.exe" "$(OutDir)"
+Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouse32.exe.manifest" "$(OutDir)"
 Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouse32.pdb" "$(OutDir)"
 Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouseDLL32.dll" "$(OutDir)"
+Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouseDLL32.dll.manifest" "$(OutDir)"
 Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouseDLL32.pdb" "$(OutDir)"
       </Command>
     </PostBuildEvent>
@@ -221,10 +224,13 @@ Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouseDLL32.pdb" "$(OutDir)"
     </Link>
     <PostBuildEvent>
       <Command>Start /wait /min cmd /c "$(SolutionDir)Sign_Modules.bat" $(OutDir)$(TargetName)$(TargetExt)
+Xcopy /Y "$(ProjectDir)$(TargetFileName).manifest" "$(OutDir)"
 Xcopy /Y "$(SolutionDir)$(Platform)\$(Configuration)\FlushMouseCursor.dat" "$(ProjectDir)"
 Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouse32.exe" "$(OutDir)"
+Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouse32.exe.manifest" "$(OutDir)"
 Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouse32.pdb" "$(OutDir)"
 Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouseDLL32.dll" "$(OutDir)"
+Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouseDLL32.dll.manifest" "$(OutDir)"
 Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouseDLL32.pdb" "$(OutDir)"
 </Command>
     </PostBuildEvent>
@@ -260,6 +266,9 @@ Xcopy /Y "$(SolutionDir)Win32\$(Configuration)\FlushMouseDLL32.pdb" "$(OutDir)"
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\FlushMouseLIB\FlushMouse.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="FlushMouse.exe.manifest" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
