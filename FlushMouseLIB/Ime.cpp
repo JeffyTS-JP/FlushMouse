@@ -24,7 +24,8 @@
 //
 // Define
 //
-#define SENDMESSAGETIMEOUT	100
+#define SENDMESSAGE_TIMEOUT	100
+#define IME_CACHE_TIMEOUT	100
 
 //
 // Struct Define
@@ -42,10 +43,13 @@
 //
 CIME::CIME()
 {
+	ZeroMemory(&m_stIMEModeCache, sizeof(IMEMODECACHE));
+	InitializeCriticalSection(&m_csIMEModeCache);
 }
 
 CIME::~CIME()
 {
+	DeleteCriticalSection(&m_csIMEModeCache);
 }
 
 //
@@ -54,6 +58,7 @@ CIME::~CIME()
 VOID		CIME::vIMEOpenCloseForced(HWND hWndObserved, DWORD dwIMEOpenClose)
 {
 	if (hWndObserved == NULL)	return;
+	vInvalidateIMEModeCache();
 	LPARAM	lParam = (LPARAM)dwIMEOpenClose;
 	EnumChildWindows(hWndObserved, &bEnumChildProcIMEOpenClose, lParam);
 	return;
@@ -65,6 +70,7 @@ VOID		CIME::vIMEOpenCloseForced(HWND hWndObserved, DWORD dwIMEOpenClose)
 VOID		CIME::vIMEConvertModeChangeForced(HWND hWnd, DWORD dwConvertMode)
 {
 	if (hWnd == NULL)	return;
+	vInvalidateIMEModeCache();
 	LPARAM	lParam = (LPARAM)dwConvertMode;
 	EnumChildWindows(hWnd, &bEnumChildProcIMEConvertMode, lParam);
 	return;
@@ -80,10 +86,10 @@ BOOL CALLBACK CIME::bEnumChildProcIMEConvertMode(HWND hWnd, LPARAM lParam)
 	if (hIMWnd == NULL) return TRUE;
 	DWORD_PTR dwRes = 0;
 	LRESULT lResult = SendMessageTimeout(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETOPENSTATUS, (LPARAM)TRUE,
-											SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
+											SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwRes);
 	if ((lResult == 0) || (dwRes == 0)) {
 		(void)SendMessageTimeout(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETCONVERSIONMODE, lParam,
-											SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
+											SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwRes);
 	}
 	return TRUE;
 }
@@ -98,7 +104,7 @@ BOOL CALLBACK CIME::bEnumChildProcIMEOpenClose(HWND hWnd, LPARAM lParam)
 	if ((hIMWnd = ImmGetDefaultIMEWnd(hWnd)) != NULL) {
 		DWORD_PTR dwRes = 0;
 		(void)SendMessageTimeout(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETOPENSTATUS, lParam,
-											SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
+											SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwRes);
 	}
 	return TRUE;
 }
@@ -109,14 +115,48 @@ BOOL CALLBACK CIME::bEnumChildProcIMEOpenClose(HWND hWnd, LPARAM lParam)
 DWORD		CIME::dwIMEMode(HWND hWnd, BOOL bForceHiragana)
 {
 	if (hWnd == NULL) return IMEOFF;
+
+	ULONGLONG uuNoq = GetTickCount64();
+	DWORD dwCachedMode = IMEOFF;
+	BOOL bCacheHit = FALSE;
+
+	EnterCriticalSection(&m_csIMEModeCache);
+	if (m_stIMEModeCache.hWnd == hWnd && 
+		(uuNoq - m_stIMEModeCache.uuTimestamp) < IME_CACHE_TIMEOUT) {
+		dwCachedMode = m_stIMEModeCache.dwIMEMode;
+		bCacheHit = TRUE;
+	}
+	LeaveCriticalSection(&m_csIMEModeCache);
+
+	if (bCacheHit && !bForceHiragana) {
+		return dwCachedMode;
+	}
+
+	DWORD dwResult = dwGetIMEModeInternal(hWnd, bForceHiragana);
+
+	EnterCriticalSection(&m_csIMEModeCache);
+	m_stIMEModeCache.hWnd = hWnd;
+	m_stIMEModeCache.dwIMEMode = dwResult;
+	m_stIMEModeCache.uuTimestamp = uuNoq;
+	LeaveCriticalSection(&m_csIMEModeCache);
+
+	return dwResult;
+}
+
+//
+// dwGetIMEModeInternal()
+//
+DWORD		CIME::dwGetIMEModeInternal(HWND hWnd, BOOL bForceHiragana)
+{
+	if (hWnd == NULL) return IMEOFF;
 	HWND hIMWnd = ImmGetDefaultIMEWnd(hWnd);
 	if (hIMWnd == NULL) return IMEOFF;
 	DWORD_PTR dwRes = 0;
 	LRESULT lResult = SendMessageTimeout(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETOPENSTATUS, NULL,
-											SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
+											SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwRes);
 	if ((lResult == 0) || (dwRes == 0)) return IMEOFF;
 	lResult = SendMessageTimeout(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETCONVERSIONMODE, NULL,
-									SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
+									SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwRes);
 	if ((lResult == 0) || (dwRes == 0)) return IMEOFF;
 	DWORD dwConvertMode = (DWORD)dwRes;
 	DWORD dwResult = IMEOFF;
@@ -155,6 +195,16 @@ DWORD		CIME::dwIMEMode(HWND hWnd, BOOL bForceHiragana)
 }
 
 //
+// vInvalidateIMEModeCache()
+//
+VOID		CIME::vInvalidateIMEModeCache()
+{
+	EnterCriticalSection(&m_csIMEModeCache);
+	ZeroMemory(&m_stIMEModeCache, sizeof(IMEMODECACHE));
+	LeaveCriticalSection(&m_csIMEModeCache);
+}
+
+//
 // vActivateIME()
 //
 VOID		CIME::vActivateIME(HWND hWndObserved)
@@ -174,7 +224,7 @@ BOOL CALLBACK CIME::bEnumChildProcActivateIME(HWND hWnd, LPARAM lParam)
 	if (hIMWnd == NULL) return TRUE;
 	DWORD_PTR dwRes = 0;
 	(void)SendMessageTimeout(hIMWnd, WM_ACTIVATE, (WPARAM)WA_ACTIVE, (LPARAM)NULL,
-								SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
+								SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwRes);
 	TCHAR szBuffer[_MAX_PATH];
 	if (GetClassName(hIMWnd, szBuffer, _MAX_PATH) == 0) {
 		return TRUE;
@@ -182,7 +232,7 @@ BOOL CALLBACK CIME::bEnumChildProcActivateIME(HWND hWnd, LPARAM lParam)
 	HWND hIMEWnd = FindWindow(szBuffer, NULL);
 	if (hIMEWnd != NULL) {
 		(void)SendMessageTimeout(hIMEWnd, WM_ACTIVATE, (WPARAM)WA_ACTIVE, (LPARAM)NULL,
-									SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
+									SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwRes);
 	}
 	return TRUE;
 }

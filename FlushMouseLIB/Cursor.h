@@ -181,7 +181,9 @@ class CCursor
 		static BOOL WINAPI		bDrawIMEModeRoutine(LPVOID lpvParam);
 
 		BOOL		bChangeFlushMouseCursor(UINT uCurID, LPIMECURSORDATA lpstCursorData, BOOL bUnderLine);
-		BOOL		bSetSystemCursor(LPMOUSECURSOR lpstMC, int iCursorSizeX, int iCursorSizeY);
+		BOOL		bSetSystemCursor(HMODULE hMod, LPMOUSECURSOR lpstMC, int iCursorSizeX, int iCursorSizeY) const;
+		HMODULE		hLoadCursorResourceForThread();
+		VOID		vUnloadCursorResourceForThread();
 
 	public:
 
@@ -200,6 +202,9 @@ class CCursor
 		ULONGLONG		uuMouseWindowTick;
 
 		CCursorSub		*CursorSub;
+		
+		HMODULE				hThreadCursorResource;
+		CRITICAL_SECTION	csCursorResource;
 };
 
 

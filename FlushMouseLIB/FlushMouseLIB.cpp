@@ -89,6 +89,7 @@ static LRESULT	Cls_OnPowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SETTIN
 static void		Cls_OnInput(HWND hWnd, DWORD dwFlags, HRAWINPUT hRawInput);
 static void		Cls_OnWTSSessionChange(HWND hWnd, DWORD dwSessionEvent, DWORD dwSessionID);
 static void		Cls_OnDisplayChange(HWND hWnd, UINT bitsPerPixel, UINT cxScreen, UINT cyScreen);
+static BOOL		Cls_OnQueryEndSession(HWND hWnd);
 
 // EX Message Handler
 static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, int iSubCode);
@@ -326,6 +327,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		HANDLE_MSG(hWnd, WM_INPUT, Cls_OnInput);
 		HANDLE_MSG(hWnd, WM_WTSSESSION_CHANGE, Cls_OnWTSSessionChange);
 		HANDLE_MSG(hWnd, WM_DISPLAYCHANGE, Cls_OnDisplayChange);
+		HANDLE_MSG(hWnd, WM_QUERYENDSESSION, Cls_OnQueryEndSession);
 
 		HANDLE_MSG(hWnd, WM_SETTINGSEX, Cls_OnSettingsEx);
 		HANDLE_MSG(hWnd, WM_INPUTLANGCHANGEEX, Cls_OnInputLangChangeEx);
@@ -511,10 +513,6 @@ void		vDestroyWindow(HWND hWnd)
 		delete RawInput;
 		RawInput = NULL;
 	}
-	if (FlushMouseHook != NULL) {
-		delete	FlushMouseHook;
-		FlushMouseHook = NULL;
-	}
 	if (Cime != NULL) {
 		delete Cime;
 		Cime = NULL;
@@ -599,6 +597,17 @@ static void	Cls_OnDisplayChange(HWND hWnd, UINT bitsPerPixel, UINT cxScreen, UIN
 			bChromium_Helper(GetForegroundWindow());
 		}
 	}
+}
+
+//
+// WM_QUERYENDSESSION
+// Cls_OnQueryEndSession()
+//
+static BOOL Cls_OnQueryEndSession(HWND hWnd)
+{
+	UNREFERENCED_PARAMETER(hWnd);
+	Cls_OnDestroy(hWnd);
+	return TRUE;
 }
 
 //

@@ -506,7 +506,6 @@ void	CRawInputDevice::vRawInputKeyboardHandler(HWND hWnd, DWORD dwFlags, LPRAWIN
 				Cls_OnSysKeyDownUpEx(hWnd, KEY_OEM_COPY, bKeyDown, 1, 0);
 			}
 			return;
-
 		case VK_ESCAPE:			// ESC (0x1b)
 		case VK_INSERT:			// INSERT (0x2d)
 			bOnlyCtrlLL = FALSE;
@@ -573,6 +572,7 @@ BOOL	CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SE
 		break;
 	case PBT_APMRESUMESUSPEND:
 		bCreateProcess(FLUSHMOUSE_EXE, CommandLine);
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		break;
 	case PBT_POWERSETTINGCHANGE:
 		break;
@@ -582,9 +582,11 @@ BOOL	CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SE
 			switch (PowerStatus.ACLineStatus) {
 			case 0:
 				bCreateProcess(FLUSHMOUSE_EXE, CommandLine);
+				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 				break;
 			case 1:
 				bCreateProcess(FLUSHMOUSE_EXE, CommandLine);
+				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 				break;
 			default:
 				break;
@@ -1006,7 +1008,6 @@ static BOOL	bChangeHKLbySendInput(HKL hNewHKL, HKL hPreviousHKL, BOOL bForce)
 					}
 				}
 				else bRet = TRUE;
-
 			}
 			delete[]	lpHKL;
 		}
@@ -1019,17 +1020,17 @@ static BOOL	bChangeHKLbySendInput(HKL hNewHKL, HKL hPreviousHKL, BOOL bForce)
 //
 static BOOL CALLBACK bEnumChildProcChangeHKL(HWND hWnd, LPARAM lParam)
 {
-#define SENDMESSAGETIMEOUT	100
+#define SENDMESSAGE_TIMEOUT	100
 	HWND	hIMWnd = NULL;
 	DWORD_PTR dwRes = 0;
 	if (ActivateKeyboardLayout((HKL)lParam, KLF_SETFORPROCESS) != 0) {
 		if ((hIMWnd = ImmGetDefaultIMEWnd(hWnd)) != NULL) {
 			(void)SendMessageTimeout(hIMWnd, WM_INPUTLANGCHANGEREQUEST, (WPARAM)INPUTLANGCHANGE_SYSCHARSET, lParam,
-									 SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
+									 SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwRes);
 		}
 	}
 	return TRUE;
-#undef SENDMESSAGETIMEOUT
+#undef SENDMESSAGE_TIMEOUT
 }
 
 //
@@ -1073,7 +1074,7 @@ static BOOL		bSendInputSub(UINT cInputs, LPINPUT pInputs)
 //
 BOOL	bChromium_Helper(HWND hForeWnd)
 {
-#define SENDMESSAGETIMEOUT	100
+#define SENDMESSAGE_TIMEOUT	100
 	DWORD_PTR dwRes = 0;
 	DWORD	dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
 	if (dwBeforeIMEMode != IMEOFF) {
@@ -1085,13 +1086,13 @@ BOOL	bChromium_Helper(HWND hForeWnd)
 				HWND    hIMWnd = NULL;
 				if ((hIMWnd = ImmGetDefaultIMEWnd(hForeWnd)) != NULL) {
 					(void)SendMessageTimeout(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETOPENSTATUS, NULL,
-											 SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
+											 SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwRes);
 					if (dwRes != 0) {
 						(void)SendMessageTimeout(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_GETSENTENCEMODE, NULL,
-												 SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
+												 SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwRes);
 						if (dwRes == 0) {
 							(void)SendMessageTimeout(hIMWnd, WM_IME_CONTROL, (WPARAM)IMC_SETSENTENCEMODE, (LPARAM)IME_SMODE_PHRASEPREDICT,
-													 SMTO_ABORTIFHUNG, SENDMESSAGETIMEOUT, &dwRes);
+													 SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwRes);
 							if (dwRes == 0) {
 								return TRUE;
 							}
@@ -1108,7 +1109,7 @@ BOOL	bChromium_Helper(HWND hForeWnd)
 		else return FALSE;
 	}
 	return TRUE;
-#undef SENDMESSAGETIMEOUT
+#undef SENDMESSAGE_TIMEOUT
 }
 
 //

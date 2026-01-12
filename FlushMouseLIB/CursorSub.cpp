@@ -123,12 +123,16 @@ CCursorSub::CCursorSub()
 
 CCursorSub::~CCursorSub()
 {
-	if (hCursorData)	bUnLoadCursorData();
+	while (hCursorData) {
+		if (!bUnLoadCursorData())	break;
+	}
 	if (lpszCursorDataFullPath)	delete []	lpszCursorDataFullPath;
+	lpszCursorDataFullPath = NULL;
 	if (lpszCursorDataTempFullPath) {
 		if (!DeleteFile(lpszCursorDataTempFullPath)) {
 		}
 		delete []	lpszCursorDataTempFullPath;
+		lpszCursorDataTempFullPath = NULL;
 	}
 }
 
@@ -339,6 +343,8 @@ BOOL		CCursorSub::bMakeAllCursor(LPFLUSHMOUSECURSOR lpstIMECursorData)
 	HANDLE	hDstRes = NULL;
 	BOOL	bRet = FALSE;
 
+	if (!lpstIMECursorData || !lpszCursorDataFullPath || !lpszCursorDataTempFullPath)	goto Cleanup;
+
 	if ((hSrcMod = LoadLibrary(lpszCursorDataFullPath)) == NULL)	goto Cleanup;
 	if ((hDstRes = BeginUpdateResource(lpszCursorDataTempFullPath, FALSE)) == NULL)	goto Cleanup;
 
@@ -362,9 +368,7 @@ BOOL		CCursorSub::bMakeAllCursor(LPFLUSHMOUSECURSOR lpstIMECursorData)
 
 Cleanup:
 
-	if (hSrcMod)	FreeLibrary(hSrcMod);
-	hSrcMod = NULL;
-
+		if (hSrcMod)	FreeLibrary(hSrcMod);
 	return bRet;
 }
 
@@ -451,7 +455,6 @@ BOOL		CCursorSub::bMakeCursor(HMODULE hSrcMod, HANDLE hDstRes, int iSrcResID, in
 	bRet = TRUE;
 
 Cleanup:
-
 	if (lpMakeCursorData)	delete []	lpMakeCursorData;
 	lpMakeCursorData = NULL;
 
@@ -581,6 +584,7 @@ void		CCursorSub::MakeAlphaBlend(LPDWORD lpData, int cx, int cy, COLORREF aRGB)
 		if (lpData[i]) lpData[i] = color;
 	}
 }
+
 //
 //class CCursorWindow : public CWindow
 //

@@ -33,6 +33,11 @@
 //
 // Struct Define
 //
+typedef struct tagIMEMODECACHE {
+	HWND		hWnd;
+	DWORD		dwIMEMode;
+	ULONGLONG	uuTimestamp;
+} IMEMODECACHE, *PIMEMODECACHE, *LPIMEMODECACHE;
 
 //
 // Class CIME
@@ -50,13 +55,17 @@ public:
 	VOID		vActivateIME(HWND hWndObserved);
 	DWORD		dwGetInputLocale();
 	HKL			hklGetInputLocale(HWND hWndObserved);
+	VOID		vInvalidateIMEModeCache();
 
 private:
 	static BOOL CALLBACK bEnumChildProcIMEOpenClose(HWND hWnd, LPARAM lParam);
 	static BOOL CALLBACK bEnumChildProcIMEConvertMode(HWND hWnd, LPARAM lParam);
 	static BOOL CALLBACK bEnumChildProcActivateIME(HWND hWnd, LPARAM lParam);
+	DWORD		dwGetIMEModeInternal(HWND hWnd, BOOL bForceHiragana);
 
 private:
+	IMEMODECACHE		m_stIMEModeCache;
+	CRITICAL_SECTION	m_csIMEModeCache;
 };
 
 

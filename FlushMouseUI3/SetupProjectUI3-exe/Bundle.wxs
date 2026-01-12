@@ -97,6 +97,12 @@
 			Value="Version"
 			Variable="DotNetVersion" />
 
+		<util:FileSearch
+			Id="SearchForDotNetFileVersion"
+			Path="[ProgramFiles64Folder]dotnet\dotnet.exe"
+			Result="version"
+			Variable="DotNetFileVersion" />
+
 		<Variable Name="AddDesktopShortcut" bal:Overridable="yes" Value="1" />
 		<Variable Name="AddDesktopShortcutVariable" bal:Overridable="yes" Value="[AddDesktopShortcut]" />
 		<Variable Name="RegisterStartMenu" bal:Overridable="yes" Value="1" />
@@ -116,8 +122,8 @@
 				PerMachine="yes"
 				Vital="yes"
 				InstallCommand="/install /norestart /quiet"
-				DetectCondition="DotNetVersion AND (DotNetVersion >= v10.0)"
-				InstallCondition="VersionNT64 AND NOT (DotNetVersion >= v10.0)" >
+				DetectCondition="DotNetVersion AND (DotNetVersion >= v10.0) OR DotNetFileVersion AND (DotNetFileVersion >= v10.0)"
+				InstallCondition="VersionNT64 AND NOT ((DotNetVersion >= v10.0) OR (DotNetFileVersion >= v10.0))" >
 				<RemotePayload
 					CertificatePublicKey="C6FE1068276FF20DECBBF3C243C8852471E51B99"
 					CertificateThumbprint="860AB2B78578D8EF61F692CF81AE4B1198CCBC94"

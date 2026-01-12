@@ -265,25 +265,20 @@ namespace FlushMouseUI3DLL {
 					sizeDouble.Width = OutRectWindowDouble.Width;
 					sizeDouble.Height = OutRectWindowDouble.Height;
 					UInt32 dpi = GetDpiForWindow(hWnd);
-					if (dpi != 0)
-					{
+					if (dpi != 0) {
 						sizeDouble.Width = ((double)sizeDouble.Width * (double)dpi / (double)USER_DEFAULT_SCREEN_DPI);
 						sizeDouble.Height = ((double)sizeDouble.Height * (double)dpi / (double)USER_DEFAULT_SCREEN_DPI);
 					}
-					if (sizeDouble.Width >= (double)lpmi.rcWork.Width)
-					{
+					if (sizeDouble.Width >= (double)lpmi.rcWork.Width) {
 						OutRectWindowDouble.Width = lpmi.rcWork.Width;
 					}
-					else
-					{
+					else {
 						OutRectWindowDouble.Width = sizeDouble.Width;
 					}
-					if (sizeDouble.Height >= (double)lpmi.rcWork.Height)
-					{
+					if (sizeDouble.Height >= (double)lpmi.rcWork.Height) {
 						OutRectWindowDouble.Height = (double)lpmi.rcWork.Height;
 					}
-					else
-					{
+					else {
 						OutRectWindowDouble.Height = sizeDouble.Height;
 					}
 					OutRectWindowDouble.X = (int)(lpmi.rcWork.X + ((double)lpmi.rcWork.Width - (double)lpmi.rcWork.X - OutRectWindowDouble.Width) / 2.0);
@@ -296,16 +291,13 @@ namespace FlushMouseUI3DLL {
 		{
 			OutRectWindowDouble = InRectWindowDouble;
 			Int64 hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
-			if (hMonitor != (Int64)0)
-			{
+			if (hMonitor != (Int64)0) {
 				MONITORINFOEXW lpmi = new();
-				if (GetMonitorInfoW(hMonitor, lpmi))
-				{
+				if (GetMonitorInfoW(hMonitor, lpmi)) {
 					if ((OutRectWindowDouble.X < lpmi.rcWork.X)
 							|| (lpmi.rcWork.Width > (lpmi.rcWork.Width + OutRectWindowDouble.Width))
 							|| (OutRectWindowDouble.Y < lpmi.rcWork.Y)
-							|| (lpmi.rcWork.Height < (OutRectWindowDouble.Y + OutRectWindowDouble.Height)))
-					{
+							|| (lpmi.rcWork.Height < (OutRectWindowDouble.Y + OutRectWindowDouble.Height))) {
 						OutRectWindowDouble.X = (int)(lpmi.rcWork.X + ((double)lpmi.rcWork.Width - (double)lpmi.rcWork.X - OutRectWindowDouble.Width) / 2.0);
 						OutRectWindowDouble.Y = (int)(lpmi.rcWork.Y + ((double)lpmi.rcWork.Height - (double)lpmi.rcWork.Y - OutRectWindowDouble.Height) / 2.0);
 						return true;
@@ -319,8 +311,7 @@ namespace FlushMouseUI3DLL {
 		{
 			OutSizeDouble = InSizeDouble;
 			UInt32 dpi = GetDpiForWindow(hWnd);
-			if (dpi != 0)
-			{
+			if (dpi != 0) {
 				OutSizeDouble.Width = ((double)OutSizeDouble.Width * (double)dpi / (double)USER_DEFAULT_SCREEN_DPI);
 				OutSizeDouble.Height = ((double)OutSizeDouble.Height * (double)dpi / (double)USER_DEFAULT_SCREEN_DPI);
 			}
@@ -342,24 +333,21 @@ namespace FlushMouseUI3DLL {
 		private static long _MessageBox(Int64 hWnd, string lpText, string lpCaption, UInt32 uType)
 		{
 			long result = 0;
-			try
-			{
+			try {
 				Int64 hInstance = GetWindowLongPtrW(hWnd, GWLP_HINSTANCE);
 				Int32 dwThreadID = GetCurrentThreadId();
 				hParentWnd = hWnd;
 				hMessageBoxHook = SetWindowsHookExW(WH_CBT, new(_HookProc), hInstance, dwThreadID);
 				result = MessageBoxW(hWnd, lpText, lpCaption, uType);
 			}
-			catch (Exception)
-			{
+			catch (Exception) {
 			}
 			return result;
 		}
 
 		private static Int64 _HookProc(Int32 nCode, Int64 wParam, Int64 lParam)
 		{
-			if (nCode == HCBT_ACTIVATE)
-			{
+			if (nCode == HCBT_ACTIVATE) {
 				RECT rcParent = new();
 				RECT rcMsgBox = new();
 				GetWindowRect(hParentWnd, ref rcParent);
@@ -381,10 +369,8 @@ namespace FlushMouseUI3DLL {
 			if (text == null) return false;
 			Regex regex = new("^[0-9]*$");
 			Int64 i;
-			if (text != null)
-			{
-				if (regex.IsMatch(text))
-				{
+			if (text != null) {
+				if (regex.IsMatch(text)) {
 					i = Convert.ToInt64(text);
 					if ((Min <= i) && (i <= Max)) return true;
 				}
@@ -397,10 +383,8 @@ namespace FlushMouseUI3DLL {
 			if (text == null) return false;
 			Regex regex = new("^[0-9a-fA-F]*$");
 			Int64 i;
-			if (text != null)
-			{
-				if (regex.IsMatch(text))
-				{
+			if (text != null) {
+				if (regex.IsMatch(text)) {
 					i = Convert.ToInt64(text, 16);
 					if ((Min <= i) && (i <= Max)) return true;
 				}
@@ -413,10 +397,8 @@ namespace FlushMouseUI3DLL {
 			if (text == null) return false;
 			Regex regex = new("^[01]*$");
 			Int64 i;
-			if (text != null)
-			{
-				if (regex.IsMatch(text))
-				{
+			if (text != null) {
+				if (regex.IsMatch(text)) {
 					i = Convert.ToInt64(text, 2);
 					if ((Min <= i) && (i <= Max)) return true;
 				}
