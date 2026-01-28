@@ -1077,6 +1077,7 @@ BOOL	bChromium_Helper(HWND hForeWnd)
 #define SENDMESSAGE_TIMEOUT	100
 	DWORD_PTR dwRes = 0;
 	DWORD	dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
+	dwBeforeIMEMode = (dwBeforeIMEMode == IMEENG) ? IMEOFF : dwBeforeIMEMode;
 	if (dwBeforeIMEMode != IMEOFF) {
 		TCHAR	szBuffer[_MAX_PATH]{};
 		if (GetClassName(hForeWnd, szBuffer, _MAX_PATH) != 0 && szBuffer[0] != _T('\0')) {

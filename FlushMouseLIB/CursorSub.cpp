@@ -464,7 +464,7 @@ Cleanup:
 //
 // bMakeCursorSub()
 //
-BOOL		CCursorSub::bMakeCursorSub(LPRTCURSORHEAD	lpRTCursorHead, LPRTCURSORHEAD lpMakeCursorData, DWORD dwResSize, int cx, int cy, DWORD dwIMEMode, LPTSTR lpszIMEMode, COLORREF dwRGB, LPCTSTR lpszFontFace, BOOL bUnderLine)
+BOOL		CCursorSub::bMakeCursorSub(LPRTCURSORHEAD lpRTCursorHead, LPRTCURSORHEAD lpMakeCursorData, DWORD dwResSize, int cx, int cy, DWORD dwIMEMode, LPTSTR lpszIMEMode, COLORREF dwRGB, LPCTSTR lpszFontFace, BOOL bUnderLine)
 {
 	HDC		hDC = NULL, hCursorMemDC = NULL, hTextMemDC = NULL;
 	HBITMAP	hCursorBitmap = NULL, hTextBitmap = NULL;

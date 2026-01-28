@@ -29,6 +29,7 @@
 #define ZENHIRA_IMEON	(IME_CMODE_ROMAN | IME_CMODE_FULLSHAPE | IME_CMODE_NATIVE)						// 0x19 :あ 全角ひら 0001 1001（漢字変換モード)
 #define ZENKANA_IMEON	(IME_CMODE_ROMAN | IME_CMODE_FULLSHAPE | IME_CMODE_KATAKANA | IME_CMODE_NATIVE)	// 0x1B :カ 全角カナ 0001 1011
 #define IMEHIDE			(0x88)																			// 0x88 :■  Hide    1000 1000
+#define IMEENG			(0xff)																			// 0x88 :■  Hide    1000 1000
 
 //
 // Struct Define

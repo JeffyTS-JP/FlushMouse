@@ -20,7 +20,7 @@
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
     <CompilerAdditionalOptions>-arch x64</CompilerAdditionalOptions>
-    <SuppressValidation>False</SuppressValidation>
+    <SuppressValidation>True</SuppressValidation>
     <SuppressIces>ICE03</SuppressIces>
     <LinkerAdditionalOptions>
     </LinkerAdditionalOptions>

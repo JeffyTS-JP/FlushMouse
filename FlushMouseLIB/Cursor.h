@@ -137,6 +137,8 @@ class CCursor
 {
 	public:
 		CCursor();
+		CCursor(const CCursor&) = delete;
+		CCursor& operator=(const CCursor&) = delete;
 		~CCursor();
 
 	public:

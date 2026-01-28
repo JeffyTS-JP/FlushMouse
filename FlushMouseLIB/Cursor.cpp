@@ -773,6 +773,7 @@ BOOL CCursor::bIMEModeMouseByWndThreadRoutine(LPVOID lpvParam)
 			break;
 		}
 		DWORD	dwIMEMode = Cime->dwIMEMode(lpstCursorData->hWndObserved, lpstCursorData->bForceHiragana);
+		dwIMEMode = (dwIMEMode == IMEENG) ? IMEOFF : dwIMEMode;
 		if ((dwIMEMode == IMEOFF) && !lpstCursorData->bDisplayIMEModeIMEOFF) dwIMEMode = IMEHIDE;
 		BOOL	bCapsLock = (GetKeyState(VK_CAPITAL) & 0x0001) ? TRUE : FALSE;
 		if ((hCur == lpstCursorData->hCursorArrow || hCur == lpstCursorData->hCursorIBeam || hCur == lpstCursorData->hCursorHand)) {
@@ -877,6 +878,7 @@ BOOL		CCursor::bIsIMECursorChanged(LPIMECURSORDATA lpstCursorData)
 	if (lpstCursorData == NULL)	return FALSE;
 
 	DWORD	dwIMEMode = Cime->dwIMEMode(lpstCursorData->hWndObserved, lpstCursorData->bForceHiragana);
+	dwIMEMode = (dwIMEMode == IMEENG) ? IMEOFF : dwIMEMode;
 	if (lpstCursorData->dwIMEModeCursor == dwIMEMode) return FALSE;
 	lpstCursorData->dwIMEModeCursor = dwIMEMode;
 	return TRUE;
@@ -1198,6 +1200,7 @@ BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData, LPRECT l
 #undef MERGIN_X
 #undef MERGIN_Y
 					_dwIMEModeCaret = Cime->dwIMEMode(hCaretWnd, lpstCursorData->bForceHiragana);
+					_dwIMEModeCaret = (_dwIMEModeCaret == IMEENG) ? IMEOFF : _dwIMEModeCaret;
 					int	iCaret = iGetCursorID(_dwIMEModeCaret, lpstCursorData->lpstNearDrawCaretCursor, _bCapsLock);
 					if (iCaret == 0) _dwIMEModeCaret = IMEOFF;
 					vAdjustFontXLeftPosition(_dwIMEModeCaret, lpstCursorData->lpstNearDrawCaretCursor[iCaret].szMode, &iCaretSizeX, lprcCaret);
@@ -1215,13 +1218,13 @@ BOOL		CCursor::bDrawIMEModeOnDisplaySub(LPIMECURSORDATA lpstCursorData, LPRECT l
 	}
 	if (bFoundCaret == FALSE) {
 		_dwIMEModeCursor = Cime->dwIMEMode(lpstCursorData->hWndObserved, lpstCursorData->bForceHiragana);
+		_dwIMEModeCursor = (_dwIMEModeCursor == IMEENG) ? IMEOFF : _dwIMEModeCursor;
+		iCursor = iGetCursorID(_dwIMEModeCursor, lpstCursorData->lpstNearDrawMouseCursor, _bCapsLock);
+		lpstCursorData->CursorWindow->vSetModeStringColorFont(lpstCursorData->lpstNearDrawMouseCursor[iCursor].szMode, lpstCursorData->lpstNearDrawMouseCursor[iCursor].dwColor, lpstCursorData->lpstNearDrawMouseCursor[IMEMODE_IMEOFF].szFont);
 	}
 	else {
 		_dwIMEModeCursor = Cime->dwIMEMode(GetForegroundWindow(), lpstCursorData->bForceHiragana);
-	}
-	if (bFoundCaret == FALSE) {
-		iCursor = iGetCursorID(_dwIMEModeCursor, lpstCursorData->lpstNearDrawMouseCursor, _bCapsLock);
-		lpstCursorData->CursorWindow->vSetModeStringColorFont(lpstCursorData->lpstNearDrawMouseCursor[iCursor].szMode, lpstCursorData->lpstNearDrawMouseCursor[iCursor].dwColor, lpstCursorData->lpstNearDrawMouseCursor[IMEMODE_IMEOFF].szFont);
+		_dwIMEModeCursor = (_dwIMEModeCursor == IMEENG) ? IMEOFF : _dwIMEModeCursor;
 	}
 #define	COUNT	10
 	BOOL	bRet = FALSE;

@@ -109,16 +109,14 @@ BOOL 	CThread::bRegister(LPCTSTR lpszThreadName, DWORD dwThreadID, LPTHREAD_STAR
 //
 BOOL 	CThread::bStart()
 {
-	if ((lpstThreadData == NULL) || (lpstThreadData->lpstSA == NULL) || (lpstThreadData->hThread == NULL))	return FALSE;
+	if ((lpstThreadData == NULL) || (lpstThreadData->lpstSA == NULL) || (lpstThreadData->hThread == NULL) || (lpstThreadData->hEvent == NULL))	return FALSE;
 	lpstThreadData->bThreadSentinel = TRUE;
 	DWORD	dwExitCode = 0;
 	if (GetExitCodeThread((HANDLE)lpstThreadData->hThread, &dwExitCode)) {
 		if (dwExitCode == STILL_ACTIVE) {
 			if (ResumeThread(lpstThreadData->hThread) != (DWORD)-1) {
-				if (lpstThreadData->hEvent != NULL) {
-					if (SetEvent(lpstThreadData->hEvent)) {
-						return TRUE;
-					}
+				if (SetEvent(lpstThreadData->hEvent)) {
+					return TRUE;
 				}
 			}
 		}
@@ -126,7 +124,14 @@ BOOL 	CThread::bStart()
 			vUnregister();
 			if (bRegister(lpstThreadData->lpszThreadName, lpstThreadData->dwThreadID,
 				lpstThreadData->lpbCallbackRoutine, lpstThreadData->lParamOption, lpstThreadData->dwSleepTime)) {
-				return TRUE;
+				if (lpstThreadData->hThread != NULL && lpstThreadData->hEvent != NULL) {
+					lpstThreadData->bThreadSentinel = TRUE;
+					if (ResumeThread(lpstThreadData->hThread) != (DWORD)-1) {
+						if (SetEvent(lpstThreadData->hEvent)) {
+							return TRUE;
+						}
+					}
+				}
 			}
 		}
 	}

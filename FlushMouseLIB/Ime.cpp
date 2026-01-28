@@ -116,13 +116,13 @@ DWORD		CIME::dwIMEMode(HWND hWnd, BOOL bForceHiragana)
 {
 	if (hWnd == NULL) return IMEOFF;
 
-	ULONGLONG uuNoq = GetTickCount64();
+	ULONGLONG uuNow = GetTickCount64();
 	DWORD dwCachedMode = IMEOFF;
 	BOOL bCacheHit = FALSE;
 
 	EnterCriticalSection(&m_csIMEModeCache);
 	if (m_stIMEModeCache.hWnd == hWnd && 
-		(uuNoq - m_stIMEModeCache.uuTimestamp) < IME_CACHE_TIMEOUT) {
+		(uuNow - m_stIMEModeCache.uuTimestamp) < IME_CACHE_TIMEOUT) {
 		dwCachedMode = m_stIMEModeCache.dwIMEMode;
 		bCacheHit = TRUE;
 	}
@@ -137,7 +137,7 @@ DWORD		CIME::dwIMEMode(HWND hWnd, BOOL bForceHiragana)
 	EnterCriticalSection(&m_csIMEModeCache);
 	m_stIMEModeCache.hWnd = hWnd;
 	m_stIMEModeCache.dwIMEMode = dwResult;
-	m_stIMEModeCache.uuTimestamp = uuNoq;
+	m_stIMEModeCache.uuTimestamp = uuNow;
 	LeaveCriticalSection(&m_csIMEModeCache);
 
 	return dwResult;
@@ -189,7 +189,7 @@ DWORD		CIME::dwGetIMEModeInternal(HWND hWnd, BOOL bForceHiragana)
 	}
 	HKL hkl = hklGetInputLocale(hWnd);
 	if (hkl != (HKL)0 && hkl != JP_IME) {
-		dwResult = IMEOFF;
+		dwResult = IMEENG;
 	}
 	return dwResult;
 }

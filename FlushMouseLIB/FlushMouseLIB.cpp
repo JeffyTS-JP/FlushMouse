@@ -638,7 +638,13 @@ void Cls_OnLButtonDownEx(HWND hWnd, int x, int y, HWND hForeground)
 		if (lpAppRegData->bEnableEPHelper) {
 			HWND	hWndHidemaru = hGetCachedWindowByClassName(_T("Hidemaru32Class"));
 			if ((!hWndHidemaru) || (hForeground != hWndHidemaru)) {
-				bForExplorerPatcherSWS(hForeground, TRUE, FALSE, NULL, NULL);
+				DWORD	dwIMEMode = Cime->dwIMEMode(hForeground, FALSE);
+				if (dwIMEMode == IMEENG) {
+					bForExplorerPatcherSWS(hForeground, TRUE, TRUE, NULL, NULL);
+				}
+				else {
+					bForExplorerPatcherSWS(hForeground, TRUE, FALSE, NULL, NULL);
+				}
 			}
 		}
 		if (lpAppRegData->bIMEModeForced) {
@@ -674,11 +680,17 @@ void Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground)
 		HWND	hWndObserved = NULL;
 		POINT	pt{};
 		if (GetCursorPos(&pt)) {
-			if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return;
-			if (!Cursor->bStartIMECursorChangeThread(hWndObserved))	return;
-			if (!bCheckDrawIMEModeArea(hWndObserved))	return;
-			if (!Cursor->bStartDrawIMEModeThread(hWndObserved))	return;
+			if ((hWndObserved = WindowFromPoint(pt)) != NULL) {
+				if (Cursor->bStartIMECursorChangeThread(hWndObserved)) {
+					if (bCheckDrawIMEModeArea(hWndObserved)) {
+						if (Cursor->bStartDrawIMEModeThread(hWndObserved))	return;
+					}
+					else return;
+				}
+			}
 		}
+		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 	}
 	return;
 }
@@ -724,7 +736,11 @@ static void		Cls_OnInputLangChangeEx(HWND hWnd, UINT CodePage, HKL hkl)
 			if (Cursor->bStartIMECursorChangeThread(hWndObserved)) {
 				if (lpAppRegData->bDoModeDispByIMEKeyDown) {
 					if (!bCheckDrawIMEModeArea(hWndObserved))	return;
-					if (!Cursor->bStartDrawIMEModeThread(hWndObserved))	return;
+					if (!Cursor->bStartDrawIMEModeThread(hWndObserved)) {
+						bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+						PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+						return;
+					}
 				}
 			}
 		}
@@ -773,7 +789,11 @@ static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd)
 	if (lpAppRegData->bDoModeDispByMouseBttnUp) {
 		if (!bCheckDrawIMEModeArea(hWndObserved))	return;
 #define	DELAYTIME	300
-		if (!Cursor->bStartDrawIMEModeThreadWait(hForeWnd, (lpAppRegData->dwAdditionalWaitTime + DELAYTIME)))	return;
+		if (!Cursor->bStartDrawIMEModeThreadWait(hForeWnd, (lpAppRegData->dwAdditionalWaitTime + DELAYTIME))) {
+			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			return;
+		}
 #undef	DELAYTIME
 	}
 	return;
@@ -835,7 +855,11 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 			if (lpAppRegData->bEnableEPHelper)	bForExplorerPatcherSWS(hForeWnd, FALSE, FALSE, NULL, NULL);
 			if (GetCursorPos(&pt)) {
 				if (lpAppRegData->bDoModeDispByCtrlUp) {
-					if (!Cursor->bStartDrawIMEModeThreadWait(WindowFromPoint(pt), lpAppRegData->dwWaitWaveTime))	return;
+					if (!Cursor->bStartDrawIMEModeThreadWait(WindowFromPoint(pt), lpAppRegData->dwWaitWaveTime)) {
+						bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+						PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+						return;
+					}
 				}
 			}
 			return;
@@ -879,6 +903,7 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 			if (bIMEInConverting)	return;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
+			dwBeforeIMEMode = (dwBeforeIMEMode == IMEENG) ? IMEOFF : dwBeforeIMEMode;
 			if ((lpAppRegData->bEnableEPHelper || lpAppRegData->bIMEModeForced)) {
 				if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
 					SleepEx(50, FALSE);
@@ -925,6 +950,7 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 			if (bIMEInConverting)	return;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
+			dwBeforeIMEMode = (dwBeforeIMEMode == IMEENG) ? IMEOFF : dwBeforeIMEMode;
 			if ((lpAppRegData->bEnableEPHelper || lpAppRegData->bIMEModeForced)) {
 				if (dwBeforeIMEMode != IMEOFF) {
 					if (lpAppRegData->bIMEModeForced) {
@@ -945,6 +971,7 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 			if (bIMEInConverting)	return;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
+			dwBeforeIMEMode = (dwBeforeIMEMode == IMEENG) ? IMEOFF : dwBeforeIMEMode;
 			if ((lpAppRegData->bEnableEPHelper || lpAppRegData->bIMEModeForced)) {
 				if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
 					SleepEx(50, FALSE);
@@ -988,6 +1015,7 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 			if (bIMEInConverting)	return;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
+			dwBeforeIMEMode = (dwBeforeIMEMode == IMEENG) ? IMEOFF : dwBeforeIMEMode;
 			if ((lpAppRegData->bEnableEPHelper || lpAppRegData->bIMEModeForced)) {
 				if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
 					SleepEx(50, FALSE);
@@ -1065,6 +1093,7 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 			}
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
+			dwBeforeIMEMode = (dwBeforeIMEMode == IMEENG) ? IMEOFF : dwBeforeIMEMode;
 			if ((lpAppRegData->bEnableEPHelper || lpAppRegData->bIMEModeForced)) {
 				if (dwBeforeIMEMode == IMEOFF) {
 					if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
@@ -1099,6 +1128,7 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 			if (bIMEInConverting)	return;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
+			dwBeforeIMEMode = (dwBeforeIMEMode == IMEENG) ? IMEOFF : dwBeforeIMEMode;
 			if ((lpAppRegData->bEnableEPHelper || lpAppRegData->bIMEModeForced)) {
 				if (dwBeforeIMEMode != IMEOFF) {
 					if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
@@ -1142,6 +1172,7 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 			if ((GetKeyState(VK_SHIFT) & 0x8000) || (GetKeyState(VK_LSHIFT) & 0x8000) || (GetKeyState(VK_RSHIFT) & 0x8000))	break;
 			if ((hForeWnd = GetForegroundWindow()) == NULL)	return;
 			dwBeforeIMEMode = Cime->dwIMEMode(hForeWnd, FALSE);
+			dwBeforeIMEMode = (dwBeforeIMEMode == IMEENG) ? IMEOFF : dwBeforeIMEMode;
 			if ((lpAppRegData->bEnableEPHelper || lpAppRegData->bIMEModeForced)) {
 				if (dwBeforeIMEMode != IMEOFF) {
 					if ((hWndHidemaru != NULL) && (hForeWnd == hWndHidemaru)) {
@@ -1248,7 +1279,11 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 	if (!hWndObserved)	return;
 	if (lpAppRegData->bDoModeDispByIMEKeyDown) {
 		if (!bIMEInConverting) {
-			if (!Cursor->bStartDrawIMEModeThreadWait(hWndObserved, lpAppRegData->dwAdditionalWaitTime))	return;
+			if (!Cursor->bStartDrawIMEModeThreadWait(hWndObserved, lpAppRegData->dwAdditionalWaitTime)) {
+				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+				return;
+			}
 		}
 	}
 	if (!Cursor->bStartIMECursorChangeThread(hWndObserved))	return;
