@@ -1,136 +1,39 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="WixToolset.Sdk/6.0.2">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
-    <ProductVersion>3.10</ProductVersion>
-    <ProjectGuid>40614f11-a07b-42ab-822e-fac73cc85cb0</ProjectGuid>
-    <SchemaVersion>2.0</SchemaVersion>
     <OutputName>FlushMouse_x64</OutputName>
-    <OutputType>Package</OutputType>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
-    <DefineConstants>Debug</DefineConstants>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <SuppressValidation>true</SuppressValidation>
+    <OutputPath>$(TargetDir)</OutputPath>
     <Cultures>ja-JP</Cultures>
-    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+    <SuppressSpecificWarnings>1070;1071</SuppressSpecificWarnings>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
-    <Cultures>ja-JP</Cultures>
-    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
-    <CompilerAdditionalOptions>-arch x64</CompilerAdditionalOptions>
-    <SuppressValidation>True</SuppressValidation>
-    <SuppressIces>ICE03</SuppressIces>
-    <LinkerAdditionalOptions>
-    </LinkerAdditionalOptions>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="Product.wxs" />
-    <Compile Include="_ExitDialog.wxs" />
-    <Compile Include="_MaintenanceTypeDlg.wxs" />
-    <Compile Include="_VerifyReadyDlg.wxs" />
-    <Compile Include="_WixUI_FeatureTree.wxs" />
-  </ItemGroup>
   <ItemGroup>
     <Content Include="banner.bmp" />
     <Content Include="dialog.bmp" />
-    <Content Include="Register_Eventlog.reg" />
-    <Content Include="Register_TaskScheduler.xml" />
-    <Content Include="License.rtf" />
-    <Content Include="Readme.txt" />
-    <Content Include="Register_TaskScheduler1.xml" />
-    <Content Include="Register_TaskScheduler2.xml" />
-    <Content Include="Register_TaskScheduler3.xml" />
+    <Content Include="TaskScheduler_StartDelay.xml" />
+    <Content Include="TaskScheduler_StartEvent.xml" />
+    <Content Include="TaskScheduler_Quit.xml" />
+    <Content Include="TaskScheduler_Start.xml" />
     <Content Include="version.wxi" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FlushMouse32\FlushMouse32.vcxproj">
-      <Name>FlushMouse32</Name>
-      <Project>{dbedaf04-fc3f-48dc-81ac-981a747f30a4}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
-    <ProjectReference Include="..\FlushMouseCursor\FlushMouseCursor.vcxproj">
-      <Name>FlushMouseCursor</Name>
-      <Project>{fb5448f4-cedd-4025-af2a-f7540bdf9dde}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
-    <ProjectReference Include="..\FlushMouseDLL32\FlushMouseDLL32.vcxproj">
-      <Name>FlushMouseDLL32</Name>
-      <Project>{701b5f8e-0e39-40c3-a692-b23a3836bede}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
-    <ProjectReference Include="..\FlushMouseDLL\FlushMouseDLL.vcxproj">
-      <Name>FlushMouseDLL</Name>
-      <Project>{ec908a5d-8859-4b02-9ace-023ff407a3a3}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
-    <ProjectReference Include="..\FlushMouseUI3\FlushMouseSettings\FlushMouseSettings.vcxproj">
-      <Name>FlushMouseSettings</Name>
-      <Project>{5f3b07f2-915c-447b-8db6-0d2a532885a9}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
-    <ProjectReference Include="..\FlushMouseUI3\FlushMouseUI3DLL\FlushMouseUI3DLL.csproj">
-      <Name>FlushMouseUI3DLL</Name>
-      <Project>{dda48b43-4f82-40aa-ac94-f6b40c7d276e}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
-    <ProjectReference Include="..\FlushMouse\FlushMouse.vcxproj">
-      <Name>FlushMouse</Name>
-      <Project>{25ccb51d-e30e-4a21-ba9d-09cf79484fe9}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
+    <None Include="License.rtf" />
   </ItemGroup>
   <ItemGroup>
-    <WixExtension Include="WixUtilExtension">
-      <HintPath>$(WixExtDir)WixUtilExtension.dll</HintPath>
-      <Name>WixUtilExtension</Name>
-    </WixExtension>
-    <WixExtension Include="WixUIExtension">
-      <HintPath>$(WixExtDir)WixUIExtension.dll</HintPath>
-      <Name>WixUIExtension</Name>
-    </WixExtension>
+    <ProjectReference Include="..\FlushMouseUI3\FlushMouseUI3DLL\FlushMouseUI3DLL.csproj" />
+    <ProjectReference Include="..\FlushMouse\FlushMouse.vcxproj" />
+    <ProjectReference Include="..\FlushMouseDLL\FlushMouseDLL.vcxproj" />
+    <ProjectReference Include="..\FlushMouse32\FlushMouse32.vcxproj" />
+    <ProjectReference Include="..\FlushMouseDLL32\FlushMouseDLL32.vcxproj" />
+    <ProjectReference Include="..\FlushMouseCursor\FlushMouseCursor.vcxproj" />
+    <ProjectReference Include="..\FlushMouseUI3\FlushMouseSettings\FlushMouseSettings.vcxproj" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="_WixUI_Alt_ja-jp.wxl" />
+    <PackageReference Include="WixToolset.UI.wixext" Version="6.0.2" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="6.0.2" />
   </ItemGroup>
-  <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />
-  <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true' ">
-    <Error Text="The WiX Toolset v3.11 (or newer) build tools must be installed to build this project. To download the WiX Toolset, see http://wixtoolset.org/releases/" />
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="Start /wait /min cmd /c &quot;$(SolutionDir)Sign_Modules.bat&quot; $(TargetDir)$(Cultures)\$(TargetFileName)" />
   </Target>
-  <PropertyGroup>
-    <PostBuildEvent>Start /wait /min cmd /c "$(SolutionDir)Sign_Modules.bat" $(TargetDir)ja-JP\$(TargetFileName)
-rem "%25ProgramFiles(x86)%25\Microsoft SDKs\ClickOnce\SignTool\signtool.exe" sign  /a /fd SHA256 /sha1 CA5B47D3AF0E8AED7A2E86121552C558407B23B8 /t http://timestamp.sectigo.com/authenticode "$(TargetDir)ja-JP\$(TargetFileName)" 
-rem copy "$(TargetDir)ja-JP\$(TargetFileName)" "$(SolutionDir)$(TargetFileName)"</PostBuildEvent>
-  </PropertyGroup>
-  <!--
-	To modify your build process, add your task inside one of the targets below and uncomment it.
-	Other similar extension points exist, see Wix.targets.
-	<Target Name="BeforeBuild">
-	</Target>
-	<Target Name="AfterBuild">
-	</Target>
-	-->
 </Project>

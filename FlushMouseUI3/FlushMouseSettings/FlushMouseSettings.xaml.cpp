@@ -518,6 +518,9 @@ static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, int iSubCode)
 			if (!Profile->bSetProfileData4IMEMode())	return FALSE;
 			return TRUE;
 		case SETTINGSEX_SETTINGS_CLOSE:
+			vSettingDialogApply();
+			if (!Profile->bSetProfileData())	return FALSE;
+			vSettingDialogClose();
 			return TRUE;
 		case SETTINGSEX_SYNTP_START:
 			vSettingDialogApply();

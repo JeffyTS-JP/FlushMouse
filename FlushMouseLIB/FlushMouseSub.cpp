@@ -564,14 +564,14 @@ BOOL	CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SE
 {
 	UNREFERENCED_PARAMETER(hWnd);
 
-	TCHAR	CommandLine[] = L"/Start";
 	switch (Type) {
 	case PBT_APMSUSPEND:
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		break;
 	case PBT_APMRESUMEAUTOMATIC:
 		break;
 	case PBT_APMRESUMESUSPEND:
-		bCreateProcess(FLUSHMOUSE_EXE, CommandLine);
+		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		break;
 	case PBT_POWERSETTINGCHANGE:
@@ -581,11 +581,11 @@ BOOL	CPowerNotification::PowerBroadcast(HWND hWnd, ULONG Type, POWERBROADCAST_SE
 		if (GetSystemPowerStatus(&PowerStatus)) {
 			switch (PowerStatus.ACLineStatus) {
 			case 0:
-				bCreateProcess(FLUSHMOUSE_EXE, CommandLine);
+				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
 				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 				break;
 			case 1:
-				bCreateProcess(FLUSHMOUSE_EXE, CommandLine);
+				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
 				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 				break;
 			default:
@@ -787,7 +787,7 @@ BOOL	 	CFlushMouseHook::bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name)
 					NORMAL_PRIORITY_CLASS, NULL, NULL, &stStartupInfo, lpstProcessInformation)) != FALSE) {
 					for (int i = 5; i > 0; i--) {
 						Sleep(500);
-						if (hGetCachedWindowByClassName(CLASS_FLUSHMOUSE32) != NULL) {
+						if (FindWindow(CLASS_FLUSHMOUSE32, NULL) != NULL) {
 							bHook32Dll = TRUE;
 							bRet = TRUE;
 							break;
@@ -812,7 +812,7 @@ BOOL	 	CFlushMouseHook::bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name)
 BOOL 	CFlushMouseHook::bHook32DllStop()
 {
 #define	TIMEOUT	3000
-	if (!bHook32Dll)		return TRUE;
+	if (!bHook32Dll)	return TRUE;
 	BOOL	bRet = FALSE;
 	if (lpstProcessInformation != NULL) {
 		if (lpstProcessInformation->hProcess != NULL) {
@@ -858,8 +858,7 @@ BOOL CALLBACK CFlushMouseHook::bEnumWindowsProcHookStop(HWND hWnd, LPARAM lParam
 	DWORD lpdwProcessId = 0;
 	GetWindowThreadProcessId(hWnd, &lpdwProcessId);
 
-	if (pi->dwProcessId == lpdwProcessId)
-	{
+	if (pi->dwProcessId == lpdwProcessId) {
 		PostMessage(hWnd, WM_CLOSE, 0, 0);
 		SetLastError(ERROR_SUCCESS);
 		return FALSE;

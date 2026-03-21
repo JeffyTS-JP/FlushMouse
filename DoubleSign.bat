@@ -7,7 +7,7 @@ echo.
 echo ===================
 echo       Desktop
 echo ===================
-copy /Y SetupProject-exe\bin\Release\FlushMouse_x64.exe FlushMouse_x64_signed.exe >NUL
+copy /Y "SetupProject-exe\bin\x64\Release\FlushMouse_x64.exe" "FlushMouse_x64_signed.exe" >NUL
 CALL "%USERPROFILE%\Program Files\SignTool\DoubleSign_Products.bat" FlushMouse_x64_signed.exe
 
 echo.
@@ -15,7 +15,7 @@ echo.
 echo ===================
 echo         UI3
 echo ===================
-copy /Y FlushMouseUI3\SetupProjectUI3-exe\bin\Release\FlushMouseUI3_x64.exe FlushMouseUI3_x64_signed.exe >NUL
+copy /Y "FlushMouseUI3\SetupProjectUI3-exe\bin\x64\Release\FlushMouseUI3_x64.exe" "FlushMouseUI3_x64_signed.exe" >NUL
 CALL "%USERPROFILE%\Program Files\SignTool\DoubleSign_Products.bat" FlushMouseUI3_x64_signed.exe
 
 if NOT EXIST "%USERPROFILE%\Program Files\SignTool\DoubleSign_Modules.bat" goto DONE
@@ -51,4 +51,4 @@ echo.
 pause
 
 :DONE
-exit
+rem exit

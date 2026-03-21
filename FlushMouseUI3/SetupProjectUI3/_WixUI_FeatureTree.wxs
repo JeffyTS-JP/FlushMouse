@@ -1,53 +1,71 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
+
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<!-- _WixUI_FeatureTree.wxs for FlushMouseUI3
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
+-->
+
+<!--
+First-time install dialog sequence:
+ - WixUI_WelcomeDlg
+ - WixUI_LicenseAgreementDlg
+ - WixUI_CustomizeDlg
+ - WixUI_VerifyReadyDlg
+ - WixUI_DiskCostDlg
+
+Maintenance dialog sequence:
+ - WixUI_MaintenanceWelcomeDlg
+ - WixUI_MaintenanceTypeDlg
+ - WixUI_CustomizeDlg
+ - WixUI_VerifyReadyDlg
+
+Patch dialog sequence:
+ - WixUI_WelcomeDlg
+ - WixUI_VerifyReadyDlg
+-->
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <?foreach WIXUIARCH in X86;X64;A64 ?>
     <Fragment>
-        <UI Id="_WixUI_FeatureTree">
+        <UI Id="_WixUI_FeatureTree_$(WIXUIARCH)" />
+        <UIRef Id="_WixUI_FeatureTree" />
+    </Fragment>
+
+    <?endforeach?>
+
+    <Fragment>
+        <UI Id="file _WixUI_FeatureTree">
             <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
             <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
             <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
 
             <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
-            <Property Id="WixUI_Mode" Value="FeatureTree" />
 
+            <DialogRef Id="BrowseDlg" />
+            <DialogRef Id="DiskCostDlg" />
             <DialogRef Id="ErrorDlg" />
             <DialogRef Id="FatalError" />
-            <DialogRef Id="FilesInUse" />
-            <DialogRef Id="MsiRMFilesInUse" />
+			<DialogRef Id="FilesInUse" />
+			<DialogRef Id="MsiRMFilesInUse" />
             <DialogRef Id="PrepareDlg" />
             <DialogRef Id="ProgressDlg" />
             <DialogRef Id="ResumeDlg" />
             <DialogRef Id="UserExit" />
 
-            <Publish Dialog="_ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+			<Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999" />
 
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT Installed</Publish>
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="_VerifyReadyDlg">Installed AND PATCH</Publish>
+			<Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg" Condition="NOT Installed" />
 
-            <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
-            <!-- Skip CustomizeDlg -->
-			<!--Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="CustomizeDlg">LicenseAccepted = "1"</Publish-->
-			<Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="_VerifyReadyDlg">LicenseAccepted = "1"</Publish>
+			<Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" />
+			<Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="_VerifyReadyDlg" Condition="LicenseAccepted = &quot;1&quot;" />
 
-			<!--Publish Dialog="CustomizeDlg" Control="Back" Event="NewDialog" Value="_MaintenanceTypeDlg" Order="1">Installed</Publish-->
-            <Publish Dialog="CustomizeDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg" Order="2">NOT Installed</Publish>
-            <Publish Dialog="CustomizeDlg" Control="Next" Event="NewDialog" Value="_VerifyReadyDlg">1</Publish>
+			<Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="_VerifyReadyDlg" />
 
-			<!-- Skip CustomizeDlg -->
-			<!--Publish Dialog="_VerifyReadyDlg" Control="Back" Event="NewDialog" Value="CustomizeDlg" Order="1">NOT Installed OR WixUI_InstallMode = "Change"</Publish-->
-			<!--Publish Dialog="_VerifyReadyDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg" Order="1">NOT Installed OR WixUI_InstallMode = "Change"</Publish-->
-			<!--Publish Dialog="_VerifyReadyDlg" Control="Back" Event="NewDialog" Value="_MaintenanceTypeDlg" Order="2">Installed AND NOT PATCH</Publish-->
-			<!--Publish Dialog="_VerifyReadyDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="3">Installed AND PATCH</Publish-->
-
-            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="_MaintenanceTypeDlg">1</Publish>
-
-			<Publish Dialog="_MaintenanceTypeDlg" Control="ChangeButton" Event="NewDialog" Value="CustomizeDlg">1</Publish>
-			<Publish Dialog="_MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="_VerifyReadyDlg">1</Publish>
-            <Publish Dialog="_MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="_VerifyReadyDlg">1</Publish>
-			<Publish Dialog="_MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
-        </UI>
-
+		</UI>
         <UIRef Id="WixUI_Common" />
     </Fragment>
 </Wix>
+
+<!-- EOF -->

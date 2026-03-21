@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<!-- _RtfLargeTheme.xml for FlushMouse and UI3
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
+-->
+
+<Theme xmlns="http://wixtoolset.org/schemas/v4/thmutil">
+	<Font Id="0" Height="-16" Weight="500" Foreground="windowtext" Background="window">Yu Gothic UI</Font>
+	<Font Id="1" Height="-24" Weight="500" Foreground="windowtext">Yu Gothic UI</Font>
+	<Font Id="2" Height="-22" Weight="500" Foreground="graytext">Yu Gothic UI</Font>
+	<Font Id="3" Height="-16" Weight="500" Foreground="windowtext" Background="window">Yu Gothic UI</Font>
+	<Font Id="4" Height="-16" Weight="500" Foreground="windowtext" Background="window" Underline="yes">Yu Gothic UI</Font>
+
+	<Window Width="600" Height="500" HexStyle="100a0000" FontId="0" Caption="#(loc.Caption)" IconFile="icon.ico">
+		<ImageControl X="20" Y="20" Width="46" Height="46" ImageFile="logo.png" Visible="yes"/>
+		<Label X="80" Y="20" Width="-11" Height="86" FontId="1" Visible="yes" DisablePrefix="yes">#(loc.Title)</Label>
+
+		<Page Name="Help">
+			<Label X="80" Y="30" Width="-11" Height="30" FontId="2" DisablePrefix="yes">#(loc.HelpHeader)</Label>
+			<Label X="80" Y="80" Width="-11" Height="-35" FontId="3" DisablePrefix="yes">#(loc.HelpText)</Label>
+			<Button Name="HelpCloseButton" X="-11" Y="-11" Width="100" Height="27" TabStop="yes" FontId="0">
+				<Text>#(loc.HelpCloseButton)</Text>
+				<CloseWindowAction />
+			</Button>
+		</Page>
+		<Page Name="Loading">
+			<Label X="80" Y="80" Width="-11" Height="30" FontId="2" DisablePrefix="yes" Visible="no" Name="CheckingForUpdatesLabel" />
+		</Page>
+		<Page Name="Install">
+			<Label X="11" Y="80" Width="-11" Height="-140" TabStop="no" FontId="2" HexStyle="800000" DisablePrefix="yes" />
+			<Label Name="InstallVersion" X="340" Y="26" Width="110" Height="27" FontId="3" DisablePrefix="yes" VisibleCondition="WixStdBAShowVersion">#(loc.InstallVersion)</Label>
+			<Label X="460" Y="26" Width="-11" Height="27" FontId="3" DisablePrefix="yes" VisibleCondition="WixStdBAShowVersion">
+				<Text Condition="NOT SearchBundleVersion">#(loc.InstallText)</Text>
+				<Text Condition="SearchBundleVersion">#(loc.ModifyText)</Text>
+			</Label>
+			<Richedit Name="EulaRichedit" X="12" Y="81" Width="-12" Height="-144" TabStop="no" FontId="0" />
+			<Checkbox Name="AddDesktopShortcut" X="21" Y="-112" Width="-11" Height="27" TabStop="yes" FontId="3" HideWhenDisabled="yes" EnableCondition="NOT SearchBundleVersion">#(loc.InstallDesktopShortcut)</Checkbox>
+			<Checkbox Name="RegisterStartMenu" X="21" Y="-90" Width="-11" Height="27" TabStop="yes" FontId="3" HideWhenDisabled="yes" EnableCondition="NOT SearchBundleVersion">#(loc.InstallRegisterStartMenu)</Checkbox>
+			<Checkbox Name="StartApplication" X="21" Y="-68" Width="-11" Height="27" TabStop="yes" FontId="3" HideWhenDisabled="yes">#(loc.InstallStartApplication)</Checkbox>
+			<Checkbox Name="EulaAcceptCheckbox" X="-11" Y="-41" Width="320" Height="27" TabStop="yes" FontId="3" HideWhenDisabled="yes">#(loc.InstallAcceptCheckbox)</Checkbox>
+			<Button Name="InstallUpdateButton" X="11" Y="-11" Width="200" Height="23" TabStop="yes" FontId="0" EnableCondition="WixStdBAUpdateAvailable" HideWhenDisabled="yes">#(loc.UpdateButton)</Button>
+			<Button Name="OptionsButton" X="-241" Y="-11" Width="110" Height="27" TabStop="no" FontId="0" VisibleCondition="NOT WixStdBASuppressOptionsUI">
+				<Text>#(loc.InstallOptionsButton)</Text>
+				<ChangePageAction Page="Options" />
+			</Button>
+			<Button Name="InstallButton" X="-131" Y="-11" Width="110" Height="27" TabStop="yes" FontId="0">#(loc.InstallInstallButton)</Button>
+			<Button Name="InstallCancelButton" X="-11" Y="-11" Width="100" Height="27" TabStop="yes" FontId="0">
+				<Text>#(loc.InstallCancelButton)</Text>
+				<CloseWindowAction />
+			</Button>
+		</Page>
+		<Page Name="Options">
+			<Label X="11" Y="80" Width="-11" Height="30" FontId="2" DisablePrefix="yes">#(loc.OptionsHeader)</Label>
+			<Label X="11" Y="141" Width="-11" Height="27" FontId="3" DisablePrefix="yes">#(loc.OptionsLocationLabel)</Label>
+			<Editbox Name="InstallFolder" X="11" Y="143" Width="-91" Height="21" TabStop="yes" FontId="3" FileSystemAutoComplete="yes" />
+			<Button Name="BrowseButton" X="-11" Y="182" Width="100" Height="27" TabStop="yes" FontId="3">
+				<Text>#(loc.OptionsBrowseButton)</Text>
+				<BrowseDirectoryAction VariableName="InstallFolder" />
+			</Button>
+			<Button Name="OptionsOkButton" X="-121" Y="-11" Width="100" Height="27" TabStop="yes" FontId="0">
+				<Text>#(loc.OptionsOkButton)</Text>
+				<ChangePageAction Page="Install" />
+			</Button>
+			<Button Name="OptionsCancelButton" X="-11" Y="-11" Width="100" Height="27" TabStop="yes" FontId="0">
+				<Text>#(loc.OptionsCancelButton)</Text>
+				<ChangePageAction Page="Install" Cancel="yes" />
+			</Button>
+		</Page>
+		<Page Name="Progress">
+			<Label X="11" Y="80" Width="-11" Height="30" FontId="2" DisablePrefix="yes">#(loc.ProgressHeader)</Label>
+			<Label Name="InstallVersion" X="340" Y="26" Width="110" Height="27" FontId="3" DisablePrefix="yes" VisibleCondition="WixStdBAShowVersion">#(loc.InstallVersion)</Label>
+			<Label X="460" Y="26" Width="-11" Height="27" FontId="3" DisablePrefix="yes" VisibleCondition="WixStdBAShowVersion">
+				<Text Condition="WixBundleAction = 4">#(loc.UninstallText)</Text>
+				<Text Condition="(WixBundleAction = 6) AND NOT SearchBundleVersion">#(loc.InstallText)</Text>
+				<Text Condition="(WixBundleAction = 6) AND SearchBundleVersion">#(loc.ModifyText)</Text>
+			</Label>
+			<Label X="11" Y="130" Width="110" Height="27" FontId="3" DisablePrefix="yes">
+				<Text>#(loc.ProgressLabel)</Text>
+				<Text Condition="WixBundleAction = 4">#(loc.ProgressLabelUninstallingText)</Text>
+				<Text Condition="(WixBundleAction = 6) AND NOT SearchBundleVersion">#(loc.ProgressLabelInstallingText)</Text>
+				<Text Condition="(WixBundleAction = 6) AND SearchBundleVersion">#(loc.ProgressLabelUpgradingText)</Text>
+			</Label>
+			<Label Name="OverallProgressPackageText" X="125" Y="130" Width="-11" Height="27" FontId="3" DisablePrefix="yes">#(loc.OverallProgressPackageText)</Label>
+			<Label X="11" Y="180" Width="-11" Height="27" FontId="3" DisablePrefix="yes">#(loc.ProgressLabelOverallProgressPackageText)</Label>
+			<Progressbar Name="OverallCalculatedProgressbar" X="11" Y="250" Width="-11" Height="15" />
+			<Label Name="ExecuteProgressActionDataText" X="125" Y="180" Width="-11" Height="27" FontId="3" DisablePrefix="yes" Visible="no" />
+			<Button Name="ProgressCancelButton" X="-11" Y="-11" Width="100" Height="27" TabStop="yes" FontId="0">#(loc.ProgressCancelButton)</Button>
+		</Page>
+		<Page Name="Modify">
+			<Label X="11" Y="80" Width="-11" Height="30" FontId="2" DisablePrefix="yes">#(loc.ModifyHeader)</Label>
+			<Label Name="InstallVersion" X="340" Y="26" Width="110" Height="27" FontId="3" DisablePrefix="yes" VisibleCondition="WixStdBAShowVersion">#(loc.InstallVersion)</Label>
+			<Label X="460" Y="26" Width="-11" Height="27" FontId="3" DisablePrefix="yes" VisibleCondition="WixStdBAShowVersion">#(loc.UninstallText)</Label>
+			<Checkbox Name="RemoveAppRegstry" X="21" Y="-110" Width="-11" Height="27" TabStop="yes" FontId="3" HideWhenDisabled="yes">#(loc.RemoveAppRegstry)</Checkbox>
+			<Button Name="ModifyUpdateButton" X="11" Y="-11" Width="200" Height="27" TabStop="yes" FontId="0" EnableCondition="WixStdBAUpdateAvailable" HideWhenDisabled="yes">#(loc.UpdateButton)</Button>
+			<Button Name="RepairButton" X="-251" Y="-11" Width="100" Height="27" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.ModifyRepairButton)</Button>
+			<Button Name="UninstallButton" X="-131" Y="-11" Width="140" Height="27" TabStop="yes" FontId="0">#(loc.ModifyUninstallButton)</Button>
+			<Button Name="ModifyCancelButton" X="-11" Y="-11" Width="100" Height="27" TabStop="yes" FontId="0">
+				<Text>#(loc.ModifyCancelButton)</Text>
+				<CloseWindowAction />
+			</Button>
+		</Page>
+		<Page Name="Success">
+			<Label X="11" Y="80" Width="-11" Height="30" FontId="2" DisablePrefix="yes">
+				<Text>#(loc.SuccessHeader)</Text>
+				<Text Condition="WixBundleAction = 4">#(loc.SuccessUninstallHeader)</Text>
+				<Text Condition="(WixBundleAction = 6) AND NOT SearchBundleVersion">#(loc.SuccessInstallHeader)</Text>
+				<Text Condition="(WixBundleAction = 6) AND SearchBundleVersion">#(loc.SuccessUpgradeHeader)</Text>
+			</Label>
+			<Label Name="InstallVersion" X="340" Y="26" Width="110" Height="27" FontId="3" DisablePrefix="yes" VisibleCondition="WixStdBAShowVersion">#(loc.InstallVersion)</Label>
+			<Label X="460" Y="26" Width="-11" Height="27" FontId="3" DisablePrefix="yes" VisibleCondition="WixStdBAShowVersion">
+				<Text Condition="WixBundleAction = 4">#(loc.UninstallText)</Text>
+				<Text Condition="(WixBundleAction = 6) AND NOT SearchBundleVersion">#(loc.InstallText)</Text>
+				<Text Condition="(WixBundleAction = 6) AND SearchBundleVersion">#(loc.ModifyText)</Text>
+			</Label>
+			<Button Name="SuccessCloseButton" X="-11" Y="-11" Width="100" Height="27" TabStop="yes" FontId="0">
+				<Text>#(loc.SuccessCloseButton)</Text>
+				<CloseWindowAction />
+			</Button>
+		</Page>
+		<Page Name="Failure">
+			<Label X="11" Y="80" Width="-11" Height="30" FontId="2" DisablePrefix="yes">
+				<Text>#(loc.FailureHeader)</Text>
+				<Text Condition="WixBundleAction = 4">#(loc.FailureUninstallHeader)</Text>
+				<Text Condition="(WixBundleAction = 6) AND NOT SearchBundleVersion">#(loc.FailureInstallHeader)</Text>
+				<Text Condition="(WixBundleAction = 6) AND SearchBundleVersion">#(loc.FailureUpgradeHeader)</Text>
+			</Label>
+			<Label Name="InstallVersion" X="340" Y="26" Width="110" Height="27" FontId="3" DisablePrefix="yes" VisibleCondition="WixStdBAShowVersion">#(loc.InstallVersion)</Label>
+			<Label X="460" Y="26" Width="-11" Height="27" FontId="3" DisablePrefix="yes" VisibleCondition="WixStdBAShowVersion">
+				<Text Condition="WixBundleAction = 4">#(loc.UninstallText)</Text>
+				<Text Condition="(WixBundleAction = 6) AND NOT SearchBundleVersion">#(loc.InstallText)</Text>
+				<Text Condition="(WixBundleAction = 6) AND SearchBundleVersion">#(loc.ModifyText)</Text>
+			</Label>
+			<Hypertext Name="FailureMessageText" X="22" Y="141" Width="-11" Height="100" FontId="3" TabStop="yes" HideWhenDisabled="yes" />
+			<Hypertext Name="FailureLogFileLink" X="22" Y="260" Width="-11" Height="42" FontId="3" TabStop="yes" HideWhenDisabled="yes">#(loc.FailureHyperlinkLogText)</Hypertext>
+			<Label Name="FailureRestartText" X="22" Y="320" Width="-11" Height="54" FontId="3" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.FailureRestartText)</Label>
+			<Button Name="FailureRestartButton" X="-121" Y="-11" Width="150" Height="27" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.FailureRestartButton)</Button>
+			<Button Name="FailureCloseButton" X="-11" Y="-11" Width="100" Height="27" TabStop="yes" FontId="0">
+				<Text>#(loc.FailureCloseButton)</Text>
+				<CloseWindowAction />
+			</Button>
+		</Page>
+	</Window>
+</Theme>
+
+<!-- EOF -->

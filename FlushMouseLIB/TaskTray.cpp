@@ -91,14 +91,11 @@ BOOL		CTaskTray::bCreateTaskTrayWindow(HWND hWnd, HICON hIcon, LPCTSTR lpszTitle
 
 	if (Shell_NotifyIcon(NIM_ADD, &nIco))	return TRUE;
 
-	DWORD err = GetLastError();
-	if (err == ERROR_TIMEOUT) {
-		Sleep(2000);
-		if (Shell_NotifyIcon(NIM_MODIFY, &nIco)) return TRUE;
-		err = GetLastError();
+	for (int i = 0; i < 30; i++) {
+		DWORD err = GetLastError();
 		if (err == ERROR_TIMEOUT) {
-			Sleep(2000);
-			if (Shell_NotifyIcon(NIM_ADD, &nIco)) return TRUE;
+			Sleep(1000);
+			if (Shell_NotifyIcon(NIM_MODIFY, &nIco)) return TRUE;
 		}
 	}
 	bReportEvent(MSG_TASKTRAY_REGISTER_FAILD, APPLICATION_CATEGORY);
@@ -121,7 +118,7 @@ BOOL		CTaskTray::bReCreateTaskTrayWindow(HWND hWnd) const
 		}
 		if (bRet) {
 			if (!Cursor->bReloadCursor()) {
-				bReportEvent(MSG_THREAD_HOOK_TIMER_RESTART_FAILED, APPLICATION_CATEGORY);
+				bReportEvent(MSG_TASKTRAY_REGISTER_FAILD, APPLICATION_CATEGORY);
 				return FALSE;
 			}
 		}

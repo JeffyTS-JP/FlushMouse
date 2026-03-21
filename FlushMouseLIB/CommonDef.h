@@ -43,9 +43,9 @@
 #define FLUSHMOUSECURSOR_DAT		L"FlushMouseCursor.dat"
 
 // Window Class
-#define	CLASS_FLUSHMOUSE			L"FlushMouse-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
-#define CLASS_FLUSHMOUSE32			L"FlushMouse32-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
-#define	CLASS_FLUSHMOUSESETTINGS	L"FlushMouseSettings-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
+#define	CLASS_FLUSHMOUSE			L"Global\\FlushMouse-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
+#define CLASS_FLUSHMOUSE32			L"Global\\FlushMouse32-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
+#define	CLASS_FLUSHMOUSESETTINGS	L"Global\\FlushMouseSettings-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}"
 
 // for IME
 #define IMC_GETCONVERSIONMODE   0x0001
@@ -106,17 +106,13 @@ typedef struct tagSIZED
 // Message Handler Define
 //
 
-// void Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg);
-#define WM_TASKTRAYEX						(WM_USER + 0x0001)
-#define HANDLE_WM_TASKTRAYEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (UINT)(wParam), (UINT)(lParam)), 0L)
+// void Cls_OnCreateEx(HWND hWnd, WPARAM wParam, LPCREATESTRUCT lParam)
+#define WM_CREATEEX							(WM_USER + WM_CREATE)
+#define HANDLE_WM_CREATEEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (WPARAM)(wParam), (LPCREATESTRUCT )(lParam)), 0L)
 
-// void Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd);
-#define WM_EVENT_SYSTEM_FOREGROUNDEX		(WM_USER + 0x0002)
-#define HANDLE_WM_EVENT_SYSTEM_FOREGROUNDEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (DWORD)(wParam), (HWND)(lParam)), 0L)
-
-// void	Cls_OnCheckIMEStartConvertingEx(HWND hWnd, BOOL bStartConverting, DWORD vkCode);
-#define WM_CHECKIMESTARTCONVEX				(WM_USER + 0x0004)
-#define	HANDLE_WM_CHECKIMESTARTCONVEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (BOOL)(wParam), (DWORD)(lParam)), 0L)
+// void Cls_OnDestroyEx(HWND hwnd)
+#define WM_DESTROYEX							(WM_USER + WM_DESTROY)
+#define HANDLE_WM_DESTROYEX(hwnd, wParam, lParam, fn) ((fn)(hwnd), 0L)
 
 // void Cls_OnLButtonDownEx(HWND hWnd, int x, int y, HWND hForeground)
 #define WM_LBUTTONDOWNEX					(WM_USER + WM_LBUTTONDOWN)
@@ -146,10 +142,6 @@ typedef struct tagSIZED
 #define WM_SYSKEYDOWNUPEX					(WM_USER + WM_SYSKEYDOWN)
 #define HANDLE_WM_SYSKEYDOWNUPEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (UINT)(wParam), (!(BOOL)(lParam & 0x80000000)), (int)(short)LOWORD(lParam), (UINT)HIWORD(lParam)), 0L)
 
-// void Cls_OnCreateEx(HWND hWnd, WPARAM wParam, LPCREATESTRUCT lParam)
-#define WM_CREATEEX							(WM_USER + WM_CREATE)
-#define HANDLE_WM_CREATEEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (WPARAM)(wParam), (LPCREATESTRUCT )(lParam)), 0L)
-
 // void Cls_OnInputLangChangeEx(HWND hWnd, UINT CodePage, HKL hkl);
 #define WM_INPUTLANGCHANGEEX				(WM_USER + WM_INPUTLANGCHANGE)
 #define HANDLE_WM_INPUTLANGCHANGEEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (UINT)(wParam), (HKL)(lParam)), 0L)
@@ -162,8 +154,20 @@ typedef struct tagSIZED
 #define	WM_MOUSEHWHEELEX					(WM_USER + WM_MOUSEHWHEEL)
 #define HANDLE_WM_MOUSEHWHEELEX(hwnd, wParam, lParam, fn) ((fn)((hwnd), (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (int)(short)HIWORD(wParam), (UINT)(short)LOWORD(wParam)), 0L)
 
+// void Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg);
+#define WM_TASKTRAYEX						(WM_USER + 0x00fb)
+#define HANDLE_WM_TASKTRAYEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (UINT)(wParam), (UINT)(lParam)), 0L)
+
+// void Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd);
+#define WM_EVENT_SYSTEM_FOREGROUNDEX		(WM_USER + 0x00fc)
+#define HANDLE_WM_EVENT_SYSTEM_FOREGROUNDEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (DWORD)(wParam), (HWND)(lParam)), 0L)
+
+// void	Cls_OnCheckIMEStartConvertingEx(HWND hWnd, BOOL bStartConverting, DWORD vkCode);
+#define WM_CHECKIMESTARTCONVEX				(WM_USER + 0x00fd)
+#define	HANDLE_WM_CHECKIMESTARTCONVEX(hWnd, wParam, lParam, fn) ((fn)((hWnd), (BOOL)(wParam), (DWORD)(lParam)), 0L)
+
 // BOOL Cls_OnSettings(HWND hWnd, int iCode, LPARAM lParam);
-#define WM_SETTINGSEX						(WM_USER + 0xfe)
+#define WM_SETTINGSEX						(WM_USER + 0x00fe)
 #define HANDLE_WM_SETTINGSEX(hWnd, wParam, lParam, fn) ((LRESULT)(BOOL)(fn)((hWnd), (int)(wParam), (int)(lParam)))
 #define SETTINGSEX_OK								0
 #define SETTINGSEX_CANCEL							1
