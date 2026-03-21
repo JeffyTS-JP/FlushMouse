@@ -1,53 +1,62 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 
 <!-- Bundle.wxs for FlushMouse
 //		Copyright (C) 1993- JeffyTS. All rights reserved.
 //		Licensed under the GPL-2.0 License.
 -->
 
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
-	 xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
-	 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+		xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal"
+		xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
 	<?include ..\SetupProject\version.wxi ?>
+
 	<?define LogoSrc = "..\OSDN Wiki\FlushMouse.png" ?>
 	<?define LicenseSrc = "..\SetupProject\License.rtf" ?>
 	<?define IconSrcFile = "..\FlushMouseLIB\FlushMouse.ico" ?>
 
-	<?define LocalizationSrc = "customtheme.wxl" ?>
-	<?define CustomThemeSrc = "customtheme.xml" ?>
+	<?define CustomThemeSrc = "_RtfLargeTheme.xml" ?>
+	<?define LocalizationSrc = "_RtfLargeTheme_ja-jp.wxl" ?>
 
-	<Bundle Name="$(var.ProductName)"
-			Version="$(var.Version)"
+	<Bundle Id="$(var.ProductName)"
+			Name="$(var.ProductName)"
 			Manufacturer="$(var.Manufacturer)"
+			Version="$(var.Version)"
 			Copyright="Copyright (c) $(var.Manufacturer)"
 			IconSourceFile="$(var.IconSrcFile)"
+			HelpUrl="$(var.AboutUrlSrc)"
 			AboutUrl="$(var.AboutUrlSrc)"
 			UpgradeCode="{2590C08A-B975-41F3-ACA2-1DA69A22DA1D}"
 			DisableModify="yes"
-			DisableRemove="yes">
+			DisableRemove="yes" >
 
-		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
+		<BootstrapperApplication>
 			<bal:WixStandardBootstrapperApplication
-				LicenseFile="$(var.LicenseSrc)"
 				ShowVersion="yes"
 				LogoFile="$(var.LogoSrc)"
-				LogoSideFile="$(var.LogoSrc)"
 				SuppressOptionsUI="yes"
 				SuppressRepair="yes"
 				ThemeFile="$(var.CustomThemeSrc)"
 				LocalizationFile="$(var.LocalizationSrc)"
-				/>
-		</BootstrapperApplicationRef>
+				LicenseFile="$(var.LicenseSrc)"
+				Theme="rtfLicense" />
 
+			<Payload Name="icon.ico" SourceFile="$(var.IconSrcFile)" Compressed="yes" />
+		</BootstrapperApplication>
+
+		<Log Prefix ="$(var.ProductName)_$(var.Version)" Extension="log" />
 		<OptionalUpdateRegistration Name="$(var.ProductName)"/>
-		<Variable Name="SearchProductVersion" bal:Overridable="yes" Type="string" Value="" />
-		<Variable Name="SearchBundleVersion" bal:Overridable="yes" Type="string" Value=""/>
-		<Variable Name="SearchBundleID" bal:Overridable="yes" Type="string" Value=""/>
-		<Variable Name="SearchPackageName" bal:Overridable="yes" Type="string" Value=""/>
+
+		<Variable Name="SearchProductVersion" Type="string" Value="" />
+		<Variable Name="SearchBundleVersion" Type="string" Value="" />
+		<Variable Name="SearchBundleID" Type="string" Value="" />
+		<Variable Name="SearchPackageName" Type="string" Value="" />
+		<Variable Name="DotNetVersion" Type="string" Value="" />
+		<Variable Name="DotNetFileVersion" Type="version" Value="v0.0.0.0" />
+
 		<util:RegistrySearch
 			Id="SearchForProductVersion"
 			ExpandEnvironmentVariables="yes"
-			Win64="yes"
 			Root="HKLM"
 			Key="SOFTWARE\WOW6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)"
 			Value="ProductVersion"
@@ -55,7 +64,6 @@
 		<util:RegistrySearch
 			Id="SearchForBundleVersion"
 			ExpandEnvironmentVariables="yes"
-			Win64="yes"
 			Root="HKLM"
 			Key="SOFTWARE\WOW6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)"
 			Value="BundleVersion"
@@ -63,7 +71,6 @@
 		<util:RegistrySearch
 			Id="SearchForBundleID"
 			ExpandEnvironmentVariables="yes"
-			Win64="yes"
 			Root="HKLM"
 			Key="SOFTWARE\WOW6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)"
 			Value="BundleID"
@@ -71,30 +78,36 @@
 		<util:RegistrySearch
 			Id="SearchForPackageName"
 			ExpandEnvironmentVariables="yes"
-			Win64="yes"
 			Root="HKLM"
 			Key="SOFTWARE\WOW6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)"
 			Value="PackageName"
 			Variable="SearchPackageName" />
 
-		<bal:Condition Message ="別のバージョンの $(var.ProductName) が既にインストールされているため、このバージョンのインストールを続行できません。既にインストールされているバージョンを削除するには、設定の「アプリ」から「インストールされているアプリ」、またはコントロールパネルの「プログラムと機能」を使用します。">
-			<![CDATA[NOT ((NOT SearchBundleVersion) AND SearchProductVersion)]]>
-		</bal:Condition>
-		<bal:Condition Message ="新しいバージョンの $(var.ProductName) が既にインストールされているため、このバージョンのインストールを続行できません。既にインストールされているバージョンを削除するには、設定の「アプリ」から「インストールされているアプリ」、またはコントロールパネルの「プログラムと機能」を使用します。">
-			<![CDATA[NOT (SearchBundleVersion AND SearchProductVersion AND (SearchProductVersion > WixBundleFileVersion))]]>
-		</bal:Condition>
-		<bal:Condition Message ="[SearchPackageName] が既にインストールされているため、$(var.ProductName) のインストールを続行できません。既にインストールされている [SearchPackageName] を削除するには、設定の「アプリ」から「インストールされているアプリ」、またはコントロールパネルの「プログラムと機能」を使用します。">
-			<![CDATA[((NOT SearchPackageName) AND (NOT SearchBundleVersion)) OR (NOT (SearchPackageName <> "$(var.ProductName)"))]]>
-		</bal:Condition>
+		<bal:Condition
+			Condition="NOT (SearchBundleVersion AND SearchProductVersion AND (SearchProductVersion > v$(var.Version)))"
+			Message="!(loc.FailureNewerFound)" />
+		<bal:Condition
+			Condition="NOT ((NOT SearchBundleVersion) AND SearchProductVersion)"
+			Message="!(loc.FailureSelfFound)" />
+		<bal:Condition
+			Condition="NOT (SearchBundleVersion AND SearchProductVersion AND (v3.9.0.0 > SearchProductVersion))"
+			Message="!(loc.FailurePreviousInstallerFound)" />
 
 		<util:RegistrySearch
 			Id="SearchForDotNetVersion"
 			ExpandEnvironmentVariables="yes"
-			Win64="yes"
 			Root="HKLM"
 			Key="SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedhost"
 			Value="Version"
 			Variable="DotNetVersion" />
+
+		<util:RegistrySearch
+			Id="SearchForDotNetProductID"
+			ExpandEnvironmentVariables="yes"
+			Root="HKLM"
+			Key="SOFTWARE\Classes\Installer\Dependencies\{90d77843-5fbd-64ef-6bdf-df7574d01646}"
+			Value="Version"
+			Variable="DotNetProductID" />
 
 		<util:FileSearch
 			Id="SearchForDotNetFileVersion"
@@ -111,51 +124,52 @@
 		<Variable Name="RemoveAppRegstry" bal:Overridable="yes" Value="0" />
 		<Variable Name="RemoveAppRegstryVariable" bal:Overridable="yes" Value="[RemoveAppRegstry]" />
 
-		<Chain>
+		<Chain DisableSystemRestore="yes" DisableRollback="no" ParallelCache="no">
+			<!-- Windows Desktop Runtime 10.0.0 (x64) -->
 			<ExePackage Id="WindowsDesktop_Runtime"
-				Name="windowsdesktop-runtime-10.0.0-win-x64.exe"
-				DownloadUrl="https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/10.0.0/windowsdesktop-runtime-10.0.0-win-x64.exe"
+				CacheId="{A6372A29-8B26-4037-9CF9-B8C7B4D64068}"
 				Permanent="yes"
-				Cache="no"
-				Compressed="no"
+				Cache="remove"
 				PerMachine="yes"
 				Vital="yes"
-				InstallCommand="/install /norestart /quiet"
-				DetectCondition="DotNetVersion AND (DotNetVersion >= v10.0) OR DotNetFileVersion AND (DotNetFileVersion >= v10.0)"
-				InstallCondition="VersionNT64 AND NOT ((DotNetVersion >= v10.0) OR (DotNetFileVersion >= v10.0))" >
-				<RemotePayload
+				DetectCondition="DotNetVersion AND (DotNetVersion &gt;= v10.0) AND (DotNetProductID &gt;= v10.0) OR DotNetFileVersion AND (DotNetFileVersion &gt;= v10.0) AND (DotNetProductID &gt;= v10.0)"
+				InstallCondition="VersionNT64 AND NOT ((DotNetVersion &gt;= v10.0) OR (DotNetFileVersion &gt;= v10.0) OR (DotNetProductID &gt;= v10.0))" InstallArguments="/install /norestart /quiet">
+				<ExePackagePayload
 					CertificatePublicKey="C6FE1068276FF20DECBBF3C243C8852471E51B99"
 					CertificateThumbprint="860AB2B78578D8EF61F692CF81AE4B1198CCBC94"
 					Description="Microsoft Windows Desktop Runtime 10.0.0 (x64)"
-					Hash="FFED598B05E9697AE3A0117DA62F985D502B9366"
 					ProductName="Microsoft Windows Desktop Runtime 10.0.0 (x64)"
 					Size="60222728"
 					Version="10.0.0.50000"
-				/>
+					Name="windowsdesktop-runtime-10.0.0-win-x64.exe"
+					DownloadUrl="https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/10.0.0/windowsdesktop-runtime-10.0.0-win-x64.exe" />
 			</ExePackage>
 
-			<RollbackBoundary/>
+			<RollbackBoundary Vital="yes" />
 
-			<MsiPackage Id="MainPackage"
+			<!-- Main Package -->
+			<MsiPackage Id="$(var.ProductName)_MainPackage"
 						SourceFile="..\SetupProject\bin\x64\Release\ja-JP\$(var.ProductName)_x64.msi"
 						Description="$(var.ProductName) by $(var.Manufacturer)"
-						DisplayName="$(var.ProductName) $(var.Version)"
+						DisplayName="$(var.ProductName) Version $(var.Version)"
 						Permanent="no"
-						Cache="yes"
+						Cache="keep"
+						ForcePerMachine="yes"
 						EnableFeatureSelection="no"
-						DisplayInternalUI="no"
 						Visible="yes"
 						Compressed="yes"
-						Vital="no">
-				<MsiProperty Name='BUNDLE' Value='1'/>
-				<MsiProperty Name='BUNDLE_ID' Value='[WixBundleProviderKey]'/>
-				<MsiProperty Name='BUNDLE_VERSION' Value='[WixBundleVersion]'/>
-				<MsiProperty Name="ADDDESKTOPSHORTCUT" Value="[AddDesktopShortcutVariable]" />
-				<MsiProperty Name="REGISTERSTARTMENU" Value="[RegisterStartMenuVariable]" />
-				<MsiProperty Name="STARTAPPLICATION" Value="[StartApplicationVariable]" />
-				<MsiProperty Name="REMOVEAPPREGISTRY" Value="[RemoveAppRegstryVariable]" />
+						Vital="yes"
+						bal:DisplayInternalUICondition="no">
+				<MsiProperty Name="BUNDLE" Value="1" />
+				<MsiProperty Name="BUNDLE_ID" Value="[WixBundleProviderKey]" />
+				<MsiProperty Name="BUNDLE_VERSION" Value="[WixBundleVersion]" />
+				<MsiProperty Name="ADDDESKTOPSHORTCUT" Value="[AddDesktopShortcut]" />
+				<MsiProperty Name="REGISTERSTARTMENU" Value="[RegisterStartMenu]" />
+				<MsiProperty Name="STARTAPPLICATION" Value="[StartApplication]" />
+				<MsiProperty Name="REMOVEAPPREGISTRY" Value="[RemoveAppRegstry]" />
 			</MsiPackage>
 		</Chain>
 	</Bundle>
 </Wix>
 
+<!-- EOF -->

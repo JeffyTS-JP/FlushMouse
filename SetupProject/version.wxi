@@ -1,17 +1,18 @@
 ﻿<Include>
+<!--Include xmlns="http://wixtoolset.org/schemas/v4/wxs"-->
 
 	<!-- version.wxi for wix Setup Project -->
 	<!--
 //		Copyright (C) 1993- JeffyTS. All rights reserved.
 //		Licensed under the GPL-2.0 License.
 	-->
-	<?define Version = "3.8.4.7" ?>
+	<?define Version = "4.0.0.9" ?>
 
 	<!-- Common -->
 	<?define ProductName = "FlushMouse" ?>
 	<?define Manufacturer = "JeffyTS" ?>
 
-	<!-- Product.wxs -->
+	<!-- Package.wxs -->
 	<?define Comments = "Mouse and IME UTY" ?>
 
 	<!-- Bundle.wxs -->
@@ -23,3 +24,4 @@
 
 </Include>
 
+<!-- EOF -->

@@ -9,11 +9,11 @@
 // #0000	2023/03/17  JeffyTS  	New edit.
 //
 
-#define MAJOR_VERSION				3
-#define MINOR_VERSION				8
-#define BUILD_VERSION				4
-#define REVISION_VERSION		    7
-#define	VERSION				 "3.8.4.7"
+#define MAJOR_VERSION				4
+#define MINOR_VERSION				0
+#define BUILD_VERSION				0
+#define REVISION_VERSION		    9
+#define	VERSION				 "4.0.0.9"
 
 #define FILE_VERSION_STRING		VALUE	"FileVersion",		VERSION
 #define PRODUCT_VERSION_STRING	VALUE	"ProductVersion",	VERSION

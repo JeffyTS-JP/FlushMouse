@@ -92,6 +92,7 @@ static void		Cls_OnDisplayChange(HWND hWnd, UINT bitsPerPixel, UINT cxScreen, UI
 static BOOL		Cls_OnQueryEndSession(HWND hWnd);
 
 // EX Message Handler
+static void		Cls_OnDestroyEx(HWND hWnd);
 static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, int iSubCode);
 static void		Cls_OnInputLangChangeEx(HWND hWnd, UINT CodePage, HKL hkl);
 static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd);
@@ -172,74 +173,32 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_o
 //
 int			iCheckCmdLine(LPCTSTR lpCmdLine)
 {
-	if ((*lpCmdLine != _T('\0')) && (_tcscmp(lpCmdLine, L"/Start") == 0)) {
+	int	iExitCode = 0;
+	if ((lpCmdLine != NULL) && (_tcscmp(lpCmdLine, L"/Start") == 0)) {
 		bReportEvent(MSG_START_FLUSHMOUSE_EVENT, Shortcut_CATEGORY);
-		return (0);
+		iExitCode = 0;
 	}
-	if ((*lpCmdLine != _T('\0')) && (_tcscmp(lpCmdLine, L"/Quit") == 0)) {
-		HWND	hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
-		DWORD	dwCurrentProcessId = GetCurrentProcessId();
-		if (hWnd != NULL) {
-			DWORD	dwExistingProcessId = 0;
-			GetWindowThreadProcessId(hWnd, &dwExistingProcessId);
-			if (dwExistingProcessId != dwCurrentProcessId) {
-				HANDLE	hProcess = OpenProcess(PROCESS_TERMINATE | SYNCHRONIZE, FALSE, dwExistingProcessId);
-				if (hProcess != NULL) {
-					PostMessage(hWnd, WM_DESTROY, NULL, NULL);
-					DWORD	dwWaitResult = WaitForSingleObject(hProcess, 3000);
-					if (dwWaitResult == WAIT_TIMEOUT) {
-						TerminateProcess(hProcess, 1);
-						WaitForSingleObject(hProcess, 1000);
-					}
-					CloseHandle(hProcess);
-					for (int i = 0; i < 10; i++) {
-						if (FindWindow(CLASS_FLUSHMOUSE, NULL) == NULL) {
-							return (0);
-						}
-						Sleep(100);
-					}
-				}
-				else {
-					return (-1);
-				}
-			}
-		}
-		return (0);
-	}
-	HANDLE	hMutex = CreateMutex(NULL, TRUE, CLASS_FLUSHMOUSE);
-	if (hMutex == NULL) {
-		bReportEvent(MSG_FLUSHMOUSE_ALREADY_RUN, APPLICATION_CATEGORY);
-		return (-1);
-	}
-	if (GetLastError() == ERROR_ALREADY_EXISTS) {
-		HWND	hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
-		if (hWnd != NULL) {
-			DWORD dwExistingProcessId = 0;
-			DWORD dwCurrentProcessId = GetCurrentProcessId();
-			GetWindowThreadProcessId(hWnd, &dwExistingProcessId);
-			if (dwExistingProcessId != dwCurrentProcessId) {
+	else if ((lpCmdLine != NULL) && (_tcscmp(lpCmdLine, L"/Quit") == 0))	iExitCode = 0;
+	else iExitCode = 1;
+
+	HWND	hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
+	HWND	hWnd32 = FindWindow(CLASS_FLUSHMOUSE32, NULL);
+	if (hWnd || hWnd32) {
+		MSG msg{};
+		for (int i = 0; i < 3; i++) {
+			if (hWnd != NULL) {
 				SetFocus(GetLastActivePopup(hWnd));
-				PostMessage(hWnd, WM_DESTROY, NULL, NULL);
-				for (int i = 0; i < 10; i++) {
-					if (FindWindow(CLASS_FLUSHMOUSE, NULL) == NULL) {
-						return (1);
-					}
-					Sleep(500);
-				}
-				bReportEvent(MSG_FLUSHMOUSE_ALREADY_RUN, APPLICATION_CATEGORY);
-				return (-1);
+				PostMessage(hWnd, WM_DESTROYEX, NULL, NULL);
+				Sleep(500);
 			}
-		}
-		else {
-			CloseHandle(hMutex);
-			hMutex = CreateMutex(NULL, TRUE, CLASS_FLUSHMOUSE);
-			if (hMutex == NULL || GetLastError() == ERROR_ALREADY_EXISTS) {
-				bReportEvent(MSG_FLUSHMOUSE_ALREADY_RUN, APPLICATION_CATEGORY);
-				return (0);
+			hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
+			hWnd32 = FindWindow(CLASS_FLUSHMOUSE32, NULL);
+			if (!hWnd && !hWnd32) {
+				return (iExitCode);
 			}
 		}
 	}
-	return (1);
+	return (iExitCode);
 }
 
 //
@@ -270,6 +229,9 @@ static ATOM MyRegisterClass(HINSTANCE hInstance)
 
 	WNDCLASSEX wcex{};
 	wcex.cbSize = sizeof(WNDCLASSEX);
+	if (GetClassInfoEx(hInstance, CLASS_FLUSHMOUSE, &wcex)) {
+		return (ATOM)0;
+	}
 	wcex.style = CLASSSTYLE;
 	wcex.lpfnWndProc = WndProc;
 	wcex.cbClsExtra = 0;
@@ -329,6 +291,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		HANDLE_MSG(hWnd, WM_DISPLAYCHANGE, Cls_OnDisplayChange);
 		HANDLE_MSG(hWnd, WM_QUERYENDSESSION, Cls_OnQueryEndSession);
 
+		HANDLE_MSG(hWnd, WM_DESTROYEX, Cls_OnDestroyEx);
 		HANDLE_MSG(hWnd, WM_SETTINGSEX, Cls_OnSettingsEx);
 		HANDLE_MSG(hWnd, WM_INPUTLANGCHANGEEX, Cls_OnInputLangChangeEx);
 		HANDLE_MSG(hWnd, WM_EVENT_SYSTEM_FOREGROUNDEX, Cls_OnEventForegroundEx);
@@ -363,9 +326,15 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		bFlushMouseCSInitialized = TRUE;
 	}
 
-	CHANGEFILTERSTRUCT	cf{};
-	cf.cbSize = sizeof(CHANGEFILTERSTRUCT);
+	CHANGEFILTERSTRUCT	cf{ cf.cbSize =sizeof(CHANGEFILTERSTRUCT) };
 	if (!ChangeWindowMessageFilterEx(hWnd, WM_SETTINGSEX, MSGFLT_ALLOW, &cf)) {
+		vMessageBox(hWnd, IDS_CANTLOADREG, MessageBoxTYPE, __func__, __LINE__);
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+		return FALSE;
+	}
+
+	cf.cbSize = sizeof(CHANGEFILTERSTRUCT); cf.ExtStatus = MSGFLTINFO_NONE;
+	if (!ChangeWindowMessageFilterEx(hWnd, WM_DESTROYEX, MSGFLT_ALLOW, &cf)) {
 		vMessageBox(hWnd, IDS_CANTLOADREG, MessageBoxTYPE, __func__, __LINE__);
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		return FALSE;
@@ -404,9 +373,9 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 	constexpr UINT uiNumDevices = 2;
 	RAWINPUTDEVICE	RawInputDevice[uiNumDevices]{};
 	RawInputDevice[0].hwndTarget = hWnd;	RawInputDevice[0].dwFlags = (RIDEV_INPUTSINK | RIDEV_DEVNOTIFY);
-	RawInputDevice[0].usUsagePage =  HID_USAGE_PAGE_GENERIC;	RawInputDevice[0].usUsage = HID_USAGE_GENERIC_MOUSE;
+	RawInputDevice[0].usUsagePage = HID_USAGE_PAGE_GENERIC;	RawInputDevice[0].usUsage = HID_USAGE_GENERIC_MOUSE;
 	RawInputDevice[1].hwndTarget = hWnd;	RawInputDevice[1].dwFlags = (RIDEV_INPUTSINK | RIDEV_DEVNOTIFY);
-	RawInputDevice[1].usUsagePage =  HID_USAGE_PAGE_GENERIC;	RawInputDevice[1].usUsage = HID_USAGE_GENERIC_KEYBOARD;
+	RawInputDevice[1].usUsagePage = HID_USAGE_PAGE_GENERIC;	RawInputDevice[1].usUsage = HID_USAGE_GENERIC_KEYBOARD;
 	RawInput = new CRawInputDevice();
 	if (RawInput) {
 		if (!RawInput->bRegisterRawInputDevices(RawInputDevice, uiNumDevices)) {
@@ -416,21 +385,12 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		}
 	}
 
-	if (!bStartThreadHookTimer(hWnd)) {
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-		return FALSE;
-	}
-
-	if ((bCheckExistingJPIME() && lpAppRegData->bEnableEPHelper)) {
-		bForExplorerPatcherSWS(GetForegroundWindow(), TRUE, TRUE, NULL, NULL);
-	}
-
 	TaskTray = new CTaskTray();
 	if (TaskTray) {
 		HICON	hIcon = NULL;
 		if ((hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE))) != NULL) {
 			BOOL	bRet = FALSE;
-			for (int i = 0; i < 30; i++) {
+			for (int i = 0; i < 10; i++) {
 				if ((bRet = TaskTray->bCreateTaskTrayWindow(hWnd, hIcon, g_szWindowTitle)))	break;
 				Sleep(1000);
 			}
@@ -451,12 +411,10 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		}
 	}
 
-	if (lpAppRegData != NULL) {
-		if ((lpAppRegData->dwSynTPHelper1 == SYNTPH_SENDERIPV4_START)
-			|| (lpAppRegData->dwSynTPHelper1 == SYNTPH_RECEIVERIPV4_START)
-			|| (lpAppRegData->dwSynTPHelper1 == SYNTPH_SENDERHOSNAMEIPV4_START)) {
-			bStartSynTPHelper(g_hMainWnd, lpAppRegData->dwSynTPHelper1, TRUE);
-		}
+	if ((lpAppRegData->dwSynTPHelper1 == SYNTPH_SENDERIPV4_START)
+		|| (lpAppRegData->dwSynTPHelper1 == SYNTPH_RECEIVERIPV4_START)
+		|| (lpAppRegData->dwSynTPHelper1 == SYNTPH_SENDERHOSNAMEIPV4_START)) {
+		bStartSynTPHelper(g_hMainWnd, lpAppRegData->dwSynTPHelper1, TRUE);
 	}
 
 	PowerNotification = new CPowerNotification(hWnd);
@@ -465,6 +423,16 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 		return FALSE;
 	}
+
+	if (!bStartThreadHookTimer(hWnd)) {
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+		return FALSE;
+	}
+
+	if ((bCheckExistingJPIME() && lpAppRegData->bEnableEPHelper)) {
+		bForExplorerPatcherSWS(GetForegroundWindow(), TRUE, TRUE, NULL, NULL);
+	}
+
 	return TRUE;
 }
 
@@ -605,9 +573,17 @@ static void	Cls_OnDisplayChange(HWND hWnd, UINT bitsPerPixel, UINT cxScreen, UIN
 //
 static BOOL Cls_OnQueryEndSession(HWND hWnd)
 {
-	UNREFERENCED_PARAMETER(hWnd);
 	Cls_OnDestroy(hWnd);
 	return TRUE;
+}
+
+//
+// WM_DESTROYEX
+// Cls_OnDestroyEx()
+//
+static void Cls_OnDestroyEx(HWND hWnd)
+{
+	Cls_OnDestroy(hWnd);
 }
 
 //
@@ -664,6 +640,7 @@ void Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground)
 	UNREFERENCED_PARAMETER(x);
 	UNREFERENCED_PARAMETER(y);
 	UNREFERENCED_PARAMETER(hForeground);
+
 	if (!Profile || !Cursor || !EventHook)	return;
 	const LPAPPREGDATA lpAppRegData = (Profile->lpstAppRegData ? Profile->lpstAppRegData : NULL);
 	if (!lpAppRegData)	return;
@@ -676,22 +653,20 @@ void Cls_OnLButtonUpEx(HWND hWnd, int x, int y, HWND hForeground)
 			}
 		}
 	}
-	if (lpAppRegData->bDoModeDispByMouseBttnUp) {
-		HWND	hWndObserved = NULL;
-		POINT	pt{};
-		if (GetCursorPos(&pt)) {
-			if ((hWndObserved = WindowFromPoint(pt)) != NULL) {
-				if (Cursor->bStartIMECursorChangeThread(hWndObserved)) {
-					if (bCheckDrawIMEModeArea(hWndObserved)) {
-						if (Cursor->bStartDrawIMEModeThread(hWndObserved))	return;
-					}
-					else return;
+	HWND	hWndObserved = NULL;
+	POINT	pt{};
+	if (lpAppRegData->bDoModeDispByMouseBttnUp && GetCursorPos(&pt)) {
+		if ((hWndObserved = WindowFromPoint(pt)) != NULL) {
+			if (Cursor->bStartIMECursorChangeThread(hWndObserved)) {
+				if (bCheckDrawIMEModeArea(hWndObserved) && (g_hMainWnd != hForeground)) {
+					if (Cursor->bStartDrawIMEModeThread(hWndObserved))	return;
 				}
+				else return;
 			}
 		}
-		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 	}
+	bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+	PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 	return;
 }
 
@@ -726,24 +701,23 @@ static void		Cls_OnInputLangChangeEx(HWND hWnd, UINT CodePage, HKL hkl)
 				bForExplorerPatcherSWS(hForeWnd, TRUE, TRUE, &hNewHKL, &hPreviousHKL);
 			}
 		}
-		HWND	hWndObserved = NULL;
+		HWND	hWndObserved = hForeWnd;
 		POINT	pt{};
 		if (lpAppRegData->bDoModeDispByMouseBttnUp && GetCursorPos(&pt)) {
-			if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return;
-			if (lpAppRegData->bDisplayFocusWindowIME) {
-				hWndObserved = hForeWnd;
+			if (!lpAppRegData->bDisplayFocusWindowIME) {
+				if ((hWndObserved = WindowFromPoint(pt)) == NULL)	return;
 			}
 			if (Cursor->bStartIMECursorChangeThread(hWndObserved)) {
 				if (lpAppRegData->bDoModeDispByIMEKeyDown) {
-					if (!bCheckDrawIMEModeArea(hWndObserved))	return;
-					if (!Cursor->bStartDrawIMEModeThread(hWndObserved)) {
-						bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
-						PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-						return;
+					if (bCheckDrawIMEModeArea(hWndObserved)) {
+						if (Cursor->bStartDrawIMEModeThread(hWndObserved))	return;
 					}
+					else return;
 				}
 			}
 		}
+		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 	}
 }
 
@@ -785,17 +759,20 @@ static void		Cls_OnEventForegroundEx(HWND hWnd, DWORD dwEvent, HWND hForeWnd)
 	if (CursorInfo.flags != CURSOR_SHOWING)	return;
 	HWND hWndObserved = hGetObservedWnd();
 	if (!hWndObserved)	return;
-	if (!Cursor->bStartIMECursorChangeThreadWait(hWndObserved, 100))	return;
-	if (lpAppRegData->bDoModeDispByMouseBttnUp) {
-		if (!bCheckDrawIMEModeArea(hWndObserved))	return;
+#define	WAITTIME	100
 #define	DELAYTIME	300
-		if (!Cursor->bStartDrawIMEModeThreadWait(hForeWnd, (lpAppRegData->dwAdditionalWaitTime + DELAYTIME))) {
-			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
-			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
-			return;
+	if (Cursor->bStartIMECursorChangeThreadWait(hWndObserved, WAITTIME)) {
+		if (lpAppRegData->bDoModeDispByMouseBttnUp) {
+			if (!bCheckDrawIMEModeArea(hWndObserved))	return;
+			if (Cursor->bStartDrawIMEModeThreadWait(hForeWnd, (lpAppRegData->dwAdditionalWaitTime + DELAYTIME))) {
+				return;
+			}
 		}
-#undef	DELAYTIME
 	}
+#undef	DELAYTIME
+#undef	WAITTIME
+	bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+	PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 	return;
 }
 
@@ -878,7 +855,10 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 			if (bIMEInConverting)	return;
 			hWndObserved = hGetObservedWnd();
 			if (!hWndObserved)	return;
-			if (!Cursor->bStartIMECursorChangeThread(hWndObserved))	return;
+			if (!Cursor->bStartIMECursorChangeThread(hWndObserved)) {
+				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			}
 			return;
 		case KEY_F5:					// F5				(0x74)
 			if (bIMEInConverting)	return;
@@ -1286,7 +1266,10 @@ void Cls_OnSysKeyDownUpEx(HWND hWnd, UINT vk, BOOL fDown, int cRepeat, UINT flag
 			}
 		}
 	}
-	if (!Cursor->bStartIMECursorChangeThread(hWndObserved))	return;
+	if (!Cursor->bStartIMECursorChangeThread(hWndObserved)) {
+		bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+	}
 	return;
 }
 
@@ -1419,7 +1402,10 @@ static VOID CALLBACK vCheckFocusTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, D
 	if (uTimerID == nCheckFocusTimerID) {
 		HWND hWndObserved = hGetObservedWnd();
 		if (hWndObserved) {
-			(void)Cursor->bStartIMECursorChangeThreadTimer(hWndObserved);
+			if (!Cursor->bStartIMECursorChangeThreadTimer(hWndObserved)) {
+				bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+				PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			}
 		}
 	}
 	return;
@@ -1435,8 +1421,13 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 	UNREFERENCED_PARAMETER(dwTime);
 
 	if (uTimerID == nCheckProcTimerID) {
-		HWND	_hWnd32 = hGetCachedWindowByClassName(CLASS_FLUSHMOUSE32);
+		HWND	_hWnd32 = FindWindow(CLASS_FLUSHMOUSE32, NULL);
 		if (_hWnd32 == NULL) {
+			if (uCheckProcTimer != NULL) {
+				if (KillTimer(hWnd, nCheckProcTimerID)) {
+					uCheckProcTimer = NULL;
+				}
+			}
 			bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION_CATEGORY);
 			vStopThreadHookTimer(hWnd);
 			if (FlushMouseHook == NULL) {

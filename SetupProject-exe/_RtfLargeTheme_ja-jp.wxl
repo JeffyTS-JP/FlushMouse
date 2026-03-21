@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<!-- _RtfLargeTheme_ja-jp.wxl for FlushMouse and UI3
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
+-->
+
+<WixLocalization Culture="ja-jp" ExtensionDefaultCulture="yes" Language="1041" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+
+<String Id="Caption" Value="[WixBundleName] Setup" />
+	<String Id="Title" Value="[WixBundleName]" />
+	<String Id="ConfirmCancelMessage" Value="セットアップを終了してもよろしいですか?" />
+
+	<String Id="HelpHeader" Value="セットアップのヘルプ" />
+	<String Id="HelpText" Value="/passive | /quiet&#xA;&#x9;最少の UI だけを表示してプロンプトは表示しないか、UIもプロンプトも表示しません。既定では、UI とすべてのプロンプトが表示されます。&#xA;&#xA;/norestart&#xA;&#x9;再起動の試みをすべて抑制します。既定では、再起動の前に UI によりプロンプトが表示されます。&#xA;&#xA;/log log.txt&#xA;&#x9;特定のファイルにログを記録します。既定では、%TEMP% にログ ファイルが作成されます。" />
+	<String Id="HelpCloseButton" Value="閉じる(&amp;C)" />
+
+	<String Id="InstallText" Value="インストール" />
+	<String Id="ModifyText" Value="アップグレード" />
+	<String Id="UninstallText" Value="アンインストール" />
+
+	<String Id="InstallVersion" Value="Version [WixBundleVersion]" />
+	<String Id="InstallLicenseTerms" Value="Microsoft .NET Framework の&lt;a href=&quot;#&quot;&gt;ライセンス条項&lt;/a&gt;に同意する場合は、［同意してインストール］ボタンをクリックします。" />
+	<String Id="InstallLicenseLinkText" Value="ソフトウェア使用許諾契約書に同意します &lt;a href=&quot;#&quot;&gt;license terms&lt;/a&gt;" />
+	<String Id="InstallAcceptAndInstallButton" Value="同意してインストール(&amp;A)" />
+	<String Id="InstallAcceptCheckbox" Value="ソフトウェア使用許諾契約書に同意します(&amp;A)" />
+	<String Id="InstallDeclineButton" Value="同意しない" />
+	<String Id="InstallOptionsButton" Value="オプション(&amp;O)" />
+	<String Id="InstallInstallButton" Value="インストール(&amp;I)" />
+	<String Id="InstallCancelButton" Value="キャンセル(&amp;C)" />
+	<String Id="InstallCloseButton" Value="閉じる(&amp;C)" />
+	<String Id="UpdateButton" Value="更新(&amp;U)" />
+
+	<String Id="InstallDesktopShortcut" Value="デスクトップにショートカットを作成する" />
+	<String Id="InstallRegisterStartMenu" Value="スタートメニューに登録する" />
+	<String Id="InstallStartApplication" Value="セットアップを終了したら、すぐに [WixBundleName] を実行する" />
+
+	<String Id="OptionsHeader" Value="セットアップオプション" />
+	<String Id="OptionsLocationLabel" Value="場所 :" />
+	<String Id="OptionsBrowseButton" Value="Browse(&amp;B)" />
+	<String Id="OptionsOkButton" Value="OK(&amp;O)" />
+	<String Id="OptionsCancelButton" Value="キャンセル(&amp;C)" />
+
+	<String Id="ProgressHeader" Value="セットアップの進行状況" />
+	<String Id="ProgressLabel" Value="処理 :" />
+	<String Id="ProgressLabelInstallingText" Value="インストール :" />
+	<String Id="ProgressLabelUninstallingText" Value="アンインストール :" />
+	<String Id="ProgressLabelRepairingText" Value="修復 :" />
+	<String Id="ProgressLabelModifyingText" Value="変更 :" />
+	<String Id="ProgressLabelUpgradingText" Value="アップグレード :" />
+	<String Id="ProgressLabelOverallProgressPackageText" Value="アクション :" />
+	<String Id="ProgressCancelButton" Value="キャンセル(&amp;C)" />
+	<String Id="OverallProgressPackageText" Value="初期化中..." />
+	<String Id="ExecuteProgressMessage" Value="システムの復元ポイントを作成しています" />
+	<String Id="CacheProgressText" Value="パッケージをキャッシュしています: [1]" />
+	<String Id="ExecuteProgressText" Value="実行中: [1]" />
+	<String Id="CacheProgressLabel" Value="キャッシュ中:" />
+	<String Id="ExecuteProgressLabel" Value="実行中:" />
+	<String Id="ApplyProgressText" Value="[1]" />
+	<String Id="CacheUninstallProgressText" Value="古いバージョンの削除中" />
+	<String Id="ExecuteUninstallProgressText" Value="古いバージョンの削除中" />
+	<String Id="PlanRelatedBundleMessage" Value="関連するバンドルを処理中: [1]" />
+	<String Id="CachePackageMessage" Value="パッケージをキャッシュ中: [1]" />
+	<String Id="ExecutePackageMessage" Value="パッケージを実行中: [1]" />
+	<String Id="ExecuteMsiMessage" Value="[1]" />
+	<String Id="ApplyDowngrade" Value="ダウングレードを適用中..." />
+	<String Id="ApplyInstall" Value="インストールを適用中..." />
+	<String Id="ApplyModify" Value="変更を適用中..." />
+	<String Id="ApplyRepair" Value="修復を適用中..." />
+	<String Id="ApplyUninstall" Value="アンインストールを適用中..." />
+	<String Id="ApplyUpgrade" Value="アップグレードを適用中..." />
+	<String Id="ApplyComplete" Value="適用を完了しています..." />
+
+	<String Id="ModifyHeader" Value="[WixBundleName] をアンインストールします" />
+	<String Id="ModifyRepairButton" Value="修復(&amp;R)" />
+	<String Id="ModifyUninstallButton" Value="アンインストール(&amp;U)" />
+	<String Id="ModifyCancelButton" Value="キャンセル(&amp;C)" />
+	<String Id="ModifyCloseButton" Value="閉じる(&amp;C)" />
+
+	<String Id="RemoveAppRegstry" Value="[WixBundleName] の設定情報を削除する" />
+
+	<String Id="SuccessHeader" Value="セットアップが正常に終了しました" />
+	<String Id="SuccessInstallHeader" Value="インストールが正常に終了しました" />
+	<String Id="SuccessCacheHeader" Value="キャッシュが正常に終了しました" />
+	<String Id="SuccessModifyHeader" Value="変更が正常に終了しました" />
+	<String Id="SuccessRepairHeader" Value="修復が正常に終了しました" />
+	<String Id="SuccessUninstallHeader" Value="アンインストールが正常に終了しました" />
+	<String Id="SuccessUnsafeUninstallHeader" Value="アンインストール(Unsafeモード)が正常に終了しました" />
+	<String Id="SuccessUpgradeHeader" Value="アップグレードが正常に終了しました" />
+	<String Id="SuccessLaunchButton" Value="ソフトウェア起動" />
+	<String Id="SuccessRestartText" Value="セットアップを完了するには、コンピューターを再起動する必要があります。" />
+	<String Id="SuccessRestartButton" Value="今すぐ再起動(&amp;R)" />
+	<String Id="SuccessCloseButton" Value="閉じる(&amp;C)" />
+
+	<String Id="FailureHeader" Value="セットアップに失敗しました" />
+
+	<String Id="FailureLayoutHeader" Value="セットアップに失敗しました" />
+	<String Id="FailureUnsafeUninstallHeader" Value="アンインストール(Unsafeモード)に失敗しました" />
+	<String Id="FailureUninstallHeader" Value="アンインストールに失敗しました" />
+	<String Id="FailureCacheHeader" Value="キャッシュに失敗しました" />
+	<String Id="FailureInstallHeader" Value="インストールに失敗しました" />
+	<String Id="FailureModifyHeader" Value="変更に失敗しました" />
+	<String Id="FailureRepairHeader" Value="修復に失敗しました" />
+	<String Id="FailureUpgradeHeader" Value="アップグレードに失敗しました" />
+
+	<String Id="FailureHyperlinkLogText" Value="問題を解決してからセットアップをやり直してください。" />
+	<String Id="FailureRestartText" Value="" />
+	<String Id="FailureRestartButton" Value="今すぐ再起動(&amp;R)" />
+	<String Id="FailureCloseButton" Value="閉じる(&amp;C)" />
+
+	<String Id="FailureNewerFound" Value="新しいバージョンの [WixBundleName] が既にインストールされているため、このバージョンのインストールを続行できません。&#10;既にインストールされているバージョンを、設定の「アプリ」から「インストールされているアプリ」、またはコントロールパネルの「プログラムと機能」で、削除してからインストールしてください。" />
+	<String Id="FailureSelfFound" Value="別のバージョンの [WixBundleName] が既にインストールされているため、このバージョンのインストールを続行できません。&#10;既にインストールされているバージョンを、設定の「アプリ」から「インストールされているアプリ」、またはコントロールパネルの「プログラムと機能」で、削除してからインストールしてください。" />
+	<String Id="FailurePreviousInstallerFound" Value="互換性のないインストーラーバージョンの [WixBundleName] が既にインストールされているため、このバージョンのインストールを続行できません。&#10;既にインストールされているバージョンを、設定の「アプリ」から「インストールされているアプリ」、またはコントロールパネルの「プログラムと機能」で、削除してからインストールしてください。" />
+</WixLocalization>
+
+<!-- EOF -->

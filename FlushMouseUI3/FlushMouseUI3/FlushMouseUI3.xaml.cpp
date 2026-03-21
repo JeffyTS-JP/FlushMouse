@@ -193,13 +193,56 @@ void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 	LPTSTR *argv = nullptr;
 
 	argv = CommandLineToArgvW(_lpCmdLine, &iNumArgs);
-	if (argv != nullptr) {
-		if (iCheckCmdLine((LPCTSTR)argv) != 1) {
+	if ((iNumArgs > 0) && (argv != nullptr)) {
+		if (iCheckCmdLine((LPTSTR)argv[1]) != 1) {
 			LocalFree(argv);
 			PostQuitMessage(0);
 			return;
 		}
 		LocalFree(argv);
+	}
+
+	HANDLE	hMutex = CreateMutex(NULL, TRUE, CLASS_FLUSHMOUSE);
+	if (hMutex == NULL) {
+		return;
+	}
+	DWORD	dwLastError = GetLastError();
+	DWORD	dwCurrentProcessId = 0;
+	DWORD	dwExistingProcessId = 0;
+	HWND	hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
+	if ((dwLastError == ERROR_ALREADY_EXISTS) || (dwLastError == ERROR_ACCESS_DENIED)) {
+#define	TIMEOUT	1000
+		hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
+		if (hWnd != NULL) {
+			dwCurrentProcessId = GetCurrentProcessId();
+			GetWindowThreadProcessId(hWnd, &dwExistingProcessId);
+			if (dwExistingProcessId != dwCurrentProcessId) {
+				HANDLE	hProcess = OpenProcess(PROCESS_TERMINATE | SYNCHRONIZE, FALSE, dwExistingProcessId);
+				if (hProcess != NULL) {
+					DWORD	dwWaitResult = WaitForSingleObject(hProcess, TIMEOUT);
+					if (dwWaitResult == WAIT_TIMEOUT) {
+						TerminateProcess(hProcess, (UINT)(-1));
+						WaitForSingleObject(hProcess, TIMEOUT);
+					}
+					CloseHandle(hProcess);
+				}
+			}
+		}
+		else {
+			ReleaseMutex(hMutex);
+			CloseHandle(hMutex);
+			Sleep(500);
+			hMutex = CreateMutex(NULL, TRUE, CLASS_FLUSHMOUSE);
+			dwLastError = GetLastError();
+			if ((hMutex == NULL) || (dwLastError == ERROR_ALREADY_EXISTS) || (dwLastError == ERROR_ACCESS_DENIED)) {
+				if (hMutex)	{
+					ReleaseMutex(hMutex);
+					CloseHandle(hMutex);
+				}
+				return;
+			}
+		}
+#undef TIMEOUT
 	}
 
 	if ((m_hInstance = GetModuleHandle(NULL)) == NULL) {
@@ -237,6 +280,9 @@ void App::OnLaunched(Microsoft::UI::Xaml::LaunchActivatedEventArgs const&)
 
 	if (hFlushMouseUI3DLL)	FreeLibrary(hFlushMouseUI3DLL);
 	if (hMicrosoft_ui_xaml_dll)	FreeLibrary(hMicrosoft_ui_xaml_dll);
+
+	ReleaseMutex(hMutex);
+	CloseHandle(hMutex);
 
 #if defined _DEBUG
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);

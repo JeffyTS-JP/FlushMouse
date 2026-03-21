@@ -1,0 +1,509 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Package.wxs for FlushMouseUI3
+//		Copyright (C) 1993- JeffyTS. All rights reserved.
+//		Licensed under the GPL-2.0 License.
+-->
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+		xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+		xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+	<?include ..\..\SetupProject\version.wxi ?>
+
+	<?define MainExeFileName = "$(var.ProductName).exe" ?>
+	<?define Keywords = "$(var.ProductName) Installer" ?>
+	<?define Description = "$(var.ProductName) Installer" ?>
+	<?define AppRegKey = "SOFTWARE\$(var.Manufacturer)\$(var.ProductName)" ?>
+	<?define IconSrcFile = "..\..\FlushMouseLIB\$(var.ProductName).ico" ?>
+
+	<!-- Target Source file Dir -->
+	<?define FlushMouseUI3Dir=$(var.FlushMouseUI3.TargetDir)?>
+	<?define ProjectDir=$(var.ProjectDir)?>
+
+	<Package Id="$(var.ProductName).Package"
+			UpgradeCode="{CAD3E2E9-B511-4EA2-8794-9BFB299D05F6}"
+			Name="$(var.ProductName)UI3"
+			Manufacturer="$(var.Manufacturer)"
+			Version="$(var.Version)"
+			Language="1041" Codepage="932"
+			InstallerVersion="200"
+			ProductCode="$(var.ProductID)">
+		<SummaryInformation Keywords="$(var.Keywords)"
+							Description="$(var.Description)"
+							Manufacturer="$(var.Manufacturer)"
+							Codepage="932" />
+
+		<Property Id="PREVIOUSFOUND" Secure="yes" />
+
+		<Upgrade Id="{8B8C6810-E467-498D-926C-F4139B2AE8AB}">
+			<UpgradeVersion OnlyDetect="no" Property="PREVIOUSFOUND" Minimum="0.0.0.0" IncludeMinimum="yes" Maximum="$(var.Version)" IncludeMaximum="no" />
+			<UpgradeVersion OnlyDetect="no" Property="SELFFOUND" Minimum="$(var.Version)" IncludeMinimum="yes" Maximum="$(var.Version)" IncludeMaximum="yes" />
+			<UpgradeVersion OnlyDetect="no" Property="NEWERFOUND" Minimum="$(var.Version)" IncludeMinimum="no" />
+		</Upgrade>
+
+		<!-- Media Template-->
+		<MediaTemplate EmbedCab="yes" />
+
+		<!-- Icon -->
+		<Icon Id="MainIcon.ico" SourceFile="$(var.IconSrcFile)" />
+		<Property Id="ARPPRODUCTICON" Value="MainIcon.ico" />
+
+		<Property Id="ARPCOMMENTS" Value="Mouse and IME UTY" />
+		<Property Id="ARPCONTACT" Value="Twitter @JeffyTSonTW" />
+		<Property Id="ARPHELPLINK" Value="https://GitHub.com/JeffyTS-JP/FlushMouse" />
+		<Property Id="ARPURLINFOABOUT" Value="https://GitHub.com/JeffyTS-JP/FlushMouse" />
+		<Property Id="ARPURLUPDATEINFO" Value="https://GitHub.com/JeffyTS-JP/FlushMouse/releases" />
+		<Property Id="ARPINSTALLLOCATION" Value="&quot;%ProgramFiles%\$(var.Manufacturer)\$(var.ProductName)&quot;" />
+
+		<Property Id="ARPNOMODIFY" Value="1" Secure="no" />
+		<Property Id="ARPNOREPAIR" Value="1" Secure="no" />
+
+		<ui:WixUI Id="_WixUI_FeatureTree" />
+		<UIRef Id="_ErrorProgressText" />
+
+		<!-- Install Directory -->
+		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+		<Property Id="WIXUI_DATAINSTALLDIR" Value="DATAINSTALLFOLDER" />
+
+		<!-- Feature -->
+		<Feature Id="ProductFeature" Title="$(var.ProductName)" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+		</Feature>
+
+		<!-- Bitmap -->
+		<!-- 493x58 -->
+		<WixVariable Id="WixUIBannerBmp" Value="..\..\SetupProject\banner.bmp" />
+		<!-- 493x312 -->
+		<WixVariable Id="WixUIDialogBmp" Value="..\..\SetupProject\dialog.bmp" />
+
+		<!-- License.rtf -->
+		<WixVariable Id="WixUILicenseRtf" Value="..\..\SetupProject\License.rtf" />
+
+		<!-- Condition -->
+		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT1" Value="!(loc.VerifyReadyDlgOptionalCheckox1)" />
+		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX1" Value="1" />
+		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT2" Value="!(loc.VerifyReadyDlgOptionalCheckox2)" />
+		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX2" Value="1" />
+		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT3" Value="!(loc.VerifyReadyDlgOptionalCheckox3)" />
+		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOX3" Value="1" />
+		<Property Id="WIXUI_VERIFYDIALOGOPTIONALCHECKBOXTEXT4" Value="!(loc.VerifyReadyDlgOptionalCheckox4)" />
+
+		<!-- Searching for Public Property -->
+		<Property Id="BUNDLE" Value="0" />
+		<Property Id="PRODUCTED_ID">
+			<RegistrySearch Id="Producted_ID"
+							Root="HKLM"
+							Key="SOFTWARE\Wow6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)"
+							Name="ProductID"
+							Type="raw" />
+		</Property>
+		<Property Id="BUNDLED_ID">
+			<RegistrySearch Id="Bundled_ID"
+							Root="HKLM"
+							Key="SOFTWARE\Wow6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)"
+							Name="BundleID"
+							Type="raw" />
+		</Property>
+		<Property Id="BUNDLED_VERSION">
+			<RegistrySearch Id="Bundled_Version"
+							Root="HKLM"
+							Key="SOFTWARE\Wow6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)"
+							Name="BundleVersion"
+							Type="raw" />
+		</Property>
+
+		<!-- UI Dialog -->
+		<UI>
+			<!-- Major Upgrade Dialog-->
+			<Dialog Id="NewerFoundDlg" Width="270" Height="105" Title="!(loc.ErrorDlg_Title)" NoMinimize="yes">
+				<Control Id="MessageText" Type="Text" X="48" Y="15" Width="205" Height="60" TabSkip="no" Text="!(loc.ErrorNewerFoundDlgText)" />
+				<Control Id="Y" Type="PushButton" X="200" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUIOK)">
+					<Publish Event="EndDialog" Value="1" />
+				</Control>
+				<Control Id="NewerFoundDlgIcon" Type="Icon" X="15" Y="15" Width="24" Height="24" ToolTip="!(loc.ErrorDlgErrorIconTooltip)" FixedSize="yes" IconSize="32" Text="!(loc.ErrorDlgErrorIcon)" />
+			</Dialog>
+			<Dialog Id="SelfFoundDlg" Width="270" Height="105" Title="!(loc.ErrorDlg_Title)" NoMinimize="yes">
+				<Control Id="MessageText" Type="Text" X="48" Y="15" Width="205" Height="60" TabSkip="no" Text="!(loc.ErrorSelfFoundDlgText)" />
+				<Control Id="Y" Type="PushButton" X="200" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUIOK)">
+					<Publish Event="EndDialog" Value="1" />
+				</Control>
+				<Control Id="SelfFoundDlgIcon" Type="Icon" X="15" Y="15" Width="24" Height="24" ToolTip="!(loc.ErrorDlgErrorIconTooltip)" FixedSize="yes" IconSize="32" Text="!(loc.ErrorDlgErrorIcon)" />
+			</Dialog>
+			<Dialog Id="PreviousFoundDlg" Width="270" Height="105" Title="!(loc.ErrorDlg_Title)" NoMinimize="yes">
+				<Control Id="MessageText" Type="Text" X="48" Y="15" Width="205" Height="60" TabSkip="no" Text="!(loc.ErrorPreviousFoundDlgText)" />
+				<Control Id="Y" Type="PushButton" X="200" Y="80" Width="56" Height="17" TabSkip="yes" Text="!(loc.WixUIOK)">
+					<Publish Event="EndDialog" Value="1" />
+				</Control>
+				<Control Id="PreviousFoundDlgIcon" Type="Icon" X="15" Y="15" Width="24" Height="24" ToolTip="!(loc.ErrorDlgErrorIconTooltip)" FixedSize="yes" IconSize="32" Text="!(loc.ErrorDlgErrorIcon)" />
+			</Dialog>
+
+			<!-- Progress Text -->
+			<ProgressText Action="InstallFinalize" Message="!(loc.ProgressTextInstallFinalize)" />
+			<ProgressText Action="QuitApplication" Message="!(loc.ProgressTextQuitApplication)"/>
+			<ProgressText Action="RegisterTaskScheduler" Message="!(loc.ProgressTextRegisterProduct)" />
+			<ProgressText Action="UnregisterTaskScheduler" Message="!(loc.ProgressTextRemoveExistingProducts)" />
+			<ProgressText Action="RemoveAppReg" Message="!(loc.ProgressTextRemoveAppRegistry)" />
+			<ProgressText Action="RemoveProductReg" Message="!(loc.ProgressTextRemoveProductRegistry)" />
+			<ProgressText Action="RemoveProductBundledReg" Message="!(loc.ProgressTextRemoveProductRegistry)" />
+			<ProgressText Action="RemoveBundledReg" Message="!(loc.ProgressTextRemoveProductRegistry)" />
+			<ProgressText Action="RemoveUninstallBundledReg" Message="!(loc.ProgressTextRemoveProductRegistry)" />
+			<ProgressText Action="RemovePackageCache" Message="!(loc.ProgressTextRemoveExistingProducts)" />
+			<ProgressText Action="RemoveBundledCache" Message="!(loc.ProgressTextRemoveExistingProducts)" />
+			<ProgressText Action="RemoveBundleCache" Message="!(loc.ProgressTextRemoveExistingProducts)" />
+			<ProgressText Action="RemoveProgramFolder" Message="!(loc.ProgressTextRemoveExistingProducts)" />
+			<ProgressText Action="RemoveProgramData" Message="!(loc.ProgressTextRemoveExistingProducts)" />
+			<ProgressText Action="LaunchApplication" Message="!(loc.ProgressTextLaunchApplication)" />
+		</UI>
+
+		<!-- Set Properties -->
+		<SetProperty Id="REINSTALL" After="FindRelatedProducts" Value="ALL" Sequence="first" Condition="Installed and REINSTALL" />
+		<SetProperty Id="REINSTALLMODE" After="FindRelatedProducts" Value="vomus" Sequence="first" Condition="Installed and REINSTALL" />
+		<SetProperty Id="ADDSOURCE" After="FindRelatedProducts" Value="ALL" Sequence="first" Condition="Installed and REINSTALL" />
+		<SetProperty Id="ADDLOCAL" After="FindRelatedProducts" Value="ALL" Sequence="first" Condition="Installed and REINSTALL" />
+
+		<!-- Set command property -->
+		<SetProperty Id="CMD_EXE" Before="FindRelatedProducts" Value="&quot;[System64Folder]cmd.exe&quot;" />
+		<SetProperty Id="REG_EXE" Before="FindRelatedProducts" Value="&quot;[System64Folder]reg.exe&quot;" />
+		<SetProperty Id="SCHTASKS_EXE" Before="FindRelatedProducts" Value="&quot;[System64Folder]schtasks.exe&quot;" />
+
+		<!-- Install UI Sequence -->
+		<InstallUISequence>
+			<Show Dialog="NewerFoundDlg" After="FindRelatedProducts" Condition="NEWERFOUND" />
+			<Show Dialog="SelfFoundDlg" After="FindRelatedProducts" Condition="SELFFOUND" />
+			<Show Dialog="PreviousFoundDlg" After="FindRelatedProducts" Condition="PREVIOUSFOUND" />
+		</InstallUISequence>
+
+		<!-- Set Windows Installer Registry to not display Verify Dialog on uninstall -->
+		<SetProperty Id="WixUI_InstallMode" After="FindRelatedProducts" Value="Remove" Sequence="first" Condition="Installed" />
+		<Property Id="REBOOT" Secure="yes" Value="ReallySuppress" />
+		<Property Id="MSIRESTARTMANAGERCONTROL" Secure="yes" Value="Disable" />
+
+		<!-- Version Check -->
+		<InstallExecuteSequence>
+			<Custom Action="AlreadyUpdated" After="FindRelatedProducts" Condition="SELFFOUND" />
+			<Custom Action="NoDowngrade" After="FindRelatedProducts" Condition="NEWERFOUND" />
+		</InstallExecuteSequence>
+		<CustomAction Id="AlreadyUpdated" Error="!(loc.ErrorSelfFoundDlgText)" />
+		<CustomAction Id="NoDowngrade" Error="!(loc.ErrorNewerFoundDlgText)" />
+
+		<!-- Quit Application -->
+		<InstallExecuteSequence>
+			<Custom Action="QuitApplication" After="CostFinalize" Condition="Installed or REINSTALL" />
+		</InstallExecuteSequence>
+		<CustomAction Id="QuitApplication" ExeCommand="/Quit" Execute="immediate" Return="ignore" FileRef="$(var.MainExeFileName)" />
+
+		<!-- Register TaskScheduler -->
+		<InstallExecuteSequence>
+			<Custom Action="RegisterTaskScheduler" Before="InstallFinalize" Condition="(NOT Installed) or REINSTALL" />
+			<Custom Action="RegisterTaskScheduler1" After="RegisterTaskScheduler" Condition="(NOT Installed) or REINSTALL" />
+			<Custom Action="RegisterTaskScheduler2" After="RegisterTaskScheduler1" Condition="(NOT Installed) or REINSTALL" />
+			<Custom Action="RegisterTaskScheduler3" After="RegisterTaskScheduler2" Condition="(NOT Installed) or REINSTALL" />
+
+			<Custom Action="UnregisterOldTaskScheduler" After="RegisterTaskScheduler3" Condition="(NOT Installed) or REINSTALL" />
+			<Custom Action="UnregisterOldTaskScheduler1" After="UnregisterOldTaskScheduler" Condition="(NOT Installed) or REINSTALL" />
+			<Custom Action="UnregisterOldTaskScheduler2" After="UnregisterOldTaskScheduler1" Condition="(NOT Installed) or REINSTALL" />
+			<Custom Action="UnregisterOldTaskScheduler3" After="UnregisterOldTaskScheduler2" Condition="(NOT Installed) or REINSTALL" />
+		</InstallExecuteSequence>
+		<SetProperty Id="RegisterTaskScheduler" Before="RegisterTaskScheduler" Sequence="execute"
+			Value="[SCHTASKS_EXE] /Create /F /TN &quot;$(var.ProductName)\$(var.ProductName)_Start&quot; /XML &quot;[INSTALLFOLDER]TaskScheduler_Start.xml&quot;"/>
+		<CustomAction Id="RegisterTaskScheduler" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec" Execute="deferred" Return="ignore" Impersonate="no" />
+		<SetProperty Id="RegisterTaskScheduler1" Before="RegisterTaskScheduler1" Sequence="execute"
+			Value="[SCHTASKS_EXE] /Create /F /TN &quot;$(var.ProductName)\$(var.ProductName)_StartEvent&quot; /XML &quot;[INSTALLFOLDER]TaskScheduler_StartEvent.xml&quot;"/>
+		<CustomAction Id="RegisterTaskScheduler1" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec" Execute="deferred" Return="ignore" Impersonate="no" />
+		<SetProperty Id="RegisterTaskScheduler2" Before="RegisterTaskScheduler2" Sequence="execute"
+			Value="[SCHTASKS_EXE] /Create /F /TN &quot;$(var.ProductName)\$(var.ProductName)_StartDelay&quot; /XML &quot;[INSTALLFOLDER]TaskScheduler_StartDelay.xml&quot;"/>
+		<CustomAction Id="RegisterTaskScheduler2" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec" Execute="deferred" Return="ignore" Impersonate="no" />
+		<SetProperty Id="RegisterTaskScheduler3" Before="RegisterTaskScheduler3" Sequence="execute"
+			Value="[SCHTASKS_EXE] /Create /F /TN &quot;$(var.ProductName)\$(var.ProductName)_Quit&quot; /XML &quot;[INSTALLFOLDER]TaskScheduler_Quit.xml&quot;"/>
+		<CustomAction Id="RegisterTaskScheduler3" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec" Execute="deferred" Return="ignore" Impersonate="no" />
+
+		<SetProperty Id="UnregisterOldTaskScheduler" Before="UnregisterOldTaskScheduler" Sequence="execute"
+			Value="[SCHTASKS_EXE] /Delete /F /TN &quot;$(var.ProductName)_Start&quot;"/>
+		<CustomAction Id="UnregisterOldTaskScheduler" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec" Execute="deferred" Return="ignore" Impersonate="no" />
+		<SetProperty Id="UnregisterOldTaskScheduler1" Before="UnregisterOldTaskScheduler1" Sequence="execute"
+			Value="[SCHTASKS_EXE] /Delete /F /TN &quot;$(var.ProductName)_StartEvent&quot;"/>
+		<CustomAction Id="UnregisterOldTaskScheduler1" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec" Execute="deferred" Return="ignore" Impersonate="no" />
+		<SetProperty Id="UnregisterOldTaskScheduler2" Before="UnregisterOldTaskScheduler2" Sequence="execute"
+			Value="[SCHTASKS_EXE] /Delete /F /TN &quot;$(var.ProductName)_StartDelay&quot;"/>
+		<CustomAction Id="UnregisterOldTaskScheduler2" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec" Execute="deferred" Return="ignore" Impersonate="no" />
+		<SetProperty Id="UnregisterOldTaskScheduler3" Before="UnregisterOldTaskScheduler3" Sequence="execute"
+			Value="[SCHTASKS_EXE] /Delete /F /TN &quot;$(var.ProductName)_Quit&quot;"/>
+		<CustomAction Id="UnregisterOldTaskScheduler3" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec" Execute="deferred" Return="ignore" Impersonate="no" />
+
+		<!-- Unregister TaskScheduler on Uninstall -->
+		<InstallExecuteSequence>
+			<Custom Action="UnregisterTaskScheduler" After="RemoveFiles" Condition="Installed or REINSTALL" />
+			<Custom Action="UnregisterTaskScheduler1" After="UnregisterTaskScheduler" Condition="Installed or REINSTALL" />
+			<Custom Action="UnregisterTaskScheduler2" After="UnregisterTaskScheduler1" Condition="Installed or REINSTALL" />
+			<Custom Action="UnregisterTaskScheduler3" After="UnregisterTaskScheduler2" Condition="Installed or REINSTALL" />
+			<Custom Action="UnregisterTaskScheduler4" After="UnregisterTaskScheduler3" Condition="Installed or REINSTALL" />
+		</InstallExecuteSequence>
+		<SetProperty Id="UnregisterTaskScheduler" Before="UnregisterTaskScheduler" Sequence="execute"
+			Value="[SCHTASKS_EXE] /Delete /F /TN &quot;$(var.ProductName)\$(var.ProductName)_Start&quot;"/>
+		<CustomAction Id="UnregisterTaskScheduler" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec" Execute="deferred" Return="ignore" Impersonate="no" />
+		<SetProperty Id="UnregisterTaskScheduler1" Before="UnregisterTaskScheduler1" Sequence="execute"
+			Value="[SCHTASKS_EXE] /Delete /F /TN &quot;$(var.ProductName)\$(var.ProductName)_StartEvent&quot;"/>
+		<CustomAction Id="UnregisterTaskScheduler1" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec" Execute="deferred" Return="ignore" Impersonate="no" />
+		<SetProperty Id="UnregisterTaskScheduler2" Before="UnregisterTaskScheduler2" Sequence="execute"
+			Value="[SCHTASKS_EXE] /Delete /F /TN &quot;$(var.ProductName)\$(var.ProductName)_StartDelay&quot;"/>
+		<CustomAction Id="UnregisterTaskScheduler2" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec" Execute="deferred" Return="ignore" Impersonate="no" />
+		<SetProperty Id="UnregisterTaskScheduler3" Before="UnregisterTaskScheduler3" Sequence="execute"
+			Value="[SCHTASKS_EXE] /Delete /F /TN &quot;$(var.ProductName)\$(var.ProductName)_Quit&quot;"/>
+		<CustomAction Id="UnregisterTaskScheduler3" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec" Execute="deferred" Return="ignore" Impersonate="no" />
+		<SetProperty Id="UnregisterTaskScheduler4" Before="UnregisterTaskScheduler4" Sequence="execute"
+			Value="[SCHTASKS_EXE] /Delete /F /TN &quot;$(var.ProductName)&quot;"/>
+		<CustomAction Id="UnregisterTaskScheduler4" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec" Execute="deferred" Return="ignore" Impersonate="no" />
+
+		<!-- Remove App Registry on Uninstall -->
+		<InstallExecuteSequence>
+			<Custom Action="RemoveAppReg" Before="InstallFinalize" Condition="Installed and ((WIXUI_VERIFYDIALOGOPTIONALCHECKBOX4 = 1) or (REMOVEAPPREGISTRY = 1))" />
+		</InstallExecuteSequence>
+		<SetProperty Id="RemoveAppReg" Before="RemoveAppReg" Sequence="execute"
+			Value="[REG_EXE] delete HKCU\$(var.AppRegKey) /F"/>
+		<CustomAction Id="RemoveAppReg" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="yes" />
+
+		<!-- Remove Registry on Uninstall -->
+		<InstallExecuteSequence>
+			<Custom Action="RemoveProductReg" Before="InstallFinalize" Condition="Installed and ProductCode" />
+			<Custom Action="RemoveProductBundledReg" Before="InstallFinalize" Condition="Installed and ProductCode and BUNDLED_VERSION" />
+			<Custom Action="RemoveBundledReg" Before="InstallFinalize" Condition="Installed and BUNDLED_ID" />
+			<Custom Action="RemoveUninstallBundledReg" Before="InstallFinalize" Condition="Installed and BUNDLED_ID" />
+		</InstallExecuteSequence>
+		<SetProperty Id="RemoveProductReg" Before="RemoveProductReg" Sequence="execute"
+			Value="[REG_EXE] delete HKLM\SOFTWARE\Classes\Installer\Dependencies\[ProductCode] /F"/>
+		<CustomAction Id="RemoveProductReg" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		<SetProperty Id="RemoveProductBundledReg" Before="RemoveProductBundledReg" Sequence="execute"
+			Value="[REG_EXE] delete HKLM\SOFTWARE\Classes\Installer\Dependencies\[ProductCode]_v[BUNDLED_VERSION] /F"/>
+		<CustomAction Id="RemoveProductBundledReg" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		<SetProperty Id="RemoveBundledReg" Before="RemoveBundledReg" Sequence="execute"
+			Value="[REG_EXE] delete HKLM\SOFTWARE\Classes\Installer\Dependencies\[BUNDLED_ID] /F"/>
+		<CustomAction Id="RemoveBundledReg" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		<SetProperty Id="RemoveUninstallBundledReg" Before="RemoveUninstallBundledReg" Sequence="execute"
+			Value="[REG_EXE] delete HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\[BUNDLED_ID] /F"/>
+		<CustomAction Id="RemoveUninstallBundledReg" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+
+		<!-- Remove Cache files on Uninstall -->
+		<InstallExecuteSequence>
+			<Custom Action="RemovePackageCache" Before="InstallFinalize" Condition="(Installed or REINSTALL) and PRODUCTED_ID and BUNDLED_VERSION" />
+			<Custom Action="RemoveBundledCache" Before="InstallFinalize" Condition="(Installed or REINSTALL) and BUNDLED_ID" />
+			<Custom Action="RemoveBundleCache" Before="InstallFinalize" Condition="Installed and (NOT REINSTALL) and BUNDLE_ID and (NOT (BUNDLE = &quot;1&quot;))" />
+		</InstallExecuteSequence>
+		<SetProperty Id="RemovePackageCache" Before="RemovePackageCache" Sequence="execute"
+			Value="[CMD_EXE] /c &quot;if exist &quot;[CommonAppDataFolder]Package Cache\[PRODUCTED_ID]v[BUNDLED_VERSION]&quot; rmdir /S /Q &quot;[CommonAppDataFolder]Package Cache\[PRODUCTED_ID]v[BUNDLED_VERSION]&quot;&quot;" />
+		<CustomAction Id="RemovePackageCache" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		<SetProperty Id="RemoveBundledCache" Before="RemoveBundledCache" Sequence="execute"
+			Value="[CMD_EXE] /c &quot;if exist &quot;[CommonAppDataFolder]Package Cache\[BUNDLED_ID]&quot; rmdir /S /Q &quot;[CommonAppDataFolder]Package Cache\[BUNDLED_ID]&quot;&quot;" />
+		<CustomAction Id="RemoveBundledCache" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		<SetProperty Id="RemoveBundleCache" Before="RemoveBundleCache" Sequence="execute"
+			Value="[CMD_EXE] /c &quot;if exist &quot;[CommonAppDataFolder]Package Cache\[BUNDLE_ID]&quot; rmdir /S /Q &quot;[CommonAppDataFolder]Package Cache\[BUNDLE_ID]&quot;&quot;" />
+		<CustomAction Id="RemoveBundleCache" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+
+		<!-- Remove App. Directories on Uninstall -->
+		<InstallExecuteSequence>
+			<Custom Action="RemoveProgramFolder" After="RemoveFiles" Condition="Installed and (NOT REINSTALL)" />
+			<Custom Action="RemoveProgramData" After="RemoveFiles" Condition="Installed and (NOT REINSTALL)" />
+		</InstallExecuteSequence>
+		<SetProperty Id="RemoveProgramFolder" Before="RemoveProgramFolder" Sequence="execute"
+			Value="[CMD_EXE] /c &quot;if exist &quot;[INSTALLFOLDER]&quot; rmdir /S /Q &quot;[INSTALLFOLDER]&quot;&quot;" />
+		<CustomAction Id="RemoveProgramFolder" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+		<SetProperty Id="RemoveProgramData" Before="RemoveProgramData" Sequence="execute"
+			Value="[CMD_EXE] /c &quot;if exist &quot;[DATAINSTALLFOLDER]&quot; rmdir /S /Q &quot;[DATAINSTALLFOLDER]&quot;&quot;"/>
+		<CustomAction Id="RemoveProgramData" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec64" Execute="deferred" Return="ignore" Impersonate="no" />
+
+		<!-- Remove Existing Products on Uninstall -->
+		<InstallExecuteSequence>
+			<RemoveExistingProducts After="InstallFinalize"/>
+		</InstallExecuteSequence>
+
+		<!-- Launch Application -->
+		<InstallExecuteSequence>
+			<Custom Action="LaunchApplication" After="InstallFinalize" Condition="((NOT Installed) or REINSTALL) and ((NOT (BUNDLE = &quot;1&quot;) and WIXUI_VERIFYDIALOGOPTIONALCHECKBOX3 = 1) or ((BUNDLE = &quot;1&quot;) and STARTAPPLICATION = 1))" />
+		</InstallExecuteSequence>
+		<CustomAction Id="LaunchApplication" Directory="INSTALLFOLDER" Execute="immediate" Return="ignore"
+			ExeCommand="[INSTALLFOLDER]$(var.MainExeFileName) /Start" />
+	</Package>
+
+	<Fragment>
+		<!-- Directory Structure -->
+		<!-- INSTALLFOLDER -->
+		<StandardDirectory Id="ProgramFiles64Folder">
+			<Directory Id="ProgramFilesManufacturer" Name="$(var.Manufacturer)">
+				<Directory Id="INSTALLFOLDER" Name="$(var.ProductName)">
+					<!-- WinUI3 MUIs -->
+					<Directory Id="WinUI3_MUIs_Folder_01" Name="en-us">
+					</Directory>
+					<Directory Id="WinUI3_MUIs_Folder_02" Name="ja-JP">
+					</Directory>
+					<Directory Id="WinUI3_Assets_Folder_01" Name="Microsoft.UI.Xaml">
+						<!-- WinUI3 Assets -->
+						<Directory Id="WinUI3_Assets_Folder_01_01" Name="Assets">
+						</Directory>
+					</Directory>
+				</Directory>
+			</Directory>
+		</StandardDirectory>
+		<StandardDirectory Id="CommonAppDataFolder">
+			<!-- DATA INSTALLFOLDER -->
+			<Directory Id="AppDataFilesManufacturer" Name="$(var.Manufacturer)">
+				<Directory Id="DATAINSTALLFOLDER" Name="$(var.ProductName)">
+				</Directory>
+			</Directory>
+		</StandardDirectory>
+		<!-- Start Menu -->
+		<StandardDirectory Id="ProgramMenuFolder">
+			<Directory Id="AppStartMenuFolder" Name="$(var.Manufacturer)">
+			</Directory>
+		</StandardDirectory>
+		<!-- Desktop -->
+		<StandardDirectory Id="DesktopFolder">
+		</StandardDirectory>
+	</Fragment>
+
+	<Fragment>
+		<!-- Feature -->
+		<Feature Id="EssentialFeature" Title="$(var.ProductName)" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+			<ComponentRef Id="EventLogRegistry" />
+			<ComponentRef Id="InstallerDependenciesRegistry" />
+			<ComponentRef Id="WixBundleRegistry1" />
+			<ComponentRef Id="WixBundleRegistry2" />
+			<ComponentGroupRef Id="WinUI3_Folders_01" />
+			<ComponentGroupRef Id="WinUI3_Folders_02" />
+			<ComponentGroupRef Id="WinUI3_Folders_03" />
+			<ComponentGroupRef Id="ProductDataComponents" />
+			<ComponentRef Id="DesktopShortcut" />
+			<ComponentRef Id="AppStartMenuShortcut" />
+		</Feature>
+
+		<!-- Components	-->
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+			<!-- Files -->
+			<Component Id="$(var.MainExeFileName)" Guid="{25BEEEA7-583D-4C15-9566-FFA42716A1C9}">
+				<File Id="$(var.MainExeFileName)" Name="$(var.MainExeFileName)" Source="$(var.FlushMouseUI3Dir)$(var.MainExeFileName)" />
+			</Component>
+			<Files Include="$(var.FlushMouseUI3Dir)*.exe">
+				<Exclude Files="$(var.FlushMouseUI3Dir)$(var.ProductName)UI3.exe" />
+				<Exclude Files="$(var.FlushMouseUI3Dir)SynTP_Receiver.exe" />
+			</Files>
+			<Files Include="$(var.ProjectDir)..\..\SetupProject\*.xml" />
+			<Files Include="$(var.ProjectDir)..\..\SetupProject\License.rtf" />
+			<Files Include="$(var.ProjectDir)..\..\SetupProject\Readme.txt" />
+			<!-- For WinUI3 -->
+			<Files Include="$(var.FlushMouseUI3Dir)*.dll">
+				<Exclude Files="$(var.FlushMouseUI3Dir)$(var.ProductName)Cursor.dll" />
+				<Exclude Files="$(var.FlushMouseUI3Dir)DirectML.dll" />
+				<Exclude Files="$(var.FlushMouseUI3Dir)Microsoft.Graphics.Imaging*.dll" />
+				<Exclude Files="$(var.FlushMouseUI3Dir)Microsoft.ML.OnnxRuntime.dll" />
+				<Exclude Files="$(var.FlushMouseUI3Dir)Microsoft.Security*.dll" />
+				<Exclude Files="$(var.FlushMouseUI3Dir)Microsoft.UI.Designer.dll" />
+				<Exclude Files="$(var.FlushMouseUI3Dir)Microsoft.Windows.AI.*.dll" />
+				<Exclude Files="$(var.FlushMouseUI3Dir)Microsoft.Windows.ApplicationModel.Background.Projection.dll" />
+				<Exclude Files="$(var.FlushMouseUI3Dir)Microsoft.Windows.BadgeNotifications.Projection.dll" />
+				<Exclude Files="$(var.FlushMouseUI3Dir)Microsoft.Windows.Foundation.Projection.dll" />
+				<Exclude Files="$(var.FlushMouseUI3Dir)Microsoft.Windows.Media.Capture.Projection.dll" />
+				<Exclude Files="$(var.FlushMouseUI3Dir)Microsoft.Windows.Storage*.dll" />
+				<Exclude Files="$(var.FlushMouseUI3Dir)Microsoft.Windows.Workloads*.dll" />
+				<Exclude Files="$(var.FlushMouseUI3Dir)onnxruntime.dll" />
+				<Exclude Files="$(var.FlushMouseUI3Dir)onnxruntime_providers_shared.dll" />
+				<Exclude Files="$(var.FlushMouseUI3Dir)SessionHandleIPCProxyStub.dll" />
+				<Exclude Files="$(var.FlushMouseUI3Dir)System.Numerics.Tensors.dll" />
+				<Exclude Files="$(var.FlushMouseUI3Dir)WindowsAppRuntime.DeploymentExtensions.OneCore.dll" />
+			</Files>
+			<Files Include="$(var.FlushMouseUI3Dir)*.pri">
+				<Exclude Files="$(var.FlushMouseUI3Dir)$(var.ProductName)UI3.pri" />
+				<Exclude Files="$(var.FlushMouseUI3Dir)Microsoft.UI.pri" />
+				<Exclude Files="$(var.FlushMouseUI3Dir)Microsoft.WindowsAppRuntime.pri" />
+			</Files>
+			<Files Include="$(var.FlushMouseUI3Dir)*.xbf">
+				<Exclude Files="$(var.FlushMouseUI3Dir)$(var.ProductName)UI3.xbf" />
+			</Files>
+			<Files Include="$(var.FlushMouseUI3Dir)*.ico">
+				<Exclude Files="$(var.FlushMouseUI3Dir)small.ico" />
+			</Files>
+			<Files Include="$(var.FlushMouseUI3Dir)*.manifest">
+			<Exclude Files="$(var.FlushMouseUI3Dir)$(var.ProductName)UI3.exe.manifest" />
+			</Files>
+			<Files Include="$(var.FlushMouseUI3Dir)*.appxmanifest" />
+			<Files Include="$(var.FlushMouseUI3Dir)*.png" />
+			<Files Include="$(var.FlushMouseUI3Dir)*.mui" />
+			<Files Include="$(var.FlushMouseUI3Dir)WinRT.Host.runtimeconfig.json" />
+
+			<!-- EventLog Registries -->
+			<Component Id="EventLogRegistry" Guid="{B5A28410-C07F-43BD-BA17-D15F0331986B}">
+				<RegistryKey Root="HKLM" Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\$(var.ProductName)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
+					<RegistryValue Type="integer" Name="CustomSource" Value="00000001" KeyPath="yes" />
+					<RegistryValue Type="integer" Name="TypesSupported" Value="00000007" KeyPath="no" />
+					<RegistryValue Type="expandable" Name="EventMessageFile" Value="%ProgramFiles%\$(var.Manufacturer)\$(var.ProductName)\$(var.ProductName)DLL.dll" KeyPath="no" />
+				</RegistryKey>
+			</Component>
+
+			<!-- Installer Dependencies Registry -->
+			<Component Id="InstallerDependenciesRegistry" Guid="{8A3F5C21-D4B9-4E8F-9C7A-1E2F3D4A5B6C}" Condition="NOT BUNDLE_ID">
+				<RegistryKey Root="HKLM" Key="SOFTWARE\Classes\Installer\Dependencies\[ProductCode]" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
+					<RegistryValue Type="string" Value="[ProductCode]" KeyPath="yes" />
+					<RegistryValue Type="string" Name="DisplayName" Value="$(var.ProductName)" KeyPath="no" />
+					<RegistryValue Type="string" Name="Version" Value="$(var.Version)" KeyPath="no" />
+				</RegistryKey>
+				<RegistryKey Root="HKLM" Key="SOFTWARE\Classes\Installer\Dependencies\[ProductCode]\Dependents" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" />
+				<RegistryKey Root="HKLM" Key="SOFTWARE\Classes\Installer\Dependencies\[ProductCode]\Dependents\[ProductCode]" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" />
+			</Component>
+
+			<!-- Wix Bundle registries -->
+			<Component Id="WixBundleRegistry1" Guid="{3C8A8B24-B4E5-49A9-8A2C-81583585F49D}">
+				<RegistryKey Root="HKLM" Key="SOFTWARE\$(var.Manufacturer)\Updates\$(var.ProductName)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
+					<RegistryValue Type="string" Name="ProductID" Value="[ProductCode]" KeyPath="no" />
+					<RegistryValue Type="string" Name="ProductVersion" Value="$(var.Version)" KeyPath="no" />
+					<RegistryValue Type="string" Name="PackageName" Value="$(var.ProductName)" KeyPath="no" />
+					<RegistryValue Type="string" Name="BundleID" Value="[BUNDLE_ID]" KeyPath="no" />
+					<RegistryValue Type="string" Name="BundleVersion" Value="[BUNDLE_VERSION]" KeyPath="no" />
+				</RegistryKey>
+			</Component>
+
+			<!-- Wix Bundle registries in WOW6432Node-->
+			<Component Id="WixBundleRegistry2" Guid="{1CEF426E-33C4-4D16-B666-DE3F9084411E}">
+				<RegistryKey Root="HKLM" Key="SOFTWARE\WOW6432Node\$(var.Manufacturer)\Updates\$(var.ProductName)" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
+					<RegistryValue Type="string" Name="ProductID" Value="[ProductCode]" KeyPath="no" />
+					<RegistryValue Type="string" Name="ProductVersion" Value="$(var.Version)" KeyPath="no" />
+					<RegistryValue Type="string" Name="PackageName" Value="$(var.ProductName)" KeyPath="no" />
+					<RegistryValue Type="string" Name="BundleID" Value="[BUNDLE_ID]" KeyPath="no" />
+					<RegistryValue Type="string" Name="BundleVersion" Value="[BUNDLE_VERSION]" KeyPath="no" />
+				</RegistryKey>
+			</Component>
+		</ComponentGroup>
+		<!-- WinUI3 MUI -->
+		<ComponentGroup Id="WinUI3_Folders_01" Directory="WinUI3_MUIs_Folder_01">
+			<Files Include="$(var.FlushMouseUI3Dir)en-us\Microsoft.ui.xaml*.dll.mui" />
+		</ComponentGroup>
+		<ComponentGroup Id="WinUI3_Folders_02" Directory="WinUI3_MUIs_Folder_02">
+			<Files Include="$(var.FlushMouseUI3Dir)ja-JP\Microsoft.ui.xaml*.dll.mui" />
+		</ComponentGroup>
+		<!-- WinUI3 Assets -->
+		<ComponentGroup Id="WinUI3_Folders_03" Directory="WinUI3_Assets_Folder_01_01">
+			<Files Include="$(var.FlushMouseUI3Dir)Microsoft.UI.Xaml\Assets\NoiseAsset_256X256_PNG.png" />
+		</ComponentGroup>
+
+		<!-- Data Files -->
+		<ComponentGroup Id="ProductDataComponents" Directory="DATAINSTALLFOLDER">
+			<Files Include="$(var.FlushMouseUI3Dir)$(var.ProductName)Cursor.dat" />
+		</ComponentGroup>
+
+		<!-- Shortcuts -->
+		<StandardDirectory Id="DesktopFolder">
+			<Component Id="DesktopShortcut" Guid="{2E074233-454E-41B4-918F-8C6A1FBAD304}" Condition="((NOT (BUNDLE = &quot;1&quot;)) and (WIXUI_VERIFYDIALOGOPTIONALCHECKBOX1 = &quot;1&quot;)) or ((BUNDLE = &quot;1&quot;) and (ADDDESKTOPSHORTCUT = &quot;1&quot;))">
+				<RegistryValue Root="HKCU" Key="$(var.AppRegKey)" Name="InstalledDesktopShortcut" Type="integer" Value="1" KeyPath="yes" />
+				<RemoveFolder Id="DesktopFolder" On="uninstall" />
+				<Shortcut Id="DesktopShortcut" Name="Flush Mouse" Target="[INSTALLFOLDER]$(var.MainExeFileName)" Arguments="/Start" WorkingDirectory="INSTALLFOLDER" Advertise="no" />
+			</Component>
+		</StandardDirectory>
+		<DirectoryRef Id="AppStartMenuFolder">
+			<Component Id="AppStartMenuShortcut" Guid="{53762501-B26D-44E7-A14D-C74508107C19}" Condition="((NOT (BUNDLE = &quot;1&quot;)) and (WIXUI_VERIFYDIALOGOPTIONALCHECKBOX2 = &quot;1&quot;)) or ((BUNDLE = &quot;1&quot;) and (REGISTERSTARTMENU = &quot;1&quot;))">
+				<RegistryValue Root="HKCU" Key="$(var.AppRegKey)" Name="InstalledStartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
+				<RemoveFolder Id="AppStartMenuFolder" On="uninstall" />
+				<Shortcut Id="StartMenuShortcut" Name="$(var.ProductName)" Target="[INSTALLFOLDER]$(var.MainExeFileName)" Arguments="/Start" WorkingDirectory="INSTALLFOLDER" Advertise="no" />
+			</Component>
+		</DirectoryRef>
+	</Fragment>
+</Wix>
+
+<!-- EOF -->

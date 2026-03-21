@@ -455,6 +455,7 @@ void SettingsClose()
 		}
 		catch (...) {
 		}
+		if (m_Settings.g_hMainWnd() != 0)	PostMessage((HWND)m_Settings.g_hMainWnd(), WM_DESTROY, 0, 0);
 		m_Settings = nullptr;
 	}
 }
