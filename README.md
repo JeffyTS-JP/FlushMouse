@@ -240,7 +240,7 @@
   2. 変更を選んで、 「C++ によるデスクトップ開発」にチェックを入れます。次に「言語パック」タブで日本語にチェックを入れます。その後、右下の変更ボタンで、インストールを行います
   3. Visual Studioを起動して 右下の「コードなし」で起動します
   4. Tools -> Options -> Environment -> International Settings をクリックして、Languageを日本語にします
-  5. 拡張機能 -> 検索で 「Heat」と入力し「HeatWave for Visual Studio」を選択して、Visual Studio を終了するとインストールが始まります
+  5. 拡張機能 -> 拡張機能の管理 を選び、左上の検索で 「Heat」と入力し「HeatWave for Visual Studio」を選択して、Visual Studio を終了するとインストールが始まります
   6. .NET Framework SDK 10 を[https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-10.0.100-windows-x64-installer](https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-10.0.100-windows-x64-installer)からダウンロードしてインストールします
   7. Visual Studio を再起動して、リポジトリのクローン -> リポジトリの場所に [https://GitHub.com/JeffyTS-JP/FlushMouse.git](https://GitHub.com/JeffyTS-JP/FlushMouse.git)　を入力してクローンします
   8. NuGet CLI(nuget.exe)を[https://dist.nuget.org/win-x86-commandline/latest/nuget.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)からダウンロードして、FlushMouseをクローンしたフォルダの直下の「NuGet」フォルダ(デフォルトでは C:\Users\\[User]\source\repos\FlushMouse\NuGet です)に入れます
