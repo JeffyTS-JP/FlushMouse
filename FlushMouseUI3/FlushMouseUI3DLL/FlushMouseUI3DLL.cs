@@ -11,9 +11,9 @@
 
 using System.Reflection;
 
-[assembly: AssemblyVersion("4.0.0.9")]
-[assembly: AssemblyFileVersion("4.0.0.9")]
-[assembly: AssemblyInformationalVersionAttribute("4.0.0.9")]
+[assembly: AssemblyVersion("4.0.0.13")]
+[assembly: AssemblyFileVersion("4.0.0.13")]
+[assembly: AssemblyInformationalVersionAttribute("4.0.0.13")]
 
 [assembly: AssemblyCompanyAttribute("JeffyTS")]
 [assembly: AssemblyCopyrightAttribute("Copyright (C) 1993 - 2024 JeffyTS")]

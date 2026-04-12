@@ -25,8 +25,8 @@ using static FlushMouseUI3DLL.Miscs;
 namespace FlushMouseUI3DLL {
 	public partial class Settings
 	{
-		internal const String CLASS_FLUSHMOUSE = "FlushMouse-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}";
-		internal const String CLASS_FLUSHMOUSESETTINGS = "FlushMouseSettings-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}";
+		internal const String CLASS_FLUSHMOUSE = "Global\\FlushMouse-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}";
+		internal const String CLASS_FLUSHMOUSESETTINGS = "Global\\FlushMouseSettings-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}";
 
 		public const UInt32 WM_SETTINGSEX = (0x0400 + 0xfe);
 		public const Int64 SETTINGSEX_OK = 0;
