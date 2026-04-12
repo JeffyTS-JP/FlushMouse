@@ -10,8 +10,8 @@
 * **(主な変更点)**
 	* 多重起動してしまうバグを修正しました
 	* WiX を v3.14 から WiX v6.0.2 (拡張機能の HeatWave for Visual Studio を使用する方法) に変更しました
-	* ***上記の変更のため、FlushMouse の Ver. 3.x.x.x からの直接アップグレードできなくなりました。お手数ですが、コントロールパネルの「プログラムと機能」、または設定の「アプリ」「インストールされているアプリ」から、いったんアンインストールしてから、FlushMouse Ver. 4.x.x.x をインストールしてください***
-	* Heatwave でのビルド方法については後日記載します
+	* ***上記の変更のため、FlushMouse の Ver. 3.x.x.x から直接アップグレードできなくなりました。お手数ですが、コントロールパネルの「プログラムと機能」、または設定の「アプリ」「インストールされているアプリ」から、いったんアンインストールしてから、FlushMouse Ver. 4.x.x.x をインストールしてください***
+	* Heatwave でのビルド方法については後日記載します (2026/04/12 追記しました)
 	* その他、細かなバグの修正や機能改善をしました
    
 #### DEMO
@@ -25,7 +25,7 @@
    * ~~OSDN上ではここまでの機能で開発は終了としたいと考えています(バグ対応は除く)~~
    * ~~今後は、プレゼンテーションモードの追加や、マウスカーソルの形状や、表示する内容などをカスタマイズする機能をつけて有償に移行しようと考えています~~
    * と、上記のように考えていたのですが、この FlushMouse は Microsoft Storeに登録できないやり方を使って処理しているので無理なことが判明しました(フックを使用しいるとどうしてもだめなようです。ただ、SDKなどで、だいぶ検証しました)
-   * このため、ダウンロードやインストール時に警告が出ますがご容赦ください (ソースコードを公開していますし、ビルド手順も記載していますので気になる方は試してみてください)
+   * このため、ダウンロードやインストール時に警告が出ますがご容赦ください (ソースコードを公開していますし、[ビルド手順](https://github.com/JeffyTS-JP/FlushMouse?tab=readme-ov-file#%E3%83%93%E3%83%AB%E3%83%89%E6%96%B9%E6%B3%95)も記載していますので気になる方は試してみてください)
    * ***ということで、今後も暇を見つけて、GitHub上で新機能開発や機能向上を目指していきますのでよろしくお願いします***
 
 #### (既知の問題)
@@ -230,41 +230,24 @@
 
 #### ビルド方法
 
-* まず、Visual Studio 2026 の開発環境が必要になりますので、二つの方法を紹介します
+* Visual Studio 2026 の開発環境が必要になります
 
-  (A). ご自分のPCに直接Visual Studioを入れる場合は、このリンク [https://visualstudio.microsoft.com/ja/downloads/](https://visualstudio.microsoft.com/ja/downloads/) から入手できます(Communityで十分だと思います)
+  * Visual Studio のインストーラーは、このリンク [https://visualstudio.microsoft.com/ja/downloads/](https://visualstudio.microsoft.com/ja/downloads/) から入手できます(Communityで十分だと思います)
   
-  (B). 仮想マシンで開発環境を構築したい方は、このリンク [https://developer.microsoft.com/ja-jp/windows/downloads/virtual-machines/](https://developer.microsoft.com/ja-jp/windows/downloads/virtual-machines/) から入手できます
-  
-
-* 以下では、(B)の方法を紹介します(私はVMwareで作業していますので、その手順を紹介しますが、他の仮想マシンでも同じような手順だと思います)。なお、ライセンス等については、よく読んでご判断ください
-
-* (B) の Windows 11 開発環境を取得するから、仮想マシンをダウンロードしてインストールしたのち、日本語化するために最低設定する項目です(他にも設定する項目はありますが割愛します)
-
-  1. Settings -> Time & language -> Language & regionで、日本語を追加します
-  2. Japaneseを上に移動します
-  3. 右側の「…」をクリックして、Option -> Keyboards -> Change layout -> Japanese keyboard(106/109 key)を選択し、Restart nowで再起動します
-  4. Settings -> Time & language -> Date & Time -> Time zone -> UTC+09:00) Osaka, Sapporo, Tokyoを設定します
-  5. Settings -> Time & language -> Language & region -> Windows display language -> 日本語 を選んで、 Sign out、Sign inします
-  6. 設定 -> 時刻と言語 -> 言語と地域 -> 管理用言語の設定で表示されるダイアログで、システムロケールの変更を選んで 日本語(日本)を選択します
-  7. ここで、Windows Updateをしておいたほうが良いと思います
-
-* 次に、Visual Studioの設定を行います
+* Visual Studioの設定を行います
 
   1. まず、Visual Studio **Installer** (2026 本体ではなく**Installer**です。Windowsキーを押して「vis」と入力すると候補に出てきます)を起動します
   2. 変更を選んで、 「C++ によるデスクトップ開発」にチェックを入れます。次に「言語パック」タブで日本語にチェックを入れます。その後、右下の変更ボタンで、インストールを行います
-  3. 次に、WiXを使用するために、Windowsの設定 -> アプリ -> オプション機能 -> Windowsのその他の機能 -> Windowsの機能の有効化または無効化 -> .NET Framework 3.5.1(.NET 2.0及び3.0を含む)にチェックを入れてOKを押して、インストール、再起動します
-  4. [https://GitHub.com/wixtoolset/wix3](https://GitHub.com/wixtoolset/wix3) から、Wix311.exeをダウンロードしてインストールします
-  5. Visual Studioを起動して 右下の「コードなし」で起動します
-  6. Tools -> Options -> Environment -> International Settings をクリックして、Languageを日本語にします
-  7. 拡張機能 -> 検索で　WiXと入力し「WiX v3 - Visual Studio 2022 Extension」を選択して、Visual Studio を終了するとインストールが始まります
-  8. .NET Framework SDK 10 を[https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-10.0.100-windows-x64-installer](https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-10.0.100-windows-x64-installer)からダウンロードしてインストールします
-  9. Visual Studioを再起動して、リポジトリのクローン -> リポジトリの場所に [https://GitHub.com/JeffyTS-JP/FlushMouse.git](https://GitHub.com/JeffyTS-JP/FlushMouse.git)　を入力してクローンします
-  10. NuGet CLI(nuget.exe)を[https://dist.nuget.org/win-x86-commandline/latest/nuget.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)からダウンロードして、FlushMouseをクローンしたフォルダの直下の「NuGet」フォルダ(デフォルトでは C:\Users\\[User]\source\repos\FlushMouse\NuGet です)に入れます
-  11. Windowsの 設定 -> システム -> 開発者向け で 開発者モードを ON にします
-  12. 次に、ツール -> NuGet パッケージマネージャー -> ソリューションの NuGet パッケージの管理 (Altキーを押しながら続けて T N N) を開き、右側にある歯車(⚙)を選択して、ダイアログを開きます
-  13. まず、右上のプラス(＋)を押してから、下にある「ソース」欄には、nuget.exeを入れた「NuGet」フォルダ(デフォルトでは C:\Users\\[User]\source\repos\FlushMouse\NuGet)を選択して「更新」を押します(名前については適当で構いません)
-  14. その後 OK を押してダイアログを閉じ、上の歯車の左にある「パッケージソース」を「すべて」に変更します。次に「復元」を選択します
+  3. Visual Studioを起動して 右下の「コードなし」で起動します
+  4. Tools -> Options -> Environment -> International Settings をクリックして、Languageを日本語にします
+  5. 拡張機能 -> 検索で 「Heat」と入力し「HeatWave for Visual Studio」を選択して、Visual Studio を終了するとインストールが始まります
+  6. .NET Framework SDK 10 を[https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-10.0.100-windows-x64-installer](https://dotnet.microsoft.com/ja-jp/download/dotnet/thank-you/sdk-10.0.100-windows-x64-installer)からダウンロードしてインストールします
+  7. Visual Studio を再起動して、リポジトリのクローン -> リポジトリの場所に [https://GitHub.com/JeffyTS-JP/FlushMouse.git](https://GitHub.com/JeffyTS-JP/FlushMouse.git)　を入力してクローンします
+  8. NuGet CLI(nuget.exe)を[https://dist.nuget.org/win-x86-commandline/latest/nuget.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)からダウンロードして、FlushMouseをクローンしたフォルダの直下の「NuGet」フォルダ(デフォルトでは C:\Users\\[User]\source\repos\FlushMouse\NuGet です)に入れます
+  9. Windowsの 設定 -> システム -> 開発者向け で 開発者モードを ON にします
+  10. 次に、ツール -> NuGet パッケージマネージャー -> ソリューションの NuGet パッケージの管理 (Altキーを押しながら続けて T N N) を開き、右側にある歯車(⚙)を選択して、ダイアログを開きます
+  11. まず、右上のプラス(＋)を押してから、下にある「ソース」欄には、nuget.exeを入れた「NuGet」フォルダ(デフォルトでは C:\Users\\[User]\source\repos\FlushMouse\NuGet)を選択して「更新」を押します(名前については適当で構いません)
+  12. その後 OK を押してダイアログを閉じ、上の歯車の左にある「パッケージソース」を「すべて」に変更します。次に「復元」を選択します
 
 * ビルド方法です
   1. ソリューションプラットフォームを必ず「**MixedPlatform**」にしてビルドします (Ctrl + Shift + B)
