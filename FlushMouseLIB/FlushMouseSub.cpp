@@ -1141,8 +1141,7 @@ HWND	 	hGetObservedWnd()
 BOOL	 	bCreateProcess(LPCTSTR lpszExecName, LPTSTR lpCommandLine)
 {
 	BOOL	bRet = FALSE;
-	DWORD	dwSize = 0;
-	dwSize = ExpandEnvironmentStrings(lpszExecName, NULL, 0);
+	DWORD	dwSize = ExpandEnvironmentStrings(lpszExecName, NULL, 0);
 	LPTSTR	lpszBuffer = new TCHAR[dwSize];
 	if (lpszBuffer) {
 		dwSize = ExpandEnvironmentStrings(lpszExecName, lpszBuffer, dwSize);

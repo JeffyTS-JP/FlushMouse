@@ -16,7 +16,7 @@
 		<Platforms>x64</Platforms>
 		<PlatformTarget>x64</PlatformTarget>
 		<OutputType>Library</OutputType>
-		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+		<WindowsAppSDKSelfContained>false</WindowsAppSDKSelfContained>
 		<WindowsPackageType>None</WindowsPackageType>
 		<TargetCulture>jp-JP</TargetCulture>
 		<AppxPackage>false</AppxPackage>
@@ -63,11 +63,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3856.49" />
+		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3912.50" />
 		<PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.2.0" />
-		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1721" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1839" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools.MSIX" Version="1.7.260501103">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="Microsoft.Windows.UndockedRegFreeWinrt" Version="1.0.230112.2" />
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260209005" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="2.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -86,22 +90,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="%USERPROFILE%\.nuget\packages\microsoft.windows.cswinrt\2.0.4\hosting\x64\native\WinRT.Host.dll" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Remove="%USERPROFILE%\.nuget\packages\microsoft.windows.cswinrt\2.0.4\hosting\x64\native\WinRT.Host.dll" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Remove="%USERPROFILE%\.nuget\packages\microsoft.windows.cswinrt\2.0.4\hosting\x64\native\en-US\WinRT.Host.dll.mui" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Remove="%USERPROFILE%\.nuget\packages\microsoft.windows.cswinrt\2.0.4\lib\net8.0\WinRT.Host.Shim.dll" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <None Include="..\..\OSDN Wiki\FlushMouse.png">
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
@@ -114,7 +102,7 @@
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 	</Target>
-	
+
 	<Target Name="PostBuild" AfterTargets="Pack">
 		<Exec Command="Xcopy /Y &quot;$(BaseOutputPath)$(Platform)\$(Configuration)\$(ProjectName)*.nupkg&quot; &quot;$(SolutionDir)NuGet\FlushMouseUI3DLL\&quot;&#xD;&#xA;rd /S /Q &quot;$(SolutionDir)packages\FlushMouseUI3DLL.1.0.0&quot;&#xD;&#xA;&quot;$(SolutionDir)NuGet\nuget.exe&quot; install FlushMouseUI3DLL -ConfigFile &quot;NuGet.config&quot; -OutputDirectory &quot;$(SolutionDir)packages&quot;&#xD;&#xA;" />
 	</Target>

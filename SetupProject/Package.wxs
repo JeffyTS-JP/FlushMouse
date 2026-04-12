@@ -475,7 +475,6 @@
 			</Files>
 			<Files Include="$(var.FlushMouseSettingsDir)*.manifest" />
 			<Files Include="$(var.FlushMouseSettingsDir)*.appxmanifest" />
-			<Files Include="$(var.FlushMouseSettingsDir)*.png" />
 			<Files Include="$(var.FlushMouseSettingsDir)*.mui" />
 			<Files Include="$(var.FlushMouseSettingsDir)WinRT.Host.runtimeconfig.json" />
 		</ComponentGroup>

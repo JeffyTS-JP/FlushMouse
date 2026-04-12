@@ -134,8 +134,7 @@ namespace FlushMouseUI3DLL {
 					tb7?.IsEnabled = false;
 
 					cb1?.IsEnabled = false;
-					Int64 _hWnd = FindWindowW(CLASS_FLUSHMOUSE, null);
-					if (_hWnd != 0) {
+					if (g_hFlushMouseWnd != 0) {
 						btn1?.IsEnabled = false;	btn2?.IsEnabled = true;
 					}
 					else {
@@ -144,8 +143,7 @@ namespace FlushMouseUI3DLL {
 				}
 				else {
 					rb1?.IsEnabled = true;	rb2?.IsEnabled = true;	rb3?.IsEnabled = true;
-					Int64 _hWnd = FindWindowW(CLASS_FLUSHMOUSE, null);
-					if (_hWnd != 0) {
+					if (g_hFlushMouseWnd != 0) {
 						btn1?.IsEnabled = true;	btn2?.IsEnabled = false;
 					}
 					else {
@@ -158,8 +156,7 @@ namespace FlushMouseUI3DLL {
 		private void SynTP_helper_Loaded(object sender, RoutedEventArgs e) {
 			if (sender == null) { }
 			if (e == null) { }
-			Int64 _hWnd = FindWindowW(CLASS_FLUSHMOUSE, null);
-			if (_hWnd != 0) {
+			if (g_hFlushMouseWnd != 0) {
 				if (UpdateProfile(SETTINGSEX_SYNTP_IS_STARTED) == 0) {
 					bSynTPStarted1 = false;
 				}

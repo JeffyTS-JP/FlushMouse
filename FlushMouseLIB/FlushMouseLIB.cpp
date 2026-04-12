@@ -326,7 +326,8 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 		bFlushMouseCSInitialized = TRUE;
 	}
 
-	CHANGEFILTERSTRUCT	cf{ cf.cbSize =sizeof(CHANGEFILTERSTRUCT) };
+	CHANGEFILTERSTRUCT	cf{};
+	cf.cbSize = sizeof(CHANGEFILTERSTRUCT); cf.ExtStatus = MSGFLTINFO_NONE;
 	if (!ChangeWindowMessageFilterEx(hWnd, WM_SETTINGSEX, MSGFLT_ALLOW, &cf)) {
 		vMessageBox(hWnd, IDS_CANTLOADREG, MessageBoxTYPE, __func__, __LINE__);
 		PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);

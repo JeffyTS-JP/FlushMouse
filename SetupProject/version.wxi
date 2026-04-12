@@ -6,7 +6,7 @@
 //		Copyright (C) 1993- JeffyTS. All rights reserved.
 //		Licensed under the GPL-2.0 License.
 	-->
-	<?define Version = "4.0.0.13" ?>
+	<?define Version = "4.0.1.8" ?>
 
 	<!-- Common -->
 	<?define ProductName = "FlushMouse" ?>

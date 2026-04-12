@@ -425,7 +425,6 @@
 			<Exclude Files="$(var.FlushMouseUI3Dir)$(var.ProductName)UI3.exe.manifest" />
 			</Files>
 			<Files Include="$(var.FlushMouseUI3Dir)*.appxmanifest" />
-			<Files Include="$(var.FlushMouseUI3Dir)*.png" />
 			<Files Include="$(var.FlushMouseUI3Dir)*.mui" />
 			<Files Include="$(var.FlushMouseUI3Dir)WinRT.Host.runtimeconfig.json" />
 

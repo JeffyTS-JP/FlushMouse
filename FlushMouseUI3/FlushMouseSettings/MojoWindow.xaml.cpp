@@ -174,6 +174,7 @@ void SettingsExec(HWND hWnd, UINT32 uMsg, INT32 iSelectedPane)
 			m_Settings.g_Settings(m_Settings);
 			m_Settings.g_hMainWnd((INT64)hWnd);
 			m_Settings.g_uMsg((UINT32)uMsg);
+			m_Settings.g_hFlushMouseWnd((INT64)FindWindow(CLASS_FLUSHMOUSE, nullptr));
 
 			m_Settings.bIsPaneOpen(lpAppRegData->bIsPaneOpen);
 			m_Settings.dwSettingsX(lpAppRegData->dwSettingsX);

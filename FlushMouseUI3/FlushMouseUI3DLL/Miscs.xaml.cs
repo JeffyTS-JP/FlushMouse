@@ -324,7 +324,6 @@ namespace FlushMouseUI3DLL {
 				long _ = await messageBox;
 			}
 			catch (Exception) {
-				Debug.WriteLine("Message :");
 			}
 		}
 

@@ -25,9 +25,6 @@ using static FlushMouseUI3DLL.Miscs;
 namespace FlushMouseUI3DLL {
 	public partial class Settings
 	{
-		internal const String CLASS_FLUSHMOUSE = "Global\\FlushMouse-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}";
-		internal const String CLASS_FLUSHMOUSESETTINGS = "Global\\FlushMouseSettings-{E598B54C-A36A-4CDF-BC77-7082CEEDAA46}";
-
 		public const UInt32 WM_SETTINGSEX = (0x0400 + 0xfe);
 		public const Int64 SETTINGSEX_OK = 0;
 		public const Int64 SETTINGSEX_CANCEL = 1;
@@ -48,6 +45,7 @@ namespace FlushMouseUI3DLL {
 		public static Settings g_Settings { get; set; }
 		public static Int64 g_hSettingsWnd { get; set; }
 
+		public static Int64 g_hFlushMouseWnd { get; set; }
 		public static Int64 g_hMainWnd { get; set; }
 		public static UInt32 g_uMsg { get; set; }
 		private static RectDouble g_ContentFrameRectDouble;
@@ -354,7 +352,6 @@ namespace FlushMouseUI3DLL {
 				}
 				else if (_args.DidPresenterChange) {
 					if (IsIconic(g_hSettingsWnd) == false) {
-						Debug.WriteLine($"NOT Iconic3：({sender.Position.X}, {sender.Position.Y})");
 						UpdateProfile(SETTINGSEX_SETTINGS_SETREGISTRY);
 					}
 					SetWindowSize();
@@ -371,9 +368,8 @@ namespace FlushMouseUI3DLL {
 				g_Settings = null;
 				g_hSettingsWnd = 0;
 			}
-			Int64 _hWnd = FindWindowW(CLASS_FLUSHMOUSESETTINGS, null);
-			if (_hWnd != 0) {
-				SendMessageW(_hWnd, WM_DESTROY, 0, 0);
+			if (g_hSettingsWnd != 0) {
+				SendMessageW(g_hSettingsWnd, WM_DESTROY, 0, 0);
 			}
 		}
 
@@ -384,10 +380,9 @@ namespace FlushMouseUI3DLL {
 				iRet = SendMessageW(g_hMainWnd, g_uMsg, iSettingsEX, 0);
 				if (iRet == 0) return 0;
 			}
-			Int64 _hWnd = FindWindowW(CLASS_FLUSHMOUSE, null);
-			if ((_hWnd != 0) && (_hWnd != g_hMainWnd)) {
-				SendMessageW(_hWnd, g_uMsg, SETTINGSEX_RELOAD_REGISTRY, 0);
-				iRet = SendMessageW(_hWnd, g_uMsg, iSettingsEX, 0);
+			if ((g_hFlushMouseWnd != 0) && (g_hFlushMouseWnd != g_hMainWnd)) {
+				SendMessageW(g_hFlushMouseWnd, g_uMsg, SETTINGSEX_RELOAD_REGISTRY, 0);
+				iRet = SendMessageW(g_hFlushMouseWnd, g_uMsg, iSettingsEX, 0);
 			}
 			return iRet;
 		}

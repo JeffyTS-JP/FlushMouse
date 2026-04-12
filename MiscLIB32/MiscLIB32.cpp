@@ -3,9 +3,5 @@
 #pragma once
 #include "..\MiscLIB\pch.h"
 
-// TODO: これは、ライブラリ関数の例です
-void fnMiscLIB32()
-{
-}
 
 /* EOF */
