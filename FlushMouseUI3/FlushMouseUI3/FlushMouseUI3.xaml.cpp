@@ -71,21 +71,21 @@ static HINSTANCE	m_hInstance{ nullptr };
 //
 void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine)
 {
-	TCHAR	_lpFunc[MAX_LOADSTRING]{};
-	TCHAR	lpText[(MAX_LOADSTRING * 2)]{};
+	TCHAR	szFunc[MAX_LOADSTRING]{};
+	TCHAR	szText[(MAX_LOADSTRING * 2)]{};
 
 	int nLoaded = 0;
 	if (Resource && Resource->hLoad()) {
-		nLoaded = LoadString(Resource->hLoad(), uID, lpText, MAX_LOADSTRING);
+		nLoaded = LoadString(Resource->hLoad(), uID, szText, MAX_LOADSTRING);
 	}
 	if (nLoaded == 0) {
-		_sntprintf_s(lpText, (MAX_LOADSTRING * 2), _TRUNCATE, _T("Error: 0x%08X"), uID);
+		_sntprintf_s(szText, (MAX_LOADSTRING * 2), _TRUNCATE, _T("Error: 0x%08X"), uID);
 	}
 	if (lpFunc && (dwLine != 0)) {
-		MultiByteToWideChar (CP_ACP, 0, lpFunc, -1, _lpFunc, MAX_LOADSTRING);
-		_sntprintf_s(lpText, (MAX_LOADSTRING * 2), _TRUNCATE, _T("%s\r\n\r\n (%s : %d : 0x%08X)"), lpText, _lpFunc, dwLine, GetLastError());
+		MultiByteToWideChar (CP_ACP, 0, lpFunc, -1, szFunc, MAX_LOADSTRING);
+		_sntprintf_s(szText, (MAX_LOADSTRING * 2), _TRUNCATE, _T("%s\r\n\r\n (%s : %d : 0x%08X)"), szText, szFunc, dwLine, GetLastError());
 	}
-	(void)MessageBox(hWnd, lpText, g_szWindowTitle, uType);
+	(void)MessageBox(hWnd, szText, g_szWindowTitle, uType);
 	return;
 }
 

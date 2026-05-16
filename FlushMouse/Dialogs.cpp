@@ -49,8 +49,8 @@
 void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine)
 {
 	TCHAR	szRes[MAX_LOADSTRING]{};
-	TCHAR	szFuncT[MAX_LOADSTRING]{};
-	TCHAR	lpText[(MAX_LOADSTRING * 2)]{};
+	TCHAR	szFunc[MAX_LOADSTRING]{};
+	TCHAR	szText[(MAX_LOADSTRING * 2)]{};
 
 	int	nLoaded = 0;
 	if (Resource && Resource->hLoad()) {
@@ -62,17 +62,17 @@ void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine)
 
 	if (lpFunc && (dwLine != 0)) {
 #ifdef UNICODE
-		MultiByteToWideChar(CP_ACP, 0, lpFunc, -1, szFuncT, MAX_LOADSTRING);
+		MultiByteToWideChar(CP_ACP, 0, lpFunc, -1, szFunc, MAX_LOADSTRING);
 #else
-		_strncpy_s(szFuncT, MAX_LOADSTRING, lpFunc, _TRUNCATE);
+		_strncpy_s(szFunc, MAX_LOADSTRING, lpFunc, _TRUNCATE);
 #endif
-		_sntprintf_s(lpText, (MAX_LOADSTRING * 2), _TRUNCATE, _T("%s\r\n\r\n (%s : %d : 0x%08X)"), szRes, szFuncT, dwLine, GetLastError());
+		_sntprintf_s(szText, (MAX_LOADSTRING * 2), _TRUNCATE, _T("%s\r\n\r\n (%s : %d : 0x%08X)"), szRes, szFunc, dwLine, GetLastError());
 	}
 	else {
-		_tcsncpy_s(lpText, (MAX_LOADSTRING * 2), szRes, _TRUNCATE);
+		_tcsncpy_s(szText, (MAX_LOADSTRING * 2), szRes, _TRUNCATE);
 	}
 
-	(void)MessageBox(hWnd, lpText, g_szWindowTitle, uType);
+	(void)MessageBox(hWnd, szText, g_szWindowTitle, uType);
 }
 
 //

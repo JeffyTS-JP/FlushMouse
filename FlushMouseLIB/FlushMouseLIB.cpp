@@ -173,14 +173,6 @@ BOOL		bWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_o
 //
 int			iCheckCmdLine(LPCTSTR lpCmdLine)
 {
-	int	iExitCode = 0;
-	if ((lpCmdLine != NULL) && (_tcscmp(lpCmdLine, L"/Start") == 0)) {
-		bReportEvent(MSG_START_FLUSHMOUSE_EVENT, Shortcut_CATEGORY);
-		iExitCode = 0;
-	}
-	else if ((lpCmdLine != NULL) && (_tcscmp(lpCmdLine, L"/Quit") == 0))	iExitCode = 0;
-	else iExitCode = 1;
-
 	HWND	hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
 	HWND	hWnd32 = FindWindow(CLASS_FLUSHMOUSE32, NULL);
 	if (hWnd || hWnd32) {
@@ -194,11 +186,17 @@ int			iCheckCmdLine(LPCTSTR lpCmdLine)
 			hWnd = FindWindow(CLASS_FLUSHMOUSE, NULL);
 			hWnd32 = FindWindow(CLASS_FLUSHMOUSE32, NULL);
 			if (!hWnd && !hWnd32) {
-				return (iExitCode);
+				break;
 			}
 		}
 	}
-	return (iExitCode);
+
+	if ((lpCmdLine != NULL) && (_tcscmp(lpCmdLine, L"/Start") == 0)) {
+		bReportEvent(MSG_START_FLUSHMOUSE_EVENT, Shortcut_CATEGORY);
+		return (0);
+	}
+	else if ((lpCmdLine != NULL) && (_tcscmp(lpCmdLine, L"/Quit") == 0))	return (0);
+	else return (1);
 }
 
 //

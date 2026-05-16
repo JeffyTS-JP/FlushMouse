@@ -94,15 +94,15 @@ static BOOL		Cls_OnSettingsEx(HWND hWnd, int iCode, int iSubCode);
 //
 void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine)
 {
-	TCHAR	_lpFunc[MAX_LOADSTRING]{};
-	TCHAR	lpText[(MAX_LOADSTRING * 2)]{};
+	TCHAR	szFunc[MAX_LOADSTRING]{};
+	TCHAR	szText[(MAX_LOADSTRING * 2)]{};
 
-	LoadString(Resource->hLoad(), uID, lpText, MAX_LOADSTRING);
+	LoadString(Resource->hLoad(), uID, szText, MAX_LOADSTRING);
 	if (lpFunc && (dwLine != 0)) {
-		MultiByteToWideChar (CP_ACP, 0, lpFunc, -1, _lpFunc, MAX_LOADSTRING);
-		_sntprintf_s(lpText, (MAX_LOADSTRING * 2), _TRUNCATE, _T("%s\n\n (%s : %d : 0x%08X)"), lpText, _lpFunc, dwLine, GetLastError());
+		MultiByteToWideChar (CP_ACP, 0, lpFunc, -1, szFunc, MAX_LOADSTRING);
+		_sntprintf_s(szText, (MAX_LOADSTRING * 2), _TRUNCATE, _T("%s\n\n (%s : %d : 0x%08X)"), szText, szFunc, dwLine, GetLastError());
 	}
-	MessageBox(hWnd, lpText, szTitle, uType);
+	MessageBox(hWnd, szText, szTitle, uType);
 	return;
 }
 
