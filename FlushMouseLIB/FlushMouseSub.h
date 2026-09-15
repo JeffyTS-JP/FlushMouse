@@ -14,6 +14,7 @@
 //
 #pragma once
 #include "..\MiscLIB\CRawInput.h"
+#include <memory>
 
 //
 // Define
@@ -132,7 +133,7 @@ class CFlushMouseHook
 		BOOL		bHook32Dll;
 
 	private:
-		LPPROCESS_INFORMATION	lpstProcessInformation;
+		std::unique_ptr<PROCESS_INFORMATION[]> lpstProcessInformation;
 };
 
 

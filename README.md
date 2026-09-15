@@ -1,11 +1,11 @@
 ﻿
 # FlushMouse
-|<img width="100" height="100" alt="Image" src="https://github.com/user-attachments/assets/520a32ac-afd6-4af7-b0c3-389f8daf7c79" />|**システムトレイ(タスクトレイ)に常駐して、マウスカーソルやキャレットに IMEモードの表示をするユーティリティです<br>FlushMouse is a software developed by JeffyTS. It is a mouse gesture tool that allows you to perform various operations by drawing gestures with your mouse. (by Bing)**|
+|<img width="100" height="100" alt="Image" src="https://github.com/user-attachments/assets/520a32ac-afd6-4af7-b0c3-389f8daf7c79" />|**システムトレイ(タスクトレイ)に常駐して、マウスカーソルやキャレット(テキストカーソル)に IMEモードの表示をするユーティリティです<br>It is a utility that resides in the system tray (notification area) and displays the IME mode at the mouse cursor or the caret (text cursor).**|
 | :---: | :--- |
 
 #### リリース情報
 
-* **2026/09/13　　Version 4.0.2.6 を リリースしました**
+* **2026/10/11　　Version 4.0.3.5 を リリースしました**
 
 * **(主な変更点)**
 	* 細かなバグの修正や機能改善をしました
@@ -15,14 +15,14 @@
 ![Image](https://github.com/user-attachments/assets/7f710568-6645-4c80-a26e-94ead6543689)
 
 #### 対応OS
-   * Windows 10 / 11 64bit  (Latest Release Versionで検証しています。25H2 に対応しました)
+   * Windows 10 / 11 64bit  (Latest Release Versionで検証しています。25H2、26H2 で動作確認をしています)
    * WinUI3 のために.NET Framework 10 のランタイムが必要になります。インストーラーで自動的にインストールされます
 
 #### (今後について)
    * ~~OSDN上ではここまでの機能で開発は終了としたいと考えています(バグ対応は除く)~~
    * ~~今後は、プレゼンテーションモードの追加や、マウスカーソルの形状や、表示する内容などをカスタマイズする機能をつけて有償に移行しようと考えています~~
    * と、上記のように考えていたのですが、この FlushMouse は Microsoft Storeに登録できないやり方を使って処理しているので無理なことが判明しました(フックを使用しいるとどうしてもだめなようです。ただ、SDKなどで、だいぶ検証しました)
-   * このため、ダウンロードやインストール時に警告が出ますがご容赦ください (ソースコードを公開していますし、[ビルド手順](https://github.com/JeffyTS-JP/FlushMouse?tab=readme-ov-file#%E3%83%93%E3%83%AB%E3%83%89%E6%96%B9%E6%B3%95)も記載していますので気になる方は試してみてください)
+   * このため、ダウンロードやインストール時に警告が出ますがご容赦ください (ソースコードを公開しています。気になる方は、[ビルド方法](https://github.com/JeffyTS-JP/FlushMouse?tab=readme-ov-file#%E3%83%93%E3%83%AB%E3%83%89%E6%96%B9%E6%B3%95) を試してみてください)
    * ***ということで、今後も暇を見つけて、GitHub上で新機能開発や機能向上を目指していきますのでよろしくお願いします***
 
 #### (既知の問題)
@@ -32,7 +32,7 @@
 #### Copyright
    * Copyright (C) 1993 - JeffyTS. All rights reserved. Licensed under the GPL-2.0 License.
    * 詳しくはインストール時に表示される「ソフトウェア使用許諾契約」をお読みください
-   * FlushMouse を最初に作成したのは、1993年でしたが、使い物になるようなものではありませんでした。その後、2022年に偶然見つけて開発を続けています
+   * FlushMouse を最初に作成したのは、1993年でしたが、使い物になるようなものではありませんでした。その後、2022年に当時のソースコードを偶然見つけて開発を続けています
 
 #### プライバシーポリシー
    * デスクトップ版、UI3版共に個人情報の収集などは一切行っていません
@@ -43,6 +43,8 @@
 
 #### インストール / アンインストール
    * Windows Installer (exe)形式になっています。実行してインストールしてください
+	 * インストールには、管理者権限が必要です
+	 * ダウンロードやインストール時にセキュリティの警告が出ますが、証明書を発行していないためです。証明書の発行には手数料がかかってしまうため、ご容赦ください 
    * アンインストールは「設定」の「アプリと機能」、または「コントロールパネル」の「プログラムと機能」からできます
      * または、同じバージョンのインストーラーがあればそれをもう一度実行してもアンインストールできます。この場合は、本プログラムの設定(レジストリ)を削除するかどうかを選べます(デフォルトでは残すようにしてあります)
    * Ver.2 から、WinUI3に対応しました。プログラム構成については、[下記](https://GitHub.com/JeffyTS-JP/FlushMouse?tab=readme-ov-file#%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0%E6%A7%8B%E6%88%90)をご参照ください

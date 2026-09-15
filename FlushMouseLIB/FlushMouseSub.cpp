@@ -219,7 +219,7 @@ BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
 		}
 	}
 	Profile->bSetProfileData();
-	if (lpAppRegData->bSynTPStarted1) {
+	if (lpAppRegData && lpAppRegData->bSynTPStarted1) {
 		TCHAR	lpszToolHints[MAX_LOADSTRING];
 		_tcsncpy_s(lpszToolHints, MAX_LOADSTRING, g_szWindowTitle, _TRUNCATE);
 		TCHAR	lpszBuff[MAX_LOADSTRING];
@@ -227,7 +227,7 @@ BOOL		bStartSynTPHelper(HWND hWnd, DWORD dwSynTPHelper, BOOL bShowMessage)
 		_tcsncat_s(lpszToolHints, MAX_LOADSTRING, lpszBuff, _TRUNCATE);
 		TaskTray->bModifyToolHints(hWnd, lpszToolHints);
 	}
-	return (lpAppRegData->bSynTPStarted1);
+	return (lpAppRegData ? lpAppRegData->bSynTPStarted1 : FALSE);
 }
 
 //
@@ -723,18 +723,14 @@ void CALLBACK CEventHook::vHandleEventIME(HWINEVENTHOOK hook, DWORD dwEvent, HWN
 //
 CFlushMouseHook::CFlushMouseHook()
 	: hHook64Dll(NULL), bShellHook64(FALSE), bGlobalHook64(FALSE), bHook32Dll(FALSE),
-	lpstProcessInformation(new PROCESS_INFORMATION[sizeof(PROCESS_INFORMATION)])
+	lpstProcessInformation(new PROCESS_INFORMATION[sizeof(PROCESS_INFORMATION)]())
 {
-	if (lpstProcessInformation)	ZeroMemory(lpstProcessInformation, sizeof(PROCESS_INFORMATION));
 }
 
 CFlushMouseHook::~CFlushMouseHook()
 {
 	bHookUnset();
-	if (lpstProcessInformation) {
-		delete[]	lpstProcessInformation;
-		lpstProcessInformation = NULL;
-	}
+	lpstProcessInformation = NULL;
 }
 //
 // bHookSet()
@@ -784,7 +780,7 @@ BOOL	 	CFlushMouseHook::bHook32DllStart(HWND hWnd, LPCTSTR lpszExec32Name)
 			if (lpstProcessInformation) {
 				STARTUPINFO	stStartupInfo{};	stStartupInfo.cb = sizeof(STARTUPINFO);
 				if ((bRet = CreateProcess(NULL, lpszCommandLine, NULL, NULL, TRUE,
-					NORMAL_PRIORITY_CLASS, NULL, NULL, &stStartupInfo, lpstProcessInformation)) != FALSE) {
+					NORMAL_PRIORITY_CLASS, NULL, NULL, &stStartupInfo, lpstProcessInformation.get())) != FALSE) {
 					for (int i = 5; i > 0; i--) {
 						Sleep(500);
 						if (FindWindow(CLASS_FLUSHMOUSE32, NULL) != NULL) {
@@ -815,10 +811,11 @@ BOOL 	CFlushMouseHook::bHook32DllStop()
 	if (!bHook32Dll)	return TRUE;
 	BOOL	bRet = FALSE;
 	if (lpstProcessInformation != NULL) {
-		if (lpstProcessInformation->hProcess != NULL) {
-			if (!EnumWindows((WNDENUMPROC)&CFlushMouseHook::bEnumWindowsProcHookStop, (LPARAM)lpstProcessInformation)) {
+		HANDLE _hProcess = lpstProcessInformation.get()->hProcess;
+		if (_hProcess != NULL) {
+			if (!EnumWindows((WNDENUMPROC)&CFlushMouseHook::bEnumWindowsProcHookStop, (LPARAM)lpstProcessInformation.get())) {
 				if (GetLastError() == ERROR_SUCCESS) {
-					DWORD dwRet = WaitForSingleObject(lpstProcessInformation->hProcess, TIMEOUT);
+					DWORD dwRet = WaitForSingleObject(_hProcess, TIMEOUT);
 					switch (dwRet) {
 					case WAIT_OBJECT_0:
 						bRet = TRUE;
@@ -827,19 +824,19 @@ BOOL 	CFlushMouseHook::bHook32DllStop()
 					case WAIT_ABANDONED:
 					case WAIT_TIMEOUT:
 					default:
-						TerminateProcess(lpstProcessInformation->hProcess, 0);
+						TerminateProcess(_hProcess, 0);
 						bRet = TRUE;
 					}
 					DWORD dwExitCode;
-					if (!GetExitCodeProcess(lpstProcessInformation->hProcess, &dwExitCode)) {
+					if (!GetExitCodeProcess(_hProcess, &dwExitCode)) {
 						bRet = FALSE;
 					}
-					if (lpstProcessInformation->hProcess != NULL) {
-						CloseHandle(lpstProcessInformation->hProcess);
+					if (_hProcess != NULL) {
+						CloseHandle(_hProcess);
 					}
 				}
-				if (lpstProcessInformation->hThread != NULL) {
-					CloseHandle(lpstProcessInformation->hThread);
+				if (lpstProcessInformation.get()->hThread != NULL) {
+					CloseHandle(lpstProcessInformation.get()->hThread);
 				}
 			}
 		}

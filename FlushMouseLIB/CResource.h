@@ -14,6 +14,7 @@
 //
 #pragma once
 #include "pch.h"
+#include <memory>
 
 //
 // Define
@@ -45,7 +46,7 @@ class CResource
 		BOOL	bUnload();
 
 	private:
-		LPTSTR	szResFile;
+		std::unique_ptr<TCHAR[]> _lpszResFile;
 		HMODULE	hModRes;
 		int		iResourceLoadCount;
 };

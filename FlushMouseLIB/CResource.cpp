@@ -38,11 +38,10 @@ static std::once_flag	csInitFlag;
 // Class CResource
 //
 CResource::CResource(LPCTSTR lpszResFile)
-	: szResFile(new TCHAR[_MAX_PATH]), hModRes(NULL), iResourceLoadCount(0)
+	: _lpszResFile(new TCHAR[_MAX_PATH]()), hModRes(NULL), iResourceLoadCount(0)
 {
-	if (szResFile) {
-		ZeroMemory(szResFile, sizeof(TCHAR) * _MAX_PATH);
-		_tcsncpy_s(szResFile, _MAX_PATH, lpszResFile, _TRUNCATE);
+	if (_lpszResFile) {
+		_tcsncpy_s(_lpszResFile.get(), _MAX_PATH, lpszResFile, _TRUNCATE);
 	}
 	std::call_once(csInitFlag, []() {
 		InitializeCriticalSection(&csResource);
@@ -52,8 +51,7 @@ CResource::CResource(LPCTSTR lpszResFile)
 CResource::~CResource()
 {
 	(void)bUnload();
-	if (szResFile) delete[] szResFile;
-	szResFile = NULL;
+	_lpszResFile = NULL;
 	iResourceLoadCount = 0;
 }
 
@@ -62,7 +60,7 @@ CResource::~CResource()
 //
 HMODULE		CResource::hLoad()
 {
-	if (!szResFile) return NULL;
+	if (!_lpszResFile) return NULL;
 
 	std::call_once(csInitFlag, []() {
 		InitializeCriticalSection(&csResource);
@@ -72,7 +70,7 @@ HMODULE		CResource::hLoad()
 
 	HMODULE hRes = NULL;
 	if (hModRes == NULL) {
-		hRes = LoadLibraryEx(szResFile, NULL, (LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE));
+		hRes = LoadLibraryEx(_lpszResFile.get(), NULL, (LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE));
 		if (hRes == NULL) {
 			LeaveCriticalSection(&csResource);
 			return NULL;

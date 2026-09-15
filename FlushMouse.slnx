@@ -1,4 +1,4 @@
-﻿<Solution>
+<Solution>
   <Configurations>
     <Platform Name="arm64" />
     <Platform Name="Mixed Platform for FlushMouse" />
@@ -6,7 +6,9 @@
     <Platform Name="x86" />
   </Configurations>
   <Folder Name="/ソリューション項目/">
+    <File Path="LICENSE" />
     <File Path="README.md" />
+    <File Path="SECURITY.md" />
     <File Path="SetupProject/version.wxi" />
     <File Path="version.h" />
   </Folder>
