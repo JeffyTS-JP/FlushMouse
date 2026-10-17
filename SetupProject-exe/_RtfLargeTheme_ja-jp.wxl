@@ -70,6 +70,7 @@
 	<String Id="ApplyUninstall" Value="アンインストールを適用中..." />
 	<String Id="ApplyUpgrade" Value="アップグレードを適用中..." />
 	<String Id="ApplyComplete" Value="適用を完了しています..." />
+	<String Id="PauseAutomaticUpdatesMessage" Value="処理の準備中..." />
 
 	<String Id="ModifyHeader" Value="[WixBundleName] をアンインストールします" />
 	<String Id="ModifyRepairButton" Value="修復(&amp;R)" />

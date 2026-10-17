@@ -77,7 +77,7 @@ void vMessageBox(HWND hWnd, UINT uID, UINT uType, LPCSTR lpFunc, DWORD dwLine)
 
 //
 // vSettingDialog()
-//
+// 
 VOID vSettingDialog(HWND hWnd, INT32 iSelectedPane)
 {
 	UNREFERENCED_PARAMETER(hWnd);

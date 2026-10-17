@@ -247,11 +247,11 @@ static ATOM MyRegisterClass(HINSTANCE hInstance)
 static BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	UNREFERENCED_PARAMETER(nCmdShow);
-#define		WINDOWSTYLE		WS_OVERLAPPEDWINDOW  | WS_HSCROLL | WS_VSCROLL
+#define		WINDOWSTYLE		WS_DISABLED
 	hInst = hInstance;
 	HWND	hWnd = NULL;
 	hWnd = CreateWindowEx(
-					WS_DISABLED,
+					WS_EX_TOOLWINDOW,
 					CLASS_FLUSHMOUSE32,
 					szTitle,
 					WINDOWSTYLE,
@@ -383,6 +383,8 @@ static VOID CALLBACK vCheckProcTimerProc(HWND hWnd, UINT uMsg, UINT uTimerID, DW
 			if (hParentWnd)	bDestroyTaskTrayWindow(hParentWnd);
 			SystemParametersInfo(SPI_SETCURSORS, 0, NULL, 0);
 			bReportEvent(MSG_DETECT_FLUSHMOUSE_STOP, APPLICATION32_CATEGORY);
+			HWND	_hWndSettings = FindWindow(CLASS_FLUSHMOUSESETTINGS, NULL);
+			if (_hWndSettings)	PostMessage(_hWndSettings, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			if (_hWnd64)	PostMessage(_hWnd64, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 			bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION32_CATEGORY);

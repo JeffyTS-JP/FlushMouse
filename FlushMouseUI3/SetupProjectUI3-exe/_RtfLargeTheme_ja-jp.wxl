@@ -15,11 +15,11 @@
 	<String Id="HelpText" Value="/passive | /quiet&#xA;&#x9;最少の UI だけを表示してプロンプトは表示しないか、UIもプロンプトも表示しません。既定では、UI とすべてのプロンプトが表示されます。&#xA;&#xA;/norestart&#xA;&#x9;再起動の試みをすべて抑制します。既定では、再起動の前に UI によりプロンプトが表示されます。&#xA;&#xA;/log log.txt&#xA;&#x9;特定のファイルにログを記録します。既定では、%TEMP% にログ ファイルが作成されます。" />
 	<String Id="HelpCloseButton" Value="閉じる(&amp;C)" />
 
-	<String Id ="InstallText" Value="インストール" />
-	<String Id ="ModifyText" Value="アップグレード" />
-	<String Id ="UninstallText" Value="アンインストール" />
+	<String Id="InstallText" Value="インストール" />
+	<String Id="ModifyText" Value="アップグレード" />
+	<String Id="UninstallText" Value="アンインストール" />
 
-	<String Id ="InstallVersion" Value="Version [WixBundleVersion]" />
+	<String Id="InstallVersion" Value="Version [WixBundleVersion]" />
 	<String Id="InstallLicenseTerms" Value="Microsoft .NET Framework の&lt;a href=&quot;#&quot;&gt;ライセンス条項&lt;/a&gt;に同意する場合は、［同意してインストール］ボタンをクリックします。" />
 	<String Id="InstallLicenseLinkText" Value="ソフトウェア使用許諾契約書に同意します &lt;a href=&quot;#&quot;&gt;license terms&lt;/a&gt;" />
 	<String Id="InstallAcceptAndInstallButton" Value="同意してインストール(&amp;A)" />
@@ -69,6 +69,7 @@
 	<String Id="ApplyUninstall" Value="アンインストールを適用中..." />
 	<String Id="ApplyUpgrade" Value="アップグレードを適用中..." />
 	<String Id="ApplyComplete" Value="適用を完了しています..." />
+	<String Id="PauseAutomaticUpdatesMessage" Value="処理の準備中..." />
 
 	<String Id="ModifyHeader" Value="[WixBundleName] をアンインストールします" />
 	<String Id="RemoveAppRegstry" Value="[WixBundleName] の設定情報を削除する" />

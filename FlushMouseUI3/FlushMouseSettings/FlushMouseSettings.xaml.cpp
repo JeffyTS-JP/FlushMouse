@@ -422,6 +422,14 @@ static BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct)
 	if (!ChangeWindowMessageFilterEx(hWnd, WM_SETTINGSEX, MSGFLT_ALLOW, &cf)) {
 	}
 
+	if (!IsDebuggerPresent()) {
+		if (!FindWindow(CLASS_FLUSHMOUSE, NULL)) {
+			vMessageBox(hWnd, IDS_NOTRUNNINGFLUSHMOUSE, MessageBoxTYPE, __func__, __LINE__);
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
+			return FALSE;
+		}
+	}
+
 	Profile = new CProfile;
 	if (Profile != NULL) {
 		if (!Profile->bFixChangedProfileData()) {
