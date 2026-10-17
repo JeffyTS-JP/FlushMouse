@@ -57,6 +57,7 @@ public:
 	DWORD		dwGetInputLocale();
 	HKL			hklGetInputLocale(HWND hWndObserved);
 	VOID		vInvalidateIMEModeCache();
+	BOOL		bIsIMEOpen(HWND hWndObserved);
 
 private:
 	static BOOL CALLBACK bEnumChildProcIMEOpenClose(HWND hWnd, LPARAM lParam);

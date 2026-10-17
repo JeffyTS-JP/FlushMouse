@@ -208,7 +208,8 @@ BEGIN
     IDS_NOTPRIVATEADDR      "SynTP Helperを起動できませんでした\n\nIP Address はプライベートアドレスである必要があります"
     IDS_NOTHOSTNAME         "SynTP Helperを起動できませんでした\n\nHostname が見つからないか、プライベートアドレスではありません"
     IDS_SETTINGDLG_FAIL     "設定画面を開けませんでした"
-    IDS_SYNTPRUNNING        " - SynTP Helper is running."
+	IDS_NOTRUNNINGFLUSHMOUSE "FlushMouseが起動していません"
+	IDS_SYNTPRUNNING        " - SynTP Helper is running."
 END
 
 

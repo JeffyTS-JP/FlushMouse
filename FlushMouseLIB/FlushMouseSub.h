@@ -40,6 +40,7 @@ extern BOOL		bKeyboardTypeIsEP();
 extern BOOL		bForExplorerPatcherSWS(HWND hForeWnd, BOOL bChangeToIME, BOOL bIMEModeForcedChange, LPHKL lpNewHKL, LPHKL lpPreviousHKL);
 extern BOOL		bCheckExistingJPIME();
 extern BOOL		bChromium_Helper(HWND hForeWnd);
+extern BOOL		bIsChromium(HWND hForeWnd);
 
 extern HWND	 	hGetObservedWnd();
 extern BOOL	 	bCreateProcess(LPCTSTR lpszExecName, LPTSTR lpCommandLine);

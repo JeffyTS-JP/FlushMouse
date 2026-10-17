@@ -243,6 +243,12 @@ BOOL			CCursor::bReloadCursor()
 
 	if (!CursorSub->hLoadCursorData())	goto Cleanup;
 
+	if (stIMECursorData.CursorWindow) {
+		if (!stIMECursorData.CursorWindow->bSetWindowPos(HWND_NOTOPMOST, 0, 0, 0, 0, (SWP_SHOWWINDOW | SWP_NOACTIVATE))) {
+		}
+		delete	stIMECursorData.CursorWindow;
+		stIMECursorData.CursorWindow = NULL;
+	}
 	if (!stIMECursorData.CursorWindow) {
 		stIMECursorData.CursorWindow = new CCursorWindow;
 		if (stIMECursorData.CursorWindow == NULL)	goto Cleanup;
@@ -250,6 +256,12 @@ BOOL			CCursor::bReloadCursor()
 	}
 	stIMECursorData.CursorWindow->vSetModeStringColorFont(stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEHIDE].szMode, stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEHIDE].dwColor, stIMECursorData.lpstNearDrawMouseCursor[IMEMODE_IMEHIDE].szFont);
 
+	if (stIMECursorData.CaretWindow) {
+		if (!stIMECursorData.CaretWindow->bSetWindowPos(HWND_NOTOPMOST, 0, 0, 0, 0, (SWP_SHOWWINDOW | SWP_NOACTIVATE))) {
+		}
+		delete	stIMECursorData.CaretWindow;
+		stIMECursorData.CaretWindow = NULL;
+	}
 	if (!stIMECursorData.CaretWindow) {
 		stIMECursorData.CaretWindow = new CCursorWindow;
 		if (stIMECursorData.CaretWindow == NULL)	goto Cleanup;
@@ -258,6 +270,8 @@ BOOL			CCursor::bReloadCursor()
 	stIMECursorData.CaretWindow->vSetModeStringColorFont(stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEHIDE].szMode, stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEHIDE].dwColor, stIMECursorData.lpstNearDrawCaretCursor[IMEMODE_IMEHIDE].szFont);
 
 	if (stIMECursorData.MouseWindow) {
+		if (!stIMECursorData.MouseWindow->bSetWindowPos(HWND_NOTOPMOST, 0, 0, 0, 0, (SWP_SHOWWINDOW | SWP_NOACTIVATE))) {
+		}
 		delete	stIMECursorData.MouseWindow;
 		stIMECursorData.MouseWindow = NULL;
 	}

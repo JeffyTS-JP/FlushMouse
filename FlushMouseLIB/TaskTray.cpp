@@ -109,28 +109,8 @@ BOOL		CTaskTray::bReCreateTaskTrayWindow(HWND hWnd) const
 {
 	if (!Resource || !Cursor)	return FALSE;
 	(void)bDestroyTaskTrayWindow(hWnd);
-	HICON	hIcon = NULL;
-	if ((hIcon = LoadIcon(Resource->hLoad(), MAKEINTRESOURCE(IDI_FLUSHMOUSE))) != NULL) {
-		BOOL	bRet = FALSE;
-		for (int i = 0; i < 3; i++) {
-			if ((bRet = bCreateTaskTrayWindow(hWnd, hIcon, g_szWindowTitle)))	break;
-			Sleep(1000);
-		}
-		if (bRet) {
-			if (!Cursor->bReloadCursor()) {
-				bReportEvent(MSG_TASKTRAY_REGISTER_FAILD, APPLICATION_CATEGORY);
-				return FALSE;
-			}
-		}
-		else {
-			bDestroyTaskTrayWindow(hWnd);
-			bReportEvent(MSG_TASKTRAY_REGISTER_FAILD, APPLICATION_CATEGORY);
-			return FALSE;
-		}
-	}
-	else {
-		return FALSE;
-	}
+	bReportEvent(MSG_RESTART_FLUSHMOUSE_EVENT, APPLICATION_CATEGORY);
+	PostMessage(hWnd, WM_DESTROY, (WPARAM)NULL, (LPARAM)NULL);
 	return TRUE;
 }
 
@@ -199,28 +179,28 @@ void		CTaskTray::Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify)
 	if (!Profile || !Cursor)	return;
 	Cursor->vStopIMECursorChangeThread();
 	switch (id) {
-	case IDR_TT_MENU:
-		break;
-	case IDR_TT_SETTING:
-		Profile->bGetProfileData();
-		vSettingDialog(hWnd,SETTINGSEX_SELECTEDPANE_GENERAL);
-		return;
-	case IDR_TT_IMEMODE:
-		Profile->bGetProfileData();
-		vSettingDialog(hWnd,SETTINGSEX_SELECTEDPANE_IMEMODE);
-		return;
-	case IDR_TT_SYNTPHELPER:
-		Profile->bGetProfileData();
-		vSettingDialog(hWnd,SETTINGSEX_SELECTEDPANE_SYNTPHELPER);
-		return;
-	case IDM_ABOUT:
-	case IDR_TT_ABOUT:
-		vSettingDialog(hWnd,SETTINGSEX_SELECTEDPANE_ABOUT);
-		return;
-	case IDM_EXIT:
-	case IDR_TT_QUIT:
-		PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
-		return;
+		case IDR_TT_MENU:
+			break;
+		case IDR_TT_SETTING:
+			Profile->bGetProfileData();
+			vSettingDialog(hWnd,SETTINGSEX_SELECTEDPANE_GENERAL);
+			return;
+		case IDR_TT_IMEMODE:
+			Profile->bGetProfileData();
+			vSettingDialog(hWnd,SETTINGSEX_SELECTEDPANE_IMEMODE);
+			return;
+		case IDR_TT_SYNTPHELPER:
+			Profile->bGetProfileData();
+			vSettingDialog(hWnd,SETTINGSEX_SELECTEDPANE_SYNTPHELPER);
+			return;
+		case IDM_ABOUT:
+		case IDR_TT_ABOUT:
+			vSettingDialog(hWnd,SETTINGSEX_SELECTEDPANE_ABOUT);
+			return;
+		case IDM_EXIT:
+		case IDR_TT_QUIT:
+			PostMessage(hWnd, WM_DESTROY, (WPARAM)0, (LPARAM)0);
+			return;
 	}
 	if (!Cursor->bReloadCursor()) {
 		vSettingDialogClose();
@@ -240,43 +220,43 @@ void		CTaskTray::Cls_OnTaskTrayEx(HWND hWnd, UINT id, UINT uMsg)
 	}
 	if (!Profile || !Cime || !Resource)	return;
 	switch (uMsg) {
-	case WM_LBUTTONDOWN:
-		if (Profile->lpstAppRegData->bOffChangedFocus) {
-			Cime->vIMEOpenCloseForced(hWnd, IMECLOSE);
-		}
-		[[fallthrough]];
-	case WM_RBUTTONDOWN:
-		POINT pt{};
-		GetCursorPos(&pt);
-		HMENU hMenu = LoadMenu(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TT_MENU));
-		HMENU hSubMenu = GetSubMenu(hMenu, 0);
-		SetForegroundWindow(hWnd);
-		APPBARDATA stAppBarData{};
-		stAppBarData.cbSize = sizeof(APPBARDATA);
-		stAppBarData.hWnd = hWnd;
-		SHAppBarMessage(ABM_GETTASKBARPOS, &stAppBarData);
-		UINT	uFlags = 0;
-		switch (stAppBarData.uEdge) {
-		case ABE_TOP:
-			uFlags = TPM_RIGHTALIGN | TPM_TOPALIGN;
-			if (pt.y < stAppBarData.rc.bottom)	pt.y = stAppBarData.rc.bottom;
+		case WM_LBUTTONDOWN:
+			if (Profile->lpstAppRegData->bOffChangedFocus) {
+				Cime->vIMEOpenCloseForced(hWnd, IMECLOSE);
+			}
+			[[fallthrough]];
+		case WM_RBUTTONDOWN:
+			POINT pt{};
+			GetCursorPos(&pt);
+			HMENU hMenu = LoadMenu(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TT_MENU));
+			HMENU hSubMenu = GetSubMenu(hMenu, 0);
+			SetForegroundWindow(hWnd);
+			APPBARDATA stAppBarData{};
+			stAppBarData.cbSize = sizeof(APPBARDATA);
+			stAppBarData.hWnd = hWnd;
+			SHAppBarMessage(ABM_GETTASKBARPOS, &stAppBarData);
+			UINT	uFlags = 0;
+			switch (stAppBarData.uEdge) {
+				case ABE_TOP:
+					uFlags = TPM_RIGHTALIGN | TPM_TOPALIGN;
+					if (pt.y < stAppBarData.rc.bottom)	pt.y = stAppBarData.rc.bottom;
+					break;
+				case ABE_BOTTOM:
+					uFlags = TPM_RIGHTALIGN | TPM_BOTTOMALIGN;
+					if (pt.y > stAppBarData.rc.top)	pt.y = stAppBarData.rc.top;
+					break;
+				case ABE_LEFT:
+					uFlags = TPM_LEFTALIGN | TPM_BOTTOMALIGN;
+					if (pt.x < stAppBarData.rc.right)	pt.x = stAppBarData.rc.right;
+					break;
+				case ABE_RIGHT:
+					uFlags = TPM_RIGHTALIGN | TPM_BOTTOMALIGN;
+					if (pt.x > stAppBarData.rc.left)		pt.x = stAppBarData.rc.left;
+					break;
+			}
+			TrackPopupMenu(hSubMenu, uFlags, pt.x, pt.y, 0, hWnd, NULL);
+			PostMessage(hWnd, WM_NULL, 0, 0);
 			break;
-		case ABE_BOTTOM:
-			uFlags = TPM_RIGHTALIGN | TPM_BOTTOMALIGN;
-			if (pt.y > stAppBarData.rc.top)	pt.y = stAppBarData.rc.top;
-			break;
-		case ABE_LEFT:
-			uFlags = TPM_LEFTALIGN | TPM_BOTTOMALIGN;
-			if (pt.x < stAppBarData.rc.right)	pt.x = stAppBarData.rc.right;
-			break;
-		case ABE_RIGHT:
-			uFlags = TPM_RIGHTALIGN | TPM_BOTTOMALIGN;
-			if (pt.x > stAppBarData.rc.left)		pt.x = stAppBarData.rc.left;
-			break;
-		}
-		TrackPopupMenu(hSubMenu, uFlags, pt.x, pt.y, 0, hWnd, NULL);
-		PostMessage(hWnd, WM_NULL, 0, 0);
-		break;
 	}
 	return;
 }
